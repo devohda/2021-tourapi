@@ -46,7 +46,10 @@ export default class Auth extends React.Component {
 
 const styles = StyleSheet.create({
     mainpage : {
-
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     container: {
         margin: 10,
