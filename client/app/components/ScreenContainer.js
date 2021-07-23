@@ -7,7 +7,8 @@ const ScreenContainer = props => {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "#fff"
+            backgroundColor: "#fff",
+            width: "100%"
         }}>
             {props.children}
         </SafeAreaView>
