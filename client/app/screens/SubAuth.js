@@ -1,10 +1,7 @@
 import React from 'react';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import EmailAuth from './forSubAuth/EmailAuth';
-import PasswordAuth from './forSubAuth/PasswordAuth';
-import NickNameAuth from './forSubAuth/NicknameAuth';
+import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
 
 const Stack = createStackNavigator()
 const NavigationTheme = {
@@ -14,7 +11,6 @@ const NavigationTheme = {
     background: 'transparent'
   },
 };
-
 
 export default class SubAuth extends React.Component {
     constructor(props) {
@@ -49,6 +45,7 @@ export default class SubAuth extends React.Component {
     }
 
     render() {
+
         const progressComponent = this.state.forProgress.map(item => {
             if(this.state.current == 0) {
                 return (
@@ -62,11 +59,7 @@ export default class SubAuth extends React.Component {
             }
         })
         // const questionComponent = this.state.forAuth[this.state.current]
-        const continueComponent = this.state.questions.map(item => {
-            return (
-                <TouchableOpacity onClick={() => this.state.current+=1} style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 303}}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>계속하기</Text></TouchableOpacity>
-            )
-        })
+
 
         return (
             <>
@@ -89,7 +82,8 @@ export default class SubAuth extends React.Component {
                     {/* placeholder 물어보기 */}
                     <TextInput style={{fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} />                    
                 </View>
-                {continueComponent}
+                <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 303}}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>계속하기</Text></TouchableOpacity>
+
            </>
           );
         }

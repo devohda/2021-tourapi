@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function Auth({navigation}) {
+export default function MainAuth({navigation}) {
 
         return (
             <>
