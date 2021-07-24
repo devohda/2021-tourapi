@@ -4,7 +4,7 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import MainAuth from './screens/MainAuth';
-// import SubAuth from './screens/SubAuth';
+import SubAuth from './screens/SubAuth';
 import MainPage from './screens/MainPage';
 import EmailAuth from './screens/forSubAuth/EmailAuth';
 import PasswordAuth from './screens/forSubAuth/PasswordAuth';
