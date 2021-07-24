@@ -3,6 +3,7 @@ import {Text, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import SearchScreen from "../screens/SearchScreen";
+import MypageScreen from "../screens/MypageScreen";
 
 function HomeScreen() {
     return (
@@ -27,7 +28,7 @@ export default function MainNavigator() {
         <Tab.Navigator>
             <Tab.Screen name="home" component={HomeScreen} options={{title: '홈'}}/>
             <Tab.Screen name="directory" component={SearchScreen} options={{title: ''}}/>
-            <Tab.Screen name="mypage" component={SettingsScreen} options={{title: '마이페이지'}}/>
+            <Tab.Screen name="mypage" component={MypageScreen} options={{title: '마이페이지'}}/>
         </Tab.Navigator>
     );
 }
