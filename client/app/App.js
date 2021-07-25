@@ -3,6 +3,7 @@ import {NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from '@react-navigation/stack';
 import LoginNavigator from "./navigation/LoginNavigator";
 import MainNavigator from "./navigation/MainNavigator";
+import AppLoading from 'expo-app-loading';
 
 const MainStack = createStackNavigator()
 

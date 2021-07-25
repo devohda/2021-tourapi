@@ -9,141 +9,139 @@ const screenWidth = Dimensions.get('window').width;
 const SearchScreen = () => {
     return (
         <ScreenContainer>
-            <View style={{width: "80%", height: "100%"}}>
-                <View style={styles.search_container} className="search-container">
-                    <FIcon name="search" size={30} color="#000"/>
-                    <TextInput style={{flex: 1, fontSize: 20, marginLeft: "3%"}}/>
+            <View style={styles.search_container} className="search-container">
+                <FIcon name="search" size={30} color="#000"/>
+                <TextInput style={{flex: 1, fontSize: 20, marginLeft: "3%"}}/>
+            </View>
+            <View className="search-keywords" style={styles.keyword_box}>
+                <View className="keyword" style={styles.keyword}>
+                    <Text style={{fontWeight: "bold"}}>장소</Text>
+                    <IIcon name="close" size={15} color="#000" style={{paddingLeft: 3}}/>
                 </View>
-                <View className="search-keywords" style={styles.keyword_box}>
-                    <View className="keyword" style={styles.keyword}>
-                        <Text style={{fontWeight: "bold"}}>장소</Text>
-                        <IIcon name="close" size={15} color="#000" style={{paddingLeft: 3}}/>
-                    </View>
-                    <View className="keyword" style={styles.keyword}>
-                        <Text style={{fontWeight: "bold"}}>장소</Text>
-                        <IIcon name="close" size={15} color="#000" style={{paddingLeft: 3}}/>
-                    </View>
-                    <View className="keyword" style={styles.keyword}>
-                        <Text style={{fontWeight: "bold"}}>장소</Text>
-                        <IIcon name="close" size={15} color="#000" style={{paddingLeft: 3}}/>
+                <View className="keyword" style={styles.keyword}>
+                    <Text style={{fontWeight: "bold"}}>장소</Text>
+                    <IIcon name="close" size={15} color="#000" style={{paddingLeft: 3}}/>
+                </View>
+                <View className="keyword" style={styles.keyword}>
+                    <Text style={{fontWeight: "bold"}}>장소</Text>
+                    <IIcon name="close" size={15} color="#000" style={{paddingLeft: 3}}/>
+                </View>
+            </View>
+            <View className="search-results" style={styles.result_box}>
+                <View className="places" style={{marginBottom: 40}}>
+                    <View className="place-container">
+                        <Text style={{fontSize: 28, fontWeight: "900", marginBottom: 20}}>장소</Text>
+                        <ScrollView horizontal={true}
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={{flexGrow: 1}}
+                        >
+                            <View className="place" style={styles.place}>
+                                <View className="place-img">
+                                    <Image style={{width: 130, height: 100, borderRadius: 10}}
+                                           source={require('../assets/images/mountain.jpeg')}
+                                           resizeMode="cover"
+                                    />
+                                </View>
+                                <Text className="place-name"
+                                      style={{
+                                          fontSize: 20,
+                                          fontWeight: "900",
+                                          marginTop: 10,
+                                          marginBottom: 5
+                                      }}>청계산</Text>
+                                <Text className="place-description">뭐가들어가야할가...</Text>
+                            </View>
+                            <View className="place" style={styles.place}>
+                                <View className="place-img">
+                                    <Image style={{width: 130, height: 100, borderRadius: 10}}
+                                           source={require('../assets/images/mountain.jpeg')}
+                                           resizeMode="cover"
+                                    />
+                                </View>
+                                <Text className="place-name"
+                                      style={{
+                                          fontSize: 20,
+                                          fontWeight: "900",
+                                          marginTop: 10,
+                                          marginBottom: 5
+                                      }}>청계산</Text>
+                                <Text className="place-description">뭐가들어가야할가...</Text>
+                            </View>
+                            <View className="place" style={styles.place}>
+                                <View className="place-img">
+                                    <Image style={{width: 130, height: 100, borderRadius: 10}}
+                                           source={require('../assets/images/mountain.jpeg')}
+                                           resizeMode="cover"
+                                    />
+                                </View>
+                                <Text className="place-name"
+                                      style={{
+                                          fontSize: 20,
+                                          fontWeight: "900",
+                                          marginTop: 10,
+                                          marginBottom: 5
+                                      }}>청계산</Text>
+                                <Text className="place-description">뭐가들어가야할가...</Text>
+                            </View>
+                        </ScrollView>
                     </View>
                 </View>
-                <View className="search-results" style={styles.result_box}>
-                    <View className="places" style={{marginBottom: 40}}>
-                        <View className="place-container">
-                            <Text style={{fontSize: 28, fontWeight: "900", marginBottom: 20}}>장소</Text>
-                            <ScrollView horizontal={true}
-                                        showsHorizontalScrollIndicator={false}
-                                        contentContainerStyle={{flexGrow: 1}}
-                            >
-                                <View className="place" style={styles.place}>
-                                    <View className="place-img">
-                                        <Image style={{width: 130, height: 100, borderRadius: 10}}
-                                               source={require('../assets/images/mountain.jpeg')}
-                                               resizeMode="cover"
-                                        />
-                                    </View>
-                                    <Text className="place-name"
-                                          style={{
-                                              fontSize: 20,
-                                              fontWeight: "900",
-                                              marginTop: 10,
-                                              marginBottom: 5
-                                          }}>청계산</Text>
-                                    <Text className="place-description">뭐가들어가야할가...</Text>
+                <View className="places">
+                    <View className="place-container">
+                        <Text style={{fontSize: 28, fontWeight: "900", marginBottom: 20}}>디렉토리</Text>
+                        <ScrollView horizontal={true}
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={{flexGrow: 1}}
+                        >
+                            <View className="place" style={styles.place}>
+                                <View className="place-img">
+                                    <Image style={{width: 130, height: 100, borderRadius: 10}}
+                                           source={require('../assets/images/mountain.jpeg')}
+                                           resizeMode="cover"
+                                    />
                                 </View>
-                                <View className="place" style={styles.place}>
-                                    <View className="place-img">
-                                        <Image style={{width: 130, height: 100, borderRadius: 10}}
-                                               source={require('../assets/images/mountain.jpeg')}
-                                               resizeMode="cover"
-                                        />
-                                    </View>
-                                    <Text className="place-name"
-                                          style={{
-                                              fontSize: 20,
-                                              fontWeight: "900",
-                                              marginTop: 10,
-                                              marginBottom: 5
-                                          }}>청계산</Text>
-                                    <Text className="place-description">뭐가들어가야할가...</Text>
+                                <Text className="place-name"
+                                      style={{
+                                          fontSize: 20,
+                                          fontWeight: "900",
+                                          marginTop: 10,
+                                          marginBottom: 5
+                                      }}>청계산</Text>
+                                <Text className="place-description">뭐가들어가야할가...</Text>
+                            </View>
+                            <View className="place" style={styles.place}>
+                                <View className="place-img">
+                                    <Image style={{width: 130, height: 100, borderRadius: 10}}
+                                           source={require('../assets/images/mountain.jpeg')}
+                                           resizeMode="cover"
+                                    />
                                 </View>
-                                <View className="place" style={styles.place}>
-                                    <View className="place-img">
-                                        <Image style={{width: 130, height: 100, borderRadius: 10}}
-                                               source={require('../assets/images/mountain.jpeg')}
-                                               resizeMode="cover"
-                                        />
-                                    </View>
-                                    <Text className="place-name"
-                                          style={{
-                                              fontSize: 20,
-                                              fontWeight: "900",
-                                              marginTop: 10,
-                                              marginBottom: 5
-                                          }}>청계산</Text>
-                                    <Text className="place-description">뭐가들어가야할가...</Text>
+                                <Text className="place-name"
+                                      style={{
+                                          fontSize: 20,
+                                          fontWeight: "900",
+                                          marginTop: 10,
+                                          marginBottom: 5
+                                      }}>청계산</Text>
+                                <Text className="place-description">뭐가들어가야할가...</Text>
+                            </View>
+                            <View className="place" style={styles.place}>
+                                <View className="place-img">
+                                    <Image style={{width: 130, height: 100, borderRadius: 10}}
+                                           source={require('../assets/images/mountain.jpeg')}
+                                           resizeMode="cover"
+                                    />
                                 </View>
-                            </ScrollView>
-                        </View>
-                    </View>
-                    <View className="places">
-                        <View className="place-container">
-                            <Text style={{fontSize: 28, fontWeight: "900", marginBottom: 20}}>디렉토리</Text>
-                            <ScrollView horizontal={true}
-                                        showsHorizontalScrollIndicator={false}
-                                        contentContainerStyle={{flexGrow: 1}}
-                            >
-                                <View className="place" style={styles.place}>
-                                    <View className="place-img">
-                                        <Image style={{width: 130, height: 100, borderRadius: 10}}
-                                               source={require('../assets/images/mountain.jpeg')}
-                                               resizeMode="cover"
-                                        />
-                                    </View>
-                                    <Text className="place-name"
-                                          style={{
-                                              fontSize: 20,
-                                              fontWeight: "900",
-                                              marginTop: 10,
-                                              marginBottom: 5
-                                          }}>청계산</Text>
-                                    <Text className="place-description">뭐가들어가야할가...</Text>
-                                </View>
-                                <View className="place" style={styles.place}>
-                                    <View className="place-img">
-                                        <Image style={{width: 130, height: 100, borderRadius: 10}}
-                                               source={require('../assets/images/mountain.jpeg')}
-                                               resizeMode="cover"
-                                        />
-                                    </View>
-                                    <Text className="place-name"
-                                          style={{
-                                              fontSize: 20,
-                                              fontWeight: "900",
-                                              marginTop: 10,
-                                              marginBottom: 5
-                                          }}>청계산</Text>
-                                    <Text className="place-description">뭐가들어가야할가...</Text>
-                                </View>
-                                <View className="place" style={styles.place}>
-                                    <View className="place-img">
-                                        <Image style={{width: 130, height: 100, borderRadius: 10}}
-                                               source={require('../assets/images/mountain.jpeg')}
-                                               resizeMode="cover"
-                                        />
-                                    </View>
-                                    <Text className="place-name"
-                                          style={{
-                                              fontSize: 20,
-                                              fontWeight: "900",
-                                              marginTop: 10,
-                                              marginBottom: 5
-                                          }}>청계산</Text>
-                                    <Text className="place-description">뭐가들어가야할가...</Text>
-                                </View>
-                            </ScrollView>
-                        </View>
+                                <Text className="place-name"
+                                      style={{
+                                          fontSize: 20,
+                                          fontWeight: "900",
+                                          marginTop: 10,
+                                          marginBottom: 5
+                                      }}>청계산</Text>
+                                <Text className="place-description">뭐가들어가야할가...</Text>
+                            </View>
+                        </ScrollView>
                     </View>
                 </View>
             </View>

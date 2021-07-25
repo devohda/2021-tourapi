@@ -1,5 +1,5 @@
 import React from 'react'
-import {SafeAreaView} from "react-native";
+import {SafeAreaView, View} from "react-native";
 
 const ScreenContainer = props => {
     return (
@@ -10,7 +10,9 @@ const ScreenContainer = props => {
             backgroundColor: "#fff",
             width: "100%"
         }}>
-            {props.children}
+            <View style={{width: "90%", height: "100%"}}>
+                {props.children}
+            </View>
         </SafeAreaView>
     )
 }
