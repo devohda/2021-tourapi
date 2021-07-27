@@ -18,14 +18,14 @@ const NavigationTheme = {
 
 export default function App() {
     return (
-        // <NavigationContainer theme={NavigationTheme}>
-        //     <MainStack.Navigator screenOptions={{
-        //         headerShown: false
-        //     }}>
-        //         <MainStack.Screen name="Login" component={LoginNavigator}/>
-        //         <MainStack.Screen name="App" component={MainNavigator}/>
-        //     </MainStack.Navigator>
-        // </NavigationContainer>
-        <MakeDirectory />
+        <NavigationContainer theme={NavigationTheme}>
+            <MainStack.Navigator screenOptions={{
+                headerShown: false
+            }}>
+                <MainStack.Screen name="Login" component={LoginNavigator}/>
+                <MainStack.Screen name="App" component={MainNavigator}/>
+            </MainStack.Navigator>
+        </NavigationContainer>
+        // <MakeDirectory />
     );
 }
