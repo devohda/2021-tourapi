@@ -1,32 +1,26 @@
 import React from 'react';
 import { Menu, Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, SafeAreaView, ScrollView, ImageBackground } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import SideMenu from 'react-native-side-menu';
 
-import MyPage from './MyPage';
-import SubAuth from './SubAuth';
 
-const Drawer = createDrawerNavigator();
-
-function CustomDrawerContent(props) {
-    return (
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-      </DrawerContentScrollView>
-    );
-}
-
-function forMainPage({navigation}) {
+export default function MainPage({navigation}) {
     return (
         <>
             <SafeAreaView>
                 <ScrollView>
-                <Drawer.Navigator initialRouteName="MyPage">
-                    <Drawer.Screen name="MyPage" component={MyPage} />
-                    <Drawer.Screen name="SubAuth" component={SubAuth} />
-                    </Drawer.Navigator>
+                    <View style={{backgroundColor : "black", flexDirection : "row", justifyContent : "space-between"}}>
+                        <View><Text style={{
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 28,
+                            left: 16,
+                        }}>Here.</Text></View>
+                        <TouchableOpacity onPress={() => navigation.navigate('search')}>
+                            <View style={{flexDirection: 'row'}}>
+                                <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}} size={28}></Icon>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                     <View>
                         <View style={styles.blackRect}>
                             <Text style={{color: 'white', left: 16, top: 45, fontSize: 24, fontWeight: 'bold'}}>
@@ -110,19 +104,6 @@ function forMainPage({navigation}) {
       );
 
 }
-
-export default function MainPage({navigation}) {
-    return (
-    //   <NavigationContainer>
-        <Drawer.Navigator drawerContent={props => <CustomDrawerContent {...props} />}>
-          <Drawer.Screen name="MainPage" component={forMainPage} />
-          <Drawer.Screen name="MyPage" component={MyPage} />
-        </Drawer.Navigator>
-    //   </NavigationContainer>
-    )
-  }
-
-
 
 const styles = StyleSheet.create({
     blackRect : {
