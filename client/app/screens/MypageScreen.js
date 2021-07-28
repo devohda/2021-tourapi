@@ -14,9 +14,9 @@ const MypageScreen = () => {
                 alignItems: "flex-end"
             }} className="profile-container">
                 <View style={{
-                    marginTop : 50,
-                    flexDirection : "row",
-                    alignItems : "center"
+                    marginTop: 50,
+                    flexDirection: "row",
+                    alignItems: "center"
                 }}>
                     <View className="profile-img-container">
                         <Image style={{width: 120, height: 120, borderRadius: 60}}
@@ -28,9 +28,9 @@ const MypageScreen = () => {
                         marginLeft: 30,
                         height: "100%",
                         justifyContent: "space-around",
-                        paddingVertical : 40
+                        paddingVertical: 40
                     }}>
-                        <Text style={{fontSize : 20, fontWeight : "bold"}}>SuzyZzang!</Text>
+                        <Text style={{fontSize: 20, fontWeight: "bold"}}>SuzyZzang!</Text>
                         <Text>#조용한 #따뜻한</Text>
                     </View>
                 </View>

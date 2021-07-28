@@ -1,6 +1,18 @@
 import React from 'react';
-import { Menu, Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, SafeAreaView, ScrollView, ImageBackground } from 'react-native';
-import { Icon } from 'react-native-elements';
+import {
+    Menu,
+    Button,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    ImageBackground
+} from 'react-native';
+import {Icon} from 'react-native-elements';
 
 
 export default function MainPage({navigation}) {
@@ -8,7 +20,7 @@ export default function MainPage({navigation}) {
         <>
             <SafeAreaView>
                 <ScrollView>
-                    <View style={{backgroundColor : "black", flexDirection : "row", justifyContent : "space-between"}}>
+                    <View style={{backgroundColor: "black", flexDirection: "row", justifyContent: "space-between"}}>
                         <View><Text style={{
                             color: 'white',
                             fontWeight: 'bold',
@@ -17,7 +29,8 @@ export default function MainPage({navigation}) {
                         }}>Here.</Text></View>
                         <TouchableOpacity onPress={() => navigation.navigate('search')}>
                             <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}} size={28}></Icon>
+                                <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}}
+                                      size={28}></Icon>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -30,18 +43,23 @@ export default function MainPage({navigation}) {
                         </View>
                         <View style={{position: 'absolute'}}>
                             <View style={{flexDirection: 'row', left: 16, top: 140}}>
-                                <TouchableOpacity style={styles.selectedRankings}><Text style={styles.selectedRankingsText}>일간</Text></TouchableOpacity>
-                                <TouchableOpacity style={styles.notSelectedRankings}><Text style={styles.notSelectedRankingsText}>주간</Text></TouchableOpacity>
-                                <TouchableOpacity style={styles.notSelectedRankings}><Text style={styles.notSelectedRankingsText}>월간</Text></TouchableOpacity>
+                                <TouchableOpacity style={styles.selectedRankings}><Text
+                                    style={styles.selectedRankingsText}>일간</Text></TouchableOpacity>
+                                <TouchableOpacity style={styles.notSelectedRankings}><Text
+                                    style={styles.notSelectedRankingsText}>주간</Text></TouchableOpacity>
+                                <TouchableOpacity style={styles.notSelectedRankings}><Text
+                                    style={styles.notSelectedRankingsText}>월간</Text></TouchableOpacity>
                             </View>
                             {/* 데이터 붙여서(for문?) 들어가게 */}
                             <View style={styles.rankingContainer}>
                                 <View style={styles.defaultImage}></View>
                                 <View style={{marginLeft: 10}}>
-                                    <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold'}}>하루만에 북촌 정복하기</Text>
+                                    <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold'}}>하루만에 북촌
+                                        정복하기</Text>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{fontSize: 12, marginEnd: 65}}>meeeeensun</Text>
-                                        <Icon type="ionicon" name={"eye"} size={12} color="#929292" style={{marginHorizontal: 3,marginVertical: 2}}></Icon>
+                                        <Icon type="ionicon" name={"eye"} size={12} color="#929292"
+                                              style={{marginHorizontal: 3, marginVertical: 2}}></Icon>
                                         <Text style={{fontSize: 12, color: '#929292', fontWeight: 'bold'}}>1.3k</Text>
                                     </View>
                                 </View>
@@ -50,7 +68,8 @@ export default function MainPage({navigation}) {
                         <View style={{marginTop: 110}}>
                             <Text style={styles.titles}>요즘 뜨는 수집가</Text>
                             <View style={{flexDirection: 'row'}}>
-                                <Image style={styles.authorImage} source={{uri:'https://via.placeholder.com/150/92c952'}}></Image>
+                                <Image style={styles.authorImage}
+                                       source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
                                 <Text style={styles.authorDesc}>
                                     <Text style={{fontSize: 16, fontWeight: 'bold'}}>K-민선{"\n"}</Text>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
@@ -65,14 +84,18 @@ export default function MainPage({navigation}) {
                             <View style={{flexDirection: 'row', paddingLeft: 28}}>
                                 <ScrollView horizontal>
                                     {/* 보여주기 식으로 두개 dp 했을 뿐이고 실제론 하나로 돌릴 예정 */}
-                                    <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}} style={styles.regionImage} imageStyle={{borderRadius: 15}}>
+                                    <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}}
+                                                     style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                         <View style={styles.regionText}>
-                                            <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>충청북도 단양</Text>
+                                            <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>충청북도
+                                                단양</Text>
                                         </View>
                                     </ImageBackground>
-                                    <ImageBackground source={{uri: 'https://via.placeholder.com/150/1ee8a4'}} style={styles.regionImage} imageStyle={{borderRadius: 15}}>
+                                    <ImageBackground source={{uri: 'https://via.placeholder.com/150/1ee8a4'}}
+                                                     style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                         <View style={styles.regionText}>
-                                            <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>전라남도 여수</Text>
+                                            <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>전라남도
+                                                여수</Text>
                                         </View>
                                     </ImageBackground>
                                 </ScrollView>
@@ -81,8 +104,21 @@ export default function MainPage({navigation}) {
                         <View style={{marginVertical: 45}}>
                             <Text style={styles.titles}>요즘 뜨는 공간</Text>
                             <View style={{flexDirection: 'row', paddingLeft: 28, marginTop: 20}}>
-                                <Image source={{uri:'https://via.placeholder.com/150/56acb2'}} style={{width: 150, height: 100, borderRadius: 15}}></Image>
-                                <View style={{width: 25, height: 15, backgroundColor: 'black', borderRadius: 70, left: 18, top: 10}}><Text style={{color:'white', textAlign: 'center', fontSize: 10, fontWeight: 'bold'}}>4.8</Text></View>
+                                <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
+                                       style={{width: 150, height: 100, borderRadius: 15}}></Image>
+                                <View style={{
+                                    width: 25,
+                                    height: 15,
+                                    backgroundColor: 'black',
+                                    borderRadius: 70,
+                                    left: 18,
+                                    top: 10
+                                }}><Text style={{
+                                    color: 'white',
+                                    textAlign: 'center',
+                                    fontSize: 10,
+                                    fontWeight: 'bold'
+                                }}>4.8</Text></View>
                                 <View style={{flexDirection: 'row', top: 10, left: 22}}>
                                     <Icon type="ionicon" name={"star"} size={12}></Icon>
                                     <Icon type="ionicon" name={"star"} size={12}></Icon>
@@ -91,7 +127,11 @@ export default function MainPage({navigation}) {
                                     <Icon type="ionicon" name={"star-outline"} size={12}></Icon>
                                 </View>
                                 <Text style={{top: 40, right: 66}}>
-                                    <Text style={{fontSize: 17, fontWeight: 'bold', flexDirection: 'column'}}>경복궁{"\n"}</Text>
+                                    <Text style={{
+                                        fontSize: 17,
+                                        fontWeight: 'bold',
+                                        flexDirection: 'column'
+                                    }}>경복궁{"\n"}</Text>
                                     <Text></Text>
                                     <Text>서울시 종로구</Text>
                                 </Text>
@@ -101,36 +141,36 @@ export default function MainPage({navigation}) {
                 </ScrollView>
             </SafeAreaView>
         </>
-      );
+    );
 
 }
 
 const styles = StyleSheet.create({
-    blackRect : {
+    blackRect: {
         height: 398,
         backgroundColor: 'black',
         position: 'relative'
     },
-    selectedRankings : {
-        backgroundColor : '#FFF0B4',
+    selectedRankings: {
+        backgroundColor: '#FFF0B4',
         borderRadius: 10,
         marginEnd: 16
 
     },
-    notSelectedRankings : {
-        backgroundColor : 'black',
+    notSelectedRankings: {
+        backgroundColor: 'black',
         borderRadius: 10,
         marginEnd: 16
 
     },
-    selectedRankingsText : {
+    selectedRankingsText: {
         color: 'black',
         fontWeight: 'bold',
         paddingHorizontal: 16,
         paddingVertical: 2,
         fontSize: 13
     },
-    notSelectedRankingsText : {
+    notSelectedRankingsText: {
         color: 'white',
         fontWeight: 'bold',
         paddingHorizontal: 16,
@@ -159,8 +199,8 @@ const styles = StyleSheet.create({
         borderBottomStartRadius: 0,
         borderBottomEndRadius: 0
     },
-    titles : {
-        color:'black',
+    titles: {
+        color: 'black',
         // marginTop: 60,
         fontSize: 22,
         left: 18,
@@ -178,7 +218,7 @@ const styles = StyleSheet.create({
         marginTop: 28,
         left: 48
     },
-    regionImage : {
+    regionImage: {
         width: 300,
         height: 120,
         marginTop: 20,
@@ -191,4 +231,4 @@ const styles = StyleSheet.create({
         left: 16,
 
     }
-  });
+});
