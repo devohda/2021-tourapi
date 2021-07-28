@@ -36,19 +36,34 @@ export default function MainPage({navigation}) {
                     </View>
                     <View>
                         <View style={styles.blackRect}>
-                            <Text style={{color: 'white', left: 16, top: 45, fontSize: 24, fontWeight: 'bold'}}>
-                                <Text>가장 인기있는{"\n"}</Text>
-                                <Text>보관함</Text>
-                            </Text>
+                            <View>
+                                <Text style={{
+                                    color: 'white',
+                                    left: 16,
+                                    top: 50,
+                                    fontSize: 24,
+                                    lineHeight: 36,
+                                    fontWeight: 'bold'
+                                }}>
+                                    <Text>가장 인기있는{"\n"}</Text>
+                                    <Text>보관함</Text>
+                                </Text>
+                                <TouchableOpacity style={{top: 18, right: 100}}><Icon type="ionicon"
+                                                                                      name={"chevron-forward-outline"}
+                                                                                      color="white"
+                                                                                      size={26}></Icon></TouchableOpacity>
+                            </View>
                         </View>
                         <View style={{position: 'absolute'}}>
-                            <View style={{flexDirection: 'row', left: 16, top: 140}}>
-                                <TouchableOpacity style={styles.selectedRankings}><Text
-                                    style={styles.selectedRankingsText}>일간</Text></TouchableOpacity>
-                                <TouchableOpacity style={styles.notSelectedRankings}><Text
-                                    style={styles.notSelectedRankingsText}>주간</Text></TouchableOpacity>
-                                <TouchableOpacity style={styles.notSelectedRankings}><Text
-                                    style={styles.notSelectedRankingsText}>월간</Text></TouchableOpacity>
+                            <View style={{flexDirection: 'row', left: 16, top: 145}}>
+                                <View style={{paddingEnd: 42}}><TouchableOpacity style={styles.selectedRankings}><Text
+                                    style={styles.selectedRankingsText}>일간</Text></TouchableOpacity></View>
+                                <View style={{paddingEnd: 42}}><TouchableOpacity
+                                    style={styles.notSelectedRankings}><Text
+                                    style={styles.notSelectedRankingsText}>주간</Text></TouchableOpacity></View>
+                                <View style={{paddingEnd: 42}}><TouchableOpacity
+                                    style={styles.notSelectedRankings}><Text
+                                    style={styles.notSelectedRankingsText}>월간</Text></TouchableOpacity></View>
                             </View>
                             {/* 데이터 붙여서(for문?) 들어가게 */}
                             <View style={styles.rankingContainer}>
@@ -65,7 +80,7 @@ export default function MainPage({navigation}) {
                                 </View>
                             </View>
                         </View>
-                        <View style={{marginTop: 110}}>
+                        <View style={{marginTop: 210}}>
                             <Text style={styles.titles}>요즘 뜨는 수집가</Text>
                             <View style={{flexDirection: 'row'}}>
                                 <Image style={styles.authorImage}
@@ -142,46 +157,39 @@ export default function MainPage({navigation}) {
             </SafeAreaView>
         </>
     );
-
 }
+
 
 const styles = StyleSheet.create({
     blackRect: {
-        height: 398,
+        height: 306,
         backgroundColor: 'black',
         position: 'relative'
     },
     selectedRankings: {
-        backgroundColor: '#FFF0B4',
-        borderRadius: 10,
-        marginEnd: 16
+        backgroundColor: 'black',
+        borderBottomWidth: 1.5,
+        borderBottomColor: '#fff0b4',
+        paddingBottom: 2
 
     },
     notSelectedRankings: {
         backgroundColor: 'black',
-        borderRadius: 10,
-        marginEnd: 16
-
     },
     selectedRankingsText: {
-        color: 'black',
-        fontWeight: 'bold',
-        paddingHorizontal: 16,
-        paddingVertical: 2,
-        fontSize: 13
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold'
     },
     notSelectedRankingsText: {
-        color: 'white',
-        fontWeight: 'bold',
-        paddingHorizontal: 16,
-        paddingVertical: 2,
-        fontSize: 13
+        color: '#fff',
+        fontSize: 16
     },
     rankingContainer: {
         backgroundColor: 'white',
         width: 197,
         height: 282,
-        top: 160,
+        top: 166,
         left: 16,
         borderRadius: 10,
         shadowOffset: {
@@ -232,3 +240,4 @@ const styles = StyleSheet.create({
 
     }
 });
+
