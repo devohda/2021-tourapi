@@ -2,12 +2,7 @@
 import React from 'react';
 import { Menu, Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, SafeAreaView, ScrollView, ImageBackground } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import SideMenu from 'react-native-side-menu';
 
-import MyPage from './MyPage';
-import SubAuth from './SubAuth';
 
 export default function MainPage({navigation}) {
     return (

@@ -45,14 +45,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    headerLeft : {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 28,
-        left: 16,
-    },
-    headerRight: {
-        flexDirection: 'row',
     }
 });
