@@ -1,12 +1,8 @@
-//loginNavigator
-
 import React from 'react';
 import 'react-native-gesture-handler';
-import { Button, StyleSheet, Text, TouchableOpacity, View, BackHandler } from 'react-native';
+import { Button, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Icon } from 'react-native-elements';
-// import { NavigationAction } from '@react-navigation/native';
-import { NavigationActions } from 'react-navigation';
 
 import MainAuth from '../screens/MainAuth';
 import SubAuth from '../screens/SubAuth';

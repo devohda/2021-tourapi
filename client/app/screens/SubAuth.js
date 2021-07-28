@@ -1,6 +1,5 @@
-/////////
-//SubAuth.js
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
@@ -13,125 +12,77 @@ const NavigationTheme = {
     background: 'transparent'
   },
 };
-const onIncrease = () => {
-    setStep(step+1);
-    console.log(step)
-}
-const onDecrease = () => {
-    setStep(step-1)
-}
 
 export default class SubAuth extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {step: 0};
-    }
-    updateGrandparent(value) {
-        this.setState({step: value});
-    }
-    render() {
-
-        console.log(step);
-        return (
-            <ParentAuth key={this.state.step} updateParent={this.updateGrandparent.bind(this)}/>
-        )
-    }
-
-}
-class ParentAuth extends React.Component {
-    updateParent(value) {
-        this.props.updateGrandparent(value);
-    }
-    constructor(props) {
-        super(props);
+        const {navigation} = this.props;
         this.state = {
-            forAuth : [{
-                question : '이메일',
-                placeHolder: '',
-                continue: '계속하기',
-            }, {
-                question : '비밀번호',
-                placeHolder: '대/소문자 및 숫자 포함 8자리 이상',
-                continue: '계속하기',
-            }, {
-                question : '닉네임',
-                placeHolder: '',
-                continue: '회원가입',
-            }],
-            questions : ['이메일', '비밀번호', '닉네임'],
-            placeHolder : ['', '대/소문자 및 숫자 포함 8자리 이상', ''],
-            continue : ['계속하기', '계속하기', '회원가입'],
-            forProgress : [],
-            current: 0
-        }
+          step: 0,
+          QuestionComponent: {
+            buttonStyleFirst: [styles.yellowRect, styles.grayRect, styles.grayRect],
+            buttonStyleSecond: [styles.grayRect, styles.yellowRect, styles.grayRect],
+            buttonStyleThird: [styles.grayRect, styles.grayRect, styles.yellowRect],
+            question: ['이메일', '비밀번호', '닉네임'],
+            placeHolder: ['hiddenJewel@gmai.com', '대/소문자 및 숫자 포함 8자리 이상', '2자 이상 10자 미만으로 한글, 영문 대소문자 가능'],
+            continue: ['계속하기', '계속하기', '회원가입'],
+            whenPressed: ['', '', '()=>navigation.goBack()']
+            }
+        };
+        this.goBack = this.goBack.bind(this);
     }
-    data() {
-        return {
+    goBack() {
+        console.log(this.state.step)
+        this.setState({ step: this.state.step + 1 });
+        if(this.state.step == 3) {
+            this.props.navigation.goBack()
+            // this.props.navigation.push('MainAuth')
         }
-    };
-    componentDidMount() {
+      }
 
-    }
-    render() {
-        // console.log(this.state.forAuth.map((card, index)=>{return card.question}))
-        return (
+        render() {
+            return (
             <>
-                <View key={0}>
-                    <View style={styles.button}>
-                        <View style={styles.yellowRect}></View>
-                        <View style={styles.grayRect}></View>
-                        <View style={styles.grayRect}></View>
-                    </View>
-                    <AuthChild title="이메일" ad="을" placeholder="hiddenJewel@gmail.com" continue="계속하기" step={this.props.step} updateParent={this.updateParent.bind(this)}/>
-                </View>
-                <View key={1}>
-                    <View style={styles.button}>
-                        <View style={styles.grayRect}></View>
-                        <View style={styles.yellowRect}></View>
-                        <View style={styles.grayRect}></View>
-                    </View>
-                    <AuthChild title="비밀번호" ad="를" placeholder="대/소문자 및 숫자 포함 8자리 이상" continue="계속하기" />
-                </View>
-                <View key={2}>
-                    <View style={styles.button}>
-                        <View style={styles.grayRect}></View>
-                        <View style={styles.grayRect}></View>
-                        <View style={styles.yellowRect}></View>
-                    </View>
-                    <AuthChild title="닉네임" ad="을" placeholder="2자 이상 10자 미만으로 한글, 영문 대소문자만 가능" continue="가입완료" />
-                </View>
+                {this.state.step<3 ? 
+                    <> 
+                        <View style={styles.button}>
+                            <View style={this.state.QuestionComponent.buttonStyleFirst[this.state.step]}></View>
+                            <View style={this.state.QuestionComponent.buttonStyleSecond[this.state.step]}></View>
+                            <View style={this.state.QuestionComponent.buttonStyleThird[this.state.step]}></View>
+                        </View>
+                        <View style={styles.container}>
+                            <Text style={{fontSize: 28}}>
+                                <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
+                                <Text>{"\n"}채워볼까요?</Text>
+                            </Text>
+                            <Text style={{fontSize: 16, marginTop: 67, marginBottom: 12}}><Text style={{fontWeight: "bold"}}>{this.state.QuestionComponent.question[this.state.step]}</Text><Text>을 입력해주세요</Text></Text>
+                            <TextInput style={{fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} placeholder={this.state.QuestionComponent.placeHolder[this.state.step]}/>              
+                        </View>
+                        <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 303}} onPress={() => this.goBack()}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>{this.state.QuestionComponent.continue[this.state.step]}</Text></TouchableOpacity>
+                    </>
+                    :
+                    <>
+                        <View style={styles.button}>
+                            <View style={{width: 8, height: 8, backgroundColor: '#dcdcdc', borderRadius: 6, top: 0, marginLeft: 12, display: 'none'}}></View>
+                        </View>
+                        <View style={styles.container}>
+                            <Text style={{fontSize: 26, lineHeight: 45}}>
+                                <Text><Text style={{fontWeight: "bold"}}>회원가입</Text><Text>이 완료되었습니다!</Text></Text>
+                                <Text>{"\n"}히든쥬얼을 마음껏 즐겨보세요.</Text>
+                            </Text>
+                            <Text style={{fontSize: 16, marginTop: 67, marginBottom: 12}}></Text>
+                            <TextInput style={{fontSize: 16, marginBottom: 27, paddingBottom: 11}}/>              
+                        </View>
+                        <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop:293}} onPress={() => this.goBack()}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인 화면으로 돌아가기</Text></TouchableOpacity>
+                    </>
+                }
+
            </>
-          );
-    }
+              );
+        }
+
 }
-
-class AuthChild extends React.Component {
-    handleClick(event) {
-        this.props.updateParent(this.props.step + 1);
-    }
-    render() {
-        return (
-            <>
-
-                    <View style={styles.container}>
-                        <Text style={{fontSize: 28}}>
-                            <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
-                            <Text>{"\n"}채워볼까요?</Text>
-                        </Text>
-                        <Text style={{fontSize: 16, marginTop: 67, marginBottom: 12}} ><Text style={{fontWeight: "bold"}}>{this.props.title}</Text><Text>{this.props.ad} 입력해주세요</Text></Text>
-
-                        {/* placeholder 물어보기 */}
-                        {/* → email : hiddenJewel@gmail.com
-                        → 닉네임 : 2자 이상 10자 미만으로 한글, 영문 대소문자만 가능 */}
-                        <TextInput style={{fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} placeholder={this.props.placeholder}/>                    
-                    </View>
-                    <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 303}} onPress={()=>this.handleClick.bind(this)}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>{this.props.continue}</Text></TouchableOpacity>
-
-            </>
-        )
-    }
-}
-
+// ReactDOM.render(<forQuestion />)
 const styles = StyleSheet.create({
     yellowRect : {
         width: 28,
@@ -139,6 +90,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff0B4',
         borderRadius: 6,
         top: 0,
+        marginLeft: 12,
     },
     grayRect : {
         width: 8,
@@ -149,7 +101,7 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     button : {
-        left: 312,
+        left: 300,
         width: 67,
         height: 24,
         fontWeight: 'normal',
