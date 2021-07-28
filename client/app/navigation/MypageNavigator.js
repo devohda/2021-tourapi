@@ -1,5 +1,6 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {Image, ScrollView, Text, View} from "react-native";
+import {StyleSheet} from "react-native";
 import OIcon from 'react-native-vector-icons/Octicons'
 import * as React from "react";
 
@@ -10,36 +11,13 @@ function Like() {
     return (
         <View flex={1} backgroundColor="#fff">
             <View flexDirection="row" style={{marginVertical: 20}}>
-                <View className="keyword" style={{
-                    backgroundColor: "black",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginRight: "3%"
-                }}>
+                <View className="keyword" style={styles.keyword_1}>
                     <Text style={{fontWeight: "bold", color: "white"}}>전체</Text>
                 </View>
-                <View className="keyword" style={{
-                    backgroundColor: "#bbb",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginRight: "3%"
-                }}>
+                <View className="keyword" style={styles.keyword_2}>
                     <Text style={{fontWeight: "bold", color: "white"}}>장소</Text>
                 </View>
-                <View className="keyword" style={{
-                    backgroundColor: "#bbb",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                }}>
+                <View className="keyword" style={styles.keyword_2}>
                     <Text style={{fontWeight: "bold", color: "white"}}>보관함</Text>
                 </View>
             </View>
@@ -199,36 +177,13 @@ function Temporary() {
     return (
         <View flex={1} backgroundColor="#fff">
             <View flexDirection="row" style={{marginVertical: 20}}>
-                <View className="keyword" style={{
-                    backgroundColor: "black",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginRight: "3%"
-                }}>
+                <View className="keyword" style={styles.keyword_1}>
                     <Text style={{fontWeight: "bold", color: "white"}}>전체</Text>
                 </View>
-                <View className="keyword" style={{
-                    backgroundColor: "#bbb",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginRight: "3%"
-                }}>
+                <View className="keyword" style={styles.keyword_2}>
                     <Text style={{fontWeight: "bold", color: "white"}}>장소</Text>
                 </View>
-                <View className="keyword" style={{
-                    backgroundColor: "#bbb",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                }}>
+                <View className="keyword" style={styles.keyword_2}>
                     <Text style={{fontWeight: "bold", color: "white"}}>보관함</Text>
                 </View>
             </View>
@@ -388,36 +343,13 @@ function Collection() {
     return (
         <View flex={1} backgroundColor="#fff">
             <View flexDirection="row" style={{marginVertical: 20}}>
-                <View className="keyword" style={{
-                    backgroundColor: "black",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginRight: "3%"
-                }}>
+                <View className="keyword" style={styles.keyword_1}>
                     <Text style={{fontWeight: "bold", color: "white"}}>전체</Text>
                 </View>
-                <View className="keyword" style={{
-                    backgroundColor: "#bbb",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginRight: "3%"
-                }}>
+                <View className="keyword" style={styles.keyword_2}>
                     <Text style={{fontWeight: "bold", color: "white"}}>장소</Text>
                 </View>
-                <View className="keyword" style={{
-                    backgroundColor: "#bbb",
-                    paddingVertical: 5,
-                    paddingHorizontal: "3%",
-                    borderRadius: "10%",
-                    alignItems: "center",
-                    flexDirection: "row",
-                }}>
+                <View className="keyword" style={styles.keyword_2}>
                     <Text style={{fontWeight: "bold", color: "white"}}>보관함</Text>
                 </View>
             </View>
@@ -607,4 +539,25 @@ const MypageNavigation = () => {
     );
 }
 
+
+const styles = StyleSheet.create({
+    keyword_1 : {
+        backgroundColor: "black",
+        paddingVertical: 5,
+        paddingHorizontal: "3%",
+        borderRadius: 14,
+        alignItems: "center",
+        flexDirection: "row",
+        marginRight: "3%"
+    },
+    keyword_2 : {
+        backgroundColor : "#bbb",
+        paddingVertical: 5,
+        paddingHorizontal: "3%",
+        borderRadius: 14,
+        alignItems: "center",
+        flexDirection: "row",
+        marginRight: "3%"
+    }
+})
 export default MypageNavigation;
