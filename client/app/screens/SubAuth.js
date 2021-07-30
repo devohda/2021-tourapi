@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
+import * as firebase from '@react-native-firebase/app'
 
 const Stack = createStackNavigator()
 const NavigationTheme = {

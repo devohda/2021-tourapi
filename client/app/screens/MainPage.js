@@ -1,4 +1,5 @@
 import React from 'react';
+import { SearchScreen } from '../navigation/MainPageNavigator';
 import {
     Menu,
     Button,
@@ -17,10 +18,9 @@ import {Icon} from 'react-native-elements';
 
 export default function MainPage({navigation}) {
     return (
-        <>
             <SafeAreaView>
                 <ScrollView>
-                    <View style={{backgroundColor: "black", flexDirection: "row", justifyContent: "space-between"}}>
+                    {Platform.OS === 'android' ? null : <View style={{backgroundColor: "black", flexDirection: "row", justifyContent: "space-between"}}>
                         <View><Text style={{
                             color: 'white',
                             fontWeight: 'bold',
@@ -29,11 +29,11 @@ export default function MainPage({navigation}) {
                         }}>Here.</Text></View>
                         <TouchableOpacity onPress={() => navigation.navigate('search')}>
                             <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}}
-                                      size={28}></Icon>
+                                <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}} size={28}></Icon>
                             </View>
                         </TouchableOpacity>
-                    </View>
+                    </View>}
+
                     <View>
                         <View style={styles.blackRect}>
                             <View>
@@ -155,7 +155,6 @@ export default function MainPage({navigation}) {
                     </View>
                 </ScrollView>
             </SafeAreaView>
-        </>
     );
 }
 

@@ -7,21 +7,17 @@ import {Icon} from 'react-native-elements';
 import MainAuth from '../screens/MainAuth';
 import SubAuth from '../screens/SubAuth';
 import MainPage from '../screens/MainPage';
-import EmailAuth from '../screens/forSubAuth/EmailAuth';
-import PasswordAuth from '../screens/forSubAuth/PasswordAuth';
-import NickNameAuth from '../screens/forSubAuth/NicknameAuth';
-
 
 const Stack = createStackNavigator()
 
-export default function LoginNavigator() {
+export default function LoginNavigator({navigation}) {
     return (
         <Stack.Navigator initialRouteName="Home">
             <Stack.Screen name="Home" component={MainAuth} options={{headerShown: false}}/>
             {/* 회원가입 back button 모양 수정 */}
             <Stack.Screen name="SubAuth" component={SubAuth}
                           options={{title: '회원가입', headerStyle: {elevation: 0}, headerTitleStyle: {fontSize: 18}}}/>
-            <Stack.Screen name="MainPage" component={MainPage}/>
+            <Stack.Screen name="MainPage" component={MainPage} options={{headerShown: false}}/>
         </Stack.Navigator>
     );
 }
