@@ -1,10 +1,12 @@
 import React from 'react';
 import {DefaultTheme, NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from '@react-navigation/stack';
+import HomeNavigator from "./navigation/HomeNavigator";
 import LoginNavigator from "./navigation/LoginNavigator";
-import MainNavigator from "./navigation/MainNavigator";
+
 import AppLoading from 'expo-app-loading';
-import MakeDirectory from './screens/MakeDirectoy';
+import {Text, View} from "react-native";
+import {Icon} from "react-native-elements";
 
 const MainStack = createStackNavigator()
 
@@ -22,8 +24,8 @@ export default function App() {
             <MainStack.Navigator screenOptions={{
                 headerShown: false
             }}>
-                <MainStack.Screen name="Login" component={LoginNavigator}/>
-                <MainStack.Screen name="App" component={MainNavigator}/>
+                {/* <MainStack.Screen name="Login" component={LoginNavigator}/> */}
+                <MainStack.Screen name="App" component={HomeNavigator}/>
             </MainStack.Navigator>
         </NavigationContainer>
         // <MakeDirectory />

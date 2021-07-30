@@ -2,7 +2,7 @@ import React from "react";
 import {View, Text, TextInput, Image, ScrollView, Dimensions} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 import FIcon from 'react-native-vector-icons/Feather';
-import IIcon from 'react-native-vector-icons/Ionicons'
+import IIcon from 'react-native-vector-icons/Ionicons';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -154,7 +154,7 @@ const styles = {
         height: "7%",
         alignItems: "center",
         marginTop: "10%",
-        borderBottomWidth: "2rem",
+        // borderBottomWidth: "2rem",
         borderColor: "#ccc",
         flexDirection: "row",
     },
@@ -167,7 +167,7 @@ const styles = {
         paddingVertical: 5,
         paddingHorizontal: "3%",
         marginRight: "3%",
-        borderRadius: "20%",
+        borderRadius: 20,
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "space-between"

@@ -3,9 +3,9 @@ import React from 'react';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function MainAuth({navigation}) {
+
     return (
         <>
-            {/* <View style={styles.button}> */}
             <View style={styles.button}>
                 <TouchableOpacity onPress={() => navigation.navigate('MainPage')}><Text style={{color: '#DCDCDC', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text></TouchableOpacity>
             </View>
