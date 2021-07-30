@@ -3,15 +3,15 @@ import ReactDOM from 'react-dom';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
-import * as firebase from '@react-native-firebase/app'
+// import firebase from '@react-native-firebase/app';
 
 const Stack = createStackNavigator()
 const NavigationTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: 'transparent'
-  },
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        background: 'transparent'
+    },
 };
 
 export default class SubAuth extends React.Component {
@@ -19,15 +19,15 @@ export default class SubAuth extends React.Component {
         super(props);
         const {navigation} = this.props;
         this.state = {
-          step: 0,
-          QuestionComponent: {
-            buttonStyleFirst: [styles.yellowRect, styles.grayRect, styles.grayRect],
-            buttonStyleSecond: [styles.grayRect, styles.yellowRect, styles.grayRect],
-            buttonStyleThird: [styles.grayRect, styles.grayRect, styles.yellowRect],
-            question: ['이메일', '비밀번호', '닉네임'],
-            placeHolder: ['hiddenJewel@gmai.com', '대/소문자 및 숫자 포함 8자리 이상', '2자 이상 10자 미만으로 한글, 영문 대소문자 가능'],
-            continue: ['계속하기', '계속하기', '회원가입'],
-            whenPressed: ['', '', '()=>navigation.goBack()']
+            step: 0,
+            QuestionComponent: {
+                buttonStyleFirst: [styles.yellowRect, styles.grayRect, styles.grayRect],
+                buttonStyleSecond: [styles.grayRect, styles.yellowRect, styles.grayRect],
+                buttonStyleThird: [styles.grayRect, styles.grayRect, styles.yellowRect],
+                question: ['이메일', '비밀번호', '닉네임'],
+                placeHolder: ['hiddenJewel@gmai.com', '대/소문자 및 숫자 포함 8자리 이상', '2자 이상 10자 미만으로 한글, 영문 대소문자 가능'],
+                continue: ['계속하기', '계속하기', '회원가입'],
+                whenPressed: ['', '', '()=>navigation.goBack()']
             }
         };
         this.goBack = this.goBack.bind(this);
@@ -39,13 +39,13 @@ export default class SubAuth extends React.Component {
             this.props.navigation.goBack()
             // this.props.navigation.push('MainAuth')
         }
-      }
+    }
 
-        render() {
-            return (
+    render() {
+        return (
             <>
-                {this.state.step<3 ? 
-                    <> 
+                {this.state.step<3 ?
+                    <>
                         <View style={styles.button}>
                             <View style={this.state.QuestionComponent.buttonStyleFirst[this.state.step]}></View>
                             <View style={this.state.QuestionComponent.buttonStyleSecond[this.state.step]}></View>
@@ -57,7 +57,7 @@ export default class SubAuth extends React.Component {
                                 <Text>{"\n"}채워볼까요?</Text>
                             </Text>
                             <Text style={{fontSize: 16, marginTop: 67, marginBottom: 12}}><Text style={{fontWeight: "bold"}}>{this.state.QuestionComponent.question[this.state.step]}</Text><Text>을 입력해주세요</Text></Text>
-                            <TextInput style={{fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} placeholder={this.state.QuestionComponent.placeHolder[this.state.step]}/>              
+                            <TextInput style={{fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} placeholder={this.state.QuestionComponent.placeHolder[this.state.step]}/>
                         </View>
                         <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 303}} onPress={() => this.goBack()}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>{this.state.QuestionComponent.continue[this.state.step]}</Text></TouchableOpacity>
                     </>
@@ -72,15 +72,15 @@ export default class SubAuth extends React.Component {
                                 <Text>{"\n"}히든쥬얼을 마음껏 즐겨보세요.</Text>
                             </Text>
                             <Text style={{fontSize: 16, marginTop: 67, marginBottom: 12}}></Text>
-                            <TextInput style={{fontSize: 16, marginBottom: 27, paddingBottom: 11}}/>              
+                            <TextInput style={{fontSize: 16, marginBottom: 27, paddingBottom: 11}}/>
                         </View>
                         <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop:293}} onPress={() => this.goBack()}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인 화면으로 돌아가기</Text></TouchableOpacity>
                     </>
                 }
 
-           </>
-              );
-        }
+            </>
+        );
+    }
 
 }
 // ReactDOM.render(<forQuestion />)
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
         left: 16,
         width: 343,
     },
-  });
+});

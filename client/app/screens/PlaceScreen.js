@@ -1,13 +1,16 @@
 import React from "react";
+import ScreenContainer from "../components/ScreenContainer";
 import {View, Text} from "react-native";
 
 
 const PlaceScreen = () => {
-    return (<View>
+    return (
+        <ScreenContainer>
         <Text>
             Hello
         </Text>
-    </View>)
+    </ScreenContainer>
+    )
 }
 
-export default PlaceScreen
+export default PlaceScreen;
