@@ -14,9 +14,11 @@ import {
     ImageBackground
 } from 'react-native';
 import {Icon} from 'react-native-elements';
+import {KakaoOAuthToken, KakaoProfile, login, logout} from '@react-native-seoul/kakao-login';
 
 
 export default function MainPage({navigation}) {
+    
     return (
             <SafeAreaView>
                 <ScrollView>
@@ -155,6 +157,7 @@ export default function MainPage({navigation}) {
                     </View>
                 </ScrollView>
             </SafeAreaView>
+
     );
 }
 
