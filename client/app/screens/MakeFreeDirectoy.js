@@ -1,8 +1,15 @@
-import React from 'react';
+import React, {createRef} from 'react';
 import { Text, View, StyleSheet, TextInput, Image, ImageBackground, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { Icon } from 'react-native-elements';
+// import * as React from 'react';
 
-const MakeFreeDirectoy = () => {
+export const navigationRef = React.createRef();
+function navigate(name, params) {
+    navigationRef.current && navigationRef.current.navigate(name, params);
+}
+
+export default function MakeFreeDirectoy(Free) {
+    navigationRef.current?.navigate(Free);
         return (
             <>
             <SafeAreaView>
@@ -32,6 +39,7 @@ const MakeFreeDirectoy = () => {
             </SafeAreaView>
             </>
         )
+
 }
 
 const styles = StyleSheet.create({
@@ -81,4 +89,4 @@ const styles = StyleSheet.create({
     },
   });
 
-  export default MakeFreeDirectoy;
+//   export default MakeFreeDirectoy;

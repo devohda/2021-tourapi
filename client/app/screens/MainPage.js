@@ -20,7 +20,7 @@ export default function MainPage({navigation}) {
     return (
             <SafeAreaView>
                 <ScrollView>
-                    {Platform.OS === 'android' ? null : <View style={{backgroundColor: "black", flexDirection: "row", justifyContent: "space-between"}}>
+                    {Platform.OS !== 'android' && <View style={{backgroundColor: "black", flexDirection: "row", justifyContent: "space-between"}}>
                         <View><Text style={{
                             color: 'white',
                             fontWeight: 'bold',
