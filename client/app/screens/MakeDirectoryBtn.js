@@ -7,7 +7,7 @@ import {Icon} from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { withNavigation} from 'react-navigation';
 import { useNavigation } from '@react-navigation/native';
-import * as RootNavigation from './MakeFreeDirectoy';
+import * as RootNavigation from './MakeFreeDirectory';
 import RBSheet from "react-native-raw-bottom-sheet";
 
 export default function MakeDirectoryBtn({nav}) {

@@ -9,7 +9,7 @@ import SubAuth from '../screens/SubAuth';
 import MainPage from '../screens/MainPage';
 import MainPageNavigator from './MainPageNavigator';
 import HomeNavigator from './HomeNavigator';
-import MakeFreeDirectoy from '../screens/MakeFreeDirectoy';
+import MakeFreeDirectory from '../screens/MakeFreeDirectory';
 import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
 
 const Stack = createStackNavigator()
@@ -23,7 +23,7 @@ export default function LoginNavigator({navigation}) {
                           options={{title: '회원가입', headerStyle: {elevation: 0}, headerTitleStyle: {fontSize: 18}}}/>
             <Stack.Screen name="MainPage" component={HomeNavigator} options={{headerShown: false}}/>
             <Stack.Screen name="DirectoryBtn" component={MakeDirectoryBtn} />
-            <Stack.Screen name="Directory" component={MakeFreeDirectoy} options={{headerShown: false}}/>
+            <Stack.Screen name="Directory" component={MakeFreeDirectory} options={{headerShown: false}}/>
         </Stack.Navigator>
     );
 }
