@@ -7,13 +7,7 @@ import RBSheet from "react-native-raw-bottom-sheet";
 
 import MainPageNavigator from "./MainPageNavigator";
 import MyPageScreen from "../screens/MyPageScreen";
-import DirectoryScreen from '../screens/DirectoryScreen';
 import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
-import DirectoryNavigator from './DirectoryNavigator';
-import { BottomSheet, ListItem } from 'react-native-elements';
-import MakeFreeDirectoy from '../screens/MakeFreeDirectoy';
-import { TabRouter } from 'react-navigation';
-
 
 const Tab = createBottomTabNavigator();
 

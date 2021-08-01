@@ -23,7 +23,7 @@ export default function LoginNavigator({navigation}) {
                           options={{title: '회원가입', headerStyle: {elevation: 0}, headerTitleStyle: {fontSize: 18}}}/>
             <Stack.Screen name="MainPage" component={HomeNavigator} options={{headerShown: false}}/>
             <Stack.Screen name="DirectoryBtn" component={MakeDirectoryBtn} />
-            <Stack.Screen name="Directory" component={MakeFreeDirectoy} options={{title: ''}}/>
+            <Stack.Screen name="Directory" component={MakeFreeDirectoy} options={{headerShown: false}}/>
         </Stack.Navigator>
     );
 }

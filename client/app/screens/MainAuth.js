@@ -25,7 +25,7 @@ export default function MainAuth({navigation}) {
                 </Text>
                 <TextInput style={{marginTop: 38, fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} placeholder="이메일 주소를 입력해주세요" />
                 <TextInput style={{fontSize: 16, borderBottomWidth: 1, borderBottomColor: '#C5C5C5', marginBottom: 27, paddingBottom: 11}} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}/>
-                <TouchableOpacity onPress={()=>navigation.navigate('MainPage')} style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인</Text></TouchableOpacity>
+                <TouchableOpacity style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}><Text style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인</Text></TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
                     <TouchableOpacity style={{marginRight: 29}}><Text>아이디/비밀번호찾기</Text></TouchableOpacity>
                     <Text style={{marginRight: 29}}>|</Text>
