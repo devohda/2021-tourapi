@@ -5,7 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {Icon} from 'react-native-elements';
 
 import MainAuth from '../screens/MainAuth';
-import SubAuth from '../screens/SubAuth';
+import AuthenticationScreen from '../screens/AuthenticationScreen';
 import MainPage from '../screens/MainPage';
 import MainPageNavigator from './MainPageNavigator';
 import HomeNavigator from './HomeNavigator';
@@ -19,7 +19,7 @@ export default function LoginNavigator({navigation}) {
         <Stack.Navigator initialRouteName="Home">
             <Stack.Screen name="Home" component={MainAuth} options={{headerShown: false}}/>
             {/* 회원가입 back button 모양 수정 */}
-            <Stack.Screen name="SubAuth" component={SubAuth}
+            <Stack.Screen name="SubAuth" component={AuthenticationScreen}
                           options={{title: '회원가입', headerStyle: {elevation: 0}, headerTitleStyle: {fontSize: 18}}}/>
             <Stack.Screen name="MainPage" component={HomeNavigator} options={{headerShown: false}}/>
             <Stack.Screen name="DirectoryBtn" component={MakeDirectoryBtn} />

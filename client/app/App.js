@@ -4,10 +4,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeNavigator from "./navigation/HomeNavigator";
 import LoginNavigator from "./navigation/LoginNavigator";
 
-import AppLoading from 'expo-app-loading';
-import {Text, View} from "react-native";
-import {Icon} from "react-native-elements";
-
 const MainStack = createStackNavigator()
 
 const NavigationTheme = {

@@ -2,7 +2,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {Image, ScrollView, Text, View} from "react-native";
 import {StyleSheet} from "react-native";
 import OIcon from 'react-native-vector-icons/Octicons'
-import * as React from "react";
+import React from "react";
 
 const Tab = createMaterialTopTabNavigator();
 

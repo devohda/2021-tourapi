@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from '@react-navigation/stack';
-import {StyleSheet, TouchableOpacity, View, Text} from "react-native";
+import {StyleSheet, TouchableOpacity, View, Text, Platform} from "react-native";
 import { Icon } from 'react-native-elements';
 
 import MainPage from "../screens/MainPage";
