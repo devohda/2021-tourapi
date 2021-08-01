@@ -2,23 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
-import * as firebase from "firebase";
-
-// firebase 연동
-const firebaseConfig = {
-    apiKey: "AIzaSyAS0DrsLq7TOEIORPQHjGmOpoRqhAskA4k",
-    authDomain: "tourapi-321202.firebaseapp.com",
-    projectId: "tourapi-321202",
-    storageBucket: "tourapi-321202.appspot.com",
-    messagingSenderId: "481459429337",
-    appId: "1:481459429337:web:4459f5eabdbc43b78a83c8",
-    measurementId: "G-06PY1R2CYG"
-};
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
 
 
 // 네비게이션
@@ -98,20 +81,18 @@ const getTabData = (num) => {
     }
 }
 
+const signUp = (email, password, nickname) => {
+    try{
+        firebase.auth().createUserWithEmailAndPassword(email,password)
+    }catch (e) {
+        console.log(e.toString())
+    }
+}
+
 const CompletedTab = ({navigation, data}) => {
     return (
         <>
-            <View style={styles.button}>
-                <View style={{
-                    width: 8,
-                    height: 8,
-                    backgroundColor: '#dcdcdc',
-                    borderRadius: 6,
-                    top: 0,
-                    marginLeft: 12,
-                    display: 'none'
-                }}></View>
-            </View>
+            <View style={styles.button}></View>
             <View style={styles.container}>
                 <Text style={{fontSize: 26, lineHeight: 45}}>
                     <Text><Text style={{fontWeight: "bold"}}>회원가입</Text><Text>이 완료되었습니다!</Text></Text>
@@ -126,7 +107,10 @@ const CompletedTab = ({navigation, data}) => {
             </View>
             <TouchableOpacity
                 style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 293}}
-                onPress={() => navigation.navigate('Home')}><Text
+                onPress={() => {
+                    signUp(data.email, data.password, data.nickname)
+                    navigation.navigate('Home')
+                }}><Text
                 style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인 화면으로
                 돌아가기</Text>
             </TouchableOpacity>
@@ -134,7 +118,7 @@ const CompletedTab = ({navigation, data}) => {
     )
 }
 
-const SubAuth = (props) => {
+const AuthenticationScreen = (props) => {
     const [step, setStep] = useState(0)
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
@@ -156,5 +140,5 @@ const SubAuth = (props) => {
     );
 };
 
-export default SubAuth;
+export default AuthenticationScreen;
 

@@ -21,7 +21,7 @@ export default function App() {
                 headerShown: false
             }}>
                 <MainStack.Screen name="Login" component={LoginNavigator}/>
-                {/*<MainStack.Screen name="App" component={HomeNavigator}/>*/}
+                <MainStack.Screen name="App" component={HomeNavigator}/>
             </MainStack.Navigator>
         </NavigationContainer>
     );
