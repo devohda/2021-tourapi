@@ -47,7 +47,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                     placeholder={placeHolder}
                     onChangeText={(text) => setValue(text)}
                 />
-                <Text>{userValue}</Text>
+                {/* <Text>{userValue}</Text> */}
             </Form>
             <TouchableOpacity
                 style={{

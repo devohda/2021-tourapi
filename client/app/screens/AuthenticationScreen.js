@@ -68,7 +68,7 @@ const tabData = {
         [styles.grayRect, styles.grayRect, styles.yellowRect],
     ],
     question: ['이메일', '비밀번호', '닉네임'],
-    placeHolder: ['hiddenJewel@gmai.com', '대/소문자 및 숫자 포함 8자리 이상', '2자 이상 10자 미만으로 한글, 영문 대소문자 가능'],
+    placeHolder: ['hiddenJewel@gmail.com', '대/소문자 및 숫자 포함 8자리 이상', '2자 이상 10자 미만으로 한글, 영문 대소문자 가능'],
     nextBtnText: ['계속하기', '계속하기', '회원가입']
 }
 
@@ -102,7 +102,8 @@ const CompletedTab = ({navigation, data}) => {
                     fontSize: 16,
                     marginTop: 67,
                     marginBottom: 12
-                }}>{data.email + data.password + data.nickname}</Text>
+                }}></Text>
+                {/* {data.email + data.password + data.nickname} */}
                 <TextInput style={{fontSize: 16, marginBottom: 27, paddingBottom: 11}}/>
             </View>
             <TouchableOpacity

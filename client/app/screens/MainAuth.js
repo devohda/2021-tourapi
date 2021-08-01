@@ -65,7 +65,7 @@ const MainAuth = ({navigation}) => {
                     borderBottomColor: '#C5C5C5',
                     marginBottom: 27,
                     paddingBottom: 11
-                }} placeholder="비밀번호를 입력해주세요"
+                }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
                            onChangeText={(text) => setPassword(text)}
                 />
                 <TouchableOpacity
@@ -87,7 +87,7 @@ const MainAuth = ({navigation}) => {
                     <TouchableOpacity
                         onPress={() => navigation.navigate('SubAuth')}><Text>회원가입</Text></TouchableOpacity>
                 </View>
-                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 44}}>
+                {/* <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 44}}>
                     <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>
                     <View>
                         <Text style={{
@@ -101,8 +101,7 @@ const MainAuth = ({navigation}) => {
                         }}>3초만에 간편 로그인</Text>
                     </View>
                     <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>
-                </View>
-                {/* 여기에 소셜 로그인 넣을 곳 */}
+                </View> */}
             </View>
         </>
     );
