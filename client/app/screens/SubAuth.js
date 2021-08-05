@@ -45,7 +45,7 @@ export default class SubAuth extends React.Component {
         this.setState({ step: this.state.step + 1 });
         if(this.state.step == 3) {
             this.props.navigation.goBack()
-            // this.props.navigation.push('MainAuth')
+            // this.props.navigation.push('LoginPage')
         }
       }
 

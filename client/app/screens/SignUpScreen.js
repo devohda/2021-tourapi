@@ -119,7 +119,7 @@ const CompletedTab = ({navigation, data}) => {
     )
 }
 
-const AuthenticationScreen = (props) => {
+const SignUpScreen = (props) => {
     const [step, setStep] = useState(0)
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
@@ -141,5 +141,5 @@ const AuthenticationScreen = (props) => {
     );
 };
 
-export default AuthenticationScreen;
+export default SignUpScreen;
 

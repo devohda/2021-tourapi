@@ -20,7 +20,7 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-const login = (email, password, navigation) => {
+const signIn = (email, password, navigation) => {
     try {
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then((user) => {
@@ -33,7 +33,7 @@ const login = (email, password, navigation) => {
 }
 
 
-const MainAuth = ({navigation}) => {
+const SignInScreen = ({appNavigation, navigation}) => {
 
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
@@ -41,8 +41,9 @@ const MainAuth = ({navigation}) => {
     return (
         <>
             <View style={styles.button}>
-                <TouchableOpacity onPress={() => navigation.navigate('MainPage')}><Text
-                    style={{color: '#DCDCDC', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => {}}>
+                    <Text style={{color: '#DCDCDC', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text>
+                </TouchableOpacity>
             </View>
             <View style={styles.container}>
                 <Text style={{fontSize: 28}}>
@@ -70,48 +71,38 @@ const MainAuth = ({navigation}) => {
                 />
                 <TouchableOpacity
                     style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}
-                    onPress={() => {
-                        login(email, password, navigation)
-                    }}
-                ><Text style={{
-                    textAlign: 'center',
-                    padding: 14,
-                    fontSize: 16,
-                    color: '#fff',
-                    fontWeight: 'bold'
-                }}>로그인</Text>
+                    onPress={() => signIn(email, password, navigation)}
+                >
+                    <Text style={styles.loginText}>로그인</Text>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
                     <TouchableOpacity style={{marginRight: 29}}><Text>아이디/비밀번호찾기</Text></TouchableOpacity>
                     <Text style={{marginRight: 29}}>|</Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('SubAuth')}><Text>회원가입</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('SubAuth')}>
+                        <Text>회원가입</Text>
+                    </TouchableOpacity>
                 </View>
-                {/* <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 44}}>
-                    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>
-                    <View>
-                        <Text style={{
-                            width: 139,
-                            textAlign: 'center',
-                            color: '#929292',
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                            marginStart: 18,
-                            marginEnd: 18
-                        }}>3초만에 간편 로그인</Text>
-                    </View>
-                    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>
-                </View> */}
+                {/*<View style={{flexDirection: 'row', alignItems: 'center', marginTop: 44}}>*/}
+                {/*    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>*/}
+                {/*    <View>*/}
+                {/*        <Text style={{*/}
+                {/*            width: 139,*/}
+                {/*            textAlign: 'center',*/}
+                {/*            color: '#929292',*/}
+                {/*            fontSize: 16,*/}
+                {/*            fontWeight: 'bold',*/}
+                {/*            marginStart: 18,*/}
+                {/*            marginEnd: 18*/}
+                {/*        }}>3초만에 간편 로그인</Text>*/}
+                {/*    </View>*/}
+                {/*    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>*/}
+                {/*</View>*/}
             </View>
         </>
     );
 }
 
 const styles = StyleSheet.create({
-    // mainpage : {
-    //     // position: 'absolute'
-
-    // },
     button: {
         left: 312,
         width: 67,
@@ -127,6 +118,13 @@ const styles = StyleSheet.create({
         left: 16,
         width: 343,
     },
+    loginText: {
+        textAlign: 'center',
+        padding: 14,
+        fontSize: 16,
+        color: '#fff',
+        fontWeight: 'bold'
+    }
 });
 
-export default MainAuth;
+export default SignInScreen;
