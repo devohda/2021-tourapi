@@ -1,8 +1,9 @@
 //전역 선언 방법 찾아보기
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import * as firebase from "firebase";
+import {useIsSignedIn} from "../components/SignedInContextProvider";
 
 // firebase 연동
 const firebaseConfig = {
@@ -20,12 +21,11 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-const signIn = (email, password, navigation) => {
+const signIn = (email, password, navigation, setIsSignedIn) => {
     try {
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then((user) => {
-                alert('로그인이 되었습니다.')
-                navigation.navigate('App')
+                setIsSignedIn(true)
             })
     } catch (e) {
         console.log(e.toString())
@@ -37,11 +37,14 @@ const SignInScreen = ({appNavigation, navigation}) => {
 
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn()
 
     return (
         <>
             <View style={styles.button}>
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity onPress={() => {
+                    setIsSignedIn(true)
+                }}>
                     <Text style={{color: '#DCDCDC', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
@@ -71,14 +74,14 @@ const SignInScreen = ({appNavigation, navigation}) => {
                 />
                 <TouchableOpacity
                     style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}
-                    onPress={() => signIn(email, password, navigation)}
+                    onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                 >
                     <Text style={styles.loginText}>로그인</Text>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
                     <TouchableOpacity style={{marginRight: 29}}><Text>아이디/비밀번호찾기</Text></TouchableOpacity>
                     <Text style={{marginRight: 29}}>|</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('SubAuth')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
                         <Text>회원가입</Text>
                     </TouchableOpacity>
                 </View>

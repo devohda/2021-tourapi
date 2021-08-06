@@ -110,7 +110,7 @@ const CompletedTab = ({navigation, data}) => {
                 style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 293}}
                 onPress={() => {
                     signUp(data.email, data.password, data.nickname)
-                    navigation.navigate('Home')
+                    navigation.navigate('SignIn')
                 }}><Text
                 style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인 화면으로
                 돌아가기</Text>

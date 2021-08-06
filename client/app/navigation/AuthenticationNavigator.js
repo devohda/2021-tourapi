@@ -5,9 +5,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
-import HomeNavigator from './HomeNavigator';
-import MakeFreeDirectory from '../screens/MakeFreeDirectory';
-import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
 
 const Stack = createStackNavigator()
 
