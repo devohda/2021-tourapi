@@ -18,7 +18,7 @@ import {Icon} from 'react-native-elements';
 
 
 export default function MainPage({navigation}) {
-    
+
     return (
         <SafeAreaView>
             <ScrollView>
@@ -32,8 +32,12 @@ export default function MainPage({navigation}) {
                     }}>Here.</Text></View>
                     <TouchableOpacity onPress={() => navigation.navigate('search')}>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}}
-                                  size={28}></Icon>
+                            <Icon type="ionicon"
+                                  name={"md-search"}
+                                  color="white"
+                                  style={{marginEnd: 20}}
+                                  size={28}>
+                            </Icon>
                         </View>
                     </TouchableOpacity>
                 </View>

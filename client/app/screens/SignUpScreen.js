@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
-
+import * as firebase from "firebase";
 
 // 네비게이션
 const Stack = createStackNavigator()
@@ -110,7 +110,7 @@ const CompletedTab = ({navigation, data}) => {
                 style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16, marginTop: 293}}
                 onPress={() => {
                     signUp(data.email, data.password, data.nickname)
-                    navigation.navigate('Home')
+                    navigation.navigate('SignIn')
                 }}><Text
                 style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>로그인 화면으로
                 돌아가기</Text>
@@ -119,7 +119,7 @@ const CompletedTab = ({navigation, data}) => {
     )
 }
 
-const AuthenticationScreen = (props) => {
+const SignUpScreen = (props) => {
     const [step, setStep] = useState(0)
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
@@ -141,5 +141,5 @@ const AuthenticationScreen = (props) => {
     );
 };
 
-export default AuthenticationScreen;
+export default SignUpScreen;
 

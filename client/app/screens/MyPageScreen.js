@@ -6,7 +6,7 @@ const screenWidth = Dimensions.get('window').width;
 import MyTabs from "../navigation/MypageNavigator";
 
 
-const MypageScreen = () => {
+const MyPageScreen = () => {
     return (
         <ScreenContainer>
             <View style={{
@@ -42,4 +42,4 @@ const MypageScreen = () => {
 
 const styles = {}
 
-export default MypageScreen;
+export default MyPageScreen;
