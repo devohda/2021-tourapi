@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
-
+import * as firebase from "firebase";
 
 // 네비게이션
 const Stack = createStackNavigator()
