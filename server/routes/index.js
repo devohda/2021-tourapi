@@ -1,9 +1,13 @@
 const express = require('express');
-var Collections = require('./collections');
-
 const router = express.Router();
 
-router.use('/collections', Collections);
+// 라우터 파일 가져오기
+const collectionRouter = require('./collections');
+
+
+// 라우터 파일 등록하기
+router.use('/collections', collectionRouter);
+
 
 
 module.exports = router;

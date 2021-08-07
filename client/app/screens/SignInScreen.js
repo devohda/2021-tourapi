@@ -61,8 +61,10 @@ const SignInScreen = ({appNavigation, navigation}) => {
                     borderBottomColor: '#C5C5C5',
                     marginBottom: 27,
                     paddingBottom: 11
-                }} placeholder="이메일 주소를 입력해주세요"
+                }}
+                           placeholder="이메일 주소를 입력해주세요"
                            onChangeText={(text) => setEmail(text)}
+                           autoCapitalize="none"
                 />
                 <TextInput style={{
                     fontSize: 16,
@@ -72,6 +74,7 @@ const SignInScreen = ({appNavigation, navigation}) => {
                     paddingBottom: 11
                 }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
                            onChangeText={(text) => setPassword(text)}
+                           autoCapitalize="none"
                 />
                 <TouchableOpacity
                     style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}
@@ -80,7 +83,9 @@ const SignInScreen = ({appNavigation, navigation}) => {
                     <Text style={styles.loginText}>로그인</Text>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
-                    <TouchableOpacity style={{marginRight: 29}}><Text>아이디/비밀번호찾기</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('FindPassword')} style={{marginRight: 29}}>
+                        <Text>아이디/비밀번호찾기</Text>
+                    </TouchableOpacity>
                     <Text style={{marginRight: 29}}>|</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
                         <Text>회원가입</Text>

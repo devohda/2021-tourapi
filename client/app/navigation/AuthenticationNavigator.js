@@ -5,6 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import FindPasswordScreen from  '../screens/FindPasswordScreen'
 
 const Stack = createStackNavigator()
 
@@ -23,6 +24,7 @@ export default function AuthenticationNavigator({navigation, setIsSignedIn}) {
                               headerTitleStyle: {fontSize: 18}
                           }}
             />
+            <Stack.Screen name="FindPassword" component={FindPasswordScreen}/>
         </Stack.Navigator>
     );
 }

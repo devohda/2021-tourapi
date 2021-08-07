@@ -1,33 +1,24 @@
-const http = require('http');
-const router = require('router');
-const mysql = require('mysql');
-// const cors = require('cors');
-// const bodyParser = require('body-parser');
-
-const express = require('express');
-const db = require('./config/database');
-
-const hostname = '127.0.0.1';
-const port = 3000;
-
-var connection = mysql.createConnection(db);
-// connection.connect(); //DB 접속
+const express = require('express')
+const createError = require('http-errors')
 
 const app = express();
-
-const Router = require('./routes/index');
-
-// app.use(bodyParser.urlencoded({extended: false}));
-// app.use(bodyParser.json());
-// app.use(cors());
+const router = require('./routes/index');
 
 app.use(express.json());
-app.use('/', Router);
+app.use('/', router);
 
-app.set('port', process.env.PORT || 3000);
+// 404 처리
+app.use((req, res, next) => {
+  next(createError(404))
+})
 
-app.listen(app.get('port'), () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+// error 처리
+app.use((err, req, res) => {
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
+  console.error(err)
 
-// connection.end();
+  res.status(err.status || 500).send(err);
+})
+
+module.exports = app;

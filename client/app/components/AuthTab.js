@@ -46,6 +46,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                     defaultValue={userValue}
                     placeholder={placeHolder}
                     onChangeText={(text) => setValue(text)}
+                    autoCapitalize="none"
                 />
                 {/* <Text>{userValue}</Text> */}
             </Form>
