@@ -41,7 +41,7 @@ export default function MakeFreeDirectoy(Free) {
         collection_name: collectionName,
         collection_type: 0
     }
-    const getCollections = async () => {
+    const getCollections = () => {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             //TODO 언어 바꾸기 필요
