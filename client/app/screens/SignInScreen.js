@@ -25,11 +25,10 @@ const signIn = (email, password, navigation, setIsSignedIn) => {
     try {
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then((user) => {
-                alert('로그인 완료!')
                 setIsSignedIn(true)
             })
     } catch (e) {
-        console.log(e.toString())
+        alert('로그인 실패~')
     }
 }
 

@@ -9,10 +9,27 @@ import {
     SafeAreaView,
     ScrollView,
     FlatList,
-    Switch } from 'react-native';
-import { Icon } from 'react-native-elements';
+    Switch
+} from 'react-native';
+import {Icon} from 'react-native-elements';
 
 export const navigationRef = React.createRef();
+
+const Keyword = ({keyword, idx, pressFunc}) => {
+    return (
+        <View key={idx}
+              style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+              }}
+        >
+            <TouchableOpacity style={styles.selectType} onPress={pressFunc}>
+                <Text style={styles.selectTypeText}>{keyword.keyword}</Text>
+            </TouchableOpacity>
+        </View>
+    )
+}
 
 export default function MakeFreeDirectoy(Free) {
     //자유보관함이므로 type은 0
@@ -26,10 +43,10 @@ export default function MakeFreeDirectoy(Free) {
     }
     const getCollections = async () => {
         try {
-            //ipV4 주소 찾기 : ipconfig/all (window ver.)
+            // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             //TODO 언어 바꾸기 필요
             console.log(DATA.collection_name)
-            fetch('http://172.20.10.9:3000/collections/collections_free_post', {
+            fetch('http://localhost:3000/collections/collections_free_post', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -39,44 +56,38 @@ export default function MakeFreeDirectoy(Free) {
                 //     collection_name: 'name'
                 // })
                 body: JSON.stringify(DATA)
-            }).then((res)=>res.text())
-            .then((responsedata) => {
-                console.log(responsedata)
-            })
-            .catch((err) => {
-                console.error(err)
-            }) ;
-        
+            }).then((res) => res.text())
+                .then((responsedata) => {
+                    console.log(responsedata)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
         } catch (err) {
             console.error(err);
         }
     }
 
-    //TODO 플러스 버튼 클릭하면 여기에 append 가능하도록
-    const keyWords = [
+    // TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
+    const [keywords, setKeywords] = useState([
         {
             id: '1',
-            key: '힐링',
+            keyword: '힐링',
         },
         {
             id: '2',
-            key: '관광',
+            keyword: '관광',
         },
         {
             id: '3',
-            key: '여유',
+            keyword: '여유',
         },
         {
             id: '4',
-            key: '뚜벅'
+            keyword: '뚜벅'
         }
-    ]
-
-    const showKeywords = ({ item }) => (
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            <TouchableOpacity style={styles.selectType}><Text style={styles.selectTypeText}>{item.key}</Text></TouchableOpacity>
-        </View>
-    )
+    ])
 
     //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
     const users = [
@@ -94,81 +105,105 @@ export default function MakeFreeDirectoy(Free) {
         }
     ]
 
-    const showUsers = ({ item }) => (
+    const showUsers = ({item}) => (
         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
             {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
         </View>
     )
 
 
-    useEffect(()=>{
+    useEffect(() => {
         // getCollections();
     })
 
     navigationRef.current?.navigate(Free);
 
-        return (
-            <>
+    return (
+        <>
             <SafeAreaView>
                 <ScrollView>
-                <View style={styles.rankingContainer}>
-                    <View style={{marginVertical: 14}}>
-                    <TextInput style={{paddingHorizontal: 4, fontSize: 20, fontWeight: 'bold', textAlign: 'center'}} placeholder={"보관함 이름을 입력해주세요 (2~16자)"} onChangeText={(name)=>setCollectionName(name)}></TextInput>
-
+                    <View style={styles.rankingContainer}>
+                        <View style={{marginVertical: 14}}>
+                            <TextInput
+                                style={{paddingHorizontal: 4, fontSize: 20, fontWeight: 'bold', textAlign: 'center'}}
+                                placeholder={"보관함 이름을 입력해주세요 (2~16자)"}
+                                onChangeText={(name) => setCollectionName(name)}>
+                            </TextInput>
+                        </View>
                     </View>
-                </View>
-                <View style={{marginTop: 37, left: 24}}>
-                    <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>보관함 키워드</Text>
-                    <View style={{flexDirection: 'row',marginTop: 16}}>
-                    <SafeAreaView>
-                        <FlatList data={keyWords} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/>
-                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
-                    </SafeAreaView>
+                    <View style={{marginTop: 37, left: 24}}>
+                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>보관함 키워드</Text>
+                        <View style={{
+                            flexDirection: 'row',
+                            marginTop: 16
+                        }}>
+                            <View flexDirection="row">
+                                {keywords.map((keyword, idx) => (
+                                    <Keyword keyword={keyword} key={idx}/>
+                                ))}
+                                {/*{버튼 추가 가능하도록 만들었음.}*/}
+                                <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
+                                    setKeywords((addedKeywords) => {
+                                        return [...addedKeywords, {keyword: '추가됨'}]
+                                    })
+                                }}/>
+                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
+                            </View>
+                        </View>
                     </View>
-                </View>
-                <View style={{marginTop: 37, left: 24}}>
-                    <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</Text>
-                    <View style={{flexDirection: 'row',marginTop: 16}}>
-                    <SafeAreaView>
-                        <FlatList data={users} renderItem={showUsers} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/>
-                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
-                    </SafeAreaView>
+                    <View style={{marginTop: 37, left: 24}}>
+                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</Text>
+                        <View style={{flexDirection: 'row', marginTop: 16}}>
+                            <SafeAreaView>
+                                <FlatList data={users} renderItem={showUsers} keyExtractor={(item) => item.id}
+                                          contentContainerStyle={{paddingBottom: 20}} horizontal={true}
+                                          nestedScrollEnabled/>
+                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
+                            </SafeAreaView>
+                        </View>
                     </View>
-                </View>
-                <View style={{marginTop: 37, left: 24}}>
-                    <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>비공개 설정</Text>
-                    <View style={{marginTop: 16,alignItems: "center",
-                        justifyContent: "center"}}>
-                    <Switch
-                        trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={toggleSwitch}
-                        value={isEnabled}
-                    />
+                    <View style={{marginTop: 37, left: 24}}>
+                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>비공개 설정</Text>
+                        <View style={{
+                            marginTop: 16, alignItems: "center",
+                            justifyContent: "center"
+                        }}>
+                            <Switch
+                                trackColor={{false: "#767577", true: "#81b0ff"}}
+                                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={toggleSwitch}
+                                value={isEnabled}
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={{marginTop: 37, left: 24}}>
-                    <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>보관함 사진</Text>
-                    <View style={{flexDirection: 'row', marginTop: 16}}>
+                    <View style={{marginTop: 37, left: 24}}>
+                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>보관함 사진</Text>
+                        <View style={{flexDirection: 'row', marginTop: 16}}>
+                        </View>
                     </View>
-                </View>
-                {/* 완료 버튼 색깔 바뀌는건 온전히 데이터 다 만들고 할 예정 : 조건에 따라 바뀌어야 하므로 */}
-                <TouchableOpacity
-                style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16}}
-                onPress={()=>getCollections()}
-                ><Text
-                style={{textAlign: 'center', padding: 14, fontSize: 16, color: '#fff', fontWeight: 'bold'}}>완료</Text>
-                </TouchableOpacity>
+                    {/* 완료 버튼 색깔 바뀌는건 온전히 데이터 다 만들고 할 예정 : 조건에 따라 바뀌어야 하므로 */}
+                    <TouchableOpacity
+                        style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16}}
+                        onPress={() => getCollections()}
+                    ><Text
+                        style={{
+                            textAlign: 'center',
+                            padding: 14,
+                            fontSize: 16,
+                            color: '#fff',
+                            fontWeight: 'bold'
+                        }}>완료</Text>
+                    </TouchableOpacity>
                 </ScrollView>
             </SafeAreaView>
-            </>
-        )
+        </>
+    )
 
 }
 
 const styles = StyleSheet.create({
-    selectType : {
+    selectType: {
         borderColor: 'black',
         borderWidth: 1,
         paddingVertical: 1,
@@ -176,7 +211,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginRight: 10,
     },
-    selectTypeText : {
+    selectTypeText: {
         color: 'black',
         fontSize: 14
     },
@@ -188,7 +223,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12
     },
-    selectTypeIconDetail : {
+    selectTypeIconDetail: {
         color: 'black',
         paddingVertical: 1,
         borderRadius: 12
@@ -213,4 +248,4 @@ const styles = StyleSheet.create({
         width: 287,
         height: 243,
     },
-  });
+});
