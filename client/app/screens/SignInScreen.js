@@ -61,8 +61,10 @@ const SignInScreen = ({appNavigation, navigation}) => {
                     borderBottomColor: '#C5C5C5',
                     marginBottom: 27,
                     paddingBottom: 11
-                }} placeholder="이메일 주소를 입력해주세요"
+                }}
+                           placeholder="이메일 주소를 입력해주세요"
                            onChangeText={(text) => setEmail(text)}
+                           autoCapitalize="none"
                 />
                 <TextInput style={{
                     fontSize: 16,
@@ -72,6 +74,7 @@ const SignInScreen = ({appNavigation, navigation}) => {
                     paddingBottom: 11
                 }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
                            onChangeText={(text) => setPassword(text)}
+                           autoCapitalize="none"
                 />
                 <TouchableOpacity
                     style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}
