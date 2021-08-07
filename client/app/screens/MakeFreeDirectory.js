@@ -29,7 +29,7 @@ export default function MakeFreeDirectoy(Free) {
             //ipV4 주소 찾기 : ipconfig/all (window ver.)
             //TODO 언어 바꾸기 필요
             console.log(DATA.collection_name)
-            fetch('http://172.30.1.21:3000/collections/collections_free_post', {
+            fetch('http://172.20.10.9:3000/collections/collections_free_post', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

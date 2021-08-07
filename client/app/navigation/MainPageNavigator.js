@@ -5,7 +5,9 @@ import { Icon } from 'react-native-elements';
 
 import MainPage from "../screens/MainPage";
 import SearchScreen from "../screens/SearchScreen";
-import PlaceScreen from '../screens/PlaceScreen'
+import PlaceScreen from '../screens/PlaceScreen';
+import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
+import MakeFreeDirectory from "../screens/MakeFreeDirectory";
 
 const Stack = createStackNavigator();
 
@@ -26,6 +28,8 @@ export default class MainPageNavigator extends React.Component {
                 }
                 <Stack.Screen name="search" component={SearchScreen}/>
                 <Stack.Screen name="place" component={PlaceScreen} />
+                <Stack.Screen name="btn" component={MakeDirectoryBtn} />
+                <Stack.Screen name="Directory" component={MakeFreeDirectory} />
             </Stack.Navigator>
         );
     }
