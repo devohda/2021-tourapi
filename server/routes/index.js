@@ -5,4 +5,5 @@ const router = express.Router();
 
 router.use('/collections', Collections);
 
+
 module.exports = router;
