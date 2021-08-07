@@ -2,8 +2,9 @@ const express = require('express')
 const createError = require('http-errors')
 
 const app = express();
-
 const router = require('./routes/index');
+
+app.use(express.json());
 app.use('/', router);
 
 // 404 처리
