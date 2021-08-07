@@ -80,7 +80,9 @@ const SignInScreen = ({appNavigation, navigation}) => {
                     <Text style={styles.loginText}>로그인</Text>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
-                    <TouchableOpacity style={{marginRight: 29}}><Text>아이디/비밀번호찾기</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('FindPassword')} style={{marginRight: 29}}>
+                        <Text>아이디/비밀번호찾기</Text>
+                    </TouchableOpacity>
                     <Text style={{marginRight: 29}}>|</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
                         <Text>회원가입</Text>
