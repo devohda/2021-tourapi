@@ -40,7 +40,7 @@ export default function sameComponent({navigation}) {
                             <Text style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold'}}>일정 보관함</Text>
                             <Text style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: '#7C828E'}}>공간을 시간 순서대로 보관할 수 있어요</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{backgroundColor: '#FFF0B4', width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {navigation.navigate('Directory')}}>
+                        <TouchableOpacity style={{backgroundColor: '#FFF0B4', width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory')}}>
                             <Text style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold'}}>자유 보관함</Text>
                             <Text style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: '#7C828E'}}>순서 상관없이 자유롭게 공간을 보관할 수 있어요</Text>
                         </TouchableOpacity>

@@ -1,3 +1,5 @@
-const testQuery = "select * from collections;";
 
-module.exports = testQuery;
+module.exports = {
+    collectionsQuery : "select * from collections;",
+    getCollectionsFromUsersQuery : 'select * from collections where user_pk =',
+};

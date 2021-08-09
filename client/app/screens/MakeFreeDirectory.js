@@ -31,7 +31,7 @@ const Keyword = ({keyword, idx, pressFunc}) => {
     )
 }
 
-export default function MakeFreeDirectoy(Free) {
+export default function MakeFreeDirectoy({navigation}) {
     //자유보관함이므로 type은 0
     //TODO 키워드 어떻게 받지
     const [isEnabled, setIsEnabled] = useState(false);
@@ -46,15 +46,12 @@ export default function MakeFreeDirectoy(Free) {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             //TODO 언어 바꾸기 필요
             console.log(DATA.collection_name)
-            fetch('http://localhost:3000/collections/collections_free_post', {
+            fetch('http://172.30.1.36:3000/collections/collections_free_post', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                // body: JSON.stringify({
-                //     collection_name: 'name'
-                // })
                 body: JSON.stringify(DATA)
             }).then((res) => res.text())
                 .then((responsedata) => {
@@ -67,6 +64,8 @@ export default function MakeFreeDirectoy(Free) {
         } catch (err) {
             console.error(err);
         }
+        // navigation.navigate('mypage', {from: 'makeDir'})
+        navigation.navigate('mypage')
     }
 
     // TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
@@ -115,8 +114,6 @@ export default function MakeFreeDirectoy(Free) {
     useEffect(() => {
         // getCollections();
     })
-
-    navigationRef.current?.navigate(Free);
 
     return (
         <>
