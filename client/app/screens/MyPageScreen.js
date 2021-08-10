@@ -5,12 +5,10 @@ import ScreenContainer from "../components/ScreenContainer";
 const screenWidth = Dimensions.get('window').width;
 import MyTabs from "../navigation/MypageNavigator";
 
-const MyPageScreen = ({navigation}) => {
+const MyPageScreen = () => {
     useEffect(() => {
         getCollections();
     })
-    // const { from } = route.params;
-    // console.log(from)
     const [DATA, useDATA] = useState({
         user_email: '',
         user_nickname: '',
@@ -72,7 +70,7 @@ const MyPageScreen = ({navigation}) => {
                     </View>
                 </View>
             </View>
-            <MyTabs/>
+            <MyTabs />
         </ScreenContainer>
     )
 };

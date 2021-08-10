@@ -2,6 +2,7 @@ import React from "react";
 import { createStackNavigator } from '@react-navigation/stack';
 import {StyleSheet, TouchableOpacity, View, Text, Platform} from "react-native";
 import { Icon } from 'react-native-elements';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 import MainPage from "../screens/MainPage";
 import SearchScreen from "../screens/SearchScreen";
@@ -11,12 +12,10 @@ import MakeFreeDirectory from "../screens/MakeFreeDirectory";
 
 const Stack = createStackNavigator();
 
-export default class MainPageNavigator extends React.Component {
-    constructor(props) {
-        super(props);
-        const {navigation} = this.props;
+export default function MainPageNavigator({navigation, route}) {
+    if(getFocusedRouteNameFromRoute(route) === 'Directory') {
+        navigation.setOptions({tabBarVisible: false})
     }
-    render() {
         return (
             <Stack.Navigator initialRouteName="main">
                 {Platform.OS === 'android' ?
@@ -32,7 +31,6 @@ export default class MainPageNavigator extends React.Component {
                 <Stack.Screen name="Directory" component={MakeFreeDirectory} />
             </Stack.Navigator>
         );
-    }
 
 }
 

@@ -7,7 +7,6 @@ import RBSheet from "react-native-raw-bottom-sheet";
 
 export default function sameComponent({navigation}) {
     const refRBSheet = useRef();
-
     return (
         <View style={{justifyContent: 'flex-end', paddingBottom: '3%', width:'100%', height: '200%'}}>
         <TouchableOpacity onPress={() => {refRBSheet.current.open();}}>

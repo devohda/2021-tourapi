@@ -12,7 +12,7 @@ import { color } from 'react-native-elements/dist/helpers';
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeNavigator({navigation}) {
+export default function HomeNavigator({navigation,route}) {
         return (
             <Tab.Navigator>
                 <Tab.Screen name="main" component={MainPageNavigator} options={{

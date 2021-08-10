@@ -1,4 +1,4 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, {createRef, useEffect, useState, useRef, useCallback} from 'react';
 import {
     Text,
     View,
@@ -9,9 +9,13 @@ import {
     SafeAreaView,
     ScrollView,
     FlatList,
-    Switch
+    Switch,
+    KeyboardAvoidingView,
+    Keyboard,
+    TouchableWithoutFeedback
 } from 'react-native';
 import {Icon} from 'react-native-elements';
+import Toast from 'react-native-easy-toast';
 
 export const navigationRef = React.createRef();
 
@@ -31,16 +35,23 @@ const Keyword = ({keyword, idx, pressFunc}) => {
     )
 }
 
-export default function MakeFreeDirectoy({navigation}) {
+export default function MakeFreeDirectory({navigation}) {
     //자유보관함이므로 type은 0
     //TODO 키워드 어떻게 받지
+    const toastRef = useRef();
+    const showCopyToast = useCallback(() => {
+        toastRef.current.show('비어있는 필드가 있습니다.', 2000);
+        console.log('완료')
+      }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const DATA = {
         collection_name: collectionName,
-        collection_type: 0
+        collection_type: 0,
+        collection_private: (isEnabled===true) ? 1: 0
     }
+    console.log(DATA.collection_private)
     const getCollections = () => {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
@@ -113,12 +124,18 @@ export default function MakeFreeDirectoy({navigation}) {
 
     useEffect(() => {
         // getCollections();
+        // Keyboard.dismiss();
     })
 
     return (
         <>
+                <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
+
             <SafeAreaView>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
                 <ScrollView>
+
                     <View style={styles.rankingContainer}>
                         <View style={{marginVertical: 14}}>
                             <TextInput
@@ -179,10 +196,16 @@ export default function MakeFreeDirectoy({navigation}) {
                         <View style={{flexDirection: 'row', marginTop: 16}}>
                         </View>
                     </View>
-                    {/* 완료 버튼 색깔 바뀌는건 온전히 데이터 다 만들고 할 예정 : 조건에 따라 바뀌어야 하므로 */}
+
                     <TouchableOpacity
-                        style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10, margin: 16}}
-                        onPress={() => getCollections()}
+                        testID="completed"
+                        style={{backgroundColor: (DATA.collection_name.length >= 2) ? '#7B9ACC' : '#DCDCDC', height: 52, borderRadius: 10, margin: 16}}
+                        onPress={() => {
+                            if(DATA.collection_name.length >= 2) getCollections();
+                            else {
+                                alert('비어있는 필드가 있습니다.')
+                            }
+                        }}
                     ><Text
                         style={{
                             textAlign: 'center',
@@ -190,10 +213,15 @@ export default function MakeFreeDirectoy({navigation}) {
                             fontSize: 16,
                             color: '#fff',
                             fontWeight: 'bold'
-                        }}>완료</Text>
+                        }}
+                        >완료</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                </TouchableWithoutFeedback>
+
             </SafeAreaView>
+            </KeyboardAvoidingView>
+
         </>
     )
 
@@ -244,5 +272,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#c4c4c4',
         width: 287,
         height: 243,
-    },
+    }
 });
