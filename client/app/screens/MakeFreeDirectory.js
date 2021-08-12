@@ -76,7 +76,6 @@ export default function MakeFreeDirectory({navigation}) {
             console.error(err);
         }
         // navigation.navigate('mypage', {from: 'makeDir'})
-        navigation.navigate('mypage')
     }
 
     // TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
@@ -131,7 +130,7 @@ export default function MakeFreeDirectory({navigation}) {
         <>
                 <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
 
-            <SafeAreaView>
+            <SafeAreaView style={{backgroundColor: '#FCF6F5'}}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
                 <ScrollView>
@@ -139,70 +138,72 @@ export default function MakeFreeDirectory({navigation}) {
                     <View style={styles.rankingContainer}>
                         <View style={{marginVertical: 14}}>
                             <TextInput
-                                style={{paddingHorizontal: 4, fontSize: 20, fontWeight: 'bold', textAlign: 'center'}}
-                                placeholder={"보관함 이름을 입력해주세요 (2~16자)"}
+                                style={{paddingHorizontal: 14, fontSize: 20,color: '#40516E', fontWeight: 'bold'}}
+                                placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
                                 onChangeText={(name) => setCollectionName(name)}>
                             </TextInput>
                         </View>
                     </View>
                     <View style={{marginTop: 37, left: 24}}>
-                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>보관함 키워드</Text>
+                        <View style={{flexDirection:'row'}}>
+                        <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: '#40516E'}}>보관함 해시태그</Text>
+                        <Text style={{fontSize: 12, color: '#BDC2CA', alignSelf: 'center', marginLeft: 6}}>* 최대 3개</Text>
+                        </View>
                         <View style={{
                             flexDirection: 'row',
                             marginTop: 16
                         }}>
+                            
                             <View flexDirection="row">
+                                <Image source={require('../assets/images/add_keyword.png')} style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                                 {keywords.map((keyword, idx) => (
                                     <Keyword keyword={keyword} key={idx}/>
                                 ))}
                                 {/*{버튼 추가 가능하도록 만들었음.}*/}
-                                <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
+                                {/* <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
                                     setKeywords((addedKeywords) => {
                                         return [...addedKeywords, {keyword: '추가됨'}]
                                     })
-                                }}/>
+                                }}/> */}
                                 {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
                             </View>
                         </View>
                     </View>
-                    <View style={{marginTop: 37, left: 24}}>
+                    {/* <View style={{marginTop: 37, left: 24}}>
                         <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</Text>
                         <View style={{flexDirection: 'row', marginTop: 16}}>
                             <SafeAreaView>
                                 <FlatList data={users} renderItem={showUsers} keyExtractor={(item) => item.id}
                                           contentContainerStyle={{paddingBottom: 20}} horizontal={true}
                                           nestedScrollEnabled/>
-                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
                             </SafeAreaView>
                         </View>
-                    </View>
-                    <View style={{marginTop: 37, left: 24}}>
-                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>비공개 설정</Text>
-                        <View style={{
-                            marginTop: 16, alignItems: "center",
-                            justifyContent: "center"
-                        }}>
-                            <Switch
-                                trackColor={{false: "#767577", true: "#81b0ff"}}
-                                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                    </View> */}
+                                                                                {/* marginBottom은 일단 퍼블리싱때문에 */}
+                    <View style={{marginTop: 37, left: 24, flexDirection: 'row', marginBottom: '75%'}}>
+                        <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: '#40516E', marginEnd: '60%'}}>비공개 설정</Text>
+                        <Switch
+                                trackColor={{false: "#CDD0D7", true: "#7B9ACC"}}
+                                thumbColor={isEnabled ? "#fff" : "#fff"}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={toggleSwitch}
                                 value={isEnabled}
                             />
-                        </View>
                     </View>
-                    <View style={{marginTop: 37, left: 24}}>
-                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>보관함 사진</Text>
+                    {/* <View style={{marginTop: 37, left: 24}}>
+                        <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold'}}>보관함 사진</Text>
                         <View style={{flexDirection: 'row', marginTop: 16}}>
                         </View>
-                    </View>
+                    </View> */}
 
                     <TouchableOpacity
                         testID="completed"
-                        style={{backgroundColor: (DATA.collection_name.length >= 2) ? '#7B9ACC' : '#DCDCDC', height: 52, borderRadius: 10, margin: 16}}
+                        style={{backgroundColor: (DATA.collection_name.length >= 2) ? '#7B9ACC' : '#CDD0D7', height: 48, borderRadius: 10, margin: 16, marginBottom: '25%'}}
                         onPress={() => {
-                            if(DATA.collection_name.length >= 2) getCollections();
-                            else {
+                            if(DATA.collection_name.length >= 2) {
+                                getCollections();
+                                navigation.navigate('mypage');
+                            } else {
                                 alert('비어있는 필드가 있습니다.')
                             }
                         }}
@@ -214,7 +215,7 @@ export default function MakeFreeDirectory({navigation}) {
                             color: '#fff',
                             fontWeight: 'bold'
                         }}
-                        >완료</Text>
+                        >보관함 만들기</Text>
                     </TouchableOpacity>
                 </ScrollView>
                 </TouchableWithoutFeedback>
@@ -229,16 +230,26 @@ export default function MakeFreeDirectory({navigation}) {
 
 const styles = StyleSheet.create({
     selectType: {
-        borderColor: 'black',
+        borderColor: '#fff',
         borderWidth: 1,
         paddingVertical: 1,
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
+        shadowColor: '#470000',
+        shadowOffset: {width: 0, height: 10},
+        shadowOpacity: 0.2,
+        elevation: 1,
+        backgroundColor: '#fff',
+        width: 58, height: 28,
+        
     },
     selectTypeText: {
-        color: 'black',
-        fontSize: 14
+        color: '#40516E',
+        fontSize: 14,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontWeight: 'bold'
     },
     selectTypeIcon: {
         backgroundColor: 'rgb(141, 141, 141)',
@@ -249,24 +260,18 @@ const styles = StyleSheet.create({
         borderRadius: 12
     },
     selectTypeIconDetail: {
-        color: 'black',
+        color: '#40516E',
         paddingVertical: 1,
         borderRadius: 12
     },
     rankingContainer: {
-        backgroundColor: 'white',
-        // width: 287,
-        // height: 320,
-        marginTop: 36,
+        backgroundColor: '#FCF6F5',
+        width: '100%',
+        marginTop: 14,
         justifyContent: 'center',
         alignSelf: 'center',
-        borderRadius: 10,
-        shadowOffset: {
-            width: 6,
-            height: 3
-        },
-        shadowOpacity: 0.25,
-        elevation: 6,
+        borderBottomColor: '#F0E7E7',
+        borderBottomWidth: 6,
     },
     defaultImage: {
         backgroundColor: '#c4c4c4',

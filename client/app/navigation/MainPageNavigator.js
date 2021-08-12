@@ -28,7 +28,8 @@ export default function MainPageNavigator({navigation, route}) {
                 <Stack.Screen name="search" component={SearchScreen}/>
                 <Stack.Screen name="place" component={PlaceScreen} />
                 <Stack.Screen name="btn" component={MakeDirectoryBtn} />
-                <Stack.Screen name="Directory" component={MakeFreeDirectory} />
+                <Stack.Screen name="Directory" component={MakeFreeDirectory} options={{title:'자유보관함 만들기', headerStyle:{backgroundColor: '#FCF6F5', elevation: 0, shadowOpacity: 0}, headerTitleStyle:{fontSize: 16, color: '#40516E', fontWeight: 'bold', paddingLeft: '20%'}, 
+                                                                            headerLeft:()=>(<Icon type="ionicon" name={"chevron-back-outline"} style={{paddingLeft: '30%'}} color={'#40516E'}></Icon>)}}/>
             </Stack.Navigator>
         );
 

@@ -16,17 +16,16 @@ export default function HomeNavigator({navigation,route}) {
         return (
             <Tab.Navigator>
                 <Tab.Screen name="main" component={MainPageNavigator} options={{
-                    tabBarIcon:()=>(
-                    <Image style={{tintColor: 'black'}} source={require('../assets/images/home_filled.png')}></Image>),
-                    // <Icon type="ionicon" name={"home-outline"} size={26}></Icon>),
+                    tabBarIcon:({focused})=>(
+                    <Image source={focused? require('../assets/images/home_filled_click.png') : require('../assets/images/home_filled_nonclick.png')}></Image>),
                     tabBarLabel:()=>{return null}
                 }}/>
                 <Tab.Screen name="directory" component={MakeDirectoryBtn} options={{title:'', tabBarIcon:()=>(
                     MakeDirectoryBtn({navigation}))
                 }}/>
                 <Tab.Screen name="mypage" component={MyPageScreen} options={{title: '마이페이지',
-                    tabBarIcon:()=>(
-                    <Image style={{tintColor: 'black'}} source={require('../assets/images/record_voice_over.png')}></Image>),
+                    tabBarIcon:({focused})=>(
+                    <Image source={focused ? require('../assets/images/record_voice_over_click.png') : require('../assets/images/record_voice_over_nonclick.png')}></Image>),
                     // <Icon type="ionicon" name={"person-outline"} size={26}></Icon>),
                     tabBarLabel:()=>{return null}
                 }}/>
