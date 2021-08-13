@@ -20,9 +20,9 @@ export default class MainPageNavigator extends React.Component {
         return (
             <Stack.Navigator initialRouteName="main">
                 {Platform.OS === 'android' ?
-                <Stack.Screen name="main" component={MainPage} options={{headerTitle: 'Here.', headerTitleStyle: {fontSize: 28, fontWeight: 'bold', color: 'white'}, headerStyle: {backgroundColor: 'black'}, headerLeft: ()=>null, headerRight: ()=><TouchableOpacity onPress={() => this.props.navigation.navigate('search')}>
+                <Stack.Screen name="main" component={MainPage} options={{headerTitle: 'Here.', headerTitleStyle: {fontSize: 28, fontWeight: 'bold', color: '#7B9ACC'}, headerStyle: {backgroundColor: '#FCF6F5', elevation: 0, shadowOpacity: 0}, headerLeft: ()=>null, headerRight: ()=><TouchableOpacity onPress={() => this.props.navigation.navigate('search')}>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon type="ionicon" name={"md-search"} color="white" style={{marginEnd: 20}}  size={28}></Icon>
+                        <Icon type="ionicon" name={"md-search"} color="#7B9ACC" style={{marginEnd: 20}}  size={28}></Icon>
                     </View>
                 </TouchableOpacity>}}/> : <Stack.Screen name="main" component={MainPage} options={{headerShown: false}}/>
                 }
