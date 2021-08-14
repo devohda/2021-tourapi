@@ -12,28 +12,13 @@ import {
     Switch,
     KeyboardAvoidingView,
     Keyboard,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    TouchableHighlight
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import Toast from 'react-native-easy-toast';
 
 export const navigationRef = React.createRef();
-
-const Keyword = ({keyword, idx, pressFunc}) => {
-    return (
-        <View key={idx}
-              style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-              }}
-        >
-            <TouchableOpacity style={styles.selectType} onPress={pressFunc}>
-                <Text style={styles.selectTypeText}>{keyword.keyword}</Text>
-            </TouchableOpacity>
-        </View>
-    )
-}
 
 export default function MakeFreeDirectory({navigation}) {
     //자유보관함이므로 type은 0
@@ -45,19 +30,62 @@ export default function MakeFreeDirectory({navigation}) {
       }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
+    const [keywordData, setKeywordData] = useState([]);
+    //키워드 수 만큼 press 여부를 만든다
+    const [isPress, setIsPress] = useState([]);
+    const [putKeywords, setPutKeywords] = useState('');
+    const makeKeywordData = () => {
+        var datas = '';
+        for(let i=0;i<keywordData.length;i++) {
+            if(isPress[i] === true) {
+                console.log(keywordData[i].keyword_title)
+                datas = datas.concat(keywordData[i].keyword_title+',')
+                // putKeywords.concat(keywordData[i].keyword_title+',')
+            }
+        }
+        setPutKeywords(datas)
+        postCollections()
+    }
+    // const Keyword = ({keyword, idx, pressFunc}) => {
+    const Keyword = ({keyword, idx}) => {
+        return (
+            <View key={idx}
+                style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+                
+            >
+                {/* <TouchableOpacity style={styles.selectType} onPress={pressFunc}> */}
+                <TouchableOpacity onPress={()=>{
+                    let newArr = [...isPress];
+                    if(isPress[keyword.keyword_pk-1]) {
+                        newArr[keyword.keyword_pk-1] = false;
+                        setIsPress(newArr);
+                    } else {
+                        newArr[keyword.keyword_pk-1] = true;
+                        setIsPress(newArr);
+                    }
+                    }} style={isPress[keyword.keyword_pk-1] ? styles.selectTypeClicked : styles.selectType}>
+                    <Text style={isPress[keyword.keyword_pk-1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{keyword.keyword_title}</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    }
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const DATA = {
         collection_name: collectionName,
         collection_type: 0,
-        collection_private: (isEnabled===true) ? 1: 0
+        collection_private: (isEnabled===true) ? 1: 0,
+        collection_keywords: putKeywords
     }
-    console.log(DATA.collection_private)
-    const getCollections = () => {
+
+    const postCollections = () => {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
-            //TODO 언어 바꾸기 필요
-            console.log(DATA.collection_name)
-            fetch('http://172.30.1.36:3000/collections/collections_free_post', {
+            console.log(putKeywords)
+            fetch('http://172.30.1.43:3000/collections/collections_free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -77,27 +105,29 @@ export default function MakeFreeDirectory({navigation}) {
         }
         // navigation.navigate('mypage', {from: 'makeDir'})
     }
-
-    // TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
-    const [keywords, setKeywords] = useState([
-        {
-            id: '1',
-            keyword: '힐링',
-        },
-        {
-            id: '2',
-            keyword: '관광',
-        },
-        {
-            id: '3',
-            keyword: '여유',
-        },
-        {
-            id: '4',
-            keyword: '뚜벅'
+    const getKeywords = useCallback(() => {
+        try {
+    
+            fetch('http://172.30.1.43:3000/keyword/keywords', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((res) => res.json())
+                .then((responsedata) => {
+                    setKeywordData(responsedata)
+                    console.log(keywordData)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+    
+        } catch (err) {
+            console.error(err);
         }
-    ])
-
+    }, []);
+    //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
     //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
     const users = [
         {
@@ -120,20 +150,24 @@ export default function MakeFreeDirectory({navigation}) {
         </View>
     )
 
+    const setFalse = () => {
+        var pressed = [];
+        for(let i=0;i<keywordData.length;i++) {
+            pressed.push(false)
+        }
+        setIsPress(pressed)
+    }
 
     useEffect(() => {
         // getCollections();
-        // Keyboard.dismiss();
-    })
+        getKeywords();
+    }, [])
 
     return (
         <>
-                <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
-
-            <SafeAreaView style={{backgroundColor: '#FCF6F5'}}>
+            <SafeAreaView style={{backgroundColor: '#FCF6F5', flex: 1}}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-
-                <ScrollView>
+                <ScrollView keyboardShouldPersistTaps='always'>
 
                     <View style={styles.rankingContainer}>
                         <View style={{marginVertical: 14}}>
@@ -156,7 +190,7 @@ export default function MakeFreeDirectory({navigation}) {
                             
                             <View flexDirection="row">
                                 <Image source={require('../assets/images/add_keyword.png')} style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                                {keywords.map((keyword, idx) => (
+                                {keywordData.map((keyword, idx) => (
                                     <Keyword keyword={keyword} key={idx}/>
                                 ))}
                                 {/*{버튼 추가 가능하도록 만들었음.}*/}
@@ -180,7 +214,7 @@ export default function MakeFreeDirectory({navigation}) {
                         </View>
                     </View> */}
                                                                                 {/* marginBottom은 일단 퍼블리싱때문에 */}
-                    <View style={{marginTop: 37, left: 24, flexDirection: 'row', marginBottom: '75%'}}>
+                    <View style={{marginTop: 37, left: 24, flexDirection: 'row', marginBottom: '65%'}}>
                         <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: '#40516E', marginEnd: '60%'}}>비공개 설정</Text>
                         <Switch
                                 trackColor={{false: "#CDD0D7", true: "#7B9ACC"}}
@@ -196,17 +230,22 @@ export default function MakeFreeDirectory({navigation}) {
                         </View>
                     </View> */}
 
+                </ScrollView>
+            </TouchableWithoutFeedback>
+            </SafeAreaView>
+            <KeyboardAvoidingView style={{backgroundColor:'#FCF6F5'}}>
                     <TouchableOpacity
                         testID="completed"
-                        style={{backgroundColor: (DATA.collection_name.length >= 2) ? '#7B9ACC' : '#CDD0D7', height: 48, borderRadius: 10, margin: 16, marginBottom: '25%'}}
+                        style={{backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? '#7B9ACC' : '#CDD0D7', height: 48, borderRadius: 10, margin: 16, marginBottom: '5%'}}
                         onPress={() => {
-                            if(DATA.collection_name.length >= 2) {
-                                getCollections();
-                                navigation.navigate('mypage');
-                            } else {
-                                alert('비어있는 필드가 있습니다.')
+                            if((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
+                                makeKeywordData();
+                                navigation.setOptions({tabBarVisible: true});
+                                navigation.goBack(null);
+                                alert('자유보관함이 생성되었습니다')
                             }
                         }}
+                        disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3)? true : false}
                     ><Text
                         style={{
                             textAlign: 'center',
@@ -217,11 +256,7 @@ export default function MakeFreeDirectory({navigation}) {
                         }}
                         >보관함 만들기</Text>
                     </TouchableOpacity>
-                </ScrollView>
-                </TouchableWithoutFeedback>
-
-            </SafeAreaView>
-            </KeyboardAvoidingView>
+                    </KeyboardAvoidingView>
 
         </>
     )
@@ -242,14 +277,36 @@ const styles = StyleSheet.create({
         elevation: 1,
         backgroundColor: '#fff',
         width: 58, height: 28,
-        
+    },
+    selectTypeClicked: {
+        borderColor: '#7B9ACC',
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8.5,
+        borderRadius: 12,
+        marginRight: 10,
+        shadowColor: '#470000',
+        shadowOffset: {width: 0, height: 10},
+        shadowOpacity: 0.2,
+        elevation: 1,
+        backgroundColor: '#7B9ACC',
+        width: 58, height: 28,
+    },
+    selectTypeTextClicked: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontWeight: 'bold',
+        marginVertical: 2
     },
     selectTypeText: {
         color: '#40516E',
         fontSize: 14,
         textAlign: 'center',
         textAlignVertical: 'center',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        marginVertical: 2
     },
     selectTypeIcon: {
         backgroundColor: 'rgb(141, 141, 141)',

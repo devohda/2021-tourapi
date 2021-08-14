@@ -176,17 +176,31 @@ function Like() {
 function Collection() {
     useEffect(() => {
         getCollectionsFromUsers();
-    },[])
+    }, [])
     const [directoryData, setDirectoryData] = useState({})
     const DATA = []; let json = []
-    const getCollectionsFromUsers = async () => {
-        let response = await fetch(
-          'http://172.30.1.36:3000/collections/collections_free_fromUsers'
-        );
-        json = await response.json();
-        setDirectoryData(json);
-        console.log(json)
-      }
+
+    const getCollectionsFromUsers = () => {
+        try {
+    
+            fetch('http://172.30.1.43:3000/collections/collections_free', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((res) => res.json())
+                .then((responsedata) => {
+                    setDirectoryData(responsedata)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+    
+        } catch (err) {
+            console.error(err);
+        }
+    }
     const showDirectories = ({item}) => (
         // console.log(item)
             <View className="place-container"

@@ -8,7 +8,7 @@ import MyTabs from "../navigation/MypageNavigator";
 const MyPageScreen = () => {
     useEffect(() => {
         getCollections();
-    })
+    },[])
     const [DATA, useDATA] = useState({
         user_email: '',
         user_nickname: '',
@@ -16,10 +16,12 @@ const MyPageScreen = () => {
         user_pk: 0,
         user_profileImage: '',
     })
+    const [directoryData, setDirectoryData] = useState([])
+
     const getCollections = () => {
         try {
     
-            fetch('http://172.30.1.36:3000/user/users', {
+            fetch('http://172.30.1.43:3000/user/users', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

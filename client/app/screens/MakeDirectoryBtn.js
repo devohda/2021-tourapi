@@ -5,13 +5,13 @@ import {View, Text, Button, Touchable, TouchableOpacity, Image} from "react-nati
 import {Icon} from 'react-native-elements';
 import RBSheet from "react-native-raw-bottom-sheet";
 
-export default function sameComponent({navigation}) {
+export default function MakeDirectoryBtn({navigation}) {
     const refRBSheet = useRef();
     const [clicked, setClicked] = useState(false);
     return (
         <View style={{justifyContent: 'flex-end', paddingBottom: '3%', width:'100%', height: '200%'}}>
         <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
-            <Image style={{alignSelf:'center', marginBottom: '5%'}} source={clicked ? require('../assets/images/add_btn_click.png') : require('../assets/images/add_btn_nonclick.png')}></Image>
+            <Image style={{alignSelf:'center', marginBottom: 5}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
             {/* <Icon type="ionicon" name={"add-circle-outline"} size={45} color={'#7B9ACC'}/> */}
                 <RBSheet
                     ref={refRBSheet}
@@ -27,7 +27,8 @@ export default function sameComponent({navigation}) {
                     },
                     container: {
                         borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10
+                        borderTopRightRadius: 10,
+                        backgroundColor: '#FCF6F5'
                     }
                     }}
                 >

@@ -14,10 +14,10 @@ const Tab = createBottomTabNavigator();
 
 export default function HomeNavigator({navigation,route}) {
         return (
-            <Tab.Navigator>
+            <Tab.Navigator tabBarOptions={{keyboardHidesTabBar: true}}>
                 <Tab.Screen name="main" component={MainPageNavigator} options={{
                     tabBarIcon:({focused})=>(
-                    <Image source={focused? require('../assets/images/home_filled_click.png') : require('../assets/images/home_filled_nonclick.png')}></Image>),
+                    <Image source={focused? require('../assets/images/home_filled_click.png') : require('../assets/images/home_filled_nonclick.png')} style={{marginBottom: 5}}></Image>),
                     tabBarLabel:()=>{return null}
                 }}/>
                 <Tab.Screen name="directory" component={MakeDirectoryBtn} options={{title:'', tabBarIcon:()=>(
@@ -25,8 +25,7 @@ export default function HomeNavigator({navigation,route}) {
                 }}/>
                 <Tab.Screen name="mypage" component={MyPageScreen} options={{title: '마이페이지',
                     tabBarIcon:({focused})=>(
-                    <Image source={focused ? require('../assets/images/record_voice_over_click.png') : require('../assets/images/record_voice_over_nonclick.png')}></Image>),
-                    // <Icon type="ionicon" name={"person-outline"} size={26}></Icon>),
+                    <Image source={focused ? require('../assets/images/record_voice_over_click.png') : require('../assets/images/record_voice_over_nonclick.png')} style={{marginBottom: 5}}></Image>),
                     tabBarLabel:()=>{return null}
                 }}/>
             </Tab.Navigator>

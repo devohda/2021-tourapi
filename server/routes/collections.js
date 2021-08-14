@@ -20,11 +20,11 @@ router.get('/collections_free_fromUsers', async (req, res) => {
     res.send(rows);
 });
 
-router.post('/collections_free_post', async (req, res) => {
+router.post('/collections_free', async (req, res) => {
     console.log(req.body);
-    const {collection_name, collection_private} = req.body;
+    const {collection_name, collection_private, collection_keywords} = req.body;
     //회원가입 때 날아온 user_pk를 넣어줘야한다
-    const result = await db.query('insert into collections(collection_name, user_pk, collection_private) values (?, 3, ?);', [collection_name, collection_private]);
+    const result = await db.query('insert into collections(collection_name, user_pk, collection_private, collection_keywords) values (?, 3, ?, ?);', [collection_name, collection_private, collection_keywords]);
     console.log(result)
 })
 
