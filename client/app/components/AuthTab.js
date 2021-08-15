@@ -7,8 +7,6 @@ const ProgressBar = styled(View)`
   width: 67px;
   height: 24px;
   fontWeight: normal;
-  backgroundColor: #fff;
-  borderColor: #fff;
   top: 44px;
   flexDirection: row;
 `
@@ -36,11 +34,8 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                 {btnStyles.map((btnStyle, idx) => <View key={idx} style={btnStyle}></View>)}
             </ProgressBar>
             <Form>
-                <Text style={{fontSize: 28}}>
-                    <Text>나만의 <Text style={{fontWeight: "bold"}}>공간 보관함</Text>을</Text>{"\n"}채워볼까요?
-                </Text>
-                <Text style={{fontSize: 16, marginTop: 67, marginBottom: 12}}>
-                    <Text style={{fontWeight: "bold"}}>{question}</Text> 을/를 입력해주세요
+                <Text style={{fontSize : 30, color : '#40516E'}}>
+                    {question}
                 </Text>
                 <InputBox
                     defaultValue={userValue}
@@ -48,7 +43,6 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                     onChangeText={(text) => setValue(text)}
                     autoCapitalize="none"
                 />
-                {/* <Text>{userValue}</Text> */}
             </Form>
             <TouchableOpacity
                 style={{

@@ -4,25 +4,35 @@ import {Button, StyleSheet, Text, View} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import SignInEmailScreen from '../screens/auth/SignInEmailScreen';
-import SignUpEmailScreen from '../screens/auth/SignUpEmailScreen';
 import FindPasswordScreen from '../screens/auth/FindPasswordScreen'
 import SignUpSocialScreen from "../screens/auth/SignUpSocialScreen";
+import SignUpEmailNavigator from "./SignUpEmailNavigator";
 
 const Stack = createStackNavigator()
 
 export default function AuthenticationNavigator({navigation, setIsSignedIn}) {
     return (
-        <Stack.Navigator initialRouteName="SignUpSocial">
+        <Stack.Navigator initialRouteName="SignUpSocial"
+                         screenOptions={{
+                             headerStyle: {
+                                 backgroundColor: '#FCF6F5',
+                                 elevation: 0, // remove shadow on Android
+                                 shadowOpacity: 0, // remove shadow on iOS
+                             },
+                             headerTintColor: '#40516E',
+                             headerTitleStyle: {
+                                 fontWeight: 'bold',
+                             },
+                         }}>
             <Stack.Screen name="SignUpSocial" component={SignUpSocialScreen} options={{headerShown: false}}/>
             <Stack.Screen name="SignInEmail"
                           component={SignInEmailScreen}
                           options={{headerShown: false}}
                           appNavigation={navigation}
             />
-            <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen}
+            <Stack.Screen name="SignUpEmail" component={SignUpEmailNavigator}
                           options={{
                               title: '회원가입',
-                              headerStyle: {elevation: 0},
                               headerTitleStyle: {fontSize: 18}
                           }}
             />

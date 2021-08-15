@@ -14,6 +14,7 @@ const NavigationTheme = {
 };
 
 import AuthTab from "../../components/AuthTab";
+import ScreenContainer from "../../components/ScreenContainer";
 
 const styles = StyleSheet.create({
     yellowRect: {
@@ -123,7 +124,6 @@ const CompletedTab = ({navigation, data}) => {
                     marginTop: 67,
                     marginBottom: 12
                 }}></Text>
-                {/* {data.email + data.password + data.nickname} */}
                 <TextInput style={{fontSize: 16, marginBottom: 27, paddingBottom: 11}}/>
             </View>
             <TouchableOpacity
@@ -152,12 +152,12 @@ const SignUpEmailScreen = (props) => {
     const tab = [FirstTab, SecondTab, ThirdTab]
 
     return (
-        <>
+        <ScreenContainer backgroundColor="#FCF6F5">
             {step < 3 ?
                 tab[step] :
                 <CompletedTab navigation={props.navigation} data={{email, password, nickname}}/>
             }
-        </>
+        </ScreenContainer>
     );
 };
 

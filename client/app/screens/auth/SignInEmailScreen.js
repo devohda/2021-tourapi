@@ -46,11 +46,11 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                 <TouchableOpacity onPress={() => {
                     setIsSignedIn(true)
                 }}>
-                    <Text style={{color: '#DCDCDC', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text>
+                    <Text style={{color: '#40516E', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.container}>
-                <Text style={{fontSize: 28}}>
+                <Text style={{fontSize: 28, color: '#40516E'}}>
                     <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
                     <Text>{"\n"}채워볼까요?</Text>
                 </Text>
@@ -70,42 +70,33 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     fontSize: 16,
                     borderBottomWidth: 1,
                     borderBottomColor: '#C5C5C5',
-                    marginBottom: 27,
+                    marginBottom: 38,
                     paddingBottom: 11
                 }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
                            onChangeText={(text) => setPassword(text)}
                            autoCapitalize="none"
                 />
                 <TouchableOpacity
-                    style={{backgroundColor: '#DCDCDC', height: 52, borderRadius: 10}}
+                    style={{
+                        backgroundColor: '#BDC2CA',
+                        height: 52,
+                        borderRadius: 10,
+                        alignItems: 'center',
+                        justifyContent: "center"
+                    }}
                     onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                 >
                     <Text style={styles.loginText}>로그인</Text>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('FindPassword')} style={{marginRight: 29}}>
-                        <Text>아이디/비밀번호찾기</Text>
-                    </TouchableOpacity>
-                    <Text style={{marginRight: 29}}>|</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}}>
                         <Text>회원가입</Text>
                     </TouchableOpacity>
+                    <Text style={{marginRight: 29, color : '#929292'}}>|</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('FindPassword')}>
+                        <Text>비밀번호 재설정</Text>
+                    </TouchableOpacity>
                 </View>
-                {/*<View style={{flexDirection: 'row', alignItems: 'center', marginTop: 44}}>*/}
-                {/*    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>*/}
-                {/*    <View>*/}
-                {/*        <Text style={{*/}
-                {/*            width: 139,*/}
-                {/*            textAlign: 'center',*/}
-                {/*            color: '#929292',*/}
-                {/*            fontSize: 16,*/}
-                {/*            fontWeight: 'bold',*/}
-                {/*            marginStart: 18,*/}
-                {/*            marginEnd: 18*/}
-                {/*        }}>3초만에 간편 로그인</Text>*/}
-                {/*    </View>*/}
-                {/*    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>*/}
-                {/*</View>*/}
             </View>
         </ScreenContainer>
     );
