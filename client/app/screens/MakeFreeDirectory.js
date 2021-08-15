@@ -13,7 +13,7 @@ import {
     KeyboardAvoidingView,
     Keyboard,
     TouchableWithoutFeedback,
-    TouchableHighlight
+    Alert
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import Toast from 'react-native-easy-toast';
@@ -34,17 +34,40 @@ export default function MakeFreeDirectory({navigation}) {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
-    const makeKeywordData = () => {
+    const postCollections = () => {
         var datas = '';
         for(let i=0;i<keywordData.length;i++) {
             if(isPress[i] === true) {
-                console.log(keywordData[i].keyword_title)
                 datas = datas.concat(keywordData[i].keyword_title+',')
-                // putKeywords.concat(keywordData[i].keyword_title+',')
             }
         }
-        setPutKeywords(datas)
-        postCollections()
+        try {
+            // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
+            console.log(datas)
+            fetch('http://192.168.0.11:3000/collections/collections_free', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    collection_name: collectionName,
+                    collection_type: 0,
+                    collection_private: (isEnabled===true) ? 1: 0,
+                    collection_keywords: datas,
+                    collection_type: 1,
+                })
+            }).then((res) => res.text())
+                .then((responsedata) => {
+                    // console.log(responsedata)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
     }
     // const Keyword = ({keyword, idx, pressFunc}) => {
     const Keyword = ({keyword, idx}) => {
@@ -78,37 +101,14 @@ export default function MakeFreeDirectory({navigation}) {
         collection_name: collectionName,
         collection_type: 0,
         collection_private: (isEnabled===true) ? 1: 0,
-        collection_keywords: putKeywords
+        collection_keywords: putKeywords,
+        collection_type: 1,
     }
 
-    const postCollections = () => {
-        try {
-            // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
-            console.log(putKeywords)
-            fetch('http://172.30.1.43:3000/collections/collections_free', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(DATA)
-            }).then((res) => res.text())
-                .then((responsedata) => {
-                    console.log(responsedata)
-                })
-                .catch((err) => {
-                    console.error(err)
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-        // navigation.navigate('mypage', {from: 'makeDir'})
-    }
     const getKeywords = useCallback(() => {
         try {
     
-            fetch('http://172.30.1.43:3000/keyword/keywords', {
+            fetch('http://192.168.0.11:3000/keyword/keywords', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -117,7 +117,8 @@ export default function MakeFreeDirectory({navigation}) {
             }).then((res) => res.json())
                 .then((responsedata) => {
                     setKeywordData(responsedata)
-                    console.log(keywordData)
+                    setFalse()
+                    // console.log(keywordData)
                 })
                 .catch((err) => {
                     console.error(err)
@@ -159,7 +160,6 @@ export default function MakeFreeDirectory({navigation}) {
     }
 
     useEffect(() => {
-        // getCollections();
         getKeywords();
     }, [])
 
@@ -239,10 +239,10 @@ export default function MakeFreeDirectory({navigation}) {
                         style={{backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? '#7B9ACC' : '#CDD0D7', height: 48, borderRadius: 10, margin: 16, marginBottom: '5%'}}
                         onPress={() => {
                             if((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
-                                makeKeywordData();
+                                postCollections();
                                 navigation.setOptions({tabBarVisible: true});
                                 navigation.goBack(null);
-                                alert('자유보관함이 생성되었습니다')
+                                Alert.alert('', '자유보관함이 생성되었습니다')
                             }
                         }}
                         disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3)? true : false}
