@@ -42,14 +42,12 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor="#FCF6F5">
-            <View style={styles.button}>
-                <TouchableOpacity onPress={() => {
-                    setIsSignedIn(true)
-                }}>
-                    <Text style={{color: '#40516E', fontSize: 16, alignSelf: 'center'}}>둘러보기</Text>
+            <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
+                <TouchableOpacity onPress={() => {setIsSignedIn(true)}}>
+                    <Text style={{color: '#40516E', fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.container}>
+            <View style={{marginTop : 86}}>
                 <Text style={{fontSize: 28, color: '#40516E'}}>
                     <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
                     <Text>{"\n"}채워볼까요?</Text>
@@ -109,14 +107,6 @@ const styles = StyleSheet.create({
         height: 24,
         fontWeight: 'normal',
         top: 44,
-    },
-    container: {
-        margin: 10,
-        fontSize: 28,
-        fontWeight: "400",
-        top: 118,
-        left: 16,
-        width: 343,
     },
     loginText: {
         textAlign: 'center',

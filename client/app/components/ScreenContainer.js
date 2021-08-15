@@ -1,5 +1,5 @@
 import React from 'react'
-import {SafeAreaView, View, Platform} from "react-native";
+import {SafeAreaView, View, Platform, KeyboardAvoidingView} from "react-native";
 
 const ScreenContainer = props => {
     return (
@@ -9,9 +9,12 @@ const ScreenContainer = props => {
             width: "100%",
             paddingTop: Platform.OS === 'android' ? 25 : 0
         }}>
-            <View flex={1} style={{marginHorizontal : 20}}>
+            <KeyboardAvoidingView flex={1}
+                                  behavior={Platform.OS === "ios" ? "padding" : "height"}
+                                  keyboardVerticalOffset={+84}
+                                  style={{marginHorizontal: 20}}>
                 {props.children}
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

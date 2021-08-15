@@ -11,8 +11,6 @@ const ProgressBar = styled(View)`
 `
 
 const Form = styled(View)`
-  fontSize: 28px;
-  width: 343px;
   margin-top: 63px;
 `
 
@@ -28,9 +26,7 @@ const InputBox = styled(TextInput)`
 const GetEmailTab = ({navigation}) => {
     return (
         <ScreenContainer backgroundColor="#FCF6F5">
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{marginHorizontal: 20, height : '100%'}}>
+            <View flex={1}>
                 <ProgressBar>
                     <View style={{...styles.progress, ...styles.progress_active}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
@@ -50,27 +46,15 @@ const GetEmailTab = ({navigation}) => {
                         style={{marginTop: 40}}
                     />
                 </Form>
-                <View flex={1} style={{justifyContent : 'flex-end', paddingBottom : 100}}>
-                    <TouchableOpacity
-                        style={{
-                            backgroundColor: '#DCDCDC',
-                            height: 48,
-                            borderRadius: 10
-                        }}
-                        onPress={() => navigation.navigate('passwordTab')}
-                    >
-                        <Text style={{
-                            textAlign: 'center',
-                            padding: 14,
-                            fontSize: 16,
-                            color: '#fff',
-                            fontWeight: 'bold'
-                        }}>
-                            계속하기
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
+            </View>
+            <View style={{marginBottom: 20}}>
+                <TouchableOpacity
+                    style={styles.continue_btn}
+                    onPress={() => navigation.navigate('passwordTab')}
+                >
+                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                </TouchableOpacity>
+            </View>
         </ScreenContainer>
     )
 }
@@ -94,6 +78,13 @@ const styles = StyleSheet.create({
         fontSize: 30,
         color: '#40516E',
         lineHeight: 44,
+    },
+    continue_btn: {
+        backgroundColor: '#CDD0D7',
+        height: 48,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 })
 
