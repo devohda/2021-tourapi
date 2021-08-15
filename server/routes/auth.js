@@ -5,6 +5,8 @@ const twilioConfig = require('../config/twilio')
 const {authToken, accountSid} = twilioConfig
 const client = require('twilio')(accountSid, authToken);
 
+const authService = require('../services/authService')
+
 // 본인인증 - 휴대폰 인증 sms 보내기
 router.post('/authPhone', async (req, res) => {
     // TODO 인증번호 생성해서 같이 send 하기
@@ -25,6 +27,12 @@ router.post('/authPhone', async (req, res) => {
 
     res.send({state: 'SUCCESS'})
 });
+
+router.post('/makeAccount', async (req, res, next) => {
+    const {userInfo} = req.body;
+    const result = await authService.addUser(userInfo);
+    res.send(result);
+})
 
 module.exports = router;
 

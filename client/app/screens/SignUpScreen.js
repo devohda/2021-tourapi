@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
-import * as firebase from "firebase";
 
 // 네비게이션
 const Stack = createStackNavigator()
@@ -13,7 +12,6 @@ const NavigationTheme = {
         background: 'transparent'
     },
 };
-
 
 import AuthTab from "../components/AuthTab";
 
@@ -81,10 +79,32 @@ const getTabData = (num) => {
     }
 }
 
-const signUp = (email, password, nickname) => {
-    try{
-        firebase.auth().createUserWithEmailAndPassword(email,password)
-    }catch (e) {
+
+const signUp = async (user_email, user_password, user_nickname) => {
+    try {
+        let url = 'http://localhost:3000/auth/makeAccount';
+        let options = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                userInfo: {
+                    user_email,
+                    user_password,
+                    user_nickname
+                }
+            })
+        };
+        let response = await fetch(url, options);
+        let responseOK = response && response.ok;
+        if (responseOK) {
+            let data = await response.json();
+            alert(data)
+        }
+    } catch (e) {
         console.log(e.toString())
     }
 }
