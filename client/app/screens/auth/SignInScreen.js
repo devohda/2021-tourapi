@@ -3,7 +3,7 @@ import React, {useContext, useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import * as firebase from "firebase";
-import {useIsSignedIn} from "../components/SignedInContextProvider";
+import {useIsSignedIn} from "../../components/SignedInContextProvider";
 
 // firebase 연동
 const firebaseConfig = {

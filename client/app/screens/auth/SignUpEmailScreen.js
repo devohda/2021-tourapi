@@ -13,7 +13,7 @@ const NavigationTheme = {
     },
 };
 
-import AuthTab from "../components/AuthTab";
+import AuthTab from "../../components/AuthTab";
 
 const styles = StyleSheet.create({
     yellowRect: {
@@ -139,7 +139,7 @@ const CompletedTab = ({navigation, data}) => {
     )
 }
 
-const SignUpScreen = (props) => {
+const SignUpEmailScreen = (props) => {
     const [step, setStep] = useState(0)
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
@@ -161,5 +161,5 @@ const SignUpScreen = (props) => {
     );
 };
 
-export default SignUpScreen;
+export default SignUpEmailScreen;
 
