@@ -70,11 +70,11 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                     </TouchableOpacity>
                 </View>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent : 'stretch'}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('FindPassword')} style={{marginRight: 29}}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}}>
                         <Text>이메일로 로그인</Text>
                     </TouchableOpacity>
                     <Text style={{marginRight: 29}}>|</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')}>
                         <Text>이메일 회원가입</Text>
                     </TouchableOpacity>
                 </View>

@@ -4,6 +4,7 @@ import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react
 
 import * as firebase from "firebase";
 import {useIsSignedIn} from "../../components/SignedInContextProvider";
+import ScreenContainer from "../../components/ScreenContainer";
 
 // firebase 연동
 const firebaseConfig = {
@@ -33,14 +34,14 @@ const signIn = (email, password, navigation, setIsSignedIn) => {
 }
 
 
-const SignInScreen = ({appNavigation, navigation}) => {
+const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
 
     return (
-        <>
+        <ScreenContainer backgroundColor="#FCF6F5">
             <View style={styles.button}>
                 <TouchableOpacity onPress={() => {
                     setIsSignedIn(true)
@@ -106,7 +107,7 @@ const SignInScreen = ({appNavigation, navigation}) => {
                 {/*    <View style={{flex: 1, height: 1, backgroundColor: '#929292'}}/>*/}
                 {/*</View>*/}
             </View>
-        </>
+        </ScreenContainer>
     );
 }
 
@@ -135,4 +136,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SignInScreen;
+export default SignInEmailScreen;
