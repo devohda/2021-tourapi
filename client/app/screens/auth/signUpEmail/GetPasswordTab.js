@@ -23,23 +23,22 @@ const InputBox = styled(TextInput)`
 `
 
 
-const GetEmailTab = ({navigation}) => {
+const GetPasswordTab = ({navigation}) => {
     const [isValid, setIsValid] = useState(false)
-
     return (
         <>
             <View flex={1}>
                 <ProgressBar>
-                    <View style={{...styles.progress, ...styles.progress_active}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
+                    <View style={{...styles.progress, ...styles.progress_active}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>
                     <Text>
                         <View>
                             <Text style={styles.title_text}><Text
-                                style={{fontWeight: 'bold'}}>이메일주소</Text><Text>를</Text></Text>
-                            <Text style={styles.title_text}>입력해주세요</Text>
+                                style={{fontWeight: 'bold'}}>비밀번호</Text><Text>를</Text></Text>
+                            <Text style={styles.title_text}>설정해주세요</Text>
                         </View>
                     </Text>
                     <InputBox
@@ -52,7 +51,7 @@ const GetEmailTab = ({navigation}) => {
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
-                    onPress={() => navigation.navigate('passwordTab')}
+                    onPress={() => navigation.navigate('nicknameTab')}
                 >
                     <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
                 </TouchableOpacity>
@@ -90,4 +89,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default GetEmailTab;
+export default GetPasswordTab;

@@ -22,26 +22,51 @@ const InputBox = styled(TextInput)`
   paddingBottom: 11px;
 `
 
+const signUp = async (user_email, user_password, user_nickname) => {
+    try {
+        let url = 'http://localhost:3000/auth/makeAccount';
+        let options = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                userInfo: {
+                    user_email,
+                    user_password,
+                    user_nickname
+                }
+            })
+        };
+        let response = await fetch(url, options);
+        let responseOK = response && response.ok;
+        if (responseOK) {
+            let data = await response.json();
+            alert(data)
+        }
+    } catch (e) {
+        console.log(e.toString())
+    }
+}
 
-const GetEmailTab = ({navigation}) => {
+const GetNicknameTab = ({navigation, authNavigation}) => {
     const [isValid, setIsValid] = useState(false)
-
     return (
         <>
             <View flex={1}>
                 <ProgressBar>
+                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
+                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                     <View style={{...styles.progress, ...styles.progress_active}}></View>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>
-                    <Text>
-                        <View>
-                            <Text style={styles.title_text}><Text
-                                style={{fontWeight: 'bold'}}>이메일주소</Text><Text>를</Text></Text>
-                            <Text style={styles.title_text}>입력해주세요</Text>
-                        </View>
-                    </Text>
+                    <View>
+                        <Text style={styles.title_text}><Text
+                            style={{fontWeight: 'bold'}}>닉네임</Text><Text>을</Text></Text>
+                        <Text style={styles.title_text}>설정해주세요</Text>
+                    </View>
                     <InputBox
                         placeholder="hiddenjewel@gmail.com"
                         autoCapitalize="none"
@@ -52,9 +77,9 @@ const GetEmailTab = ({navigation}) => {
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
-                    onPress={() => navigation.navigate('passwordTab')}
+                    onPress={() => authNavigation.navigate('SignInEmail')}
                 >
-                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
                 </TouchableOpacity>
             </View>
         </>
@@ -90,4 +115,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default GetEmailTab;
+export default GetNicknameTab;
