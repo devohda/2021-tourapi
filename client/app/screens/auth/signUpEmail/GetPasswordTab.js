@@ -24,7 +24,37 @@ const InputBox = styled(TextInput)`
 
 
 const GetPasswordTab = ({navigation}) => {
-    const [isValid, setIsValid] = useState(false)
+    const [password, setPassword] = useState(false)
+
+    const styles = StyleSheet.create({
+        progress: {
+            height: 8,
+            borderRadius: 6,
+            top: 0,
+            marginLeft: 12,
+        },
+        progress_active: {
+            width: 28,
+            backgroundColor: '#7B9ACC'
+        },
+        progress_inactive: {
+            width: 8,
+            backgroundColor: '#CDD0D7'
+        },
+        title_text: {
+            fontSize: 30,
+            color: '#40516E',
+            lineHeight: 44,
+        },
+        continue_btn: {
+            backgroundColor: password ? '#7B9ACC' : '#CDD0D7',
+            height: 48,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }
+    })
+
     return (
         <>
             <View flex={1}>
@@ -52,6 +82,7 @@ const GetPasswordTab = ({navigation}) => {
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => navigation.navigate('nicknameTab')}
+                    disabled={password ? false : true}
                 >
                     <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
                 </TouchableOpacity>
@@ -59,34 +90,5 @@ const GetPasswordTab = ({navigation}) => {
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    progress: {
-        height: 8,
-        borderRadius: 6,
-        top: 0,
-        marginLeft: 12,
-    },
-    progress_active: {
-        width: 28,
-        backgroundColor: '#7B9ACC'
-    },
-    progress_inactive: {
-        width: 8,
-        backgroundColor: '#CDD0D7'
-    },
-    title_text: {
-        fontSize: 30,
-        color: '#40516E',
-        lineHeight: 44,
-    },
-    continue_btn: {
-        backgroundColor: '#CDD0D7',
-        height: 48,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
-})
 
 export default GetPasswordTab;

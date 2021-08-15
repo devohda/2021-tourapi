@@ -34,6 +34,17 @@ router.post('/makeAccount', async (req, res, next) => {
     res.send(result);
 })
 
+router.post('/sameEmail', async (req, res, next) => {
+    const {email} = req.body;
+    const [{count}] = await authService.findUser(email);
+
+    let isDuplicated = false;
+    if (count >= 1) {
+        isDuplicated = true;
+    }
+    res.send({isDuplicated})
+})
+
 module.exports = router;
 
 

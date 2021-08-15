@@ -78,6 +78,7 @@ const GetNicknameTab = ({navigation, authNavigation}) => {
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => authNavigation.navigate('SignInEmail')}
+                    disabled={email.length === 0 ? true : false}
                 >
                     <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
                 </TouchableOpacity>

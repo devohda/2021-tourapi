@@ -22,9 +22,74 @@ const InputBox = styled(TextInput)`
   paddingBottom: 11px;
 `
 
+const findSameEmail = async (email) => {
+    try {
+        const result = await fetch('http://localhost:3000/auth/sameEmail', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({email})
+        }).then(res => res.json())
+            .then(response => {
+                return response.isDuplicated === true;
+            })
+            .catch(error => console.log(error));
+
+        return result
+    } catch (err) {
+        console.error(err);
+    }
+}
 
 const GetEmailTab = ({navigation}) => {
-    const [isValid, setIsValid] = useState(false)
+    const [email, setEmail] = useState("");
+
+    const checkIsValid = async () => {
+        const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+        if (!email.match(emailRegExp)) {
+            alert('Error');
+            return 0;
+        }
+
+        const isDuplicated = await findSameEmail(email)
+        if (isDuplicated) {
+            alert('중복된 아이디입니다.');
+            return 0;
+        }
+
+        navigation.navigate('passwordTab', {email})
+    }
+
+    const styles = StyleSheet.create({
+        progress: {
+            height: 8,
+            borderRadius: 6,
+            top: 0,
+            marginLeft: 12,
+        },
+        progress_active: {
+            width: 28,
+            backgroundColor: '#7B9ACC'
+        },
+        progress_inactive: {
+            width: 8,
+            backgroundColor: '#CDD0D7'
+        },
+        title_text: {
+            fontSize: 30,
+            color: '#40516E',
+            lineHeight: 44,
+        },
+        continue_btn: {
+            backgroundColor: email ? '#7B9ACC' : '#CDD0D7',
+            height: 48,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }
+    })
 
     return (
         <>
@@ -46,13 +111,15 @@ const GetEmailTab = ({navigation}) => {
                         placeholder="hiddenjewel@gmail.com"
                         autoCapitalize="none"
                         style={{marginTop: 40}}
+                        onChangeText={(text) => setEmail(text)}
                     />
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
-                    onPress={() => navigation.navigate('passwordTab')}
+                    onPress={() => checkIsValid()}
+                    disabled={email ? false : true}
                 >
                     <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
                 </TouchableOpacity>
@@ -60,34 +127,5 @@ const GetEmailTab = ({navigation}) => {
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    progress: {
-        height: 8,
-        borderRadius: 6,
-        top: 0,
-        marginLeft: 12,
-    },
-    progress_active: {
-        width: 28,
-        backgroundColor: '#7B9ACC'
-    },
-    progress_inactive: {
-        width: 8,
-        backgroundColor: '#CDD0D7'
-    },
-    title_text: {
-        fontSize: 30,
-        color: '#40516E',
-        lineHeight: 44,
-    },
-    continue_btn: {
-        backgroundColor: '#CDD0D7',
-        height: 48,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
-})
 
 export default GetEmailTab;

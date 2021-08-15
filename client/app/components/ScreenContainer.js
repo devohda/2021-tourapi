@@ -11,7 +11,6 @@ const ScreenContainer = props => {
         }}>
             <KeyboardAvoidingView flex={1}
                                   behavior={Platform.OS === "ios" ? "padding" : "height"}
-                                  keyboardVerticalOffset={+84}
                                   style={{marginHorizontal: 20}}>
                 {props.children}
             </KeyboardAvoidingView>
