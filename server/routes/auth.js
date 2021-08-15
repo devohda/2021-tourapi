@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto')
 
 const twilioConfig = require('../config/twilio')
 const {authToken, accountSid} = twilioConfig
@@ -30,8 +31,30 @@ router.post('/authPhone', async (req, res) => {
 
 router.post('/makeAccount', async (req, res, next) => {
     const {userInfo} = req.body;
+
+    const createSalt = () =>
+        new Promise((resolve, reject) => {
+            crypto.randomBytes(64, (err, buf) => {
+                if (err) reject(err);
+                resolve(buf.toString('base64'));
+            });
+        });
+
+    const createHashedPassword = (plainPassword) =>
+        new Promise(async (resolve, reject) => {
+            const salt = await createSalt();
+            crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+                if (err) reject(err);
+                resolve({password: key.toString('base64'), salt});
+            });
+        });
+
+    const {password, salt} = await createHashedPassword(userInfo.user_password);
+    userInfo.user_password = password;
+    userInfo.salt = salt;
+
     const result = await authService.addUser(userInfo);
-    res.send({result : true});
+    res.send({result: true});
 })
 
 router.post('/sameEmail', async (req, res, next) => {
@@ -43,6 +66,34 @@ router.post('/sameEmail', async (req, res, next) => {
         isDuplicated = true;
     }
     res.send({isDuplicated})
+})
+
+router.post('/loginEmail', async (req, res, next) => {
+    const {email, password: plainPassword} = req.body.user;
+
+    const userData = await authService.getUser(email);
+    if (userData.length !== 1) {
+        return res.send({state: 'NOT EXIST'})
+    }
+
+    const {salt, user_password, ...user} = userData[0];
+
+    const makePasswordHashed = (plainPassword) =>
+        new Promise(async (resolve, reject) => {
+            // salt를 가져오는 부분은 각자의 DB에 따라 수정
+            crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+                if (err) reject(err);
+                resolve(key.toString('base64'));
+            });
+        });
+
+    const password = await makePasswordHashed(plainPassword)
+
+    if(user_password !== password){
+        return res.send({state : 'NOT MATCHED'})
+    }
+
+    return res.send({state : 'SUCCESS', userData : user})
 })
 
 module.exports = router;
