@@ -14,8 +14,8 @@ const SignUpEmailNavigator = ({navigation: authNavigation}) => {
             <Stack.Screen name="passwordTab" component={GetPasswordTab}/>
             <Stack.Screen name="nicknameTab"
                           children={
-                              ({navigation}) =>
-                                  <GetNicknameTab navigation={navigation} authNavigation={authNavigation}/>
+                              ({route}) =>
+                                  <GetNicknameTab route={route} authNavigation={authNavigation}/>
                           }
             />
         </Stack.Navigator>

@@ -55,7 +55,7 @@ const GetEmailTab = ({navigation}) => {
 
         const isDuplicated = await findSameEmail(email)
         if (isDuplicated) {
-            alert('중복된 아이디입니다.');
+            alert('이미 가입된 아이디입니다.');
             return 0;
         }
 

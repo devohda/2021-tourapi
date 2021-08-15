@@ -31,7 +31,7 @@ router.post('/authPhone', async (req, res) => {
 router.post('/makeAccount', async (req, res, next) => {
     const {userInfo} = req.body;
     const result = await authService.addUser(userInfo);
-    res.send(result);
+    res.send({result : true});
 })
 
 router.post('/sameEmail', async (req, res, next) => {
