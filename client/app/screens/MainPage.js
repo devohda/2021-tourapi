@@ -25,7 +25,7 @@ export default function MainPage({navigation}) {
                 {Platform.OS !== 'android' &&
                 <View style={{backgroundColor: "#FCF6F5", flexDirection: "row", justifyContent: "space-between"}}>
                     <View><Text style={{
-                        color: 'white',
+                        color: '#7B9ACC',
                         fontWeight: 'bold',
                         fontSize: 28,
                         left: 16,
@@ -34,7 +34,7 @@ export default function MainPage({navigation}) {
                         <View style={{flexDirection: 'row'}}>
                             <Icon type="ionicon"
                                   name={"md-search"}
-                                  color="white"
+                                  color="#7B9ACC"
                                   style={{marginEnd: 20}}
                                   size={28}>
                             </Icon>
@@ -348,7 +348,9 @@ const styles = StyleSheet.create({
         // left: 50
     },
     keywordHashTag: {
-        color: '#BDC2CA', backgroundColor: '#fff', borderWidth: 1, borderColor: '#EBEBEB', borderRadius: 27, paddingVertical: 5, paddingHorizontal: 10, shadowColor: 'rgba(0,0,0,0.11)',
+        color: '#BDC2CA',
+        backgroundColor: '#fff', borderWidth: 1, borderColor: '#EBEBEB', borderRadius: 27, paddingVertical: 5, paddingHorizontal: 10,
+        shadowColor: 'rgba(0,0,0,0.11)',
         shadowOffset: {width: 0, height: 10},
         shadowOpacity: 0.2,
         elevation: 1,

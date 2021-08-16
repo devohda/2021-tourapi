@@ -44,7 +44,7 @@ export default function MakeFreeDirectory({navigation}) {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             console.log(datas)
-            fetch('http://192.168.0.11:3000/collections/collections_free', {
+            fetch('http://localhost:3000/collections/collections_free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -52,7 +52,6 @@ export default function MakeFreeDirectory({navigation}) {
                 },
                 body: JSON.stringify({
                     collection_name: collectionName,
-                    collection_type: 0,
                     collection_private: (isEnabled===true) ? 1: 0,
                     collection_keywords: datas,
                     collection_type: 1,
@@ -99,7 +98,6 @@ export default function MakeFreeDirectory({navigation}) {
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const DATA = {
         collection_name: collectionName,
-        collection_type: 0,
         collection_private: (isEnabled===true) ? 1: 0,
         collection_keywords: putKeywords,
         collection_type: 1,
@@ -108,7 +106,7 @@ export default function MakeFreeDirectory({navigation}) {
     const getKeywords = useCallback(() => {
         try {
     
-            fetch('http://192.168.0.11:3000/keyword/keywords', {
+            fetch('http://localhost:3000/keyword/keywords', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -271,9 +269,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-        shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
-        shadowOpacity: 0.2,
+        // shadowColor: '#470000',
+        // shadowOffset: {width: 0, height: 10},
+        // shadowOpacity: 0.2,
         elevation: 1,
         backgroundColor: '#fff',
         width: 58, height: 28,
@@ -285,9 +283,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-        shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
-        shadowOpacity: 0.2,
+        // shadowColor: '#470000',
+        // shadowOffset: {width: 0, height: 10},
+        // shadowOpacity: 0.2,
         elevation: 1,
         backgroundColor: '#7B9ACC',
         width: 58, height: 28,
