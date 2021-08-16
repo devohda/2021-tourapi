@@ -2,8 +2,9 @@
 import React, {useContext, useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
-import {useIsSignedIn} from "../../components/SignedInContextProvider";
+import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
 import ScreenContainer from "../../components/ScreenContainer";
+import {useIsUserData} from "../../contexts/UserDataContextProvider";
 
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
@@ -11,6 +12,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
+    const [userData, setUserData] = useIsUserData()
 
     const signIn = async () => {
         try {
@@ -28,7 +30,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     }
                 })
             };
-            const {state, user} = await fetch(url, options)
+            const {state, userData : user} = await fetch(url, options)
                 .then(res => res.json())
                 .catch(error => console.log(error));
 
@@ -40,8 +42,8 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     alert('비밀번호를 다시 확인해주세요.')
                     break;
                 case 'SUCCESS' :
+                    setUserData(user);
                     setIsSignedIn(true);
-                    appNavigation.navigate('App')
                     break;
             }
         } catch (e) {

@@ -258,6 +258,7 @@ function Collection() {
             console.error(err);
         }
     }
+
     const showDirectories = ({item}) => (
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
@@ -265,7 +266,7 @@ function Collection() {
                     <View><Text style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
                     {item.collection_private === 1 && <View><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
-                <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}></Image>
+                <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
             <View style={{marginLeft: 10}}>
                 <Text style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</Text>
@@ -456,7 +457,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'center',
         textAlignVertical: 'center',
-        marginVertical: 2
+        margin: 2,
     },
     dirPlanText: {
         color: '#F07A7A',
@@ -464,7 +465,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         textAlignVertical: 'center',
         // fontWeight: 'bold',
-        marginVertical: 2
+        margin: 2
     },
     defaultImage: {
         width: '100%',

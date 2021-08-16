@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {View, Text, TextInput, Image, ScrollView, Dimensions, StyleSheet} from "react-native";
+import {Platform, View, Text, TextInput, Image, ScrollView, Dimensions, StyleSheet} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 
 const screenWidth = Dimensions.get('window').width;
@@ -62,9 +62,9 @@ const MyPageScreen = () => {
                             source={require('../assets/images/setting.png')} 
                         ></Image>
                     </View>
-                    <View>
+                    <View style={{marginTop: Platform.OS === 'ios' && 5}}>
                         <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: '#40516E'}}>{DATA.user_nickname}</Text>
-                        <View style={{flexDirection: 'row', marginTop: 8}}>
+                        <View style={{flexDirection: 'row', marginTop: Platform.OS === 'ios' ? 8 : 3}}>
                             <View style={styles.myPageHashtag}><Text style={styles.myPageHashtagText}>#조용한</Text></View>
                             <View style={styles.myPageHashtag}><Text style={styles.myPageHashtagText}>#따뜻한</Text></View>
                         </View>

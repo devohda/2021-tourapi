@@ -1,7 +1,7 @@
 import HomeNavigator from "./HomeNavigator";
 import AuthenticationNavigator from "./AuthenticationNavigator";
 import React, {useState} from "react";
-import {useIsSignedIn} from "../components/SignedInContextProvider";
+import {useIsSignedIn} from "../contexts/SignedInContextProvider";
 import {createStackNavigator} from "@react-navigation/stack";
 import SearchScreen from "../screens/SearchScreen";
 import PlaceScreen from "../screens/PlaceScreen";
