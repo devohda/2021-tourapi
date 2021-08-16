@@ -46,11 +46,7 @@ export default function MakeFreeDirectory({route, navigation}) {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             console.log(datas)
-<<<<<<< HEAD
             fetch('http://localhost:3000/collections/collections_free', {
-=======
-            fetch('http://172.30.1.38:3000/collections/collections_free', {
->>>>>>> feature/edit-mvp
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -112,11 +108,7 @@ export default function MakeFreeDirectory({route, navigation}) {
     const getKeywords = useCallback(() => {
         try {
     
-<<<<<<< HEAD
             fetch('http://localhost:3000/keyword/keywords', {
-=======
-            fetch('http://172.30.1.38:3000/keyword/keywords', {
->>>>>>> feature/edit-mvp
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -305,15 +297,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-<<<<<<< HEAD
-        // shadowColor: '#470000',
-        // shadowOffset: {width: 0, height: 10},
-        // shadowOpacity: 0.2,
-=======
         shadowColor: '#470000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
->>>>>>> feature/edit-mvp
         elevation: 1,
         backgroundColor: '#fff',
         width: 58, height: 28,
@@ -327,15 +313,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-<<<<<<< HEAD
-        // shadowColor: '#470000',
-        // shadowOffset: {width: 0, height: 10},
-        // shadowOpacity: 0.2,
-=======
         shadowColor: '#470000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
->>>>>>> feature/edit-mvp
         elevation: 1,
         backgroundColor: '#7B9ACC',
         width: 58, height: 28,

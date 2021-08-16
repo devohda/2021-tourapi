@@ -226,11 +226,7 @@ function Collection() {
     const [HashTag, setHashTag] = useState([]);
     const getCollectionsFromUsers = (type) => {
         try {
-<<<<<<< HEAD
             fetch('http://localhost:3000/collections/collections_free', {
-=======
-            fetch('http://172.30.1.38:3000/collections/collections_free', {
->>>>>>> feature/edit-mvp
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -267,13 +263,8 @@ function Collection() {
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
                 <View style={styles.dirType}>
-<<<<<<< HEAD
-                    <Text style={item.collection_type===1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text>
-                    {item.collection_private === 1 && <Image style={{width: 20, height: 20, marginLeft: '400%'}} source={require('../assets/images/lock.png')}/>}
-=======
                     <View><Text style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
                     {item.collection_private === 1 && <View><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
->>>>>>> feature/edit-mvp
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
@@ -457,13 +448,9 @@ const styles = StyleSheet.create({
         marginLeft: 9,
         marginTop: 8,
         flexDirection: 'row',
-<<<<<<< HEAD
-        zIndex : 10000,
-=======
         zIndex: 10000,
         justifyContent: 'space-between',
         alignItems: 'center'
->>>>>>> feature/edit-mvp
     },
     dirFreeText: {
         color: '#7B9ACC',
@@ -494,15 +481,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-<<<<<<< HEAD
-        // shadowColor: '#470000',
-        // shadowOffset: {width: 0, height: 10},
-        // shadowOpacity: 0.2,
-=======
         shadowColor: '#470000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
->>>>>>> feature/edit-mvp
         elevation: 1,
         backgroundColor: '#fff',
         height: 28,
@@ -516,15 +497,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-<<<<<<< HEAD
-        // shadowColor: '#470000',
-        // shadowOffset: {width: 0, height: 10},
-        // shadowOpacity: 0.2,
-=======
         shadowColor: '#470000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
->>>>>>> feature/edit-mvp
         elevation: 1,
         backgroundColor: '#7B9ACC',
         height: 28,
