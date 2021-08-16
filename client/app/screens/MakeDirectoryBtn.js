@@ -42,7 +42,7 @@ export default function MakeDirectoryBtn({navigation}) {
                             <Text style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: '#FCF6F5'}}>일정 보관함</Text>
                             <Text style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: '#FCF6F5'}}>공간을 시간 순서대로 보관할 수 있어요</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{backgroundColor: '#7B9ACC', width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory')}}>
+                        <TouchableOpacity style={{backgroundColor: '#7B9ACC', width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory'); navigation.setOptions({tabBarVisible: false})}}>
                             <Text style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: '#FCF6F5'}}>자유 보관함</Text>
                             <Text style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: '#FCF6F5'}}>순서 상관없이 자유롭게 공간을 보관할 수 있어요</Text>
                         </TouchableOpacity>

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useState, useRef, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Image} from "react-native";
+import {Image, Platform} from "react-native";
 import {Icon} from 'react-native-elements';
 import RBSheet from "react-native-raw-bottom-sheet";
 
@@ -14,7 +14,7 @@ const Tab = createBottomTabNavigator();
 
 export default function HomeNavigator({navigation,route}) {
         return (
-            <Tab.Navigator tabBarOptions={{keyboardHidesTabBar: true}}>
+            <Tab.Navigator tabBarOptions={Platform.OS === 'ios' ? {keyboardHidesTabBar: false} : {keyboardHidesTabBar: true}}>
                 <Tab.Screen name="main" component={MainPageNavigator} options={{
                     tabBarIcon:({focused})=>(
                     <Image source={focused? require('../assets/images/home_filled_click.png') : require('../assets/images/home_filled_nonclick.png')} style={{marginBottom: 5}}></Image>),
