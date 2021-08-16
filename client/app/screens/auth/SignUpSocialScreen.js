@@ -3,7 +3,7 @@ import React, {useContext, useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import * as firebase from "firebase";
-import {useIsSignedIn} from "../../components/SignedInContextProvider";
+import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
 import ScreenContainer from "../../components/ScreenContainer";
 
 // firebase 연동
@@ -43,7 +43,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     return (
         <ScreenContainer backgroundColor="#FCF6F5">
             <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
-                <TouchableOpacity onPress={() => {setIsSignedIn(true)}}>
+                <TouchableOpacity onPress={() => setIsSignedIn(true)}>
                     <Text style={{color: '#40516E', fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>

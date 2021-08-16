@@ -14,10 +14,12 @@ import {
     Platform
 } from 'react-native';
 import {Icon} from 'react-native-elements';
+import {useIsUserData} from "../contexts/UserDataContextProvider";
 // import {KakaoOAuthToken, KakaoProfile, login, logout} from '@react-native-seoul/kakao-login';
 
 
 export default function MainPage({navigation}) {
+    const [userData, setUserData] = useIsUserData()
 
     return (
         <SafeAreaView style={{backgroundColor: '#FCF6F5'}}>
