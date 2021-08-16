@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {DefaultTheme, NavigationContainer} from "@react-navigation/native";
-import {createStackNavigator} from '@react-navigation/stack';
-import SignedInContextProvider from "./components/SignedInContextProvider";
+
 import AppNavigator from "./navigation/AppNavigator";
+import AppContextProviders from "./contexts/AppContextProviders";
 
 
 const NavigationTheme = {
@@ -15,10 +15,10 @@ const NavigationTheme = {
 
 export default function App() {
     return (
-        <SignedInContextProvider>
+        <AppContextProviders>
             <NavigationContainer theme={NavigationTheme}>
                 <AppNavigator/>
             </NavigationContainer>
-        </SignedInContextProvider>
+        </AppContextProviders>
     );
 }
