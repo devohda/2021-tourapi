@@ -226,7 +226,7 @@ function Collection() {
     const [HashTag, setHashTag] = useState([]);
     const getCollectionsFromUsers = (type) => {
         try {
-            fetch('http://192.168.0.11:3000/collections/collections_free', {
+            fetch('http://172.30.1.38:3000/collections/collections_free', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -262,8 +262,8 @@ function Collection() {
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
                 <View style={styles.dirType}>
-                    <Text style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text>
-                    {item.collection_private === 1 && <Image style={{width: 20, height: 20, marginLeft: '400%'}} source={require('../assets/images/lock.png')}></Image>}
+                    <View><Text style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    {item.collection_private === 1 && <View><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}></Image>
             </View>
@@ -297,7 +297,8 @@ function Collection() {
                 style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    marginVertical: 2
                 }}
             >
                 <TouchableOpacity onPress={()=>{
@@ -327,36 +328,39 @@ function Collection() {
     }
     const [selectedDirType, setSelectedDirType] = useState(directoryType[0].name)
     return (
-        <View flex={1} backgroundColor="#FCF6F5">
-            <View flexDirection="row" style={{marginVertical: 20}}>
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                    {directoryType.map((name, idx) => (
-                        <Keyword type={name} key={idx}/>
-                    ))}
-                </ScrollView>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-                <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: '#40516E'}}>최근 추가순</Text>
-                    <Icon style={{color: '#40516E', paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+        <View flex={1} >
+            <View backgroundColor="#FCF6F5" style={{alignItems: 'center', justifyContent: 'center'}}>
+                <View flexDirection="row" style={{marginVertical: 20}}>
+                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                        {directoryType.map((name, idx) => (
+                            <Keyword type={name} key={idx}/>
+                        ))}
+                    </ScrollView>
                 </View>
-                <View style={{flexDirection: 'row', marginLeft:'40%'}}>
+                </View>
+            
+                <View style={{flexDirection: 'row', width: '100%'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                        <Text style={{color: '#40516E'}}>필터</Text>
+                        <Text style={{color: '#40516E'}}>최근 추가순</Text>
+                        <Icon style={{color: '#40516E', paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
-                    <View style={{marginHorizontal: 10}}><Text>|</Text></View>
-                    <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                        <Text style={{color: '#40516E'}}>편집</Text>
+                    <View style={{flexDirection: 'row', marginLeft:'47.5%'}}>
+                        <View style={{flexDirection: 'row'}}>
+                            <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                            <Text style={{color: '#40516E'}}>필터</Text>
+                        </View>
+                        <View style={{marginHorizontal: 10}}><Text>|</Text></View>
+                        <View style={{flexDirection: 'row'}}>
+                            <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                            <Text style={{color: '#40516E'}}>편집</Text>
+                        </View>
                     </View>
                 </View>
-            </View>
             <View style={{marginBottom: '2.5%'}}>
                 <Text style={{color: '#7B9ACC', fontSize: 18, fontWeight: 'bold', marginTop: '5%'}}>{selectedDirType}</Text>
             </View>
-            <ScrollView>
-                <SafeAreaView>
+            <ScrollView horizontal={true} scrollEnabled={false}>
+                <SafeAreaView style={{justifyContent: 'space-between', alignItems: 'center'}}>
                     <FlatList numColumns={2} data={directoryData} renderItem={showDirectories} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
                 </SafeAreaView>
             </ScrollView>
@@ -422,14 +426,16 @@ const styles = StyleSheet.create({
     },
     rankingContainer: {
         backgroundColor: 'white',
-        marginEnd: Dimensions.get('screen').width/18,
+        marginEnd: Dimensions.get('screen').width/15,
         marginTop: 11,
         width: 162,
         height: 249,
-        // borderRadius: 10
+        // borderRadius: 10,
+        // alignItems: 'center',
+        // justifyContent: 'space-between'
     },
     dirType: {
-        borderColor: '#fff',
+        borderColor: '#FCF6F5',
         borderWidth: 1,
         paddingVertical: 1,
         paddingHorizontal: 8.5,
@@ -440,7 +446,10 @@ const styles = StyleSheet.create({
         height: 22,
         marginLeft: 9,
         marginTop: 8,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        zIndex: 10000,
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     dirFreeText: {
         color: '#7B9ACC',
@@ -458,11 +467,11 @@ const styles = StyleSheet.create({
         marginVertical: 2
     },
     defaultImage: {
-        width: 162,
+        width: '100%',
         height: 162,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
-        position: 'absolute'
+        position: 'absolute',
     },
     selectType: {
         borderColor: '#fff',
@@ -472,11 +481,13 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginRight: 10,
         shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
-        shadowOpacity: 0.2,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
         elevation: 1,
         backgroundColor: '#fff',
         height: 28,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     selectTypeClicked: {
         borderColor: '#7B9ACC',
@@ -486,11 +497,13 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginRight: 10,
         shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
-        shadowOpacity: 0.2,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
         elevation: 1,
         backgroundColor: '#7B9ACC',
         height: 28,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     selectTypeTextClicked: {
         color: '#fff',

@@ -13,10 +13,12 @@ import {
     KeyboardAvoidingView,
     Keyboard,
     TouchableWithoutFeedback,
-    Alert
+    Alert,
+    Platform
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import Toast from 'react-native-easy-toast';
+import ScreenContainer from '../components/ScreenContainer';
 
 export const navigationRef = React.createRef();
 
@@ -44,7 +46,7 @@ export default function MakeFreeDirectory({navigation}) {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             console.log(datas)
-            fetch('http://192.168.0.11:3000/collections/collections_free', {
+            fetch('http://172.30.1.38:3000/collections/collections_free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -108,7 +110,7 @@ export default function MakeFreeDirectory({navigation}) {
     const getKeywords = useCallback(() => {
         try {
     
-            fetch('http://192.168.0.11:3000/keyword/keywords', {
+            fetch('http://172.30.1.38:3000/keyword/keywords', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -165,10 +167,21 @@ export default function MakeFreeDirectory({navigation}) {
 
     return (
         <>
-            <SafeAreaView style={{backgroundColor: '#FCF6F5', flex: 1}}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <ScrollView keyboardShouldPersistTaps='always'>
+            <KeyboardAvoidingView {...(Platform.OS === 'ios' ? { behavior: 'padding' } : {})} flex={1} style={{backgroundColor:'#FCF6F5'}}>
 
+         <View flex={1} style={{backgroundColor: '#FCF6F5'}}>
+            {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+                {/* <ScrollView keyboardShouldPersistTaps='always'> */}
+                <View style={{paddingHorizontal: 10, backgroundColor: '#FCF6F5'}}>
+                    <View flexDirection="row" style={{paddingTop: 20, alignItems: 'center', justifyContent : 'center', backgroundColor: '#FCF6F5'}}>
+                        <View style={{position: 'absolute', left : 0}}>
+                            <TouchableOpacity onPress={() => {navigation.goBack()}} style={{marginTop: 20}}>
+                                <Image source={require('../assets/images/back-icon.png')} width={24} height={24}/>
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={{color: '#40516E', fontSize: 16, fontWeight: 'bold'}}>자유보관함 만들기</Text>
+                    </View>
+                </View>
                     <View style={styles.rankingContainer}>
                         <View style={{marginVertical: 14}}>
                             <TextInput
@@ -214,7 +227,7 @@ export default function MakeFreeDirectory({navigation}) {
                         </View>
                     </View> */}
                                                                                 {/* marginBottom은 일단 퍼블리싱때문에 */}
-                    <View style={{marginTop: 37, left: 24, flexDirection: 'row', marginBottom: '65%'}}>
+                    <View style={{marginTop: 37, left: 24, flexDirection: 'row'}}>
                         <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: '#40516E', marginEnd: '60%'}}>비공개 설정</Text>
                         <Switch
                                 trackColor={{false: "#CDD0D7", true: "#7B9ACC"}}
@@ -230,13 +243,12 @@ export default function MakeFreeDirectory({navigation}) {
                         </View>
                     </View> */}
 
-                </ScrollView>
-            </TouchableWithoutFeedback>
-            </SafeAreaView>
-            <KeyboardAvoidingView style={{backgroundColor:'#FCF6F5'}}>
+                {/* </ScrollView> */}
+            {/* </TouchableWithoutFeedback> */}
+            </View>
                     <TouchableOpacity
                         testID="completed"
-                        style={{backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? '#7B9ACC' : '#CDD0D7', height: 48, borderRadius: 10, margin: 16, marginBottom: '5%'}}
+                        style={{backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? '#7B9ACC' : '#CDD0D7', height: 48, borderRadius: 10, margin: 16, marginBottom: '15%'}}
                         onPress={() => {
                             if((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
                                 postCollections();
@@ -257,13 +269,15 @@ export default function MakeFreeDirectory({navigation}) {
                         >보관함 만들기</Text>
                     </TouchableOpacity>
                     </KeyboardAvoidingView>
-
         </>
     )
 
 }
 
 const styles = StyleSheet.create({
+    plusComplete : {
+        marginBottom: '5%'
+    },
     selectType: {
         borderColor: '#fff',
         borderWidth: 1,
@@ -272,11 +286,13 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginRight: 10,
         shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         elevation: 1,
         backgroundColor: '#fff',
         width: 58, height: 28,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     selectTypeClicked: {
         borderColor: '#7B9ACC',
@@ -286,11 +302,13 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginRight: 10,
         shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         elevation: 1,
         backgroundColor: '#7B9ACC',
         width: 58, height: 28,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     selectTypeTextClicked: {
         color: '#fff',

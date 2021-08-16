@@ -21,7 +21,7 @@ const MyPageScreen = () => {
     const getCollections = () => {
         try {
     
-            fetch('http://192.168.0.11:3000/user/users', {
+            fetch('http://172.30.1.38:3000/user/users', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -49,7 +49,7 @@ const MyPageScreen = () => {
             <View style={{
                 height: 200,
                 backgroundColor: '#FCF6F5',
-                paddingTop: '15%'
+                paddingTop: '10%'
             }} className="profile-container">
                 <View style={{
                     alignItems: "center"
@@ -64,7 +64,7 @@ const MyPageScreen = () => {
                     </View>
                     <View>
                         <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: '#40516E'}}>{DATA.user_nickname}</Text>
-                        <View style={{flexDirection: 'row', marginTop: 3}}>
+                        <View style={{flexDirection: 'row', marginTop: 8}}>
                             <View style={styles.myPageHashtag}><Text style={styles.myPageHashtagText}>#조용한</Text></View>
                             <View style={styles.myPageHashtag}><Text style={styles.myPageHashtagText}>#따뜻한</Text></View>
                         </View>
@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         marginRight: 10,
         shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 10},
-        shadowOpacity: 0.2,
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.1,
         elevation: 1,
         backgroundColor: '#fff',
     },
