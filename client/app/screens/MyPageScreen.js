@@ -45,7 +45,7 @@ const MyPageScreen = () => {
         }
     }
     return (
-        <ScreenContainer>
+        <ScreenContainer backgroundColor="#FCF6F5">
             <View style={{
                 height: 200,
                 backgroundColor: '#FCF6F5',
