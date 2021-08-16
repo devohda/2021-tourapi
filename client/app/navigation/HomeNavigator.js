@@ -1,21 +1,21 @@
 import * as React from 'react';
 import {useState, useRef, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Image, Platform} from "react-native";
+import {Image} from "react-native";
 import {Icon} from 'react-native-elements';
 import RBSheet from "react-native-raw-bottom-sheet";
 
-import MainPageNavigator from "./MainPageNavigator";
 import MyPageScreen from "../screens/MyPageScreen";
 import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
 import { color } from 'react-native-elements/dist/helpers';
+import MainPage from "../screens/MainPage";
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeNavigator({navigation,route}) {
+export default function HomeNavigator({navigation}) {
         return (
-            <Tab.Navigator tabBarOptions={Platform.OS === 'ios' ? {keyboardHidesTabBar: false} : {keyboardHidesTabBar: true}}>
-                <Tab.Screen name="main" component={MainPageNavigator} options={{
+            <Tab.Navigator tabBarOptions={{keyboardHidesTabBar: true}}>
+                <Tab.Screen name="main" children={({navigation}) => <MainPage navigation={navigation}/>} options={{
                     tabBarIcon:({focused})=>(
                     <Image source={focused? require('../assets/images/home_filled_click.png') : require('../assets/images/home_filled_nonclick.png')} style={{marginBottom: 5}}></Image>),
                     tabBarLabel:()=>{return null}

@@ -27,7 +27,7 @@ export default function MainPage({navigation}) {
             <View style={{marginTop: 20, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
                 <View><Text style={{color: '#7B9ACC', fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>HERE</Text></View>
                 <View>
-                    <TouchableOpacity onPress={() => navigation.navigate('search')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                             <Icon type="ionicon"
                                   name={"md-search"}
                                   color="#7B9ACC"
@@ -166,7 +166,7 @@ export default function MainPage({navigation}) {
                     </View>
                     <View style={{marginVertical: 45}}>
                         <Text style={styles.titles}>요즘 뜨는 공간</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('place')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Place')}>
                             <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
@@ -212,7 +212,7 @@ export default function MainPage({navigation}) {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('place')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Place')}>
                         <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
@@ -251,7 +251,7 @@ export default function MainPage({navigation}) {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('place')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Place')}>
                         <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
