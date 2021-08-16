@@ -1,18 +1,19 @@
 import React from 'react'
-import {SafeAreaView, View} from "react-native";
+import {SafeAreaView, View, Platform, KeyboardAvoidingView} from "react-native";
 
 const ScreenContainer = props => {
     return (
         <SafeAreaView style={{
             flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#FCF6F5",
-            width: "100%"
+            backgroundColor: props.backgroundColor,
+            width: "100%",
+            paddingTop: Platform.OS === 'android' ? 25 : 0
         }}>
-            <View style={{width: "90%", height: "100%"}}>
+            <KeyboardAvoidingView flex={1}
+                                  behavior={Platform.OS === "ios" ? "padding" : "height"}
+                                  style={{marginHorizontal: 20}}>
                 {props.children}
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

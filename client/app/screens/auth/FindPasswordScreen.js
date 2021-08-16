@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import ScreenContainer from '../components/ScreenContainer'
+import ScreenContainer from '../../components/ScreenContainer'
 import {View, TextInput, Text, Button} from "react-native";
 import * as SMS from 'expo-sms';
 import PhoneInput from "react-native-phone-number-input";
@@ -10,7 +10,7 @@ const FindPasswordScreen = () => {
     const [phoneNumber, setPhoneNumber] = useState(null)
     const sendSMS = () => {
         try {
-            fetch('http://localhost:3000/authentication/authPhone', {
+            fetch('http://localhost:3000/auth/authPhone', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
