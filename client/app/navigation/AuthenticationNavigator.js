@@ -9,10 +9,10 @@ import SignUpEmailScreen from "../screens/auth/SignUpEmailScreen";
 
 const Stack = createStackNavigator()
 
-export default function AuthenticationNavigator({navigation, setIsSignedIn}) {
+export default function AuthenticationNavigator({navigation}) {
     return (
         <Stack.Navigator initialRouteName="SignUpSocial" screenOptions={{headerShown: false}}>
-            <Stack.Screen name="SignUpSocial" component={SignUpSocialScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="SignUpSocial" component={SignUpSocialScreen}/>
             <Stack.Screen name="SignInEmail" component={SignInEmailScreen}/>
             <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen}/>
             <Stack.Screen name="FindPassword" component={FindPasswordScreen}/>
