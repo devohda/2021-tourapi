@@ -11,7 +11,7 @@ export default function MakeDirectoryBtn({navigation}) {
     return (
         <View style={{justifyContent: 'flex-end', paddingBottom: '3%', width:'100%', height: '200%'}}>
         <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
-            <Image style={{alignSelf:'center', marginBottom: 5}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
+            <Image style={{alignSelf:'center', marginBottom: 0}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
             {/* <Icon type="ionicon" name={"add-circle-outline"} size={45} color={'#7B9ACC'}/> */}
                 <RBSheet
                     ref={refRBSheet}
@@ -42,7 +42,7 @@ export default function MakeDirectoryBtn({navigation}) {
                             <Text style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: '#FCF6F5'}}>일정 보관함</Text>
                             <Text style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: '#FCF6F5'}}>공간을 시간 순서대로 보관할 수 있어요</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{backgroundColor: '#7B9ACC', width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory')}}>
+                        <TouchableOpacity style={{backgroundColor: '#7B9ACC', width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory'); navigation.setOptions({tabBarVisible: false})}}>
                             <Text style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: '#FCF6F5'}}>자유 보관함</Text>
                             <Text style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: '#FCF6F5'}}>순서 상관없이 자유롭게 공간을 보관할 수 있어요</Text>
                         </TouchableOpacity>

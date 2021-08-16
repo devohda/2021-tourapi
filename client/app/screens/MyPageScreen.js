@@ -21,7 +21,11 @@ const MyPageScreen = () => {
     const getCollections = () => {
         try {
     
+<<<<<<< HEAD
             fetch('http://localhost:3000/user/users', {
+=======
+            fetch('http://172.30.1.38:3000/user/users', {
+>>>>>>> feature/edit-mvp
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -49,7 +53,7 @@ const MyPageScreen = () => {
             <View style={{
                 height: 200,
                 backgroundColor: '#FCF6F5',
-                paddingTop: '15%'
+                paddingTop: '10%'
             }} className="profile-container">
                 <View style={{
                     alignItems: "center"
@@ -64,7 +68,11 @@ const MyPageScreen = () => {
                     </View>
                     <View style={{marginTop: Platform.OS === 'ios' && 5}}>
                         <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: '#40516E'}}>{DATA.user_nickname}</Text>
+<<<<<<< HEAD
                         <View style={{flexDirection: 'row', marginTop: Platform.OS === 'ios' ? 8 : 3}}>
+=======
+                        <View style={{flexDirection: 'row', marginTop: 8}}>
+>>>>>>> feature/edit-mvp
                             <View style={styles.myPageHashtag}><Text style={styles.myPageHashtagText}>#조용한</Text></View>
                             <View style={styles.myPageHashtag}><Text style={styles.myPageHashtagText}>#따뜻한</Text></View>
                         </View>
@@ -84,9 +92,15 @@ const styles = StyleSheet.create({
         paddingVertical: 2,
         paddingHorizontal: 5,
         marginRight: 10,
+<<<<<<< HEAD
         // shadowColor: '#470000',
         // shadowOffset: {width: 0, height: 10},
         // shadowOpacity: 0.2,
+=======
+        shadowColor: '#470000',
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.1,
+>>>>>>> feature/edit-mvp
         elevation: 1,
         backgroundColor: '#fff',
     },

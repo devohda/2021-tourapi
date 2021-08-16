@@ -24,7 +24,20 @@ export default function MainPage({navigation}) {
     return (
         <SafeAreaView style={{backgroundColor: '#FCF6F5'}}>
             <ScrollView>
-                {Platform.OS !== 'android' &&
+            <View style={{marginTop: 20, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
+                <View><Text style={{color: '#7B9ACC', fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>HERE</Text></View>
+                <View>
+                    <TouchableOpacity onPress={() => navigation.navigate('search')}>
+                            <Icon type="ionicon"
+                                  name={"md-search"}
+                                  color="#7B9ACC"
+                                  style={{marginEnd: 20}}
+                                  size={28}>
+                            </Icon>
+                    </TouchableOpacity>
+                </View>
+            </View>
+                {/* {Platform.OS !== 'android' &&
                 <View style={{backgroundColor: "#FCF6F5", flexDirection: "row", justifyContent: "space-between"}}>
                     <View><Text style={{
                         color: '#7B9ACC',
@@ -43,7 +56,7 @@ export default function MainPage({navigation}) {
                         </View>
                     </TouchableOpacity>
                 </View>
-                }
+                } */}
 
                 <View>
                     <View style={styles.blackRect}>
