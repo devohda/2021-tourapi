@@ -264,7 +264,7 @@ function Collection() {
             <View style={{height: '68%'}}>
                 <View style={styles.dirType}>
                     <View><Text style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
-                    {item.collection_private === 1 && <View><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
+                    {item.collection_private === 1 && <View style={{marginLeft: '380%'}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
@@ -345,7 +345,7 @@ function Collection() {
                         <Text style={{color: '#40516E'}}>최근 추가순</Text>
                         <Icon style={{color: '#40516E', paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
-                    <View style={{flexDirection: 'row', marginLeft:'47.5%'}}>
+                    <View style={{flexDirection: 'row', marginLeft:'45%'}}>
                         <View style={{flexDirection: 'row'}}>
                             <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
                             <Text style={{color: '#40516E'}}>필터</Text>

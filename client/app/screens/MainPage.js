@@ -111,8 +111,8 @@ export default function MainPage({navigation}) {
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
-                                    <Text style={styles.keywordHashTag}>#조용한</Text>
-                                    <Text style={styles.keywordHashTag}>#따뜻한</Text>
+                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#조용한</Text></View>
+                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
                                 </View>
                             </View>
                             <View style={{alignItems: 'center'}}>
@@ -122,8 +122,8 @@ export default function MainPage({navigation}) {
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
-                                    <Text style={styles.keywordHashTag}>#조용한</Text>
-                                    <Text style={styles.keywordHashTag}>#따뜻한</Text>
+                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#조용한</Text></View>
+                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
                                 </View>
                             </View>
                             <View style={{alignItems: 'center'}}>
@@ -133,8 +133,8 @@ export default function MainPage({navigation}) {
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
-                                    <Text style={styles.keywordHashTag}>#조용한</Text>
-                                    <Text style={styles.keywordHashTag}>#따뜻한</Text>
+                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#조용한</Text></View>
+                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
                                 </View>
                             </View>
                         </ScrollView>
@@ -362,15 +362,21 @@ const styles = StyleSheet.create({
         marginTop: 10,
         // left: 50
     },
-    keywordHashTag: {
+    keywordHashTagView: {
         color: '#BDC2CA',
         backgroundColor: '#fff', borderWidth: 1, borderColor: '#EBEBEB', borderRadius: 27, paddingVertical: 5, paddingHorizontal: 10,
         shadowColor: 'rgba(0,0,0,0.11)',
-        shadowOffset: {width: 0, height: 10},
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         elevation: 1,
         marginLeft: 5,
         marginTop: 5
+    },
+    keywordHashTag: {
+        color: '#BDC2CA',
+        elevation: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     regionImage: {
         width: 237,

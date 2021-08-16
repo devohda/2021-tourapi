@@ -11,7 +11,7 @@ export default function MakeDirectoryBtn({navigation}) {
     return (
         <View style={{justifyContent: 'flex-end', paddingBottom: '3%', width:'100%', height: '200%'}}>
         <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
-            <Image style={{alignSelf:'center', marginBottom: 0}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
+            <Image style={{alignSelf:'center', marginBottom: 3}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
             {/* <Icon type="ionicon" name={"add-circle-outline"} size={45} color={'#7B9ACC'}/> */}
                 <RBSheet
                     ref={refRBSheet}
