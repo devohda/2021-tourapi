@@ -12,22 +12,20 @@ import { color } from 'react-native-elements/dist/helpers';
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeNavigator({navigation}) {
+export default function HomeNavigator({navigation,route}) {
         return (
-            <Tab.Navigator>
+            <Tab.Navigator tabBarOptions={{keyboardHidesTabBar: true}}>
                 <Tab.Screen name="main" component={MainPageNavigator} options={{
-                    tabBarIcon:()=>(
-                    <Image style={{tintColor: 'black'}} source={require('../assets/images/home_filled.png')}></Image>),
-                    // <Icon type="ionicon" name={"home-outline"} size={26}></Icon>),
+                    tabBarIcon:({focused})=>(
+                    <Image source={focused? require('../assets/images/home_filled_click.png') : require('../assets/images/home_filled_nonclick.png')} style={{marginBottom: 5}}></Image>),
                     tabBarLabel:()=>{return null}
                 }}/>
                 <Tab.Screen name="directory" component={MakeDirectoryBtn} options={{title:'', tabBarIcon:()=>(
                     MakeDirectoryBtn({navigation}))
                 }}/>
                 <Tab.Screen name="mypage" component={MyPageScreen} options={{title: '마이페이지',
-                    tabBarIcon:()=>(
-                    <Image style={{tintColor: 'black'}} source={require('../assets/images/record_voice_over.png')}></Image>),
-                    // <Icon type="ionicon" name={"person-outline"} size={26}></Icon>),
+                    tabBarIcon:({focused})=>(
+                    <Image source={focused ? require('../assets/images/record_voice_over_click.png') : require('../assets/images/record_voice_over_nonclick.png')} style={{marginBottom: 5}}></Image>),
                     tabBarLabel:()=>{return null}
                 }}/>
             </Tab.Navigator>

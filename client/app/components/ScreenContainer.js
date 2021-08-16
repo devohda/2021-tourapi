@@ -7,7 +7,7 @@ const ScreenContainer = props => {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "#fff",
+            backgroundColor: "#FCF6F5",
             width: "100%"
         }}>
             <View style={{width: "90%", height: "100%"}}>

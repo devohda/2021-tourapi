@@ -30,6 +30,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
+    "react-native-easy-toast": "^2.0.0",
     "react-native-elements": "^3.4.2",
     "react-native-fbsdk": "^3.0.0",
     "react-native-fbsdk-next": "^4.3.0",
