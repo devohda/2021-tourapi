@@ -1,7 +1,8 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
+import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -24,7 +25,7 @@ const InputBox = styled(TextInput)`
 
 const signUp = async (user_email, user_password, user_nickname) => {
     try {
-        let url = 'http://localhost:3000/auth/makeAccount';
+        let url = 'http://192.168.0.11:3000/auth/makeAccount';
         let options = {
             method: 'POST',
             mode: 'cors',
@@ -55,8 +56,9 @@ const signUp = async (user_email, user_password, user_nickname) => {
 
 const GetNicknameTab = ({route, authNavigation}) => {
     const {email, password} = route.params;
-    const [isValid, setIsValid] = useState(false)
-    const [nickname, setNickname] = useState("")
+    const [isValid, setIsValid] = useState(false);
+    const [nickname, setNickname] = useState("");
+    const { colors } = useTheme();
 
     const checkIsValid = async () => {
         const nicknameRegExp = /^([A-Z]|[a-z]|[0-9]|[가-힣]){2,12}$/g;
@@ -81,7 +83,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
         },
         progress_active: {
             width: 28,
-            backgroundColor: '#7B9ACC'
+            backgroundColor: colors.mainColor
         },
         progress_inactive: {
             width: 8,
@@ -89,11 +91,10 @@ const GetNicknameTab = ({route, authNavigation}) => {
         },
         title_text: {
             fontSize: 30,
-            color: '#40516E',
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: nickname ? '#7B9ACC' : '#CDD0D7',
+            backgroundColor: nickname ? colors.mainColor : '#CDD0D7',
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -111,9 +112,9 @@ const GetNicknameTab = ({route, authNavigation}) => {
                 </ProgressBar>
                 <Form>
                     <View>
-                        <Text style={styles.title_text}><Text
+                        <Text style={[styles.title_text, {color: colors.textNotClicked}]}><Text
                             style={{fontWeight: 'bold'}}>닉네임</Text><Text>을</Text></Text>
-                        <Text style={styles.title_text}>설정해주세요</Text>
+                        <Text style={[styles.title_text, {color: colors.textNotClicked}]}>설정해주세요</Text>
                     </View>
                     <InputBox
                         placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
@@ -129,7 +130,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={nickname ? false : true}
                 >
-                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
+                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
                 </TouchableOpacity>
             </View>
         </>

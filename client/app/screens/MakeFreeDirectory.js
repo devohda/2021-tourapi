@@ -1,4 +1,4 @@
-import React, {createRef, useEffect, useState, useRef, useCallback} from 'react';
+import React, {useEffect, useState, useRef, useCallback, useContext} from 'react';
 import {
     Text,
     View,
@@ -6,18 +6,12 @@ import {
     TextInput,
     Image,
     TouchableOpacity,
-    SafeAreaView,
-    ScrollView,
-    FlatList,
     Switch,
-    KeyboardAvoidingView,
-    Keyboard,
-    TouchableWithoutFeedback,
-    Alert,
-    Platform
+    Alert
 } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import NavigationTop from "../components/NavigationTop";
+import { useTheme } from '@react-navigation/native';
 
 export const navigationRef = React.createRef();
 
@@ -35,6 +29,7 @@ const MakeFreeDirectory = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
+    const { colors } = useTheme();
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
@@ -45,9 +40,8 @@ const MakeFreeDirectory = ({navigation}) => {
             }
         }
         try {
-            // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             console.log(datas)
-            fetch('http://localhost:3000/collections/collections_free', {
+            fetch('http://192.168.0.11:3000/collections/collections_free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -92,9 +86,9 @@ const MakeFreeDirectory = ({navigation}) => {
                         newArr[keyword.keyword_pk - 1] = true;
                         setIsPress(newArr);
                     }
-                }} style={isPress[keyword.keyword_pk - 1] ? styles.selectTypeClicked : styles.selectType}>
+                }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor : colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
-                        style={isPress[keyword.keyword_pk - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{keyword.keyword_title}</Text>
+                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.textNotClicked}]}>{keyword.keyword_title}</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -110,7 +104,7 @@ const MakeFreeDirectory = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://localhost:3000/keyword/keywords', {
+            fetch('http://192.168.0.11:3000/keyword/keywords', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -167,7 +161,7 @@ const MakeFreeDirectory = ({navigation}) => {
     }, [])
 
     return (
-        <ScreenContainer backgroundColor='#FCF6F5'>
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
             {/*<View flex={1}>*/}
             {/* <View style={{marginTop: 37, left: 24}}>
                         <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold'}}>보관함 사진</Text>
@@ -195,7 +189,7 @@ const MakeFreeDirectory = ({navigation}) => {
             </View>
             <View style={{marginTop: 24}}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{fontSize: 16, fontWeight: '500', color: '#40516E'}}>보관함 키워드</Text>
+                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.textNotClicked}}>보관함 키워드</Text>
                     <Text style={{fontSize: 12, color: '#BDC2CA', alignSelf: 'center', marginLeft: 9}}>* 최대
                         3개</Text>
                 </View>
@@ -216,7 +210,7 @@ const MakeFreeDirectory = ({navigation}) => {
                                         return [...addedKeywords, {keyword: '추가됨'}]
                                     })
                                 }}/> */}
-                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={styles.selectTypeIconDetail} ></Icon></TouchableOpacity></View> */}
+                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.textNotClicked}]} ></Icon></TouchableOpacity></View> */}
                     </View>
                 </View>
             </View>
@@ -237,10 +231,10 @@ const MakeFreeDirectory = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between'
             }}>
-                <Text style={{fontSize: 16, fontWeight: '500', color: '#40516E'}}>비공개 설정</Text>
+                <Text style={{fontSize: 16, fontWeight: '500', color: colors.textNotClicked}}>비공개 설정</Text>
                 <Switch
-                    trackColor={{false: "#CDD0D7", true: "#7B9ACC"}}
-                    thumbColor={isEnabled ? "#fff" : "#fff"}
+                    trackColor={{false: "#CDD0D7", true: colors.mainColor}}
+                    thumbColor={colors.defaultColor}
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={toggleSwitch}
                     value={isEnabled}
@@ -250,7 +244,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 <TouchableOpacity
                     testID="completed"
                     style={{
-                        backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? '#7B9ACC' : '#CDD0D7',
+                        backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : '#CDD0D7',
                         height: 48,
                         borderRadius: 10
                     }}
@@ -268,7 +262,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         textAlign: 'center',
                         padding: 14,
                         fontSize: 16,
-                        color: '#fff',
+                        color: colors.defaultColor,
                         fontWeight: 'bold'
                     }}
                 >보관함 만들기</Text>
@@ -284,7 +278,6 @@ const styles = StyleSheet.create({
         marginBottom: '5%'
     },
     selectType: {
-        borderColor: '#fff',
         borderWidth: 1,
         paddingVertical: 1,
         paddingHorizontal: 8.5,
@@ -294,13 +287,11 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         elevation: 1,
-        backgroundColor: '#fff',
         width: 58, height: 28,
         alignItems: 'center',
         justifyContent: 'center'
     },
     selectTypeClicked: {
-        borderColor: '#7B9ACC',
         borderWidth: 1,
         paddingVertical: 1,
         paddingHorizontal: 8.5,
@@ -310,13 +301,11 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         elevation: 1,
-        backgroundColor: '#7B9ACC',
         width: 58, height: 28,
         alignItems: 'center',
         justifyContent: 'center'
     },
     selectTypeTextClicked: {
-        color: '#fff',
         fontSize: 14,
         textAlign: 'center',
         textAlignVertical: 'center',
@@ -324,7 +313,6 @@ const styles = StyleSheet.create({
         marginVertical: 2
     },
     selectTypeText: {
-        color: '#40516E',
         fontSize: 14,
         textAlign: 'center',
         textAlignVertical: 'center',
@@ -340,18 +328,8 @@ const styles = StyleSheet.create({
         borderRadius: 12
     },
     selectTypeIconDetail: {
-        color: '#40516E',
         paddingVertical: 1,
         borderRadius: 12
-    },
-    rankingContainer: {
-        backgroundColor: '#FCF6F5',
-        width: '100%',
-        marginTop: 14,
-        justifyContent: 'center',
-        alignSelf: 'center',
-        borderBottomColor: '#F0E7E7',
-        borderBottomWidth: 6,
     },
     defaultImage: {
         backgroundColor: '#c4c4c4',

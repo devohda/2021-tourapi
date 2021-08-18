@@ -1,6 +1,7 @@
 import React from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import styled from "styled-components/native";
+import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   left: 300px;
@@ -28,13 +29,14 @@ const InputBox = styled(TextInput)`
 `
 
 const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, setValue, userValue) => {
+    const { colors } = useTheme();
     return (
         <>
             <ProgressBar>
                 {btnStyles.map((btnStyle, idx) => <View key={idx} style={btnStyle}></View>)}
             </ProgressBar>
             <Form>
-                <Text style={{fontSize : 30, color : '#40516E'}}>
+                <Text style={{fontSize : 30, color : colors.textNotClicked}}>
                     {question}
                 </Text>
                 <InputBox
@@ -58,7 +60,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                     textAlign: 'center',
                     padding: 14,
                     fontSize: 16,
-                    color: '#fff',
+                    color: colors.defaultColor,
                     fontWeight: 'bold'
                 }}>
                     {nextBtnText}

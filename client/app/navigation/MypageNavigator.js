@@ -2,29 +2,30 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {Image, ScrollView, Text, View, FlatList, SafeAreaView, Dimensions, TouchableOpacity} from "react-native";
 import {StyleSheet} from "react-native";
 import OIcon from 'react-native-vector-icons/Octicons'
-import React, {useEffect, useState} from "react";
-import { Icon } from 'react-native-elements';
+import React, {useEffect, useState, useContext} from "react";
+import { colors, Icon } from 'react-native-elements';
+import { useTheme } from '@react-navigation/native';
 
 const Tab = createMaterialTopTabNavigator();
 
-
 function Like() {
+    const { colors } = useTheme();
     return (
-        <View flex={1} backgroundColor="#FCF6F5">
+        <View flex={1} backgroundColor={colors.backgroundColor}>
             <View style={{flexDirection: 'row', paddingTop: 12}}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: '#40516E'}}>최근 추가순</Text>
-                    <Icon style={{color: '#40516E', paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+                    <Text style={{color: colors.textNotClicked}}>최근 추가순</Text>
+                    <Icon style={{color: colors.textNotClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                 </View>
                 <View style={{flexDirection: 'row', marginLeft:'40%'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                        <Text style={{color: '#40516E'}}>필터</Text>
+                        <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                        <Text style={{color: colors.textNotClicked}}>필터</Text>
                     </View>
                     <View style={{marginHorizontal: 10}}><Text>|</Text></View>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                        <Text style={{color: '#40516E'}}>편집</Text>
+                        <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                        <Text style={{color: colors.textNotClicked}}>편집</Text>
                     </View>
                 </View>
             </View>
@@ -195,6 +196,8 @@ function Collection() {
     useEffect(() => {
         getCollectionsFromUsers(1);
     }, [])
+
+    const { colors } = useTheme();
     const [directoryData, setDirectoryData] = useState({});
     const [directoryType, setDirectoryType] = useState([
         {
@@ -223,10 +226,12 @@ function Collection() {
             pressed : false,
         }
     ])
+    const [selectedDirType, setSelectedDirType] = useState(directoryType[0].name);
+
     const [HashTag, setHashTag] = useState([]);
     const getCollectionsFromUsers = (type) => {
         try {
-            fetch('http://localhost:3000/collections/collections_free', {
+            fetch('http://192.168.0.11:3000/collections/collections_free', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -262,9 +267,9 @@ function Collection() {
     const showDirectories = ({item}) => (
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
-                <View style={styles.dirType}>
-                    <View><Text style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
-                    {item.collection_private === 1 && <View style={{marginLeft: '380%'}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
+                <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
+                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
@@ -272,7 +277,7 @@ function Collection() {
                 <Text style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</Text>
                 <View style={{flexDirection: 'row', marginBottom: 18}}>
                     {item.collection_keywords.split(',').map((word, idx) =>(
-                        (idx <= word.length) && <Text key={idx} style={{color: '#9DA2AB', fontSize: 10, marginEnd: 6.21}}># {word}</Text>
+                        (idx <= word.length) && <Text key={idx} style={{color: colors.subColor, fontSize: 10, marginEnd: 6.21}}># {word}</Text>
                     ))}
                 </View>
                 <View style={{flexDirection: 'row'}}>
@@ -319,18 +324,17 @@ function Collection() {
                                 setSelectedDirType(newArr[type.id-1].name)
                                 getCollectionsFromUsers(type.id)
                             }
-                            }} style={directoryType[type.id-1].pressed ? styles.selectTypeClicked : styles.selectType}
+                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
-                            <Text style={directoryType[type.id-1].pressed ? styles.selectTypeTextClicked : styles.selectTypeText}>{type.name}</Text>
+                            <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</Text>
                 </TouchableOpacity>                     
             </View>
         )
     }
-    const [selectedDirType, setSelectedDirType] = useState(directoryType[0].name)
     return (
         <View flex={1} >
-            <View backgroundColor="#FCF6F5" style={{alignItems: 'center', justifyContent: 'center'}}>
+            <View backgroundColor={colors.backgroundColor} style={{alignItems: 'center', justifyContent: 'center'}}>
                 <View flexDirection="row" style={{marginVertical: 20}}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         {directoryType.map((name, idx) => (
@@ -339,30 +343,30 @@ function Collection() {
                     </ScrollView>
                 </View>
                 </View>
-            
-                <View style={{flexDirection: 'row', width: '100%'}}>
+                
+                <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Text style={{color: '#40516E'}}>최근 추가순</Text>
-                        <Icon style={{color: '#40516E', paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+                        <Text style={{color: colors.textNotClicked}}>최근 추가순</Text>
+                        <Icon style={{color: colors.textNotClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
-                    <View style={{flexDirection: 'row', marginLeft:'45%'}}>
+                    <View style={{flexDirection: 'row'}}>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                            <Text style={{color: '#40516E'}}>필터</Text>
+                            <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                            <Text style={{color: colors.textNotClicked}}>필터</Text>
                         </View>
                         <View style={{marginHorizontal: 10}}><Text>|</Text></View>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon style={{color: '#40516E', marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                            <Text style={{color: '#40516E'}}>편집</Text>
+                            <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                            <Text style={{color: colors.textNotClicked}}>편집</Text>
                         </View>
                     </View>
                 </View>
-            <View style={{marginBottom: '2.5%'}}>
-                <Text style={{color: '#7B9ACC', fontSize: 18, fontWeight: 'bold', marginTop: '5%'}}>{selectedDirType}</Text>
+            <View style={{marginVertical: '2.5%'}}>
+                <Text style={{color: colors.mainColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</Text>
             </View>
             <ScrollView horizontal={true} scrollEnabled={false}>
-                <SafeAreaView style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                    <FlatList numColumns={2} data={directoryData} renderItem={showDirectories} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
+                <SafeAreaView>
+                    <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={directoryData} renderItem={showDirectories} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
                 </SafeAreaView>
             </ScrollView>
         </View>
@@ -370,6 +374,7 @@ function Collection() {
 }
 
 const MypageNavigation = () => {
+    const {colors} = useTheme();
     return (
         <Tab.Navigator
             swipeEnabled={true}
@@ -380,18 +385,18 @@ const MypageNavigation = () => {
                     textAlign: 'center'
                 },
                 indicatorStyle: {
-                    backgroundColor: "#F07A7A",
+                    backgroundColor: colors.emphasizedColor,
                     height: 2,
                     width: 50,
                     marginLeft: Dimensions.get('screen').width/6.2,
                 },
                 style: {
                     elevation: 0,
-                    backgroundColor: '#FCF6F5',
+                    backgroundColor: colors.backgroundColor,
                     height: 40
                 },
-                activeTintColor: '#40516E',
-                inactiveTintColor: '#9DA2AB'
+                activeTintColor: colors.mainColor,
+                inactiveTintColor: colors.textNotClicked
             }}
             style={{paddingBottom: 15}}
         >
@@ -427,7 +432,7 @@ const styles = StyleSheet.create({
     },
     rankingContainer: {
         backgroundColor: 'white',
-        marginEnd: Dimensions.get('screen').width/15,
+        marginEnd: Dimensions.get('screen').width/14,
         marginTop: 11,
         width: 162,
         height: 249,
@@ -436,36 +441,25 @@ const styles = StyleSheet.create({
         // justifyContent: 'space-between'
     },
     dirType: {
-        borderColor: '#FCF6F5',
         borderWidth: 1,
         paddingVertical: 1,
-        paddingHorizontal: 8.5,
+        paddingHorizontal: 8,
         borderRadius: 14,
         elevation: 1,
-        backgroundColor: '#FCF6F5',
         width: 43,
         height: 22,
         marginLeft: 9,
         marginTop: 8,
         flexDirection: 'row',
         zIndex: 10000,
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     dirFreeText: {
-        color: '#7B9ACC',
         fontSize: 12,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        margin: 2,
     },
     dirPlanText: {
-        color: '#F07A7A',
-        fontSize: 12,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        // fontWeight: 'bold',
-        margin: 2
+        fontSize: 12
     },
     defaultImage: {
         width: '100%',
@@ -475,7 +469,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     selectType: {
-        borderColor: '#fff',
         borderWidth: 1,
         paddingVertical: 1,
         paddingHorizontal: 8.5,
@@ -485,13 +478,11 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
         elevation: 1,
-        backgroundColor: '#fff',
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
     },
     selectTypeClicked: {
-        borderColor: '#7B9ACC',
         borderWidth: 1,
         paddingVertical: 1,
         paddingHorizontal: 8.5,
@@ -501,13 +492,11 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
         elevation: 1,
-        backgroundColor: '#7B9ACC',
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
     },
     selectTypeTextClicked: {
-        color: '#fff',
         fontSize: 14,
         textAlign: 'center',
         textAlignVertical: 'center',

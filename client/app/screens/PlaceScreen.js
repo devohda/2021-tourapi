@@ -2,9 +2,10 @@ import React from "react";
 import ScreenContainer from "../components/ScreenContainer";
 import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView} from "react-native";
 import styled, {css} from 'styled-components/native';
+import {useTheme} from '@react-navigation/native';
 
 import Star from "../components/Star";
-import StarScore from '../components/StarScore'
+import StarScore from '../components/StarScore';
 
 // styled component 사용해봤음.
 const Line = styled(View)`
@@ -45,12 +46,14 @@ const Time = (props) => {
 }
 
 const PlaceScreen = () => {
+    const { colors } = useTheme();
+
     return (
         <SafeAreaView style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "#fff",
+            backgroundColor: colors.defaultColor,
             width: "100%"
         }}>
             <ScrollView style={{width: "100%"}}>
