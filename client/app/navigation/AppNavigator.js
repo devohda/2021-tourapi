@@ -11,6 +11,7 @@ const MainStack = createStackNavigator()
 
 const AppNavigator = () => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
+
     return (
         <MainStack.Navigator screenOptions={{headerShown: false}}>
             {!isSignedIn ?

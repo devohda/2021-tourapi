@@ -1,7 +1,10 @@
 import React from 'react';
 import {Image, Text, TouchableOpacity, View} from "react-native";
+import { useTheme } from '@react-navigation/native';
 
 const NavigationTop = props => {
+    const { colors } = useTheme();
+
     return (
         <View flexDirection="row" style={{height: 24, marginTop: 20, alignItems: 'center', justifyContent : 'center'}}>
             <View style={{position: 'absolute', left : 0}}>
@@ -9,7 +12,7 @@ const NavigationTop = props => {
                     <Image source={require('../assets/images/back-icon.png')} width={24} height={24}/>
                 </TouchableOpacity>
             </View>
-            <Text style={{color: '#40516E', fontSize: 16, fontWeight: 'bold'}}>{props.title}</Text>
+            <Text style={{color: colors.textNotClicked, fontSize: 16, fontWeight: 'bold'}}>{props.title}</Text>
         </View>
     )
 }
