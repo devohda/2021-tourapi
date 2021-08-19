@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.yourappname",
+      "bundleIdentifier": "com.ohda.Here",
       "buildNumber": "0.0.1"
     },
     "android": {
@@ -26,7 +26,7 @@
         "foregroundImage": "./app/assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.yourcompany.yourappname"
+      "package": "com.ohda.Here"
     },
     "web": {
       "favicon": "./app/assets/images/favicon.png"
