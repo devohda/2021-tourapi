@@ -226,7 +226,7 @@ function Collection() {
     const [HashTag, setHashTag] = useState([]);
     const getCollectionsFromUsers = (type) => {
         try {
-            fetch('http://34.146.140.88:3000/collections/collections_free', {
+            fetch('http://34.146.140.88/collections/collections_free', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

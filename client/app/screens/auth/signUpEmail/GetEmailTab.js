@@ -24,7 +24,7 @@ const InputBox = styled(TextInput)`
 
 const findSameEmail = async (email) => {
     try {
-        const result = await fetch('http://34.146.140.88:3000/auth/sameEmail', {
+        const result = await fetch('http://34.146.140.88/auth/sameEmail', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
