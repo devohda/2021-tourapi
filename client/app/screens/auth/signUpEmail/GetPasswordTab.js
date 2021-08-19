@@ -1,7 +1,8 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
+import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -25,7 +26,8 @@ const InputBox = styled(TextInput)`
 
 const GetPasswordTab = ({route, navigation}) => {
     const {email} = route.params
-    const [password, setPassword] = useState("")
+    const [password, setPassword] = useState("");
+    const { colors } = useTheme();
 
     const checkIsValid = async () => {
         if (password.length < 8) {
@@ -45,7 +47,7 @@ const GetPasswordTab = ({route, navigation}) => {
         },
         progress_active: {
             width: 28,
-            backgroundColor: '#7B9ACC'
+            backgroundColor: colors.mainColor
         },
         progress_inactive: {
             width: 8,
@@ -53,11 +55,10 @@ const GetPasswordTab = ({route, navigation}) => {
         },
         title_text: {
             fontSize: 30,
-            color: '#40516E',
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: password ? '#7B9ACC' : '#CDD0D7',
+            backgroundColor: password ? colors.mainColor : '#CDD0D7',
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -76,9 +77,9 @@ const GetPasswordTab = ({route, navigation}) => {
                 <Form>
                     <Text>
                         <View>
-                            <Text style={styles.title_text}><Text
+                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}><Text
                                 style={{fontWeight: 'bold'}}>비밀번호</Text><Text>를</Text></Text>
-                            <Text style={styles.title_text}>설정해주세요</Text>
+                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}>설정해주세요</Text>
                         </View>
                     </Text>
                     <InputBox
@@ -97,7 +98,7 @@ const GetPasswordTab = ({route, navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={password ? false : true}
                 >
-                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
                 </TouchableOpacity>
             </View>
         </>

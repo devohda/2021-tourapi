@@ -1,6 +1,7 @@
 //전역 선언 방법 찾아보기
 import React, {useContext, useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
 import ScreenContainer from "../../components/ScreenContainer";
@@ -13,6 +14,8 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     const [password, setPassword] = useState(null)
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
     const [userData, setUserData] = useIsUserData()
+
+    const { colors } = useTheme();
 
     const signIn = async () => {
         try {
@@ -52,14 +55,14 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     }
 
     return (
-        <ScreenContainer backgroundColor="#FCF6F5">
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
                 <TouchableOpacity onPress={() => {setIsSignedIn(true)}}>
-                    <Text style={{color: '#40516E', fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
+                    <Text style={{color: colors.textNotClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
             <View style={{marginTop : 86}}>
-                <Text style={{fontSize: 28, color: '#40516E'}}>
+                <Text style={{fontSize: 28, color: colors.mainColor}}>
                     <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
                     <Text>{"\n"}채워볼까요?</Text>
                 </Text>
@@ -96,7 +99,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     disabled={email && password ? false : true}
                     onPress={() => signIn()}
                 >
-                    <Text style={styles.loginText}>로그인</Text>
+                    <Text style={[styles.loginText, {color: colors.defaultColor}]}>로그인</Text>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
                     <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}}>
@@ -124,7 +127,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         padding: 14,
         fontSize: 16,
-        color: '#fff',
         fontWeight: 'bold'
     }
 });

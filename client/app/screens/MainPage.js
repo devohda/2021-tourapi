@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
     Menu,
     Button,
@@ -13,85 +13,73 @@ import {
     ImageBackground,
     Platform
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import {useIsUserData} from "../contexts/UserDataContextProvider";
-// import {KakaoOAuthToken, KakaoProfile, login, logout} from '@react-native-seoul/kakao-login';
-
 
 export default function MainPage({navigation}) {
-    const [userData, setUserData] = useIsUserData()
+    const [userData, setUserData] = useIsUserData();
+    const { colors } = useTheme();
 
     return (
-        <SafeAreaView style={{backgroundColor: '#FCF6F5'}}>
+        <SafeAreaView style={{backgroundColor: colors.backgroundColor}}>
             <ScrollView>
             <View style={{marginTop: 20, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
-                <View><Text style={{color: '#7B9ACC', fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>HERE</Text></View>
+                <View><Text style={{color: colors.mainColor, fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>Here.</Text></View>
                 <View>
                     <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                             <Icon type="ionicon"
                                   name={"md-search"}
-                                  color="#7B9ACC"
+                                  color={colors.mainColor}
                                   style={{marginEnd: 20}}
                                   size={28}>
                             </Icon>
                     </TouchableOpacity>
                 </View>
             </View>
-                {/* {Platform.OS !== 'android' &&
-                <View style={{backgroundColor: "#FCF6F5", flexDirection: "row", justifyContent: "space-between"}}>
-                    <View><Text style={{
-                        color: '#7B9ACC',
-                        fontWeight: 'bold',
-                        fontSize: 28,
-                        left: 16,
-                    }}>Here.</Text></View>
-                    <TouchableOpacity onPress={() => navigation.navigate('search')}>
-                        <View style={{flexDirection: 'row'}}>
-                            <Icon type="ionicon"
-                                  name={"md-search"}
-                                  color="#7B9ACC"
-                                  style={{marginEnd: 20}}
-                                  size={28}>
-                            </Icon>
-                        </View>
-                    </TouchableOpacity>
-                </View>
-                } */}
-
                 <View>
                     <View style={styles.blackRect}>
                         <View>
                             <Text style={{
-                                color: '#7B9ACC',
-                                left: 16,
-                                top: 50,
-                                fontSize: 24,
-                                lineHeight: 36,
-                            }}>
-                                <Text style={{fontWeight:'bold'}}>가장 인기있는{"\n"}보관함</Text>
-                            </Text>
-                            <TouchableOpacity style={{top: 18, right: 100}}><Icon type="ionicon"
-                                                                                  name={"chevron-forward-outline"}
-                                                                                  color="#7B9ACC"
-                                                                                  size={26}></Icon></TouchableOpacity>
+                                    color: colors.mainColor,
+                                    left: 16,
+                                    top: 50,
+                                    fontSize: 24,
+                                    lineHeight: 36,
+                                    fontWeight: 'bold'
+                                }}>가장 인기있는</Text>
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={{
+                                    color: colors.mainColor,
+                                    left: 16,
+                                    top: 50,
+                                    fontSize: 24,
+                                    lineHeight: 36,
+                                    fontWeight: 'bold'
+                                }}>보관함</Text>
+                                <TouchableOpacity style={{top: 54.5, left: 16}}><Icon type="ionicon"
+                                                                                    name={"chevron-forward-outline"}
+                                                                                    color={colors.mainColor}
+                                                                                    size={26}></Icon></TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                     <View style={{position: 'absolute'}}>
                         <View style={{flexDirection: 'row', left: 16, top: 145}}>
-                            <View style={{paddingEnd: 42}}><TouchableOpacity style={styles.selectedRankings}><Text
-                                style={styles.selectedRankingsText}>일간</Text></TouchableOpacity></View>
+                            <View style={{paddingEnd: 42}}><TouchableOpacity style={[styles.selectedRankings, {borderBottomColor: colors.emphasizedColor}]}><Text
+                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>일간</Text></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><Text
-                                style={styles.notSelectedRankingsText}>주간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>주간</Text></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><Text
-                                style={styles.notSelectedRankingsText}>월간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>월간</Text></TouchableOpacity></View>
                         </View>
                         {/* 데이터 붙여서(for문?) 들어가게 */}
                         <View style={styles.rankingContainer}>
                             <View style={styles.defaultImage}></View>
                             <View style={{marginLeft: 10}}>
-                                <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: '#40516E'}}>하루만에 북촌
+                                <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: colors.textNotClicked}}>하루만에 북촌
                                     정복하기</Text>
                                 <View style={{flexDirection: 'row'}}>
                                     <Text style={{fontSize: 12, marginEnd: 85, color: '#BDC2CA'}}>meeeeensun</Text>
@@ -101,40 +89,40 @@ export default function MainPage({navigation}) {
                         </View>
                     </View>
                     <View style={{marginTop: 210}}>
-                        <Text style={styles.titles}>요즘 뜨는 수집가</Text>
+                        <Text style={[styles.titles, {color: colors.mainColor}]}>요즘 뜨는 수집가</Text>
                         <View style={{flexDirection:'row', marginLeft: '2%'}}>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: '#7B9ACC', marginTop: 10}}>K-민선</Text>
+                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10}}>K-민선</Text>
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
-                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#조용한</Text></View>
-                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
+                                    <View style={[styles.keywordHashTagView, {backgroundColor: colors.defaultColor}]}><Text style={styles.keywordHashTag}>#조용한</Text></View>
+                                    <View style={[styles.keywordHashTagView, {backgroundColor: colors.defaultColor}]}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
                                 </View>
                             </View>
                             <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: '#7B9ACC', marginTop: 10}}>K-민선</Text>
+                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10}}>K-민선</Text>
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
-                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#조용한</Text></View>
-                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
+                                    <View style={[styles.keywordHashTagView, {backgroundColor: colors.defaultColor}]}><Text style={styles.keywordHashTag}>#조용한</Text></View>
+                                    <View style={[styles.keywordHashTagView, {backgroundColor: colors.defaultColor}]}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
                                 </View>
                             </View>
                             <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: '#7B9ACC', marginTop: 10}}>K-민선</Text>
+                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10}}>K-민선</Text>
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
-                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#조용한</Text></View>
-                                    <View style={styles.keywordHashTagView}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
+                                    <View style={[styles.keywordHashTagView, {backgroundColor: colors.defaultColor}]}><Text style={styles.keywordHashTag}>#조용한</Text></View>
+                                    <View style={[styles.keywordHashTagView, {backgroundColor: colors.defaultColor}]}><Text style={styles.keywordHashTag}>#따뜻한</Text></View>
                                 </View>
                             </View>
                         </ScrollView>
@@ -142,30 +130,30 @@ export default function MainPage({navigation}) {
                     </View>
                     
                     <View style={{marginTop: 45}}>
-                        <Text style={styles.titles}>지역 추천</Text>
+                        <Text style={[styles.titles, {color: colors.mainColor}]}>지역 추천</Text>
                         <View style={{flexDirection: 'row', marginLeft: '5%'}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}}
                                                  style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#FCF6F5'}}>충청북도
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>충청북도
                                             단양</Text>
-                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: '#FCF6F5'}}>추천하는 이유는 다음과 같습니다</Text>
+                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는 이유는 다음과 같습니다</Text>
                                     </View>
                                 </ImageBackground>
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/1ee8a4'}}
                                                  style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#FCF6F5'}}>전라남도
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>전라남도
                                             여수</Text>
-                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: '#FCF6F5'}}>추천하는 이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</Text>
+                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는 이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</Text>
                                     </View>
                                 </ImageBackground>
                             </ScrollView>
                         </View>
                     </View>
                     <View style={{marginVertical: 45}}>
-                        <Text style={styles.titles}>요즘 뜨는 공간</Text>
+                        <Text style={[styles.titles, {color: colors.mainColor}]}>요즘 뜨는 공간</Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Place')}>
                             <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
@@ -180,7 +168,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: '#7B9ACC',
+                                            color: colors.mainColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -192,7 +180,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: '#7B9ACC',
+                                            color: colors.mainColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -202,7 +190,7 @@ export default function MainPage({navigation}) {
                                     <Text style={{
                                         fontSize: 16,
                                         fontWeight: 'bold',
-                                        color: '#7B9ACC',
+                                        color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
                                     <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
@@ -219,7 +207,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: '#7B9ACC',
+                                            color: colors.mainColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -231,7 +219,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: '#7B9ACC',
+                                            color: colors.mainColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -241,7 +229,7 @@ export default function MainPage({navigation}) {
                                     <Text style={{
                                         fontSize: 16,
                                         fontWeight: 'bold',
-                                        color: '#7B9ACC',
+                                        color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
                                     <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
@@ -258,7 +246,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: '#7B9ACC',
+                                            color: colors.mainColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -270,7 +258,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: '#7B9ACC',
+                                            color: colors.mainColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -280,7 +268,7 @@ export default function MainPage({navigation}) {
                                     <Text style={{
                                         fontSize: 16,
                                         fontWeight: 'bold',
-                                        color: '#7B9ACC',
+                                        color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
                                     <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
@@ -301,25 +289,17 @@ export default function MainPage({navigation}) {
 const styles = StyleSheet.create({
     blackRect: {
         height: 306,
-        backgroundColor: '#FCF6F5',
-        position: 'relative'
     },
     selectedRankings: {
         borderBottomWidth: 1.5,
-        borderBottomColor: '#F07A7A',
         paddingBottom: 2
 
     },
     notSelectedRankings: {
     },
     selectedRankingsText: {
-        color: '#7B9ACC',
         fontSize: 16,
         fontWeight: 'bold'
-    },
-    notSelectedRankingsText: {
-        color: '#7B9ACC',
-        fontSize: 16
     },
     rankingContainer: {
         backgroundColor: 'white',
@@ -344,8 +324,6 @@ const styles = StyleSheet.create({
         borderBottomEndRadius: 0
     },
     titles: {
-        color: '#7B9ACC',
-        // marginTop: 60,
         fontSize: 22,
         marginLeft: '5%',
         fontWeight: 'bold'
@@ -364,7 +342,7 @@ const styles = StyleSheet.create({
     },
     keywordHashTagView: {
         color: '#BDC2CA',
-        backgroundColor: '#fff', borderWidth: 1, borderColor: '#EBEBEB', borderRadius: 27, paddingVertical: 5, paddingHorizontal: 10,
+        borderWidth: 1, borderColor: '#EBEBEB', borderRadius: 27, paddingVertical: 5, paddingHorizontal: 10,
         shadowColor: 'rgba(0,0,0,0.11)',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,

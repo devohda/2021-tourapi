@@ -1,6 +1,7 @@
 //전역 선언 방법 찾아보기
 import React, {useContext, useState} from 'react';
 import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
 import ScreenContainer from "../../components/ScreenContainer";
@@ -16,18 +17,20 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     const [password, setPassword] = useState(null)
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
 
+    const {colors} = useTheme()
+
     return (
-        <ScreenContainer backgroundColor="#FCF6F5">
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
                 <TouchableOpacity onPress={() => setIsSignedIn(true)}>
-                    <Text style={{color: '#40516E', fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
+                    <Text style={{color: colors.textNotClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
             <View style={{marginTop : 86}}>
                 <View style={{alignContent : "flex-start"}}>
-                    <Text style={{fontSize: 28, color : '#40516E'}}>나만의 </Text>
-                    <Text style={{fontSize: 28, color : '#40516E'}}><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
-                    <Text style={{fontSize: 28, color : '#40516E'}}>채워볼까요?</Text>
+                    <Text style={{fontSize: 28, color : colors.mainColor}}>나만의 </Text>
+                    <Text style={{fontSize: 28, color : colors.mainColor}}><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
+                    <Text style={{fontSize: 28, color : colors.mainColor}}>채워볼까요?</Text>
                 </View>
                 <View style={{marginTop : 200}}>
                     <TouchableOpacity
@@ -40,7 +43,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         style={{backgroundColor: '#000', height: 52, borderRadius: 10, marginVertical : 8}}
                         onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                     >
-                        <Text style={{...styles.loginText, color : '#fff'}}>Apple로 계속하기</Text>
+                        <Text style={{...styles.loginText, color : colors.defaultColor}}>Apple로 계속하기</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent : 'stretch'}}>
