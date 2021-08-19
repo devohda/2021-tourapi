@@ -47,7 +47,7 @@ const MakeFreeDirectory = ({navigation}) => {
         try {
             // ! localhost 로 보내면 굳이 ip 안 찾아도 됩니다~!! 확인 후 삭제해주세요 :)
             console.log(datas)
-            fetch('http://localhost:3000/collections/collections_free', {
+            fetch('http://34.146.140.88:3000/collections/collections_free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -110,7 +110,7 @@ const MakeFreeDirectory = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://localhost:3000/keyword/keywords', {
+            fetch('http://34.146.140.88:3000/keyword/keywords', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
