@@ -62,7 +62,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                 </TouchableOpacity>
             </View>
             <View style={{marginTop : 86}}>
-                <Text style={{fontSize: 28, color: colors.textNotClicked}}>
+                <Text style={{fontSize: 28, color: colors.mainColor}}>
                     <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
                     <Text>{"\n"}채워볼까요?</Text>
                 </Text>

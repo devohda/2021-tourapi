@@ -12,7 +12,7 @@ const NavigationTop = props => {
                     <Image source={require('../assets/images/back-icon.png')} width={24} height={24}/>
                 </TouchableOpacity>
             </View>
-            <Text style={{color: colors.textNotClicked, fontSize: 16, fontWeight: 'bold'}}>{props.title}</Text>
+            <Text style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold'}}>{props.title}</Text>
         </View>
     )
 }

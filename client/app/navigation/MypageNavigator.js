@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {Image, ScrollView, Text, View, FlatList, SafeAreaView, Dimensions, TouchableOpacity} from "react-native";
+import {Image, ScrollView, Text, View, FlatList, SafeAreaView, Dimensions, TouchableOpacity, Platform} from "react-native";
 import {StyleSheet} from "react-native";
 import OIcon from 'react-native-vector-icons/Octicons'
 import React, {useEffect, useState, useContext} from "react";
@@ -382,21 +382,24 @@ const MypageNavigation = () => {
                 labelStyle: {
                     fontSize: 16,
                     fontWeight: 'bold',
-                    textAlign: 'center'
+                    textAlign: 'center',
                 },
                 indicatorStyle: {
                     backgroundColor: colors.emphasizedColor,
                     height: 2,
-                    width: 50,
-                    marginLeft: Dimensions.get('screen').width/6.2,
+                    // width: 50,
+                    // marginLeft: Dimensions.get('screen').width/6.2,
+                    // marginLeft: Platform.OS === 'ios' ? Dimensions.get('screen').width/6 : Dimensions.get('screen').width/6.2
+                    width: Dimensions.get('screen').width/6 * 0.9,
+                    marginLeft: Dimensions.get('screen').width/6 * 0.9
                 },
                 style: {
                     elevation: 0,
                     backgroundColor: colors.backgroundColor,
-                    height: 40
+                    height: 40,
                 },
                 activeTintColor: colors.mainColor,
-                inactiveTintColor: colors.textNotClicked
+                inactiveTintColor: colors.textNotClicked,
             }}
             style={{paddingBottom: 15}}
         >

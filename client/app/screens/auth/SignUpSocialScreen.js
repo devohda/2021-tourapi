@@ -52,9 +52,9 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
             </View>
             <View style={{marginTop : 86}}>
                 <View style={{alignContent : "flex-start"}}>
-                    <Text style={{fontSize: 28, color : colors.textNotClicked}}>나만의 </Text>
-                    <Text style={{fontSize: 28, color : colors.textNotClicked}}><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
-                    <Text style={{fontSize: 28, color : colors.textNotClicked}}>채워볼까요?</Text>
+                    <Text style={{fontSize: 28, color : colors.mainColor}}>나만의 </Text>
+                    <Text style={{fontSize: 28, color : colors.mainColor}}><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
+                    <Text style={{fontSize: 28, color : colors.mainColor}}>채워볼까요?</Text>
                 </View>
                 <View style={{marginTop : 200}}>
                     <TouchableOpacity
