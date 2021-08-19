@@ -23,7 +23,7 @@ const MyPageScreen = () => {
     const getCollections = () => {
         try {
     
-            fetch('http://192.168.0.11:3000/user/users', {
+            fetch('http://34.146.140.88/user/users', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

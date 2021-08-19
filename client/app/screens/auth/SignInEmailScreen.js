@@ -19,7 +19,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            let url = 'http://192.168.0.11:3000/auth/loginEmail';
+            let url = 'http://34.146.140.88/auth/loginEmail';
             let options = {
                 method: 'POST',
                 mode: 'cors',

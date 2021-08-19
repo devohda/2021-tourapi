@@ -1,8 +1,7 @@
-import React, {useState, useContext} from "react";
+import React, {useState} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
-import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -25,7 +24,7 @@ const InputBox = styled(TextInput)`
 
 const findSameEmail = async (email) => {
     try {
-        const result = await fetch('http://192.168.0.11:3000/auth/sameEmail', {
+        const result = await fetch('http://34.146.140.88/auth/sameEmail', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -46,7 +45,6 @@ const findSameEmail = async (email) => {
 
 const GetEmailTab = ({navigation}) => {
     const [email, setEmail] = useState("");
-    const { colors } = useTheme();
 
     const checkIsValid = async () => {
         const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
@@ -73,7 +71,7 @@ const GetEmailTab = ({navigation}) => {
         },
         progress_active: {
             width: 28,
-            backgroundColor: colors.mainColor
+            backgroundColor: '#7B9ACC'
         },
         progress_inactive: {
             width: 8,
@@ -81,10 +79,11 @@ const GetEmailTab = ({navigation}) => {
         },
         title_text: {
             fontSize: 30,
+            color: '#40516E',
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: email ? colors.mainColor : '#CDD0D7',
+            backgroundColor: email ? '#7B9ACC' : '#CDD0D7',
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -103,9 +102,9 @@ const GetEmailTab = ({navigation}) => {
                 <Form>
                     <Text>
                         <View>
-                            <Text style={[styles.title_text, {color: colors.mainColor}]}><Text
+                            <Text style={styles.title_text}><Text
                                 style={{fontWeight: 'bold'}}>이메일주소</Text><Text>를</Text></Text>
-                            <Text style={[styles.title_text, {color: colors.mainColor}]}>입력해주세요</Text>
+                            <Text style={styles.title_text}>입력해주세요</Text>
                         </View>
                     </Text>
                     <InputBox
@@ -122,7 +121,7 @@ const GetEmailTab = ({navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={email ? false : true}
                 >
-                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
                 </TouchableOpacity>
             </View>
         </>

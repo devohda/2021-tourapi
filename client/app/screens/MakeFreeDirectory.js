@@ -41,7 +41,7 @@ const MakeFreeDirectory = ({navigation}) => {
         }
         try {
             console.log(datas)
-            fetch('http://192.168.0.11:3000/collections/collections_free', {
+            fetch('http://34.146.140.88/collections/collections_free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -104,7 +104,7 @@ const MakeFreeDirectory = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://192.168.0.11:3000/keyword/keywords', {
+            fetch('http://34.146.140.88/keyword/keywords', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

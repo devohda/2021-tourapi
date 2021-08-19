@@ -231,7 +231,7 @@ function Collection() {
     const [HashTag, setHashTag] = useState([]);
     const getCollectionsFromUsers = (type) => {
         try {
-            fetch('http://192.168.0.11:3000/collections/collections_free', {
+            fetch('http://34.146.140.88/collections/collections_free', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -343,7 +343,7 @@ function Collection() {
                     </ScrollView>
                 </View>
                 </View>
-                
+
                 <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{color: colors.textNotClicked}}>최근 추가순</Text>
