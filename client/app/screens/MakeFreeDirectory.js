@@ -182,15 +182,15 @@ const MakeFreeDirectory = ({navigation}) => {
                 borderBottomWidth: 6,
             }}>
                 <TextInput
-                    style={{paddingHorizontal: 14, fontSize: 20, color: '#BDC2CA', fontWeight: '400'}}
+                    style={[collectionName && {color : colors.mainColor},{paddingHorizontal: 14, fontSize: 20, fontWeight: 'bold'}]}
                     placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
                     onChangeText={(name) => setCollectionName(name)}>
                 </TextInput>
             </View>
             <View style={{marginTop: 24}}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.textNotClicked}}>보관함 키워드</Text>
-                    <Text style={{fontSize: 12, color: '#BDC2CA', alignSelf: 'center', marginLeft: 9}}>* 최대
+                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
+                    <Text style={{fontSize: 12, color: '#BABFC8', alignSelf: 'center', marginLeft: 9}}>* 최대
                         3개</Text>
                 </View>
                 <View style={{
@@ -231,7 +231,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between'
             }}>
-                <Text style={{fontSize: 16, fontWeight: '500', color: colors.textNotClicked}}>비공개 설정</Text>
+                <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
                 <Switch
                     trackColor={{false: "#CDD0D7", true: colors.mainColor}}
                     thumbColor={colors.defaultColor}

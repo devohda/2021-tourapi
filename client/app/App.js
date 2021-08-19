@@ -15,11 +15,12 @@ const NavigationTheme = {
 const ColorTheme = {
     colors: {
         defaultColor : '#FFFFFF',
-        mainColor : '#7B9ACC',
+        mainColor : '#4C648D',
         backgroundColor : '#FCF6F5',
-        textNotClicked : '#40516E',
+        textNotClicked : '#C9CFD9',
         emphasizedColor : '#F07A7A',
-        subColor : '#9DA2AB'
+        subColor : '#BABFC8',
+        hashTagColor: '#90969F'
     }
 };
 

@@ -103,9 +103,9 @@ const GetEmailTab = ({navigation}) => {
                 <Form>
                     <Text>
                         <View>
-                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}><Text
+                            <Text style={[styles.title_text, {color: colors.mainColor}]}><Text
                                 style={{fontWeight: 'bold'}}>이메일주소</Text><Text>를</Text></Text>
-                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}>입력해주세요</Text>
+                            <Text style={[styles.title_text, {color: colors.mainColor}]}>입력해주세요</Text>
                         </View>
                     </Text>
                     <InputBox

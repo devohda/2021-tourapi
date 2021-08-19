@@ -25,7 +25,7 @@ export default function MainPage({navigation}) {
         <SafeAreaView style={{backgroundColor: colors.backgroundColor}}>
             <ScrollView>
             <View style={{marginTop: 20, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
-                <View><Text style={{color: colors.mainColor, fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>HERE</Text></View>
+                <View><Text style={{color: colors.mainColor, fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>Here.</Text></View>
                 <View>
                     <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                             <Icon type="ionicon"
@@ -41,18 +41,27 @@ export default function MainPage({navigation}) {
                     <View style={styles.blackRect}>
                         <View>
                             <Text style={{
-                                color: colors.mainColor,
-                                left: 16,
-                                top: 50,
-                                fontSize: 24,
-                                lineHeight: 36,
-                            }}>
-                                <Text style={{fontWeight:'bold'}}>가장 인기있는{"\n"}보관함</Text>
-                            </Text>
-                            <TouchableOpacity style={{top: 18, right: 100}}><Icon type="ionicon"
-                                                                                  name={"chevron-forward-outline"}
-                                                                                  color={colors.mainColor}
-                                                                                  size={26}></Icon></TouchableOpacity>
+                                    color: colors.mainColor,
+                                    left: 16,
+                                    top: 50,
+                                    fontSize: 24,
+                                    lineHeight: 36,
+                                    fontWeight: 'bold'
+                                }}>가장 인기있는</Text>
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={{
+                                    color: colors.mainColor,
+                                    left: 16,
+                                    top: 50,
+                                    fontSize: 24,
+                                    lineHeight: 36,
+                                    fontWeight: 'bold'
+                                }}>보관함</Text>
+                                <TouchableOpacity style={{top: 54.5, left: 16}}><Icon type="ionicon"
+                                                                                    name={"chevron-forward-outline"}
+                                                                                    color={colors.mainColor}
+                                                                                    size={26}></Icon></TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                     <View style={{position: 'absolute'}}>
@@ -280,7 +289,6 @@ export default function MainPage({navigation}) {
 const styles = StyleSheet.create({
     blackRect: {
         height: 306,
-        position: 'relative'
     },
     selectedRankings: {
         borderBottomWidth: 1.5,
