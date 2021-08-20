@@ -14,18 +14,18 @@ function Like() {
         <View flex={1} backgroundColor={colors.backgroundColor}>
             <View style={{flexDirection: 'row', paddingTop: 12}}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: colors.textNotClicked}}>최근 추가순</Text>
-                    <Icon style={{color: colors.textNotClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+                    <Text style={{color: colors.notClicked}}>최근 추가순</Text>
+                    <Icon style={{color: colors.notClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                 </View>
                 <View style={{flexDirection: 'row', marginLeft:'40%'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                        <Text style={{color: colors.textNotClicked}}>필터</Text>
+                        <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                        <Text style={{color: colors.notClicked}}>필터</Text>
                     </View>
                     <View style={{marginHorizontal: 10}}><Text>|</Text></View>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                        <Text style={{color: colors.textNotClicked}}>편집</Text>
+                        <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                        <Text style={{color: colors.notClicked}}>편집</Text>
                     </View>
                 </View>
             </View>
@@ -333,8 +333,8 @@ function Collection() {
         )
     }
     return (
-        <View flex={1} >
-            <View backgroundColor={colors.backgroundColor} style={{alignItems: 'center', justifyContent: 'center'}}>
+        <View flex={1} style={{backgroundColor: colors.backgroundColor}}>
+            <View style={{alignItems: 'center', justifyContent: 'center', backgroundColor: colors.backgroundColor}}>
                 <View flexDirection="row" style={{marginVertical: 20}}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         {directoryType.map((name, idx) => (
@@ -346,18 +346,18 @@ function Collection() {
                 
                 <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Text style={{color: colors.textNotClicked}}>최근 추가순</Text>
-                        <Icon style={{color: colors.textNotClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+                        <Text style={{color: colors.notClicked}}>최근 추가순</Text>
+                        <Icon style={{color: colors.notClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                            <Text style={{color: colors.textNotClicked}}>필터</Text>
+                            <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                            <Text style={{color: colors.notClicked}}>필터</Text>
                         </View>
                         <View style={{marginHorizontal: 10}}><Text>|</Text></View>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon style={{color: colors.textNotClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                            <Text style={{color: colors.textNotClicked}}>편집</Text>
+                            <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                            <Text style={{color: colors.notClicked}}>편집</Text>
                         </View>
                     </View>
                 </View>
@@ -399,7 +399,7 @@ const MypageNavigation = () => {
                     height: 40,
                 },
                 activeTintColor: colors.mainColor,
-                inactiveTintColor: colors.textNotClicked,
+                inactiveTintColor: colors.notClicked,
             }}
             style={{paddingBottom: 15}}
         >
@@ -434,7 +434,6 @@ const styles = StyleSheet.create({
         marginRight: "3%"
     },
     rankingContainer: {
-        backgroundColor: 'white',
         marginEnd: Dimensions.get('screen').width/14,
         marginTop: 11,
         width: 162,

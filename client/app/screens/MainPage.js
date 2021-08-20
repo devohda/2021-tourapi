@@ -79,7 +79,7 @@ export default function MainPage({navigation}) {
                         <View style={styles.rankingContainer}>
                             <View style={styles.defaultImage}></View>
                             <View style={{marginLeft: 10}}>
-                                <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: colors.textNotClicked}}>하루만에 북촌
+                                <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: colors.notClicked}}>하루만에 북촌
                                     정복하기</Text>
                                 <View style={{flexDirection: 'row'}}>
                                     <Text style={{fontSize: 12, marginEnd: 85, color: '#BDC2CA'}}>meeeeensun</Text>

@@ -77,9 +77,9 @@ const GetPasswordTab = ({route, navigation}) => {
                 <Form>
                     <Text>
                         <View>
-                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}><Text
+                            <Text style={[styles.title_text, {color: colors.notClicked}]}><Text
                                 style={{fontWeight: 'bold'}}>비밀번호</Text><Text>를</Text></Text>
-                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}>설정해주세요</Text>
+                            <Text style={[styles.title_text, {color: colors.notClicked}]}>설정해주세요</Text>
                         </View>
                     </Text>
                     <InputBox

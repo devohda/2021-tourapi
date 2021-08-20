@@ -36,7 +36,7 @@ export default function MakeDirectoryBtn({navigation}) {
                 >
                <View style={{paddingTop: '5%', backgroundColor: colors.backgroundColor}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Text style={{fontSize: 18, fontWeight: 'bold', marginLeft: '5%', marginTop: '1%', color: colors.textNotClicked}}>보관함 만들기</Text>
+                        <Text style={{fontSize: 18, fontWeight: 'bold', marginLeft: '5%', marginTop: '1%', color: colors.notClicked}}>보관함 만들기</Text>
                         <TouchableOpacity onPress={() => {refRBSheet.current.close()}} style={{marginLeft: '58%'}}><Icon type="ionicon" name={"close"}></Icon></TouchableOpacity>
                     </View>
                     <View style={{alignItems : "center", justifyContent : "center", marginTop: '1%'}}>
