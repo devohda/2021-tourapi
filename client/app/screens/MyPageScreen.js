@@ -47,10 +47,10 @@ const MyPageScreen = () => {
         }
     }
     return (
-        <ScreenContainer backgroundColor={colors.backgroundColor}>
+        <ScreenContainer backgroundColor={colors.background}>
             <View style={{
                 height: 200,
-                backgroundColor: colors.backgroundColor,
+                backgroundColor: colors.background,
                 paddingTop: '10%'
             }} className="profile-container">
                 <View style={{
@@ -65,7 +65,7 @@ const MyPageScreen = () => {
                         ></Image>
                     </View>
                     <View style={Platform.OS === 'ios' && {marginTop: 5}}>
-                        <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: colors.mainColor}}>{DATA.user_nickname}</Text>
+                        <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: colors.mainTextColor}}>{DATA.user_nickname}</Text>
                         <View style={{flexDirection: 'row', marginTop: Platform.OS === 'ios' ? 8 : 3}}>
                             <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.subcolor}]}>#조용한</Text></View>
                             <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.subcolor}]}>#따뜻한</Text></View>

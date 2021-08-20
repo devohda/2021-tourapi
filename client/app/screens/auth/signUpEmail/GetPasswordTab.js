@@ -47,7 +47,7 @@ const GetPasswordTab = ({route, navigation}) => {
         },
         progress_active: {
             width: 28,
-            backgroundColor: colors.mainColor
+            backgroundColor: colors.mainTextColor
         },
         progress_inactive: {
             width: 8,
@@ -58,7 +58,7 @@ const GetPasswordTab = ({route, navigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: password ? colors.mainColor : '#CDD0D7',
+            backgroundColor: password ? colors.mainTextColor : '#CDD0D7',
             height: 48,
             borderRadius: 10,
             alignItems: 'center',

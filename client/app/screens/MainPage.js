@@ -22,15 +22,15 @@ export default function MainPage({navigation}) {
     const { colors } = useTheme();
 
     return (
-        <SafeAreaView style={{backgroundColor: colors.backgroundColor}}>
+        <SafeAreaView style={{backgroundColor: colors.background}}>
             <ScrollView>
             <View style={{marginTop: 20, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
-                <View><Text style={{color: colors.mainColor, fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>Here.</Text></View>
+                <View><Text style={{color: colors.mainTextColor, fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>Here.</Text></View>
                 <View>
                     <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                             <Icon type="ionicon"
                                   name={"md-search"}
-                                  color={colors.mainColor}
+                                  color={colors.mainTextColor}
                                   style={{marginEnd: 20}}
                                   size={28}>
                             </Icon>
@@ -41,7 +41,7 @@ export default function MainPage({navigation}) {
                     <View style={styles.blackRect}>
                         <View>
                             <Text style={{
-                                    color: colors.mainColor,
+                                    color: colors.mainTextColor,
                                     left: 16,
                                     top: 50,
                                     fontSize: 24,
@@ -50,7 +50,7 @@ export default function MainPage({navigation}) {
                                 }}>가장 인기있는</Text>
                             <View style={{flexDirection: 'row'}}>
                                 <Text style={{
-                                    color: colors.mainColor,
+                                    color: colors.mainTextColor,
                                     left: 16,
                                     top: 50,
                                     fontSize: 24,
@@ -59,7 +59,7 @@ export default function MainPage({navigation}) {
                                 }}>보관함</Text>
                                 <TouchableOpacity style={{top: 54.5, left: 16}}><Icon type="ionicon"
                                                                                     name={"chevron-forward-outline"}
-                                                                                    color={colors.mainColor}
+                                                                                    color={colors.mainTextColor}
                                                                                     size={26}></Icon></TouchableOpacity>
                             </View>
                         </View>
@@ -67,13 +67,13 @@ export default function MainPage({navigation}) {
                     <View style={{position: 'absolute'}}>
                         <View style={{flexDirection: 'row', left: 16, top: 145}}>
                             <View style={{paddingEnd: 42}}><TouchableOpacity style={[styles.selectedRankings, {borderBottomColor: colors.emphasizedColor}]}><Text
-                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>일간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.mainTextColor}]}>일간</Text></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><Text
-                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>주간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.mainTextColor}]}>주간</Text></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><Text
-                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>월간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.mainTextColor}]}>월간</Text></TouchableOpacity></View>
                         </View>
                         {/* 데이터 붙여서(for문?) 들어가게 */}
                         <View style={styles.rankingContainer}>
@@ -89,13 +89,13 @@ export default function MainPage({navigation}) {
                         </View>
                     </View>
                     <View style={{marginTop: 210}}>
-                        <Text style={[styles.titles, {color: colors.mainColor}]}>요즘 뜨는 수집가</Text>
+                        <Text style={[styles.titles, {color: colors.mainTextColor}]}>요즘 뜨는 수집가</Text>
                         <View style={{flexDirection:'row', marginLeft: '2%'}}>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10}}>K-민선</Text>
+                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainTextColor, marginTop: 10}}>K-민선</Text>
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
@@ -106,7 +106,7 @@ export default function MainPage({navigation}) {
                             <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10}}>K-민선</Text>
+                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainTextColor, marginTop: 10}}>K-민선</Text>
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
@@ -117,7 +117,7 @@ export default function MainPage({navigation}) {
                             <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10}}>K-민선</Text>
+                                    <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainTextColor, marginTop: 10}}>K-민선</Text>
                         
                                 <View style={{flexDirection: 'row'}}>
                                     {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
@@ -130,30 +130,30 @@ export default function MainPage({navigation}) {
                     </View>
                     
                     <View style={{marginTop: 45}}>
-                        <Text style={[styles.titles, {color: colors.mainColor}]}>지역 추천</Text>
+                        <Text style={[styles.titles, {color: colors.mainTextColor}]}>지역 추천</Text>
                         <View style={{flexDirection: 'row', marginLeft: '5%'}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}}
                                                  style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>충청북도
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.background}}>충청북도
                                             단양</Text>
-                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는 이유는 다음과 같습니다</Text>
+                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.background}}>추천하는 이유는 다음과 같습니다</Text>
                                     </View>
                                 </ImageBackground>
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/1ee8a4'}}
                                                  style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>전라남도
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.background}}>전라남도
                                             여수</Text>
-                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는 이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</Text>
+                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.background}}>추천하는 이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</Text>
                                     </View>
                                 </ImageBackground>
                             </ScrollView>
                         </View>
                     </View>
                     <View style={{marginVertical: 45}}>
-                        <Text style={[styles.titles, {color: colors.mainColor}]}>요즘 뜨는 공간</Text>
+                        <Text style={[styles.titles, {color: colors.mainTextColor}]}>요즘 뜨는 공간</Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Place')}>
                             <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
@@ -168,7 +168,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.mainTextColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -180,7 +180,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.mainTextColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -190,7 +190,7 @@ export default function MainPage({navigation}) {
                                     <Text style={{
                                         fontSize: 16,
                                         fontWeight: 'bold',
-                                        color: colors.mainColor,
+                                        color: colors.mainTextColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
                                     <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
@@ -207,7 +207,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.mainTextColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -219,7 +219,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.mainTextColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -229,7 +229,7 @@ export default function MainPage({navigation}) {
                                     <Text style={{
                                         fontSize: 16,
                                         fontWeight: 'bold',
-                                        color: colors.mainColor,
+                                        color: colors.mainTextColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
                                     <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
@@ -246,7 +246,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.mainTextColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -258,7 +258,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.mainTextColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -268,7 +268,7 @@ export default function MainPage({navigation}) {
                                     <Text style={{
                                         fontSize: 16,
                                         fontWeight: 'bold',
-                                        color: colors.mainColor,
+                                        color: colors.mainTextColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
                                     <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>

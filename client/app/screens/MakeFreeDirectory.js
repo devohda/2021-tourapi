@@ -86,7 +86,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         newArr[keyword.keyword_pk - 1] = true;
                         setIsPress(newArr);
                     }
-                }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor : colors.defaultColor, backgroundColor: colors.defaultColor}]}>
+                }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {borderColor: colors.mainTextColor, backgroundColor: colors.mainTextColor}] : [styles.selectType, {borderColor : colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
                         style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.textNotClicked}]}>{keyword.keyword_title}</Text>
                 </TouchableOpacity>
@@ -161,7 +161,7 @@ const MakeFreeDirectory = ({navigation}) => {
     }, [])
 
     return (
-        <ScreenContainer backgroundColor={colors.backgroundColor}>
+        <ScreenContainer backgroundColor={colors.background}>
             {/*<View flex={1}>*/}
             {/* <View style={{marginTop: 37, left: 24}}>
                         <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold'}}>보관함 사진</Text>
@@ -182,14 +182,14 @@ const MakeFreeDirectory = ({navigation}) => {
                 borderBottomWidth: 6,
             }}>
                 <TextInput
-                    style={[collectionName && {color : colors.mainColor},{paddingHorizontal: 14, fontSize: 20, fontWeight: 'bold'}]}
+                    style={[collectionName && {color : colors.mainTextColor},{paddingHorizontal: 14, fontSize: 20, fontWeight: 'bold'}]}
                     placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
                     onChangeText={(name) => setCollectionName(name)}>
                 </TextInput>
             </View>
             <View style={{marginTop: 24}}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
+                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainTextColor}}>보관함 키워드</Text>
                     <Text style={{fontSize: 12, color: '#BABFC8', alignSelf: 'center', marginLeft: 9}}>* 최대
                         3개</Text>
                 </View>
@@ -231,9 +231,9 @@ const MakeFreeDirectory = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between'
             }}>
-                <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
+                <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainTextColor}}>비공개 설정</Text>
                 <Switch
-                    trackColor={{false: "#CDD0D7", true: colors.mainColor}}
+                    trackColor={{false: "#CDD0D7", true: colors.mainTextColor}}
                     thumbColor={colors.defaultColor}
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={toggleSwitch}
@@ -244,7 +244,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 <TouchableOpacity
                     testID="completed"
                     style={{
-                        backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : '#CDD0D7',
+                        backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainTextColor : '#CDD0D7',
                         height: 48,
                         borderRadius: 10
                     }}

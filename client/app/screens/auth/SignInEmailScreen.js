@@ -55,14 +55,14 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     }
 
     return (
-        <ScreenContainer backgroundColor={colors.backgroundColor}>
+        <ScreenContainer backgroundColor={colors.background}>
             <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
                 <TouchableOpacity onPress={() => {setIsSignedIn(true)}}>
                     <Text style={{color: colors.textNotClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
             <View style={{marginTop : 86}}>
-                <Text style={{fontSize: 28, color: colors.mainColor}}>
+                <Text style={{fontSize: 28, color: colors.mainTextColor}}>
                     <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
                     <Text>{"\n"}채워볼까요?</Text>
                 </Text>
