@@ -23,7 +23,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
                 <TouchableOpacity onPress={() => setIsSignedIn(true)}>
-                    <Text style={{color: colors.textNotClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
+                    <Text style={{color: colors.notClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
                 </TouchableOpacity>
             </View>
             <View style={{marginTop : 86}}>

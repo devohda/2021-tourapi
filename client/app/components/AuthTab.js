@@ -36,7 +36,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                 {btnStyles.map((btnStyle, idx) => <View key={idx} style={btnStyle}></View>)}
             </ProgressBar>
             <Form>
-                <Text style={{fontSize : 30, color : colors.textNotClicked}}>
+                <Text style={{fontSize : 30, color : colors.notClicked}}>
                     {question}
                 </Text>
                 <InputBox

@@ -88,7 +88,7 @@ const MakeFreeDirectory = ({navigation}) => {
                     }
                 }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor : colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
-                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.textNotClicked}]}>{keyword.keyword_title}</Text>
+                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.notClicked}]}>{keyword.keyword_title}</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -210,7 +210,7 @@ const MakeFreeDirectory = ({navigation}) => {
                                         return [...addedKeywords, {keyword: '추가됨'}]
                                     })
                                 }}/> */}
-                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.textNotClicked}]} ></Icon></TouchableOpacity></View> */}
+                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.notClicked}]} ></Icon></TouchableOpacity></View> */}
                     </View>
                 </View>
             </View>

@@ -14,7 +14,7 @@ const Star = (props) => {
             star.push('star')
         } else if (score.toFixed(0) == i) {
             if (decimalFraction >= 0.5) {
-                star.push('star-half-o')
+                star.push('star-half-o');
             } else {
                 star.push('star-o')
             }
@@ -28,7 +28,7 @@ const Star = (props) => {
         <View style={{flexDirection: 'row', justifyContent : 'center', alignItems : 'center'}}>
             {star.map((iconName, idx) =>
                 <View key={idx} style={{marginHorizontal : 2}}>
-                    <FIcon name={iconName} size={props.starSize}></FIcon>
+                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? '#EAE0E0' : '#FFC978'}></FIcon>
                 </View>)}
         </View>
     )

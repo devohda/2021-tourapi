@@ -111,9 +111,9 @@ const GetNicknameTab = ({route, authNavigation}) => {
                 </ProgressBar>
                 <Form>
                     <View>
-                        <Text style={styles.title_text}><Text
+                        <Text style={[styles.title_text, {color: colors.notClicked}]}><Text
                             style={{fontWeight: 'bold'}}>닉네임</Text><Text>을</Text></Text>
-                        <Text style={styles.title_text}>설정해주세요</Text>
+                        <Text style={[styles.title_text, {color: colors.notClicked}]}>설정해주세요</Text>
                     </View>
                     <InputBox
                         placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
