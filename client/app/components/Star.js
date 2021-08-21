@@ -1,5 +1,6 @@
 import React from "react";
 import {View, Text, StyleSheet} from "react-native";
+import { useTheme } from '@react-navigation/native';
 import FIcon from "react-native-vector-icons/FontAwesome";
 
 const Star = (props) => {
@@ -28,7 +29,7 @@ const Star = (props) => {
         <View style={{flexDirection: 'row', justifyContent : 'center', alignItems : 'center'}}>
             {star.map((iconName, idx) =>
                 <View key={idx} style={{marginHorizontal : 2}}>
-                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? '#EAE0E0' : '#FFC978'}></FIcon>
+                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? '#EAE0E0' :'#FFC978'}></FIcon>
                 </View>)}
         </View>
     )

@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
+import { useTheme } from "@react-navigation/native";
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -45,6 +46,7 @@ const findSameEmail = async (email) => {
 
 const GetEmailTab = ({navigation}) => {
     const [email, setEmail] = useState("");
+    const { colors } = useTheme();
 
     const checkIsValid = async () => {
         const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
@@ -71,7 +73,7 @@ const GetEmailTab = ({navigation}) => {
         },
         progress_active: {
             width: 28,
-            backgroundColor: '#7B9ACC'
+            backgroundColor: colors.mainColor
         },
         progress_inactive: {
             width: 8,
@@ -79,11 +81,11 @@ const GetEmailTab = ({navigation}) => {
         },
         title_text: {
             fontSize: 30,
-            color: '#40516E',
+            color: colors.mainColor,
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: email ? '#7B9ACC' : '#CDD0D7',
+            backgroundColor: email ? colors.mainColor : colors.notClicked,
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -121,7 +123,7 @@ const GetEmailTab = ({navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={email ? false : true}
                 >
-                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
                 </TouchableOpacity>
             </View>
         </>

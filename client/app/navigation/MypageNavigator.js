@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View, FlatList, SafeAreaView, Dimensions, Touch
 import {StyleSheet} from "react-native";
 import OIcon from 'react-native-vector-icons/Octicons'
 import React, {useEffect, useState, useContext} from "react";
-import { colors, Icon } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 import { useTheme } from '@react-navigation/native';
 
 const Tab = createMaterialTopTabNavigator();
@@ -14,18 +14,18 @@ function Like() {
         <View flex={1} backgroundColor={colors.backgroundColor}>
             <View style={{flexDirection: 'row', paddingTop: 12}}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: colors.notClicked}}>최근 추가순</Text>
-                    <Icon style={{color: colors.notClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+                    <Text style={{color: colors.mainColor}}>최근 추가순</Text>
+                    <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                 </View>
                 <View style={{flexDirection: 'row', marginLeft:'40%'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                        <Text style={{color: colors.notClicked}}>필터</Text>
+                        <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                        <Text style={{color: colors.mainColor}}>필터</Text>
                     </View>
-                    <View style={{marginHorizontal: 10}}><Text>|</Text></View>
+                    <View style={{marginHorizontal: 10}}><Text style={{color: colors.subColor}}>|</Text></View>
                     <View style={{flexDirection: 'row'}}>
-                        <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                        <Text style={{color: colors.notClicked}}>편집</Text>
+                        <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                        <Text style={{color: colors.mainColor}}>편집</Text>
                     </View>
                 </View>
             </View>
@@ -277,19 +277,19 @@ function Collection() {
                 <Text style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</Text>
                 <View style={{flexDirection: 'row', marginBottom: 18}}>
                     {item.collection_keywords.split(',').map((word, idx) =>(
-                        (idx <= word.length) && <Text key={idx} style={{color: colors.subColor, fontSize: 10, marginEnd: 6.21}}># {word}</Text>
+                        (idx <= word.length) && <Text key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</Text>
                     ))}
                 </View>
                 <View style={{flexDirection: 'row'}}>
                     <Text style={{fontSize: 8, width: '60%'}}>by minsun</Text>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
                         <Image source={require('../assets/images/here_icon.png')} style={{width: 8, height: 8, margin: 2}}></Image>
-                        <Text style={{fontSize: 8, color: '#929292', fontWeight: 'bold'}}>1.2k</Text>
+                        <Text style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</Text>
                     </View>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
-                        <Icon type="ionicon" name={"location"} size={8} color="#929292"
+                        <Icon type="ionicon" name={"location"} size={8} color={colors.hashTagColor}
                             style={{margin: 2}}></Icon>
-                        <Text style={{fontSize: 8, color: '#929292', fontWeight: 'bold'}}>9</Text>
+                        <Text style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</Text>
                     </View>
                 </View>
             </View>
@@ -324,7 +324,7 @@ function Collection() {
                                 setSelectedDirType(newArr[type.id-1].name)
                                 getCollectionsFromUsers(type.id)
                             }
-                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}
+                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.shadowColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.shadowColor}]}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
                             <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</Text>
@@ -346,18 +346,18 @@ function Collection() {
 
                 <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Text style={{color: colors.notClicked}}>최근 추가순</Text>
-                        <Icon style={{color: colors.notClicked, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
+                        <Text style={{color: colors.mainColor}}>최근 추가순</Text>
+                        <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                            <Text style={{color: colors.notClicked}}>필터</Text>
+                            <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
+                            <Text style={{color: colors.mainColor}}>필터</Text>
                         </View>
-                        <View style={{marginHorizontal: 10}}><Text>|</Text></View>
+                        <View style={{marginHorizontal: 10}}><Text style={{color: colors.subColor}}>|</Text></View>
                         <View style={{flexDirection: 'row'}}>
-                            <Icon style={{color: colors.notClicked, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                            <Text style={{color: colors.notClicked}}>편집</Text>
+                            <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
+                            <Text style={{color: colors.mainColor}}>편집</Text>
                         </View>
                     </View>
                 </View>
@@ -374,7 +374,7 @@ function Collection() {
 }
 
 const MypageNavigation = () => {
-    const {colors} = useTheme();
+    const { colors } = useTheme();
     return (
         <Tab.Navigator
             swipeEnabled={true}
@@ -399,7 +399,7 @@ const MypageNavigation = () => {
                     height: 40,
                 },
                 activeTintColor: colors.mainColor,
-                inactiveTintColor: colors.notClicked,
+                inactiveTintColor: colors.notClickedDirColor,
             }}
             style={{paddingBottom: 15}}
         >
@@ -415,24 +415,24 @@ const MypageNavigation = () => {
 
 
 const styles = StyleSheet.create({
-    keyword_1 : {
-        backgroundColor: "black",
-        paddingVertical: 5,
-        paddingHorizontal: "3%",
-        borderRadius: 14,
-        alignItems: "center",
-        flexDirection: "row",
-        marginRight: "3%"
-    },
-    keyword_2 : {
-        backgroundColor : "#bbb",
-        paddingVertical: 5,
-        paddingHorizontal: "3%",
-        borderRadius: 14,
-        alignItems: "center",
-        flexDirection: "row",
-        marginRight: "3%"
-    },
+    // keyword_1 : {
+    //     backgroundColor: "black",
+    //     paddingVertical: 5,
+    //     paddingHorizontal: "3%",
+    //     borderRadius: 14,
+    //     alignItems: "center",
+    //     flexDirection: "row",
+    //     marginRight: "3%"
+    // },
+    // keyword_2 : {
+    //     backgroundColor : "#bbb",
+    //     paddingVertical: 5,
+    //     paddingHorizontal: "3%",
+    //     borderRadius: 14,
+    //     alignItems: "center",
+    //     flexDirection: "row",
+    //     marginRight: "3%"
+    // },
     rankingContainer: {
         marginEnd: Dimensions.get('screen').width/14,
         marginTop: 11,
@@ -459,9 +459,11 @@ const styles = StyleSheet.create({
     },
     dirFreeText: {
         fontSize: 12,
+        fontWeight: 'bold',
     },
     dirPlanText: {
-        fontSize: 12
+        fontSize: 12,
+        fontWeight: 'bold'
     },
     defaultImage: {
         width: '100%',
@@ -476,7 +478,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-        shadowColor: '#470000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
         elevation: 1,
@@ -490,7 +491,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8.5,
         borderRadius: 12,
         marginRight: 10,
-        shadowColor: '#470000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
         elevation: 1,
@@ -506,11 +506,9 @@ const styles = StyleSheet.create({
         marginVertical: 2
     },
     selectTypeText: {
-        color: '#BDC2CA',
         fontSize: 14,
         textAlign: 'center',
         textAlignVertical: 'center',
-        // fontWeight: 'bold',
         marginVertical: 2
     },
 })

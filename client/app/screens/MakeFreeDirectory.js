@@ -189,8 +189,8 @@ const MakeFreeDirectory = ({navigation}) => {
             </View>
             <View style={{marginTop: 24}}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
-                    <Text style={{fontSize: 12, color: '#BABFC8', alignSelf: 'center', marginLeft: 9}}>* 최대
+                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 해시태그</Text>
+                    <Text style={{fontSize: 12, color: colors.subColor, alignSelf: 'center', marginLeft: 9}}>* 최대
                         3개</Text>
                 </View>
                 <View style={{
@@ -233,9 +233,9 @@ const MakeFreeDirectory = ({navigation}) => {
             }}>
                 <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
                 <Switch
-                    trackColor={{false: "#CDD0D7", true: colors.mainColor}}
+                    trackColor={{false: colors.notClicked, true: colors.mainColor}}
                     thumbColor={colors.defaultColor}
-                    ios_backgroundColor="#3e3e3e"
+                    ios_backgroundColor={colors.notClicked}
                     onValueChange={toggleSwitch}
                     value={isEnabled}
                 />

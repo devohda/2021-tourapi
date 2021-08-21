@@ -52,7 +52,6 @@ const Time = (props) => {
             // 이부분은 placeScreen 보고 받은거라 props로 다시 바꿔도될듯
             flexDirection: 'row',
             width: 60,
-            height: 38
         }}><Text style={{fontSize: 14, paddingEnd: 4}}>{props.name}</Text>
         <Icon type="ionicon" name={"sunny"} color={props.iconColor} size={props.iconSize}></Icon>
         </View>
@@ -69,7 +68,7 @@ const Facility = (props) => {
             borderRadius: 30,
             alignItems: 'center',
             justifyContent: 'center',
-            paddingVertical: 8,
+            paddingVertical: 4,
             paddingHorizontal: 10,
             marginRight: 10,
         }}>
