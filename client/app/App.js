@@ -26,7 +26,9 @@ const ColorTheme = {
         detailColor: '#F0E7E7',
         detailTextColor: '#818792',
         detailSubTextColor: '#AFB3BB',
-        linkColor: '#7E97C2'
+        linkColor: '#7E97C2',
+        notClickedDirColor: '#9DA2AB',
+        shadowColor: '#cbb4b4'
     }
 };
 
