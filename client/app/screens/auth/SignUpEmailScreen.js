@@ -10,10 +10,10 @@ const SignUpEmailScreen = ({navigation}) => {
     const {colors} = useTheme();
 
     return (
-        <ScreenContainer backgroundColor={colors.background}>
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
+            <NavigationTop navigation={navigation} title="회원가입"/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-                <ScreenContainerView>
-                    <NavigationTop navigation={navigation} title="회원가입"/>
+                <ScreenContainerView flex={1}>
                     <SignUpEmailNavigator navigation={navigation}/>
                 </ScreenContainerView>
             </KeyboardAvoidingView>

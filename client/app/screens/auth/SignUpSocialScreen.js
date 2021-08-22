@@ -21,7 +21,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     const {colors} = useTheme()
 
     return (
-        <ScreenContainer backgroundColor={colors.background}>
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
             <ScreenContainerView>
                 <View style={{height: 24, marginTop: 20, justifyContent: 'center'}}>
                     <TouchableOpacity onPress={() => setIsSignedIn(true)}>

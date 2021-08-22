@@ -55,7 +55,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     }
 
     return (
-        <ScreenContainer backgroundColor={colors.background}>
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View style={{height : 24, marginTop : 20, justifyContent : 'center'}}>
                 <TouchableOpacity onPress={() => {setIsSignedIn(true)}}>
                     <Text style={{color: colors.textNotClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>

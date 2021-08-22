@@ -14,6 +14,7 @@ import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import NavigationTop from "../components/NavigationTop";
 import {useTheme} from '@react-navigation/native';
+import CustomTextInput from "../components/CustomTextInput";
 
 export const navigationRef = React.createRef();
 
@@ -166,15 +167,15 @@ const MakeFreeDirectory = ({navigation}) => {
     }, [])
 
     return (
-        <ScreenContainer backgroundColor={colors.background}>
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
+            <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                 <ScreenContainerView>
-                    <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
                     <View style={{
                         marginTop: 26,
                         paddingVertical: 18
                     }}>
-                        <TextInput
+                        <CustomTextInput
                             style={[collectionName && {color: colors.mainTextColor}, {
                                 paddingHorizontal: 14,
                                 fontSize: 20,
@@ -182,7 +183,7 @@ const MakeFreeDirectory = ({navigation}) => {
                             }]}
                             placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
                             onChangeText={(name) => setCollectionName(name)}>
-                        </TextInput>
+                        </CustomTextInput>
                     </View>
                 </ScreenContainerView>
                 <View style={{height: 6, backgroundColor: '#F0E7E7'}}></View>

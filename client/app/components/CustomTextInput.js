@@ -7,6 +7,8 @@ import {TextInput} from "react-native";
 const CustomTextInput = (props) => {
     return (
         <TextInput style={props.style}
+                   placeholder={props.placeholder}
+                   onChangeText={props.onChangeText}
                    autoCapitalize="none"
                    autoCorrect={false}
         >

@@ -10,7 +10,13 @@ const NavigationTop = props => {
     const {colors} = useTheme();
 
     return (
-        <View flexDirection="row" style={{height: 24, marginTop: 20, alignItems: 'center', justifyContent: 'center'}}>
+        <View flexDirection="row" style={{
+            height: 24,
+            marginVertical: 20,
+            marginHorizontal: 20,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
             <View style={{position: 'absolute', left: 0}}>
                 <TouchableOpacity onPress={() => {
                     props.navigation.goBack()

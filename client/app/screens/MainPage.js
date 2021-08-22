@@ -22,7 +22,7 @@ export default function MainPage({navigation}) {
     const { colors } = useTheme();
 
     return (
-        <SafeAreaView style={{backgroundColor: colors.background}}>
+        <SafeAreaView style={{backgroundColor: colors.backgroundColor}}>
             <ScrollView>
             <View style={{marginTop: 20, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
                 <View><Text style={{color: colors.mainTextColor, fontSize: 28, fontWeight: 'bold', marginLeft: 20}}>Here.</Text></View>
@@ -136,17 +136,17 @@ export default function MainPage({navigation}) {
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}}
                                                  style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.background}}>충청북도
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>충청북도
                                             단양</Text>
-                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.background}}>추천하는 이유는 다음과 같습니다</Text>
+                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는 이유는 다음과 같습니다</Text>
                                     </View>
                                 </ImageBackground>
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/1ee8a4'}}
                                                  style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.background}}>전라남도
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>전라남도
                                             여수</Text>
-                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.background}}>추천하는 이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</Text>
+                                        <Text numberOfLines={2} ellipsizeMode='tail' style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는 이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</Text>
                                     </View>
                                 </ImageBackground>
                             </ScrollView>

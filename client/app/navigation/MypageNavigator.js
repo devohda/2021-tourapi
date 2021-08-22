@@ -11,7 +11,7 @@ const Tab = createMaterialTopTabNavigator();
 function Like() {
     const { colors } = useTheme();
     return (
-        <View flex={1} backgroundColor={colors.background}>
+        <View flex={1} backgroundColor={colors.backgroundColor}>
             <View style={{flexDirection: 'row', paddingTop: 12}}>
                 <View style={{flexDirection: 'row'}}>
                     <Text style={{color: colors.textNotClicked}}>최근 추가순</Text>
@@ -268,7 +268,7 @@ function Collection() {
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
                 <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
-                    <View style={[styles.dirType, {borderColor: colors.background, backgroundColor: colors.background}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainTextColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainTextColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
                     {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
@@ -334,7 +334,7 @@ function Collection() {
     }
     return (
         <View flex={1} >
-            <View backgroundColor={colors.background} style={{alignItems: 'center', justifyContent: 'center'}}>
+            <View backgroundColor={colors.backgroundColor} style={{alignItems: 'center', justifyContent: 'center'}}>
                 <View flexDirection="row" style={{marginVertical: 20}}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         {directoryType.map((name, idx) => (
@@ -395,7 +395,7 @@ const MypageNavigation = () => {
                 },
                 style: {
                     elevation: 0,
-                    backgroundColor: colors.background,
+                    backgroundColor: colors.backgroundColor,
                     height: 40,
                 },
                 activeTintColor: colors.mainTextColor,

@@ -47,10 +47,10 @@ const MyPageScreen = () => {
         }
     }
     return (
-        <ScreenContainer backgroundColor={colors.background}>
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View style={{
                 height: 200,
-                backgroundColor: colors.background,
+                backgroundColor: colors.backgroundColor,
                 paddingTop: '10%'
             }} className="profile-container">
                 <View style={{
