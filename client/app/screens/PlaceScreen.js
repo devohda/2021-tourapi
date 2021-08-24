@@ -1,8 +1,11 @@
-import React from "react";
-import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity} from "react-native";
+import React, { useEffect, useState } from "react";
+import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking} from "react-native";
 import styled, {css} from 'styled-components/native';
 import {useTheme} from '@react-navigation/native';
 import { Icon } from "react-native-elements";
+import MapView, { Marker } from 'react-native-maps';
+// import Share from 'react-native-share';
+import RNStoryShare from 'react-native-story-share';
 
 import ScreenContainer from "../components/ScreenContainer";
 import Star from "../components/Star";
@@ -79,6 +82,28 @@ const Facility = (props) => {
 
 const PlaceScreen = ({navigation}) => {
     const { colors } = useTheme();
+    //데이터 받아서 다시해야함
+    const [ placeTitle, setPlaceTitle ] = useState('주왕산 주산지');
+
+    const onShare = async () => {
+        try {
+          const result = await Share.share({
+            message:
+              placeTitle,
+          });
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      };
 
     return (
         <>
@@ -100,7 +125,7 @@ const PlaceScreen = ({navigation}) => {
                             alignItems: 'center'
                         }}>
                             <View style={{width: '90%', paddingTop: 20, justifyContent: "space-between", flexDirection: 'row'}}>
-                                <Text style={{fontSize: 22, fontWeight: "bold", color: colors.mainColor}}>주왕산 주산지</Text>
+                                <Text style={{fontSize: 22, fontWeight: "bold", color: colors.mainColor}}>{placeTitle}</Text>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                     <View style={[styles.categoryBorder, {borderColor: colors.detailColor, backgroundColor: colors.detailColor}]}>
                                         <Text style={[styles.categoryText, {color : colors.detailTextColor}]}>음식점</Text>
@@ -140,7 +165,9 @@ const PlaceScreen = ({navigation}) => {
                             <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.detailColor, marginHorizontal: 30}}></View>
                             <Icon type="ionicon" name={"add"} color={colors.detailColor} size={28}></Icon>
                             <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.detailColor, marginHorizontal: 30}}></View>
-                            <Icon type="ionicon" name={"share-social"} color={colors.detailColor} size={28}></Icon>
+                            <TouchableOpacity onPress={onShare}>
+                                <Icon type="ionicon" name={"share-social"} color={colors.detailColor} size={28}></Icon>
+                            </TouchableOpacity>
                         </View>
                     </View>
                     
@@ -203,8 +230,22 @@ const PlaceScreen = ({navigation}) => {
                                 </View>
                             </View>
                         </View>
-                        {/* 카카오 지도 api 가져오기 */}
-                        <Image source={require('../assets/images/map_example.png')} style={{width: '100%'}}></Image>
+                        {/* TODO 카카오 지도 api 가져오기 */}
+                        <View>
+                            {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
+                            <MapView style={{width: Dimensions.get('window').width, height: 200}}
+                                initialRegion={{
+                                    latitude: 37.56633546113615,
+                                    longitude: 126.9779482762618,
+                                    latitudeDelta: 0.0015,
+                                    longitudeDelta: 0.0015,
+                                }}
+                            ><Marker coordinate={{latitude: 37.56633546113615, 
+                                    longitude: 126.9779482762618}}
+                                    title="서울시청"
+                                    description="기본값입니다" />
+                            </MapView>
+                        </View>
                     </View>
 
                     <View>
