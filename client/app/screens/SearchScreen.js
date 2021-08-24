@@ -14,6 +14,16 @@ const SearchScreen = ({navigation}) => {
     const {colors} = useTheme();
     const [searchText, setSearchText] = useState("");
 
+    const styles = {
+        search_box: {
+            borderBottomWidth: 1,
+            borderColor: colors.gray[5],
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: 4
+        }
+    }
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop title="검색" navigation={navigation}/>
@@ -25,7 +35,7 @@ const SearchScreen = ({navigation}) => {
                                    autoCorrect={false}
                                    onChangeText={(text) => setSearchText(text)}/>
                         <Pressable style={{marginLeft: 5}} onPress={() => alert(searchText)}>
-                            <SearchIcon width={26} height={26}/>
+                            <SearchIcon width={26} height={26} style={{ color : colors.gray[5]}}/>
                         </Pressable>
                     </View>
                     <SearchTabNavigator />
@@ -34,15 +44,5 @@ const SearchScreen = ({navigation}) => {
         </ScreenContainer>
     )
 };
-
-const styles = {
-    search_box: {
-        borderBottomWidth: 1,
-        borderColor: '#BABFC8',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 4
-    }
-}
 
 export default SearchScreen;

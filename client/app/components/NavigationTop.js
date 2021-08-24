@@ -21,10 +21,10 @@ const NavigationTop = props => {
                 <TouchableOpacity onPress={() => {
                     props.navigation.goBack()
                 }}>
-                    <BackIcon width={24} height={24}/>
+                    <BackIcon width={24} height={24} style={{color : colors.mainColor}}/>
                 </TouchableOpacity>
             </View>
-            <Text style={{color: colors.mainTextColor, fontSize: 16, fontWeight: 'bold'}}>
+            <Text style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold'}}>
                 {props.title}
             </Text>
         </View>
