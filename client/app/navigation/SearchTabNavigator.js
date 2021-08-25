@@ -108,7 +108,7 @@ const SearchTabNavigator = (props) => {
             // tabBar={(props) => <MyTabBar {...{...props, colors: colors}} />}
             screenOptions={({route}) => {
                 const tabWidth = (totalWidth - 40) / 3;
-                const textWidth = route.name.length * 10 + 5;
+                const textWidth = route.name.length * 12 + 5;
 
                 return ({
                     tabBarActiveTintColor: colors.blue[2],
@@ -127,9 +127,9 @@ const SearchTabNavigator = (props) => {
                 })
             }}
         >
-            <Tab.Screen name={`공간 10002`} component={SearchPlace}/>
-            <Tab.Screen name={`보관함 100`} component={SearchCollection}/>
-            <Tab.Screen name={`유저 2`} component={SearchUser}/>
+            <Tab.Screen name={`공간 ${placeList.length}`} component={SearchPlace}/>
+            <Tab.Screen name={`보관함 ${collectionList.length}`} component={SearchCollection}/>
+            <Tab.Screen name={`유저 ${userList.length}`} component={SearchUser}/>
         </Tab.Navigator>
     );
 };
