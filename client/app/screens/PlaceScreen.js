@@ -82,8 +82,64 @@ const Facility = (props) => {
 
 const PlaceScreen = ({navigation}) => {
     const { colors } = useTheme();
+    //TODO 유저의 보관함 안에 이 place_pk가 있는지 확인하는 작업 필요
+    const [ isLiked, setIsLiked ] = useState(false);
     //데이터 받아서 다시해야함
     const [ placeTitle, setPlaceTitle ] = useState('주왕산 주산지');
+    const [ placeLocation, setPlaceLocation ] = useState('서울시 광진구 능동로 216 (우)04991');
+    const [ placeScore, setPlaceScore ] = useState('4.84');
+
+    const postLikes = async () => {
+        try {
+            fetch('http://192.168.0.11:3000/like/likes', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    //임의로 음식점이라서 0으로 넣음
+                    like_type: 0,
+                    like_title: placeTitle,
+                    like_location: placeLocation.split(' ')[0] + ' ' + placeLocation.split(' ')[1],
+                    //이것도 불러와야 함
+                    like_score: parseFloat(placeScore).toFixed(1),
+                })
+            }).then((res) => res.text())
+                .then((responsedata) => {
+                    console.log(responsedata);
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+        setIsLiked(true)
+    }
+
+    const deleteLikes = async () => {
+        try {
+            fetch('http://192.168.0.11:3000/like/likes/'+ 32, {
+                method: 'DELETE',
+                body: {
+                    like_type: 0,
+                    like_pk: 34
+                }
+            }).then((res) => res.text())
+                .then((responsedata) => {
+                    console.log(responsedata);
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+        setIsLiked(false)
+    }
 
     const onShare = async () => {
         try {
@@ -137,7 +193,7 @@ const PlaceScreen = ({navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 <Icon type="ionicon" name={"location"} size={14} color={colors.mainColor} style={{marginTop: 3}}></Icon>
                                 <View style={{marginLeft: 5}}>
-                                    <Text style={{color: colors.detailTextColor, fontSize: 14, marginBottom: 1, lineHeight: 22.4}}>서울 광진구 능동로 216 (우)04991</Text>
+                                    <Text style={{color: colors.detailTextColor, fontSize: 14, marginBottom: 1, lineHeight: 22.4}}>{placeLocation}</Text>
                                     <Text style={{color: colors.detailSubTextColor, fontSize: 14, lineHeight: 22.4}}>지번 : 능동 259-1</Text>
                                 </View>
                             </View>
@@ -161,7 +217,9 @@ const PlaceScreen = ({navigation}) => {
                         </View>
                         <View style={{flexDirection: 'row', paddingVertical: 32, justifyContent: 'center', alignItems: 'center'}}>
                             {/* 이 부분도 유저 정보에 따라 바뀔수 있도록 하기 */}
-                            <Image source={require('../assets/images/here_icon_nonclicked.png')}></Image>
+                            <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}>
+                                <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image>
+                            </TouchableOpacity>
                             <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.detailColor, marginHorizontal: 30}}></View>
                             <Icon type="ionicon" name={"add"} color={colors.detailColor} size={28}></Icon>
                             <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.detailColor, marginHorizontal: 30}}></View>
@@ -178,7 +236,7 @@ const PlaceScreen = ({navigation}) => {
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
                                 <Image style={{width: 30, height: 26, marginTop: 3}} source={require('../assets/images/here_icon_nonclicked.png')}></Image>
                                 <View style={{marginLeft: 6, marginRight: 4}}><Text
-                                    style={{fontSize: 22, fontWeight: 'bold', marginRight: 5, color: colors.mainColor}}>0.00점</Text></View>
+                                    style={{fontSize: 22, fontWeight: 'bold', marginRight: 5, color: colors.mainColor}}>{placeScore}점</Text></View>
                                 <View><Text style={{color: colors.subColor}}>(0명)</Text></View>
                             </View>
                         </View>

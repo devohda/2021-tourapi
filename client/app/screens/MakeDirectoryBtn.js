@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useState, useRef} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {View, Text, Button, Touchable, TouchableOpacity, Image} from "react-native";
+import {View, Text, Button, Touchable, TouchableOpacity, Image, Platform} from "react-native";
 import {Icon} from 'react-native-elements';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useTheme } from '@react-navigation/native';
@@ -12,9 +12,9 @@ export default function MakeDirectoryBtn({navigation}) {
     const { colors } = useTheme();
 
     return (
-        <View style={{justifyContent: 'flex-end', paddingBottom: '3%', width:'100%', height: '200%'}}>
+        <View style={{justifyContent: 'flex-end', width:'100%', height: '200%'}}>
         <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
-            <Image style={{alignSelf:'center', marginBottom: 3}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
+            <Icon type="ionicon" name={"add-circle-outline"} size={36} color={colors.mainColor} iconStyle={Platform.OS === 'ios' ? {marginBottom: '5%'} : {marginBottom: '6%'}}></Icon>
                 <RBSheet
                     ref={refRBSheet}
                     closeOnDragDown={true}

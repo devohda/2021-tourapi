@@ -10,14 +10,71 @@ const Tab = createMaterialTopTabNavigator();
 
 function Like() {
     const { colors } = useTheme();
+    const [likedData, setLikedData] = useState({});
+
+    useEffect(() => {
+        getLikesFromUsers();
+    }, [])
+
+    const getLikesFromUsers = () => {
+        try {
+            fetch('http://192.168.0.11:3000/like/likes', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((res) => res.json())
+                .then((responsedata) => {
+                    // console.log(responsedata);
+                    setLikedData(responsedata)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+    
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const showLikes = ({item}) => (
+        <View style={styles.likesContainer}>
+            <View>
+                <View style={{alignItems: 'center'}}>
+                    <View style={{marginEnd: 8}}>
+                        <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
+                                    style={{width: 163, height: 113, borderRadius: 10}}></Image></View>
+                        <View style={{flexDirection: 'row', marginTop: 8}}>
+                        {/* //TODO 리스트화 할필요 있음 */}
+                            <Text style={{color: colors.mainColor, fontSize: 10, marginTop: 2}}>{item.like_type ===0 && '음식점'}</Text>
+                            <Text style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6,}}>|</Text>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <Image source={require('../assets/images/here_icon.png')} style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
+                                <Text style={{color: colors.mainColor, fontSize: 10}}>{item.like_score}</Text>
+                            </View>
+                        </View>
+                        <View>
+                            <Text style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold', lineHeight: 28.8}}>{item.like_title}</Text>
+                        </View>
+                        <View>
+                            <Text style={{color: colors.detailSubTextColor, fontSize: 12, lineHeight: 19.2}}>{item.like_location}</Text>
+                        </View>
+                    </View>
+                </View>
+            </View>
+        </View>
+
+    )
+
     return (
         <View flex={1} backgroundColor={colors.backgroundColor}>
-            <View style={{flexDirection: 'row', paddingTop: 12}}>
+            <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: 16}}>
                 <View style={{flexDirection: 'row'}}>
                     <Text style={{color: colors.mainColor}}>최근 추가순</Text>
                     <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                 </View>
-                <View style={{flexDirection: 'row', marginLeft:'40%'}}>
+                <View style={{flexDirection: 'row'}}>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
                         <Text style={{color: colors.mainColor}}>필터</Text>
@@ -29,164 +86,11 @@ function Like() {
                     </View>
                 </View>
             </View>
-            {/* <View flexDirection="row" style={{marginVertical: 20}}>
-                <View className="keyword" style={styles.keyword_1}>
-                    <Text style={{fontWeight: "bold", color: "white"}}>전체</Text>
-                </View>
-                <View className="keyword" style={styles.keyword_2}>
-                    <Text style={{fontWeight: "bold", color: "white"}}>장소</Text>
-                </View>
-                <View className="keyword" style={styles.keyword_2}>
-                    <Text style={{fontWeight: "bold", color: "white"}}>보관함</Text>
-                </View>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View className="place-container"
-                      flexDirection="row"
-                      style={{
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginVertical: 20,
-                          height: 80
-                      }}>
-                    <View className="place-img">
-                        <Image style={{width: 80, height: 80, borderRadius: 10}}
-                               source={require('../assets/images/mountain.jpeg')}
-                               resizeMode="cover"
-                        />
-                    </View>
-                    <View style={{
-                        flex: 1,
-                        height: "100%",
-                        justifyContent: 'space-around',
-                        paddingVertical: 12,
-                        marginLeft: 20
-                    }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
-                    </View>
-                    <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
-                        <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
-                    </View>
-                </View>
-                <View className="place-container"
-                      flexDirection="row"
-                      style={{
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginVertical: 20,
-                          height: 80
-                      }}>
-                    <View className="place-img">
-                        <Image style={{width: 80, height: 80, borderRadius: 10}}
-                               source={require('../assets/images/mountain.jpeg')}
-                               resizeMode="cover"
-                        />
-                    </View>
-                    <View style={{
-                        flex: 1,
-                        height: "100%",
-                        justifyContent: 'space-around',
-                        paddingVertical: 12,
-                        marginLeft: 20
-                    }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
-                    </View>
-                    <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
-                        <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
-                    </View>
-                </View>
-                <View className="place-container"
-                      flexDirection="row"
-                      style={{
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginVertical: 20,
-                          height: 80
-                      }}>
-                    <View className="place-img">
-                        <Image style={{width: 80, height: 80, borderRadius: 10}}
-                               source={require('../assets/images/mountain.jpeg')}
-                               resizeMode="cover"
-                        />
-                    </View>
-                    <View style={{
-                        flex: 1,
-                        height: "100%",
-                        justifyContent: 'space-around',
-                        paddingVertical: 12,
-                        marginLeft: 20
-                    }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
-                    </View>
-                    <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
-                        <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
-                    </View>
-                </View>
-                <View className="place-container"
-                      flexDirection="row"
-                      style={{
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginVertical: 20,
-                          height: 80
-                      }}>
-                    <View className="place-img">
-                        <Image style={{width: 80, height: 80, borderRadius: 10}}
-                               source={require('../assets/images/mountain.jpeg')}
-                               resizeMode="cover"
-                        />
-                    </View>
-                    <View style={{
-                        flex: 1,
-                        height: "100%",
-                        justifyContent: 'space-around',
-                        paddingVertical: 12,
-                        marginLeft: 20
-                    }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
-                    </View>
-                    <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
-                        <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
-                    </View>
-                </View>
-                <View className="place-container"
-                      flexDirection="row"
-                      style={{
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginVertical: 20,
-                          height: 80
-                      }}>
-                    <View className="place-img">
-                        <Image style={{width: 80, height: 80, borderRadius: 10}}
-                               source={require('../assets/images/mountain.jpeg')}
-                               resizeMode="cover"
-                        />
-                    </View>
-                    <View style={{
-                        flex: 1,
-                        height: "100%",
-                        justifyContent: 'space-around',
-                        paddingVertical: 12,
-                        marginLeft: 20
-                    }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
-                    </View>
-                    <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
-                        <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
-                    </View>
-                </View>
-            </ScrollView> */}
+            <ScrollView horizontal={true} scrollEnabled={false}>
+                <SafeAreaView>
+                    <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={likedData} renderItem={showLikes} keyExtractor={(item) => item.like_pk.toString()} nestedScrollEnabled/>
+                </SafeAreaView>
+            </ScrollView>
         </View>
 
     );
@@ -265,7 +169,7 @@ function Collection() {
     }
 
     const showDirectories = ({item}) => (
-        <View style={styles.rankingContainer}>
+        <View style={styles.directoryContainer}>
             <View style={{height: '68%'}}>
                 <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
                     <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
@@ -387,9 +291,6 @@ const MypageNavigation = () => {
                 indicatorStyle: {
                     backgroundColor: colors.emphasizedColor,
                     height: 2,
-                    // width: 50,
-                    // marginLeft: Dimensions.get('screen').width/6.2,
-                    // marginLeft: Platform.OS === 'ios' ? Dimensions.get('screen').width/6 : Dimensions.get('screen').width/6.2
                     width: Dimensions.get('screen').width/6 * 0.9,
                     marginLeft: Dimensions.get('screen').width/6 * 0.9
                 },
@@ -433,14 +334,16 @@ const styles = StyleSheet.create({
     //     flexDirection: "row",
     //     marginRight: "3%"
     // },
-    rankingContainer: {
+    directoryContainer: {
         marginEnd: Dimensions.get('screen').width/14,
         marginTop: 11,
         width: 162,
         height: 249,
-        // borderRadius: 10,
-        // alignItems: 'center',
-        // justifyContent: 'space-between'
+    },
+    likesContainer: {
+        width: Dimensions.get('screen').width/2.25,
+        // marginEnd: Dimensions.get('screen').width/20,
+        marginTop: 16,
     },
     dirType: {
         borderWidth: 1,
