@@ -35,10 +35,10 @@ const SearchScreen = ({navigation}) => {
                                    autoCorrect={false}
                                    onChangeText={(text) => setSearchText(text)}/>
                         <Pressable style={{marginLeft: 5}} onPress={() => alert(searchText)}>
-                            <SearchIcon width={26} height={26} style={{ color : colors.gray[5]}}/>
+                            <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
                         </Pressable>
                     </View>
-                    <SearchTabNavigator />
+                    <SearchTabNavigator/>
                 </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>
