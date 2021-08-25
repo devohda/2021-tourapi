@@ -108,28 +108,29 @@ const SearchTabNavigator = (props) => {
             // tabBar={(props) => <MyTabBar {...{...props, colors: colors}} />}
             screenOptions={({route}) => {
                 const tabWidth = (totalWidth - 40) / 3;
-                const textWidth = 30 + route.name.length * 3;
+                const textWidth = 30 + 10 * 5;
 
                 return ({
-                tabBarActiveTintColor: colors.blue[2],
-                tabBarInactiveTintColor: colors.gray[5],
-                tabBarLabelStyle: { fontSize: 16, fontWeight : '700' },
-                tabBarStyle: { backgroundColor: colors.backgroundColor },
-                tabBarIndicatorStyle : {
-                    position : 'absolute',
-                    bottom : 10,
-                    left : (tabWidth - textWidth) / 2,
-                    width : textWidth,
-                    backgroundColor : colors.red[3],
-                    borderRadius : 6,
-                    height : 2
-                }
-            })}}
+                    tabBarActiveTintColor: colors.blue[2],
+                    tabBarInactiveTintColor: colors.gray[5],
+                    tabBarLabelStyle: { fontSize: 16, fontWeight : '700' },
+                    tabBarStyle: { backgroundColor: colors.backgroundColor },
+                    tabBarIndicatorStyle : {
+                        position : 'absolute',
+                        bottom : 10,
+                        left : (tabWidth - textWidth) / 2,
+                        width : textWidth,
+                        backgroundColor : colors.red[3],
+                        borderRadius : 6,
+                        height : 2
+                    }
+                })
+            }}
         >
-            <Tab.Screen name="Places" component={SearchPlace} options={{tabBarLabel: `공간 ${placeList.length}`}}/>
+            <Tab.Screen name="Places" component={SearchPlace} options={{title: `공간 102`}}/>
             <Tab.Screen name="Collections" component={SearchCollection}
-                        options={{tabBarLabel: `보관함 ${collectionList.length}`}}/>
-            <Tab.Screen name="Users" component={SearchUser} options={{tabBarLabel: `유저 ${userList.length}`}}/>
+                        options={{title: `보관함 0`}}/>
+            <Tab.Screen name="Users" component={SearchUser} options={{title: `유저 12`}}/>
         </Tab.Navigator>
     );
 };
