@@ -45,7 +45,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                     <View style={{marginTop: 35.08, alignItems: 'center'}}>
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의 </AppText>
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>
-                            <AppText style={{fontWeight: 'bold'}}>공간 보관함</AppText>을
+                            <AppText style={{fontWeight: '700'}}>공간 보관함</AppText>을
                         </AppText>
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</AppText>
                     </View>
