@@ -69,7 +69,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         marginTop: 38,
                         fontSize: 16,
                         borderBottomWidth: 1,
-                        borderBottomColor: '#C5C5C5',
+                        borderBottomColor: colors.subColor,
                         marginBottom: 27,
                         paddingBottom: 11
                     }}
@@ -80,7 +80,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     <TextInput style={{
                         fontSize: 16,
                         borderBottomWidth: 1,
-                        borderBottomColor: colors.gray[5],
+                        borderBottomColor: colors.subColor,
                         marginBottom: 38,
                         paddingBottom: 11
                     }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
@@ -89,7 +89,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     />
                     <TouchableOpacity
                         style={{
-                            backgroundColor: '#BDC2CA',
+                            backgroundColor: colors.notClicked,
                             height: 52,
                             borderRadius: 10,
                             alignItems: 'center',

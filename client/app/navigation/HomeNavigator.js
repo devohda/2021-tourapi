@@ -7,7 +7,6 @@ import RBSheet from "react-native-raw-bottom-sheet";
 
 import MyPageScreen from "../screens/MyPageScreen";
 import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
-import { color } from 'react-native-elements/dist/helpers';
 import MainPage from "../screens/MainPage";
 
 const Tab = createBottomTabNavigator();

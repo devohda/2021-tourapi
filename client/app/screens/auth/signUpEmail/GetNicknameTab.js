@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
-import {useTheme} from "@react-navigation/native";
+import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -55,10 +55,10 @@ const signUp = async (user_email, user_password, user_nickname) => {
 }
 
 const GetNicknameTab = ({route, authNavigation}) => {
-    const {colors} = useTheme();
     const {email, password} = route.params;
     const [isValid, setIsValid] = useState(false)
     const [nickname, setNickname] = useState("")
+    const { colors} = useTheme()
 
     const checkIsValid = async () => {
         const nicknameRegExp = /^([A-Z]|[a-z]|[0-9]|[가-힣]){2,12}$/g;
@@ -91,11 +91,11 @@ const GetNicknameTab = ({route, authNavigation}) => {
         },
         title_text: {
             fontSize: 30,
-            color: '#40516E',
+            color: colors.mainColor,
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: nickname ? colors.mainColor : colors.gray[5],
+            backgroundColor: nickname ? colors.mainColor : colors.notClicked,
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -131,7 +131,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={nickname ? false : true}
                 >
-                    <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
+                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
                 </TouchableOpacity>
             </View>
         </>

@@ -8,13 +8,15 @@ import {
     TouchableOpacity,
     Switch,
     Alert,
-    KeyboardAvoidingView, Platform
+    KeyboardAvoidingView,
+    Platform
 } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import NavigationTop from "../components/NavigationTop";
 import {useTheme} from '@react-navigation/native';
 import CustomTextInput from "../components/CustomTextInput";
+import ScreenDivideLine from "../components/ScreenDivideLine";
 
 export const navigationRef = React.createRef();
 
@@ -94,7 +96,7 @@ const MakeFreeDirectory = ({navigation}) => {
                     backgroundColor: colors.mainColor
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
-                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color: colors.defaultColor}] : [styles.selectTypeText, {color: colors.textNotClicked}]}>{keyword.keyword_title}</Text>
+                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.notClicked}]}>{keyword.keyword_title}</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -171,22 +173,15 @@ const MakeFreeDirectory = ({navigation}) => {
             <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                 <ScreenContainerView>
-                    <View style={{
-                        marginTop: 26,
-                        paddingVertical: 18
-                    }}>
+                    <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName && {color: colors.mainColor}, {
-                                paddingHorizontal: 14,
-                                fontSize: 20,
-                                fontWeight: 'bold'
-                            }]}
+                            style={[collectionName && {color: colors.mainColor}, {fontSize: 20}]}
                             placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>
                     </View>
                 </ScreenContainerView>
-                <View style={{height: 6, backgroundColor: '#F0E7E7'}}></View>
+                <ScreenDivideLine />
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -211,7 +206,7 @@ const MakeFreeDirectory = ({navigation}) => {
                                         return [...addedKeywords, {keyword: '추가됨'}]
                                     })
                                 }}/> */}
-                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.textNotClicked}]} ></Icon></TouchableOpacity></View> */}
+                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.notClicked}]} ></Icon></TouchableOpacity></View> */}
                             </View>
                         </View>
                     </View>
@@ -234,9 +229,9 @@ const MakeFreeDirectory = ({navigation}) => {
                     }}>
                         <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
                         <Switch
-                            trackColor={{false: "#CDD0D7", true: colors.mainColor}}
+                            trackColor={{false: colors.notClicked, true: colors.mainColor}}
                             thumbColor={colors.defaultColor}
-                            ios_backgroundColor="#3e3e3e"
+                            ios_backgroundColor={colors.notClicked}
                             onValueChange={toggleSwitch}
                             value={isEnabled}
                         />

@@ -55,10 +55,11 @@ const GetPasswordTab = ({route, navigation}) => {
         },
         title_text: {
             fontSize: 30,
+            color: colors.mainColor,
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: password ? colors.mainColor : colors.gray[5],
+            backgroundColor: password ? colors.mainColor : colors.notClicked,
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -77,9 +78,9 @@ const GetPasswordTab = ({route, navigation}) => {
                 <Form>
                     <Text>
                         <View>
-                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}><Text
+                            <Text style={styles.title_text}><Text
                                 style={{fontWeight: 'bold'}}>비밀번호</Text><Text>를</Text></Text>
-                            <Text style={[styles.title_text, {color: colors.textNotClicked}]}>설정해주세요</Text>
+                            <Text style={styles.title_text}>설정해주세요</Text>
                         </View>
                     </Text>
                     <InputBox

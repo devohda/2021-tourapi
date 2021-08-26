@@ -70,20 +70,20 @@ export default function MainPage({navigation}) {
                                 style={[styles.selectedRankingsText, {color: colors.mainColor}]}>일간</Text></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><Text
-                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>주간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.notClicked}]}>주간</Text></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><Text
-                                style={[styles.selectedRankingsText, {color: colors.mainColor}]}>월간</Text></TouchableOpacity></View>
+                                style={[styles.selectedRankingsText, {color: colors.notClicked}]}>월간</Text></TouchableOpacity></View>
                         </View>
                         {/* 데이터 붙여서(for문?) 들어가게 */}
                         <View style={styles.rankingContainer}>
                             <View style={styles.defaultImage}></View>
                             <View style={{marginLeft: 10}}>
-                                <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: colors.textNotClicked}}>하루만에 북촌
+                                <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold', color: colors.mainColor}}>하루만에 북촌
                                     정복하기</Text>
                                 <View style={{flexDirection: 'row'}}>
-                                    <Text style={{fontSize: 12, marginEnd: 85, color: '#BDC2CA'}}>meeeeensun</Text>
-                                    <Text style={{fontSize: 12, color: '#BDC2CA'}}>1.3k</Text>
+                                    <Text style={{fontSize: 12, marginEnd: 85, color: colors.detailSubTextColor}}>meeeeensun</Text>
+                                    <Text style={{fontSize: 12, color: colors.detailSubTextColor}}>1.3k</Text>
                                 </View>
                             </View>
                         </View>
@@ -168,7 +168,7 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.notClickedDirColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -180,7 +180,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.notClickedDirColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -193,7 +193,7 @@ export default function MainPage({navigation}) {
                                         color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
-                                    <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
+                                    <Text style={{fontSize: 12,color: colors.detailSubTextColor}}>서울시 종로구</Text>
                                 </View>
                                 <View style={{justifyContent:'center', marginLeft:'45%'}}>
                                     <Image source={require('../assets/images/here_nonclick.png')}></Image>
@@ -201,13 +201,20 @@ export default function MainPage({navigation}) {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                        <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
+                            <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                                {/* <View style={{flexDirection: 'row', top: 10, left: 22}}>
+                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star-half-outline"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star-outline"} size={12}></Icon>
+                                </View> */}
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.notClickedDirColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -219,7 +226,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.notClickedDirColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -232,7 +239,7 @@ export default function MainPage({navigation}) {
                                         color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
-                                    <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
+                                    <Text style={{fontSize: 12,color: colors.detailSubTextColor}}>서울시 종로구</Text>
                                 </View>
                                 <View style={{justifyContent:'center', marginLeft:'45%'}}>
                                     <Image source={require('../assets/images/here_nonclick.png')}></Image>
@@ -240,13 +247,20 @@ export default function MainPage({navigation}) {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                        <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
+                            <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
                                 <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                                {/* <View style={{flexDirection: 'row', top: 10, left: 22}}>
+                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star-half-outline"} size={12}></Icon>
+                                    <Icon type="ionicon" name={"star-outline"} size={12}></Icon>
+                                </View> */}
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.notClickedDirColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
@@ -258,7 +272,7 @@ export default function MainPage({navigation}) {
                                         <Image source={require('../assets/images/review_star.png')}
                                        style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <Text style={{
-                                            color: colors.mainColor,
+                                            color: colors.notClickedDirColor,
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -271,7 +285,7 @@ export default function MainPage({navigation}) {
                                         color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</Text>
-                                    <Text style={{fontSize: 12,color:'#BDC2CA'}}>서울시 종로구</Text>
+                                    <Text style={{fontSize: 12,color: colors.detailSubTextColor}}>서울시 종로구</Text>
                                 </View>
                                 <View style={{justifyContent:'center', marginLeft:'45%'}}>
                                     <Image source={require('../assets/images/here_click.png')}></Image>
@@ -309,11 +323,11 @@ const styles = StyleSheet.create({
         left: 16,
         borderRadius: 10,
         shadowOffset: {
-            width: 4,
-            height: 12
+            width: 0,
+            height: 2
         },
         shadowOpacity: 0.25,
-        elevation: 6,
+        elevation: 3,
     },
     defaultImage: {
         backgroundColor: '#c4c4c4',
