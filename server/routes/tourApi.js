@@ -49,39 +49,71 @@ var options = {
     textFn: removeJsonTextAttribute
   };
 
-  var url = 'http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList';
+  var url = 'http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList';
   var queryParams = '?' + encodeURIComponent('ServiceKey') + `=${SERVICE_KEY}`;
-  queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('3517'); /* totalCount 가져오기 */
+  queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('3166'); /* totalCount 가져오기 : 서울은 3000여개 */
+  // queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('2');
   queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent(''); /* */
   queryParams += '&' + encodeURIComponent('MobileOS') + '=' + encodeURIComponent('ETC'); /* */
   queryParams += '&' + encodeURIComponent('MobileApp') + '=' + encodeURIComponent('AppTest'); /* */
-  queryParams += '&' + encodeURIComponent('arrange') + '=' + encodeURIComponent('E'); /* */
+  queryParams += '&' + encodeURIComponent('arrange') + '=' + encodeURIComponent('O'); /* */
   queryParams += '&' + encodeURIComponent('contentTypeId') + '=' + encodeURIComponent(''); /* */
-  queryParams += '&' + encodeURIComponent('mapX') + '=' + encodeURIComponent('126.981611'); /* 현 위치 가져와야 할듯 */
-  queryParams += '&' + encodeURIComponent('mapY') + '=' + encodeURIComponent('37.568477'); /* 현 위치 가져와야 할듯 */
-  queryParams += '&' + encodeURIComponent('radius') + '=' + encodeURIComponent('20000'); /* */
+  queryParams += '&' + encodeURIComponent('areaCode') + '=' + encodeURIComponent('1');
+  queryParams += '&' + encodeURIComponent('sigunguCode') + '=' + encodeURIComponent('');
   queryParams += '&' + encodeURIComponent('listYN') + '=' + encodeURIComponent('Y'); /* */
   queryParams += '&' + encodeURIComponent('modifiedtime') + '=' + encodeURIComponent(''); /* */
 
-router.get('/', async (req, res) => {
-    request (
-        {
-            url:  url + queryParams,
-            method: 'GET',
-        },
-        (error, response, body) => {
-            var result = body;
-            var xmlToJson = convert.xml2json(result, options);
-            res.send(xmlToJson);
+let tourAPIArray=[];
+router.get('/forPost', async (req, res) => {
+  request (
+    {
+        url:  url + queryParams,
+        method: 'GET',
+    },
+    (error, response, body) => {
+        var result = body;
+        var xmlToJson = JSON.parse(convert.xml2json(result, options));
+        var getTourAPI = xmlToJson.response.body.items.item;
+        var array = []; 
+        for(var i=0;i<getTourAPI.length;i++) {
+          array.push(getTourAPI[i]);
         }
-    );
+        array.forEach(o => {
+          var addr = '';
+          if (typeof o.addr1 == 'undefined' && typeof o.addr2 == 'undefined') addr = '';
+          else if (typeof o.addr1 == 'undefined' && typeof o.addr2 != 'undefined') {
+            addr = o.addr2;
+          } else if (typeof o.addr1 != 'undefined' && typeof o.addr2 == 'undefined') {
+            addr = o.addr1;
+          } else {
+            addr = o.addr1 + ' ' + o.addr2;
+          }
+          tourAPIArray.push({
+            title: o.title,
+            address: addr,
+            img1: o.firstimage,
+            img2: o.firstimage2
+          })
+        })
+        res.send(getTourAPI);
+        // callArray();
+    }
+    
+  );
 });
 
-router.post('/post', async (req, res) => {
-    // console.log(req.body);
-    // const {collection_name, collection_private, collection_keywords, collection_type} = req.body;
-    // const result = await db.query(tourApiPostQuery, [collection_name, collection_private, collection_keywords, collection_type]);
-    console.log(result)
-})
+router.get('/', async (req, res) => {
+  const rows = await db.execute(tourApiGetQuery)
+  console.log(rows)
+  res.send(rows);
+});
+
+const callArray = async () => {
+  var result = {};
+  for(let i=0;i<tourAPIArray.length;i++) {
+    result = await db.query(tourApiPostQuery, [tourAPIArray[i].title, tourAPIArray[i].address, tourAPIArray[i].img1, tourAPIArray[i].img2]);
+  }
+  console.log(result)
+}
 
 module.exports = router;
