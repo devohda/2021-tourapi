@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {View, Text, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet} from "react-native";
+import {View, Text, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 import {useTheme} from '@react-navigation/native';
 import NavigationTop from "../components/NavigationTop";
@@ -45,7 +45,7 @@ const SearchScreen = ({navigation}) => {
             <View style={{marginRight: 8}}>
                 <Image source={require('../assets/images/mountain.jpeg')}
                        style={{width: 141, height: 101, borderRadius: 10}}/>
-                <View style={{height: 62, justifyContent : 'space-between', marginVertical : 8}}>
+                <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
                         <Text style={{fontSize: 10, color: colors.mainColor}}>음식점</Text>
                         <View style={styles.score_line}></View>
@@ -54,6 +54,45 @@ const SearchScreen = ({navigation}) => {
                     </View>
                     <Text style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{props.name}</Text>
                     <Text style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{props.address}</Text>
+                </View>
+            </View>
+        )
+    }
+
+    const RecommendedCollection = (props) => {
+        return (
+            <View style={{
+                width: 162,
+                height: 249,
+                shadowColor: 'black',
+                shadowOffset: {width: 0, height: 0},
+                shadowOpacity: 0.27,
+                shadowRadius: 6,
+                elevation: 6,
+
+                marginRight : 8,
+                borderRadius : 10,
+                overflow: 'hidden'
+            }}>
+                <View flexDirection="row" style={{
+                    flexWrap: "wrap",
+                    height: 162,
+                    width: 162,
+                }}>
+                    <Image source={require('../assets/images/flower.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../assets/images/mountain.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../assets/images/autumn.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../assets/images/sea.jpeg')} style={{width: 81, height: 81}}/>
+                </View>
+                <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
+                    <Text style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
+                        종로 25년 토박이가 알려주는 종로 사진스팟
+                    </Text>
+                    <Text style={{flexDirection : 'row', fontSize : 10, color : colors.gray[5]}}>
+                        <Text># 힐링</Text>
+                        <Text># 뚜벅</Text>
+                        <Text># 여유</Text>
+                    </Text>
                 </View>
             </View>
         )
@@ -78,13 +117,13 @@ const SearchScreen = ({navigation}) => {
                 <ScreenDivideLine/>
                 <ScreenContainerView>
                     <View style={{marginVertical: 12}}>
-                        <View flexDirection="row" style={{alignItems: 'center', marginBottom : 12}}>
+                        <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
                             <Text style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 공간</Text>
                             <View style={styles.ad_sticker}>
                                 <Text style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</Text>
                             </View>
                         </View>
-                        <ScrollView horizontal={true}>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
                             <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
                             <RecommendedPlace name="헬로피자" address="서울 마포구"/>
@@ -97,19 +136,16 @@ const SearchScreen = ({navigation}) => {
                         </ScrollView>
                     </View>
                     <View style={{marginVertical: 12}}>
-                        <View flexDirection="row" style={{alignItems: 'center', marginBottom : 12}}>
+                        <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
                             <Text style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 보관함</Text>
                         </View>
-                        <ScrollView horizontal={true}>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            <RecommendedCollection/>
+                            <RecommendedCollection/>
+                            <RecommendedCollection/>
+                            <RecommendedCollection/>
+                            <RecommendedCollection/>
+                            <RecommendedCollection/>
                         </ScrollView>
                     </View>
                 </ScreenContainerView>
