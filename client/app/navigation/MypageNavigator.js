@@ -40,7 +40,6 @@ function Like() {
 
     const showLikes = ({item}) => (
         <View style={styles.likesContainer}>
-            <View>
                 <View style={{alignItems: 'center'}}>
                     <View style={{marginEnd: 8}}>
                         <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
@@ -62,14 +61,13 @@ function Like() {
                         </View>
                     </View>
                 </View>
-            </View>
         </View>
 
     )
 
     return (
         <View flex={1} backgroundColor={colors.backgroundColor}>
-            <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: 16}}>
+            <View style={{flexDirection: 'row', width: '90%', justifyContent: 'space-between', marginTop: 16, paddingBottom: 17}}>
                 <View style={{flexDirection: 'row'}}>
                     <Text style={{color: colors.mainColor}}>최근 추가순</Text>
                     <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
@@ -248,7 +246,7 @@ function Collection() {
                 </View>
                 </View>
 
-                <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
+                <View style={{flexDirection: 'row', width: '90%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{color: colors.mainColor}}>최근 추가순</Text>
                         <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
@@ -282,27 +280,27 @@ const MypageNavigation = () => {
     return (
         <Tab.Navigator
             swipeEnabled={true}
-            tabBarOptions={{
-                labelStyle: {
+            screenOptions={{
+                tabBarLabelStyle: {
                     fontSize: 16,
                     fontWeight: 'bold',
                     textAlign: 'center',
                 },
-                indicatorStyle: {
+                tabBarIndicatorStyle: {
                     backgroundColor: colors.emphasizedColor,
                     height: 2,
                     width: Dimensions.get('screen').width/6 * 0.9,
                     marginLeft: Dimensions.get('screen').width/6 * 0.9
                 },
-                style: {
+                tabBarStyle: {
                     elevation: 0,
                     backgroundColor: colors.backgroundColor,
                     height: 40,
                 },
-                activeTintColor: colors.mainColor,
-                inactiveTintColor: colors.notClickedDirColor,
+                tabBarActiveTintColor: colors.mainColor,
+                tabBarInactiveTintColor: colors.notClickedDirColor,
             }}
-            style={{paddingBottom: 15}}
+            style={{paddingBottom: 15, paddingHorizontal: 20}}
         >
             <Tab.Screen name="공간" component={Like} Options={{
                 tabBarLabel: {

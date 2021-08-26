@@ -6,6 +6,7 @@ import FIcon from "react-native-vector-icons/FontAwesome";
 const Star = (props) => {
     //props score 에 따라서 별 개수 다르게 렌더링하도록 만들어야 함~!
 
+    const { colors } = useTheme();
     const score = props.score;
     const decimalFraction = score - Math.floor(score);
 
@@ -29,7 +30,7 @@ const Star = (props) => {
         <View style={{flexDirection: 'row', justifyContent : 'center', alignItems : 'center'}}>
             {star.map((iconName, idx) =>
                 <View key={idx} style={{marginHorizontal : 2}}>
-                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? '#EAE0E0' :'#FFC978'}></FIcon>
+                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? colors.red_gray[4] : colors.emphasizedColor}></FIcon>
                 </View>)}
         </View>
     )

@@ -38,12 +38,9 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-ionicons": "^4.6.5",
     "react-native-mail": "^6.1.0",
-<<<<<<< HEAD
     "react-native-maps": "^0.28.0",
-=======
     "react-native-measure-text": "^1.0.0-alpha.2",
     "react-native-pager-view": "5.0.12",
->>>>>>> 9a4102882d6d48b6c4fa72364fd94ae1751f7ba9
     "react-native-phone-number-input": "^2.1.0",
     "react-native-raw-bottom-sheet": "^2.2.0",
     "react-native-reanimated": "~2.1.0",
@@ -52,11 +49,8 @@
     "react-native-screens": "~3.0.0",
     "react-native-share": "^7.0.0",
     "react-native-side-menu": "^1.1.3",
-<<<<<<< HEAD
     "react-native-story-share": "^0.6.0",
-=======
     "react-native-svg": "12.1.0",
->>>>>>> 9a4102882d6d48b6c4fa72364fd94ae1751f7ba9
     "react-native-tab-view": "^2.16.0",
     "react-native-text-size": "^4.0.0-rc.1",
     "react-native-vector-icons": "^8.1.0",

@@ -18,7 +18,7 @@ const ColorTheme = {
         ...DefaultTheme.colors,
         defaultColor : '#FFFFFF',
         mainColor : '#4C648D',
-        backgroundColor : '#FCF6F5',
+        backgroundColor : '#FFF8F8',
         notClicked : '#C9CFD9',
         emphasizedColor : '#F07A7A',
         subColor : '#BABFC8',

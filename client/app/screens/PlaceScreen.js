@@ -173,10 +173,34 @@ const PlaceScreen = ({navigation}) => {
             }}>
                 <ScrollView style={{width: "100%"}}>
                     <View>
-                        <Image style={{width: "100%", height: 200}}
-                            source={require('../assets/images/mountain.jpeg')}
-                            resizeMode="center"
-                        />
+                        <View style={{flexDirection: 'row'}}>
+                            <Image style={{width: "50%", height: 200}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                            <View style={{width: '50%', height: 200}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                    <Image style={{width: "50%", height: 100}}
+                                        source={require('../assets/images/mountain.jpeg')}
+                                        resizeMode="cover"
+                                    />
+                                    <Image style={{width: "50%", height: 100}}
+                                        source={require('../assets/images/mountain.jpeg')}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                    <Image style={{width: "50%", height: 100}}
+                                        source={require('../assets/images/mountain.jpeg')}
+                                        resizeMode="cover"
+                                    />
+                                    <Image style={{width: "50%", height: 100}}
+                                        source={require('../assets/images/mountain.jpeg')}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                            </View>
+                        </View>
                         <View style={{
                             alignItems: 'center'
                         }}>
@@ -204,6 +228,14 @@ const PlaceScreen = ({navigation}) => {
                                 <View style={{marginLeft: 5}}>
                                     {/* 하이퍼링크 하도록 */}
                                     <Text style={{color: colors.linkColor, fontSize: 12}}>http://childrenpark.net</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
+                            <View style={{flexDirection: 'row'}}>
+                                <Icon type="ionicon" name={"time-outline"} size={14} color={colors.mainColor}></Icon>
+                                <View style={{marginLeft: 5}}>
+                                    <Text style={{color: colors.linkColor, fontSize: 12}}>매일 11:00~17:00</Text>
                                 </View>
                             </View>
                         </View>
@@ -247,6 +279,15 @@ const PlaceScreen = ({navigation}) => {
                                 <Score name="주변상권" color={colors.mainColor} marginBottom={5} fontSize={12} textAlign={'center'}><StarScore score={3.8} starSize={12}/></Score>
                             </View>
                         </View>
+                        {/* 만약 해당 장소에 리뷰를 남겼다면 뜨지 않도록 하기 */}
+                        <View style={{width: '100%', height: 38, alignItems: 'center', marginBottom: 20}}>
+                            <TouchableOpacity style={{flexDirection: 'row', backgroundColor: colors.emphasizedColor, width: '90%', height: 38, alignItems: 'center', justifyContent: 'center',
+                                                    borderRadius: 35, paddingVertical: 6}}>
+                                <Image style={{width: 20.82, height: 27, marginTop: 3}} source={require('../assets/images/write_review_icon.png')}></Image>
+                                <Text style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점 남기기</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
                     
                         <View style={{width: '100%', height: 8, backgroundColor: colors.detailColor, zIndex: -1000}}></View>
                     
@@ -272,22 +313,6 @@ const PlaceScreen = ({navigation}) => {
                         </View>
                     </View>
                     <View style={{marginBottom: 24}}>
-                        {/* user_nickname, 만약 해당 장소에 리뷰를 남겼다면 뜨지 않도록 하기 */}
-                        <View style={{width: '100%', height: 70, backgroundColor: '#F39191', paddingTop: 10, paddingLeft: 16, paddingBottom: 8}}>
-                            <View style={{flexDirection: 'row'}}>
-                                <Text style={{color: colors.defaultColor, fontWeight: 'bold', fontSize: 16, lineHeight: 25.6}}>minsun</Text>
-                                <Text style={{color: colors.defaultColor, fontSize: 16, lineHeight: 25.6}}> 님은</Text>
-                            </View>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                                <View><Text style={{color: colors.defaultColor, fontSize: 16, lineHeight: 25.6}}>어떤 경험을 하셨나요?</Text></View>
-                                <View style={{flexDirection: 'row', marginRight: 20}}>
-                                    <Text style={{color: colors.defaultColor, fontWeight: 'bold', fontSize: 16, lineHeight: 25.6}}>평점남기기</Text>
-                                    <TouchableOpacity style={{alignItems: 'center', justifyContent: 'center'}}>
-                                        <Icon type="ionicon" name={"chevron-forward"} size={16} color={colors.defaultColor}></Icon>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
                         {/* TODO 카카오 지도 api 가져오기 */}
                         <View>
                             {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
@@ -310,23 +335,31 @@ const PlaceScreen = ({navigation}) => {
                         <View style={{
                             alignItems: 'center'
                         }}>
-                            <View style={{width: '90%', flexDirection: 'row', paddingBottom: 12}}>
-                                <Text style={{fontSize: 20, fontWeight: "bold", color: colors.mainColor, lineHeight: 32}}>보관함에서 모아온 한줄 TIP!</Text>
-                                <TouchableOpacity style={{alignItems: 'center', justifyContent: 'center'}}>
-                                    <Icon type="ionicon" name={"chevron-forward"} size={20} color={colors.mainColor}></Icon>
-                                </TouchableOpacity>
+                            <View style={{width: '90%', paddingBottom: 12}}>
+                                <View style={{flexDirection: 'row'}}>
+                                    <Text style={{fontSize: 20, fontWeight: "bold", color: colors.mainColor, lineHeight: 32}}>한줄 TIP</Text>
+                                    <TouchableOpacity style={{alignItems: 'center', justifyContent: 'center'}}>
+                                        <Icon type="ionicon" name={"chevron-forward"} size={20} color={colors.mainColor}></Icon>
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={{color: colors.notClickedDirColor, fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</Text>
                             </View>
                             <View style={{width: '90%', marginBottom: 29}}>
                                 {/* count data 여야 */}
                                 <View style={{marginBottom: 6}}><Text style={{color: '#9DA2AB', fontSize: 14, lineHeight: 20.72, fontWeight: 'bold'}}>총 20개</Text></View>
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 100}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                     <View><Image style={styles.reviewImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
                                     <View style={{marginLeft: 12, marginRight: 20}}>
-                                        <View><Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10, width: 271}}>
+                                        <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 6, paddingLeft: 6, paddingRight: 61, marginBottom: 6,
+                                                    justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
+                                            <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={'#3E557D'} style={{paddingTop: 2}}></Icon>
+                                            <Text style={{color: '#3E557D', paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
+                                        </View>
+                                        <View><Text style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
                                             종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
                                         </Text></View>
-                                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 271, marginTop: 2}}>
+                                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 267, marginTop: 4}}>
                                             <View style={{flexDirection: 'row'}}>
                                                 <Text style={{color: '#9DA2AB', fontWeight: 'bold', fontSize: 12}}>by. </Text>
                                                 <Text style={{color: '#9DA2AB', fontSize: 12}}>minsun</Text>
@@ -334,25 +367,25 @@ const PlaceScreen = ({navigation}) => {
                                             <View>
                                                 <Text style={{color: '#9DA2AB', fontSize: 12}}>21.06.24</Text>
                                             </View>
-                                        </View>
-                                        <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 4, paddingLeft: 6, paddingRight: 61, marginVertical: 8,
-                                                    justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={'#3E557D'} ></Icon>
-                                            <Text style={{color: '#3E557D', lineHeight: 19.2, paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
                                         </View>
                                     </View>
                                 </View>
                                 
-                                <View style={{width: '100%', height: 1, backgroundColor: colors.detailColor, zIndex: -1000, marginVertical: 16}}></View>
+                                <View style={{width: '100%', height: 1, backgroundColor: colors.detailColor, zIndex: -1000, marginVertical: 18}}></View>
                                 
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 100}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                     <View><Image style={styles.reviewImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
                                     <View style={{marginLeft: 12, marginRight: 20}}>
-                                        <View><Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10, width: 271}}>
+                                        <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 6, paddingLeft: 6, paddingRight: 61, marginBottom: 6,
+                                                    justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
+                                            <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={'#3E557D'} style={{paddingTop: 2}}></Icon>
+                                            <Text style={{color: '#3E557D', paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
+                                        </View>
+                                        <View><Text style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
                                             종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
                                         </Text></View>
-                                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 271, marginTop: 2}}>
+                                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 267, marginTop: 4}}>
                                             <View style={{flexDirection: 'row'}}>
                                                 <Text style={{color: '#9DA2AB', fontWeight: 'bold', fontSize: 12}}>by. </Text>
                                                 <Text style={{color: '#9DA2AB', fontSize: 12}}>minsun</Text>
@@ -360,25 +393,25 @@ const PlaceScreen = ({navigation}) => {
                                             <View>
                                                 <Text style={{color: '#9DA2AB', fontSize: 12}}>21.06.24</Text>
                                             </View>
-                                        </View>
-                                        <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 4, paddingLeft: 6, paddingRight: 61, marginVertical: 8,
-                                                    justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={'#3E557D'} ></Icon>
-                                            <Text style={{color: '#3E557D', lineHeight: 19.2, paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
                                         </View>
                                     </View>
                                 </View>
 
-                                <View style={{width: '100%', height: 1, backgroundColor: colors.detailColor, zIndex: -1000, marginVertical: 16}}></View>
+                                <View style={{width: '100%', height: 1, backgroundColor: colors.detailColor, zIndex: -1000, marginVertical: 18}}></View>
 
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 100}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                     <View><Image style={styles.reviewImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
                                     <View style={{marginLeft: 12, marginRight: 20}}>
-                                        <View><Text style={{fontSize: 16, fontWeight: 'bold', color: colors.mainColor, marginTop: 10, width: 271}}>
+                                        <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 6, paddingLeft: 6, paddingRight: 61, marginBottom: 6,
+                                                    justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
+                                            <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={'#3E557D'} style={{paddingTop: 2}}></Icon>
+                                            <Text style={{color: '#3E557D', paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
+                                        </View>
+                                        <View><Text style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
                                             종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
                                         </Text></View>
-                                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 271, marginTop: 2}}>
+                                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 267, marginTop: 4}}>
                                             <View style={{flexDirection: 'row'}}>
                                                 <Text style={{color: '#9DA2AB', fontWeight: 'bold', fontSize: 12}}>by. </Text>
                                                 <Text style={{color: '#9DA2AB', fontSize: 12}}>minsun</Text>
@@ -386,11 +419,6 @@ const PlaceScreen = ({navigation}) => {
                                             <View>
                                                 <Text style={{color: '#9DA2AB', fontSize: 12}}>21.06.24</Text>
                                             </View>
-                                        </View>
-                                        <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 4, paddingLeft: 6, paddingRight: 61, marginVertical: 8,
-                                                    justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={'#3E557D'} ></Icon>
-                                            <Text style={{color: '#3E557D', lineHeight: 19.2, paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -494,7 +522,7 @@ const styles = StyleSheet.create({
         height: 56,
         backgroundColor: '#c4c4c4',
         borderRadius: 50,
-        marginBottom: 30,
+
     },
 })
 export default PlaceScreen;
