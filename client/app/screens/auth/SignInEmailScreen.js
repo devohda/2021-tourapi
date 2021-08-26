@@ -60,8 +60,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation}/>
             <ScreenContainerView>
-                <View style={{height: 24, marginTop: 20, justifyContent: 'center'}}></View>
-                <View style={{marginTop: 86}}>
+                <View style={{marginTop: 60}}>
                     <Text style={{fontSize: 28, color: colors.mainColor}}>
                         <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
                         <Text>{"\n"}채워볼까요?</Text>
