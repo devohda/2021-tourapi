@@ -8,7 +8,10 @@ import ScreenContainer from "../../components/ScreenContainer";
 import ScreenContainerView from "../../components/ScreenContainerView";
 
 const windowWidth = Dimensions.get('window').width;
-import MainBoxIcon from '../../assets/images/main_box_icon.svg'
+import MainBoxIcon from '../../assets/images/login/main_box_icon.svg';
+import AppleLogo from '../../assets/images/login/apple.svg';
+import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg'
+
 
 const signIn = (email, password, navigation, setIsSignedIn) => {
 
@@ -38,7 +41,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 </View>
                 <View flex={1} style={{alignItems: 'center', justifyContent: 'flex-end'}}>
                     <MainBoxIcon/>
-                    <View style={{alignItems: 'center', marginTop: 35.08}}>
+                    <View style={{marginTop: 35.08, alignItems : 'center'}}>
                         <Text style={{fontSize: 28, color: colors.mainColor}}>나만의 </Text>
                         <Text style={{fontSize: 28, color: colors.mainColor}}><Text style={{fontWeight: "bold"}}>공간
                             보관함</Text><Text>을</Text></Text>
@@ -54,7 +57,10 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                         >
-                            <Text style={{...styles.loginText, color: '#000'}}>카카오로 계속하기</Text>
+                            <View flexDirection="row" style={{alignItems : 'center'}}>
+                                <KakaotalkLogo />
+                                <Text style={{...styles.loginText, color: '#000'}}>카카오로 계속하기</Text>
+                            </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={{
@@ -63,7 +69,10 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                         >
-                            <Text style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</Text>
+                            <View flexDirection="row" style={{alignItems : 'center'}}>
+                                <AppleLogo />
+                                <Text style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</Text>
+                            </View>
                         </TouchableOpacity>
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
@@ -86,14 +95,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         padding: 14,
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        flex : 1
     },
     socialLoginBtn: {
         height: 52,
         borderRadius: 10,
         marginVertical: 8,
+        paddingLeft : 20,
+        paddingRight : 45,
         width : '100%',
-        maxWidth: 650
+        // maxWidth: 650
     }
 });
 

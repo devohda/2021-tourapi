@@ -7,6 +7,7 @@ import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
 import ScreenContainer from "../../components/ScreenContainer";
 import {useIsUserData} from "../../contexts/UserDataContextProvider";
 import ScreenContainerView from "../../components/ScreenContainerView";
+import NavigationTop from "../../components/NavigationTop";
 
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
@@ -57,6 +58,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
+            <NavigationTop navigation={navigation}/>
             <ScreenContainerView>
                 <View style={{height: 24, marginTop: 20, justifyContent: 'center'}}></View>
                 <View style={{marginTop: 86}}>
