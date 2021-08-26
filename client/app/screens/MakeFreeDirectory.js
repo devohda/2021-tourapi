@@ -90,8 +90,8 @@ const MakeFreeDirectory = ({navigation}) => {
                         setIsPress(newArr);
                     }
                 }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {
-                    borderColor: colors.mainTextColor,
-                    backgroundColor: colors.mainTextColor
+                    borderColor: colors.mainColor,
+                    backgroundColor: colors.mainColor
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
                         style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color: colors.defaultColor}] : [styles.selectTypeText, {color: colors.textNotClicked}]}>{keyword.keyword_title}</Text>
@@ -176,7 +176,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         paddingVertical: 18
                     }}>
                         <CustomTextInput
-                            style={[collectionName && {color: colors.mainTextColor}, {
+                            style={[collectionName && {color: colors.mainColor}, {
                                 paddingHorizontal: 14,
                                 fontSize: 20,
                                 fontWeight: 'bold'
@@ -190,7 +190,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainTextColor}}>보관함 키워드</Text>
+                            <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
                             <Text style={{fontSize: 12, color: '#BABFC8', alignSelf: 'center', marginLeft: 9}}>* 최대
                                 3개</Text>
                         </View>
@@ -232,9 +232,9 @@ const MakeFreeDirectory = ({navigation}) => {
                         alignItems: 'center',
                         justifyContent: 'space-between'
                     }}>
-                        <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainTextColor}}>비공개 설정</Text>
+                        <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
                         <Switch
-                            trackColor={{false: "#CDD0D7", true: colors.mainTextColor}}
+                            trackColor={{false: "#CDD0D7", true: colors.mainColor}}
                             thumbColor={colors.defaultColor}
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={toggleSwitch}
@@ -245,7 +245,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         <TouchableOpacity
                             testID="completed"
                             style={{
-                                backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainTextColor : '#CDD0D7',
+                                backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : colors.gray[5],
                                 height: 48,
                                 borderRadius: 10
                             }}

@@ -268,7 +268,7 @@ function Collection() {
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
                 <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
-                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainTextColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
                     {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
@@ -324,7 +324,7 @@ function Collection() {
                                 setSelectedDirType(newArr[type.id-1].name)
                                 getCollectionsFromUsers(type.id)
                             }
-                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainTextColor, backgroundColor: colors.mainTextColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}
+                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
                             <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</Text>
@@ -362,7 +362,7 @@ function Collection() {
                     </View>
                 </View>
             <View style={{marginVertical: '2.5%'}}>
-                <Text style={{color: colors.mainTextColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</Text>
+                <Text style={{color: colors.mainColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</Text>
             </View>
             <ScrollView horizontal={true} scrollEnabled={false}>
                 <SafeAreaView>
@@ -398,7 +398,7 @@ const MypageNavigation = () => {
                     backgroundColor: colors.backgroundColor,
                     height: 40,
                 },
-                activeTintColor: colors.mainTextColor,
+                activeTintColor: colors.mainColor,
                 inactiveTintColor: colors.textNotClicked,
             }}
             style={{paddingBottom: 15}}

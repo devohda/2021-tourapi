@@ -1,11 +1,14 @@
 //전역 선언 방법 찾아보기
 import React, {useContext, useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
 import ScreenContainer from "../../components/ScreenContainer";
 import ScreenContainerView from "../../components/ScreenContainerView";
+
+const windowWidth = Dimensions.get('window').width;
+import MainBoxIcon from '../../assets/images/main_box_icon.svg'
 
 const signIn = (email, password, navigation, setIsSignedIn) => {
 
@@ -22,34 +25,42 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <ScreenContainerView>
+            <ScreenContainerView flex={1}>
                 <View style={{height: 24, marginTop: 20, justifyContent: 'center'}}>
                     <TouchableOpacity onPress={() => setIsSignedIn(true)}>
-                        <Text style={{color: colors.textNotClicked, fontSize: 16, alignSelf: 'flex-end'}}>둘러보기</Text>
+                        <Text style={{
+                            color: colors.mainColor,
+                            fontSize: 16,
+                            fontWeight: '400',
+                            alignSelf: 'flex-end'
+                        }}>둘러보기</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{marginTop: 86}}>
-                    <View style={{alignContent: "flex-start"}}>
-                        <Text style={{fontSize: 28, color: colors.mainTextColor}}>나만의 </Text>
-                        <Text style={{fontSize: 28, color: colors.mainTextColor}}><Text style={{fontWeight: "bold"}}>공간
+                <View flex={1} style={{alignItems: 'center', justifyContent: 'flex-end'}}>
+                    <MainBoxIcon/>
+                    <View style={{alignItems: 'center', marginTop: 35.08}}>
+                        <Text style={{fontSize: 28, color: colors.mainColor}}>나만의 </Text>
+                        <Text style={{fontSize: 28, color: colors.mainColor}}><Text style={{fontWeight: "bold"}}>공간
                             보관함</Text><Text>을</Text></Text>
-                        <Text style={{fontSize: 28, color: colors.mainTextColor}}>채워볼까요?</Text>
+                        <Text style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</Text>
                     </View>
-                    <View style={{marginTop: 200}}>
+                </View>
+                <View flex={1} style={{marginTop: 50}}>
+                    <View style={{alignItems : 'center'}}>
                         <TouchableOpacity
                             style={{
                                 backgroundColor: '#FEE500',
-                                height: 52,
-                                borderRadius: 10,
-                                marginVertical: 8,
-                                width: '100%'
+                                ...styles.socialLoginBtn
                             }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                         >
                             <Text style={{...styles.loginText, color: '#000'}}>카카오로 계속하기</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={{backgroundColor: '#000', height: 52, borderRadius: 10, marginVertical: 8}}
+                            style={{
+                                backgroundColor: '#000',
+                                ...styles.socialLoginBtn
+                            }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                         >
                             <Text style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</Text>
@@ -76,6 +87,13 @@ const styles = StyleSheet.create({
         padding: 14,
         fontSize: 16,
         fontWeight: 'bold'
+    },
+    socialLoginBtn: {
+        height: 52,
+        borderRadius: 10,
+        marginVertical: 8,
+        width : '100%',
+        maxWidth: 650
     }
 });
 

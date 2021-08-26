@@ -40,6 +40,7 @@ const SearchScreen = ({navigation}) => {
                     </View>
                     <SearchTabNavigator/>
                 </ScreenContainerView>
+                <View></View>
             </ScrollView>
         </ScreenContainer>
     )

@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
+import {useTheme} from "@react-navigation/native";
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -54,6 +55,7 @@ const signUp = async (user_email, user_password, user_nickname) => {
 }
 
 const GetNicknameTab = ({route, authNavigation}) => {
+    const {colors} = useTheme();
     const {email, password} = route.params;
     const [isValid, setIsValid] = useState(false)
     const [nickname, setNickname] = useState("")
@@ -81,11 +83,11 @@ const GetNicknameTab = ({route, authNavigation}) => {
         },
         progress_active: {
             width: 28,
-            backgroundColor: '#7B9ACC'
+            backgroundColor: colors.mainColor
         },
         progress_inactive: {
             width: 8,
-            backgroundColor: '#CDD0D7'
+            backgroundColor: colors.gray[5]
         },
         title_text: {
             fontSize: 30,
@@ -93,7 +95,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: nickname ? '#7B9ACC' : '#CDD0D7',
+            backgroundColor: nickname ? colors.mainColor : colors.gray[5],
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
