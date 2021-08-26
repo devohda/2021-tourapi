@@ -2,7 +2,8 @@ import React, {useState} from "react";
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
-import { useTheme } from "@react-navigation/native";
+import CustomTextInput from "../../../components/CustomTextInput";
+import {useTheme} from "@react-navigation/native";
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -77,7 +78,7 @@ const GetEmailTab = ({navigation}) => {
         },
         progress_inactive: {
             width: 8,
-            backgroundColor: '#CDD0D7'
+            backgroundColor: colors.gray[5]
         },
         title_text: {
             fontSize: 30,
@@ -109,10 +110,17 @@ const GetEmailTab = ({navigation}) => {
                             <Text style={styles.title_text}>입력해주세요</Text>
                         </View>
                     </Text>
-                    <InputBox
+                    <CustomTextInput
                         placeholder="hiddenjewel@gmail.com"
                         autoCapitalize="none"
-                        style={{marginTop: 40}}
+                        style={{
+                            marginTop : 40,
+                            fontSize: 16,
+                            borderBottomWidth: 1,
+                            borderBottomColor: '#C5C5C5',
+                            marginBottom: 38,
+                            paddingBottom: 11
+                        }}
                         onChangeText={(text) => setEmail(text)}
                     />
                 </Form>

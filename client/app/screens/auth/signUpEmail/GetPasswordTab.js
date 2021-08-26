@@ -51,7 +51,7 @@ const GetPasswordTab = ({route, navigation}) => {
         },
         progress_inactive: {
             width: 8,
-            backgroundColor: '#CDD0D7'
+            backgroundColor: colors.gray[5]
         },
         title_text: {
             fontSize: 30,
