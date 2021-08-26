@@ -7,11 +7,16 @@ import {
     Image,
     TouchableOpacity,
     Switch,
-    Alert
+    Alert,
+    KeyboardAvoidingView,
+    Platform
 } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
+import ScreenContainerView from '../components/ScreenContainerView';
 import NavigationTop from "../components/NavigationTop";
-import { useTheme } from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
+import CustomTextInput from "../components/CustomTextInput";
+import ScreenDivideLine from "../components/ScreenDivideLine";
 
 export const navigationRef = React.createRef();
 
@@ -29,7 +34,7 @@ const MakeFreeDirectory = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
-    const { colors } = useTheme();
+    const {colors} = useTheme();
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
@@ -86,7 +91,10 @@ const MakeFreeDirectory = ({navigation}) => {
                         newArr[keyword.keyword_pk - 1] = true;
                         setIsPress(newArr);
                     }
-                }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor}] : [styles.selectType, {borderColor : colors.defaultColor, backgroundColor: colors.defaultColor}]}>
+                }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {
+                    borderColor: colors.mainColor,
+                    backgroundColor: colors.mainColor
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
                         style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.notClicked}]}>{keyword.keyword_title}</Text>
                 </TouchableOpacity>
@@ -162,59 +170,47 @@ const MakeFreeDirectory = ({navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {/*<View flex={1}>*/}
-            {/* <View style={{marginTop: 37, left: 24}}>
-                        <Text style={{marginVertical: 8, fontSize: 16, fontWeight: 'bold'}}>보관함 사진</Text>
-                        <View style={{flexDirection: 'row', marginTop: 16}}>
-                        </View>
-                    </View> */}
-
-            {/* </ScrollView> */}
-            {/* </TouchableWithoutFeedback> */}
-            {/*</View>*/}
-            {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-            {/* <ScrollView keyboardShouldPersistTaps='always'> */}
             <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
-            <View style={{
-                marginTop: 26,
-                paddingVertical: 18,
-                borderBottomColor: '#F0E7E7',
-                borderBottomWidth: 6,
-            }}>
-                <TextInput
-                    style={[collectionName && {color : colors.mainColor},{paddingHorizontal: 14, fontSize: 20, fontWeight: 'bold'}]}
-                    placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
-                    onChangeText={(name) => setCollectionName(name)}>
-                </TextInput>
-            </View>
-            <View style={{marginTop: 24}}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 해시태그</Text>
-                    <Text style={{fontSize: 12, color: colors.subColor, alignSelf: 'center', marginLeft: 9}}>* 최대
-                        3개</Text>
-                </View>
-                <View style={{
-                    flexDirection: 'row',
-                    marginTop: 16
-                }}>
+            <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                <ScreenContainerView>
+                    <View style={{marginTop: 26}}>
+                        <CustomTextInput
+                            style={[collectionName && {color: colors.mainColor}, {fontSize: 20}]}
+                            placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
+                            onChangeText={(name) => setCollectionName(name)}>
+                        </CustomTextInput>
+                    </View>
+                </ScreenContainerView>
+                <ScreenDivideLine />
+                <ScreenContainerView flex={1}>
+                    <View style={{marginTop: 24}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
+                            <Text style={{fontSize: 12, color: '#BABFC8', alignSelf: 'center', marginLeft: 9}}>* 최대
+                                3개</Text>
+                        </View>
+                        <View style={{
+                            flexDirection: 'row',
+                            marginTop: 16
+                        }}>
 
-                    <View flexDirection="row">
-                        <Image source={require('../assets/images/add_keyword.png')}
-                               style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                        {keywordData.map((keyword, idx) => (
-                            <Keyword keyword={keyword} key={idx}/>
-                        ))}
-                        {/*{버튼 추가 가능하도록 만들었음.}*/}
-                        {/* <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
+                            <View flexDirection="row">
+                                <Image source={require('../assets/images/add_keyword.png')}
+                                       style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
+                                {keywordData.map((keyword, idx) => (
+                                    <Keyword keyword={keyword} key={idx}/>
+                                ))}
+                                {/*{버튼 추가 가능하도록 만들었음.}*/}
+                                {/* <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
                                     setKeywords((addedKeywords) => {
                                         return [...addedKeywords, {keyword: '추가됨'}]
                                     })
                                 }}/> */}
-                        {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.notClicked}]} ></Icon></TouchableOpacity></View> */}
+                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.notClicked}]} ></Icon></TouchableOpacity></View> */}
+                            </View>
+                        </View>
                     </View>
-                </View>
-            </View>
-            {/* <View style={{marginTop: 37, left: 24}}>
+                    {/* <View style={{marginTop: 37, left: 24}}>
                         <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</Text>
                         <View style={{flexDirection: 'row', marginTop: 16}}>
                             <SafeAreaView>
@@ -224,50 +220,52 @@ const MakeFreeDirectory = ({navigation}) => {
                             </SafeAreaView>
                         </View>
                     </View> */}
-            {/* marginBottom은 일단 퍼블리싱때문에 */}
-            <View style={{
-                marginTop: 24,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-            }}>
-                <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
-                <Switch
-                    trackColor={{false: colors.notClicked, true: colors.mainColor}}
-                    thumbColor={colors.defaultColor}
-                    ios_backgroundColor={colors.notClicked}
-                    onValueChange={toggleSwitch}
-                    value={isEnabled}
-                />
-            </View>
-            <View flex={1} style={{marginBottom: 20, justifyContent: "flex-end"}}>
-                <TouchableOpacity
-                    testID="completed"
-                    style={{
-                        backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : '#CDD0D7',
-                        height: 48,
-                        borderRadius: 10
-                    }}
-                    onPress={() => {
-                        if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
-                            postCollections();
-                            navigation.setOptions({tabBarVisible: true});
-                            navigation.goBack(null);
-                            Alert.alert('', '자유보관함이 생성되었습니다')
-                        }
-                    }}
-                    disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
-                ><Text
-                    style={{
-                        textAlign: 'center',
-                        padding: 14,
-                        fontSize: 16,
-                        color: colors.defaultColor,
-                        fontWeight: 'bold'
-                    }}
-                >보관함 만들기</Text>
-                </TouchableOpacity>
-            </View>
+                    {/* marginBottom은 일단 퍼블리싱때문에 */}
+                    <View style={{
+                        marginTop: 24,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}>
+                        <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
+                        <Switch
+                            trackColor={{false: colors.notClicked, true: colors.mainColor}}
+                            thumbColor={colors.defaultColor}
+                            ios_backgroundColor={colors.notClicked}
+                            onValueChange={toggleSwitch}
+                            value={isEnabled}
+                        />
+                    </View>
+                    <View flex={1} style={{marginBottom: 20, justifyContent: "flex-end"}}>
+                        <TouchableOpacity
+                            testID="completed"
+                            style={{
+                                backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : colors.gray[5],
+                                height: 48,
+                                borderRadius: 10
+                            }}
+                            onPress={() => {
+                                if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
+                                    postCollections();
+                                    navigation.setOptions({tabBarVisible: true});
+                                    navigation.goBack(null);
+                                    Alert.alert('', '자유보관함이 생성되었습니다')
+                                }
+                            }}
+                            disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
+                        ><Text
+                            style={{
+                                textAlign: 'center',
+                                padding: 14,
+                                fontSize: 16,
+                                color: colors.defaultColor,
+                                fontWeight: 'bold'
+                            }}
+                        >보관함 만들기</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScreenContainerView>
+            </KeyboardAvoidingView>
         </ScreenContainer>
     )
 

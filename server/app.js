@@ -17,7 +17,6 @@ if(process.env.NODE_ENV === 'production'){
   app.use(morgan('dev'));
 }
 
-
 app.use(express.json());
 app.use('/', router);
 
@@ -38,5 +37,6 @@ app.use((err, req, res) => {
 
   res.status(err.status || 500).send(err);
 })
+
 
 module.exports = app;
