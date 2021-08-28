@@ -19,10 +19,15 @@ const SearchTabNavigator = (props) => {
 
     return (
         <Tab.Navigator
-            style={{backgroundColor: colors.backgroundColor}}
+            sceneContainerStyle={{
+                backgroundColor: colors.backgroundColor,
+                //만약 검색 결과가 존재하지 않으면 '검색 결과가 존재하지 않습니다' 띄우면 될것
+                // height: 72 * placeList.length
+            }}
             screenOptions={({route}) => {
                 const tabWidth = (totalWidth - 40) / 3;
                 const textWidth = route.name.length * 12 + 5;
+                
 
                 return ({
                     tabBarActiveTintColor: colors.blue[2],
@@ -35,6 +40,7 @@ const SearchTabNavigator = (props) => {
                         justifyContent : 'center',
                         height : 56
                     },
+                    
                     tabBarIndicatorStyle: {
                         position: 'absolute',
                         bottom: 14,
@@ -43,11 +49,11 @@ const SearchTabNavigator = (props) => {
                         backgroundColor: colors.red[3],
                         borderRadius: 6,
                         height: 2
-                    }
+                    },
                 })
             }}
         >
-            <Tab.Screen name={`공간 ${placeList.length}`} component={SearchPlace}/>
+            <Tab.Screen name={`공간 ${placeList.length}`} component={SearchPlace} />
             <Tab.Screen name={`보관함 ${collectionList.length}`} component={SearchCollection}/>
             <Tab.Screen name={`유저 ${userList.length}`} component={SearchUser}/>
         </Tab.Navigator>

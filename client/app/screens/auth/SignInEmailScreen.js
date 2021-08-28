@@ -20,6 +20,23 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const {colors} = useTheme();
 
+    const styles = StyleSheet.create({
+        button: {
+            left: 312,
+            width: 67,
+            height: 24,
+            fontWeight: 'normal',
+            top: 44,
+        },
+        loginText: {
+            color: colors.defaultColor,
+            textAlign: 'center',
+            padding: 14,
+            fontSize: 16,
+            fontWeight: 'bold'
+        }
+    });
+
     const signIn = async () => {
         try {
             let url = 'http://34.146.140.88/auth/loginEmail';
@@ -62,11 +79,11 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             <NavigationTop navigation={navigation}/>
             <ScreenContainerView>
                 <View style={{marginTop: 60}}>
-                    <AppText style={{fontSize: 28, color: colors.mainColor}}>
-                        <AppText>나만의</AppText>
-                        <AppText><AppText style={{fontWeight: "bold"}}>공간 보관함</AppText>을</AppText>
-                        <AppText>채워볼까요?</AppText>
-                    </AppText>
+                    <View >
+                        <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의</AppText>
+                        <AppText style={{fontSize: 28, color: colors.mainColor}}><AppText style={{fontWeight: "bold", fontSize: 28, color: colors.mainColor}}>공간 보관함</AppText>을</AppText>
+                        <AppText style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</AppText>
+                    </View>
                     <TextInput style={{
                         marginTop: 38,
                         fontSize: 16,
@@ -100,7 +117,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         disabled={email && password ? false : true}
                         onPress={() => signIn()}
                     >
-                        <AppText style={[styles.loginText, {color: colors.defaultColor}]}>로그인</AppText>
+                        <AppText style={styles.loginText}>로그인</AppText>
                     </TouchableOpacity>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}}>
@@ -116,21 +133,5 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
         </ScreenContainer>
     );
 }
-
-const styles = StyleSheet.create({
-    button: {
-        left: 312,
-        width: 67,
-        height: 24,
-        fontWeight: 'normal',
-        top: 44,
-    },
-    loginText: {
-        textAlign: 'center',
-        padding: 14,
-        fontSize: 16,
-        fontWeight: 'bold'
-    }
-});
 
 export default SignInEmailScreen;

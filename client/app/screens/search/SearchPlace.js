@@ -27,7 +27,7 @@ const SearchPlace = (props) => {
         const [like, setLike] = useState(false);
 
         return (
-            <View flexDirection="row" style={{marginVertical: 8, alignItems: 'center', height: 72}}>
+            <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22}}>
                 <Image source={require('../../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
                 <View flex={1} style={styles.info_container}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>

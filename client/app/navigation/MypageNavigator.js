@@ -5,6 +5,7 @@ import OIcon from 'react-native-vector-icons/Octicons'
 import React, {useEffect, useState, useContext} from "react";
 import { Icon } from 'react-native-elements';
 import { useTheme } from '@react-navigation/native';
+import AppText from '../components/AppText';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -267,7 +268,7 @@ function Collection() {
     const showDirectories = ({item}) => (
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
-                <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
+                <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                     <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><AppText style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</AppText></View>
                     {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>

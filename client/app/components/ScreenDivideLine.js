@@ -8,7 +8,7 @@ const ScreenDivideLine = (props) => {
     return (
         <View style={{
             height: 8,
-            backgroundColor: colors.red_gray[6],
+            // backgroundColor: colors.red_gray[6],
             marginVertical: props.style && props.style.marginVertical ? props.style.marginVertical : 20
         }}></View>
     )
