@@ -1,7 +1,8 @@
 import React, {useState, useContext} from "react";
-import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
+import {StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
+import AppText from "../../../components/AppText";
 import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
@@ -76,13 +77,13 @@ const GetPasswordTab = ({route, navigation}) => {
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>
-                    <Text>
+                    <AppText>
                         <View>
-                            <Text style={styles.title_text}><Text
-                                style={{fontWeight: 'bold'}}>비밀번호</Text><Text>를</Text></Text>
-                            <Text style={styles.title_text}>설정해주세요</Text>
+                            <AppText style={styles.title_text}><AppText
+                                style={{fontWeight: 'bold'}}>비밀번호</AppText><AppText>를</AppText></AppText>
+                            <AppText style={styles.title_text}>설정해주세요</AppText>
                         </View>
-                    </Text>
+                    </AppText>
                     <InputBox
                         placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
                         autoCapitalize="none"
@@ -99,7 +100,7 @@ const GetPasswordTab = ({route, navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={password ? false : true}
                 >
-                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>
             </View>
         </>

@@ -14,30 +14,30 @@ function Like() {
         <View flex={1} backgroundColor={colors.backgroundColor}>
             <View style={{flexDirection: 'row', paddingTop: 12}}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: colors.mainColor}}>최근 추가순</Text>
+                    <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
                     <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                 </View>
                 <View style={{flexDirection: 'row', marginLeft:'40%'}}>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                        <Text style={{color: colors.mainColor}}>필터</Text>
+                        <AppText style={{color: colors.mainColor}}>필터</AppText>
                     </View>
-                    <View style={{marginHorizontal: 10}}><Text style={{color: colors.subColor}}>|</Text></View>
+                    <View style={{marginHorizontal: 10}}><AppText style={{color: colors.subColor}}>|</AppText></View>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                        <Text style={{color: colors.mainColor}}>편집</Text>
+                        <AppText style={{color: colors.mainColor}}>편집</AppText>
                     </View>
                 </View>
             </View>
             {/* <View flexDirection="row" style={{marginVertical: 20}}>
                 <View className="keyword" style={styles.keyword_1}>
-                    <Text style={{fontWeight: "bold", color: "white"}}>전체</Text>
+                    <AppText style={{fontWeight: "bold", color: "white"}}>전체</AppText>
                 </View>
                 <View className="keyword" style={styles.keyword_2}>
-                    <Text style={{fontWeight: "bold", color: "white"}}>장소</Text>
+                    <AppText style={{fontWeight: "bold", color: "white"}}>장소</AppText>
                 </View>
                 <View className="keyword" style={styles.keyword_2}>
-                    <Text style={{fontWeight: "bold", color: "white"}}>보관함</Text>
+                    <AppText style={{fontWeight: "bold", color: "white"}}>보관함</AppText>
                 </View>
             </View>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -62,12 +62,12 @@ function Like() {
                         paddingVertical: 12,
                         marginLeft: 20
                     }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
+                        <AppText style={{fontSize: 22, fontWeight: '900'}}>청계산</AppText>
+                        <AppText style={{fontSize: 16}}>뭐가들어가야할가..</AppText>
                     </View>
                     <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
                         <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
+                        <AppText>4.7k</AppText>
                     </View>
                 </View>
                 <View className="place-container"
@@ -91,12 +91,12 @@ function Like() {
                         paddingVertical: 12,
                         marginLeft: 20
                     }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
+                        <AppText style={{fontSize: 22, fontWeight: '900'}}>청계산</AppText>
+                        <AppText style={{fontSize: 16}}>뭐가들어가야할가..</AppText>
                     </View>
                     <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
                         <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
+                        <AppText>4.7k</AppText>
                     </View>
                 </View>
                 <View className="place-container"
@@ -120,12 +120,12 @@ function Like() {
                         paddingVertical: 12,
                         marginLeft: 20
                     }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
+                        <AppText style={{fontSize: 22, fontWeight: '900'}}>청계산</AppText>
+                        <AppText style={{fontSize: 16}}>뭐가들어가야할가..</AppText>
                     </View>
                     <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
                         <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
+                        <AppText>4.7k</AppText>
                     </View>
                 </View>
                 <View className="place-container"
@@ -149,12 +149,12 @@ function Like() {
                         paddingVertical: 12,
                         marginLeft: 20
                     }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
+                        <AppText style={{fontSize: 22, fontWeight: '900'}}>청계산</AppText>
+                        <AppText style={{fontSize: 16}}>뭐가들어가야할가..</AppText>
                     </View>
                     <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
                         <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
+                        <AppText>4.7k</AppText>
                     </View>
                 </View>
                 <View className="place-container"
@@ -178,12 +178,12 @@ function Like() {
                         paddingVertical: 12,
                         marginLeft: 20
                     }}>
-                        <Text style={{fontSize: 22, fontWeight: '900'}}>청계산</Text>
-                        <Text style={{fontSize: 16}}>뭐가들어가야할가..</Text>
+                        <AppText style={{fontSize: 22, fontWeight: '900'}}>청계산</AppText>
+                        <AppText style={{fontSize: 16}}>뭐가들어가야할가..</AppText>
                     </View>
                     <View flexDirection="column" style={{alignItems: "center", marginRight: 20}}>
                         <OIcon name="heart" size={30} color="#000"/>
-                        <Text>4.7k</Text>
+                        <AppText>4.7k</AppText>
                     </View>
                 </View>
             </ScrollView> */}
@@ -268,28 +268,28 @@ function Collection() {
         <View style={styles.rankingContainer}>
             <View style={{height: '68%'}}>
                 <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
-                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><AppText style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</AppText></View>
                     {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
             <View style={{marginLeft: 10}}>
-                <Text style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</Text>
+                <AppText style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</AppText>
                 <View style={{flexDirection: 'row', marginBottom: 18}}>
                     {item.collection_keywords.split(',').map((word, idx) =>(
-                        (idx <= word.length) && <Text key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</Text>
+                        (idx <= word.length) && <AppText key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</AppText>
                     ))}
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{fontSize: 8, width: '60%'}}>by minsun</Text>
+                    <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
                         <Image source={require('../assets/images/here_icon.png')} style={{width: 8, height: 8, margin: 2}}></Image>
-                        <Text style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</Text>
+                        <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
                     </View>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
                         <Icon type="ionicon" name={"location"} size={8} color={colors.hashTagColor}
                             style={{margin: 2}}></Icon>
-                        <Text style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</Text>
+                        <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</AppText>
                     </View>
                 </View>
             </View>
@@ -327,7 +327,7 @@ function Collection() {
                             }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.shadowColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.shadowColor}]}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
-                            <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</Text>
+                            <AppText style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</AppText>
                 </TouchableOpacity>                     
             </View>
         )
@@ -346,23 +346,23 @@ function Collection() {
 
                 <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Text style={{color: colors.mainColor}}>최근 추가순</Text>
+                        <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
                         <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <View style={{flexDirection: 'row'}}>
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                            <Text style={{color: colors.mainColor}}>필터</Text>
+                            <AppText style={{color: colors.mainColor}}>필터</AppText>
                         </View>
-                        <View style={{marginHorizontal: 10}}><Text style={{color: colors.subColor}}>|</Text></View>
+                        <View style={{marginHorizontal: 10}}><AppText style={{color: colors.subColor}}>|</AppText></View>
                         <View style={{flexDirection: 'row'}}>
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                            <Text style={{color: colors.mainColor}}>편집</Text>
+                            <AppText style={{color: colors.mainColor}}>편집</AppText>
                         </View>
                     </View>
                 </View>
             <View style={{marginVertical: '2.5%'}}>
-                <Text style={{color: colors.mainColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</Text>
+                <AppText style={{color: colors.mainColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</AppText>
             </View>
             <ScrollView horizontal={true} scrollEnabled={false}>
                 <SafeAreaView>

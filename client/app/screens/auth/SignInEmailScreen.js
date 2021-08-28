@@ -1,6 +1,6 @@
 //전역 선언 방법 찾아보기
 import React, {useContext, useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Button, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
@@ -8,6 +8,7 @@ import ScreenContainer from "../../components/ScreenContainer";
 import {useIsUserData} from "../../contexts/UserDataContextProvider";
 import ScreenContainerView from "../../components/ScreenContainerView";
 import NavigationTop from "../../components/NavigationTop";
+import AppText from "../../components/AppText";
 
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
@@ -61,10 +62,11 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             <NavigationTop navigation={navigation}/>
             <ScreenContainerView>
                 <View style={{marginTop: 60}}>
-                    <Text style={{fontSize: 28, color: colors.mainColor}}>
-                        <Text><Text>나만의 </Text><Text style={{fontWeight: "bold"}}>공간 보관함</Text><Text>을</Text></Text>
-                        <Text>{"\n"}채워볼까요?</Text>
-                    </Text>
+                    <AppText style={{fontSize: 28, color: colors.mainColor}}>
+                        <AppText>나만의</AppText>
+                        <AppText><AppText style={{fontWeight: "bold"}}>공간 보관함</AppText>을</AppText>
+                        <AppText>채워볼까요?</AppText>
+                    </AppText>
                     <TextInput style={{
                         marginTop: 38,
                         fontSize: 16,
@@ -98,15 +100,15 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         disabled={email && password ? false : true}
                         onPress={() => signIn()}
                     >
-                        <Text style={[styles.loginText, {color: colors.defaultColor}]}>로그인</Text>
+                        <AppText style={[styles.loginText, {color: colors.defaultColor}]}>로그인</AppText>
                     </TouchableOpacity>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}}>
-                            <Text>회원가입</Text>
+                            <AppText>회원가입</AppText>
                         </TouchableOpacity>
-                        <Text style={{marginRight: 29, color: '#929292'}}>|</Text>
+                        <AppText style={{marginRight: 29, color: '#929292'}}>|</AppText>
                         <TouchableOpacity onPress={() => navigation.navigate('FindPassword')}>
-                            <Text>비밀번호 재설정</Text>
+                            <AppText>비밀번호 재설정</AppText>
                         </TouchableOpacity>
                     </View>
                 </View>

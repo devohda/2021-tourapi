@@ -1,8 +1,9 @@
 import React, {useState} from "react";
-import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
+import {StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
 import CustomTextInput from "../../../components/CustomTextInput";
+import AppText from "../../../components/AppText";
 import {useTheme} from "@react-navigation/native";
 
 const ProgressBar = styled(View)`
@@ -103,13 +104,13 @@ const GetEmailTab = ({navigation}) => {
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>
-                    <Text>
+                    <AppText>
                         <View>
-                            <Text style={styles.title_text}><Text
-                                style={{fontWeight: 'bold'}}>이메일주소</Text><Text>를</Text></Text>
-                            <Text style={styles.title_text}>입력해주세요</Text>
+                            <AppText style={styles.title_text}><AppText
+                                style={{fontWeight: 'bold'}}>이메일주소</AppText><AppText>를</AppText></AppText>
+                            <AppText style={styles.title_text}>입력해주세요</AppText>
                         </View>
-                    </Text>
+                    </AppText>
                     <CustomTextInput
                         placeholder="hiddenjewel@gmail.com"
                         autoCapitalize="none"
@@ -131,7 +132,7 @@ const GetEmailTab = ({navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={email ? false : true}
                 >
-                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</Text>
+                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>
             </View>
         </>

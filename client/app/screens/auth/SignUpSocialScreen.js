@@ -1,6 +1,6 @@
 //전역 선언 방법 찾아보기
-import React, {useContext, useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, TouchableOpacity, View, Dimensions, Text} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
@@ -8,16 +8,9 @@ import ScreenContainer from "../../components/ScreenContainer";
 import ScreenContainerView from "../../components/ScreenContainerView";
 import AppText from "../../components/AppText";
 
-const windowWidth = Dimensions.get('window').width;
 import MainBoxIcon from '../../assets/images/login/main_box_icon.svg';
 import AppleLogo from '../../assets/images/login/apple.svg';
 import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg'
-
-
-const signIn = (email, password, navigation, setIsSignedIn) => {
-
-}
-
 
 const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
@@ -79,7 +72,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
                         <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}}>
-                            <AppText>이메일로 로그인</AppText>
+                            <Text>이메일로 로그인</Text>
                         </TouchableOpacity>
                         <AppText style={{marginRight: 29, color: '#929292'}}>|</AppText>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')}>

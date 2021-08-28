@@ -1,7 +1,8 @@
 import React, {useState} from "react";
-import {StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
+import {StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
+import AppText from "../../../components/AppText";
 import { useTheme } from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
@@ -113,9 +114,9 @@ const GetNicknameTab = ({route, authNavigation}) => {
                 </ProgressBar>
                 <Form>
                     <View>
-                        <Text style={styles.title_text}><Text
-                            style={{fontWeight: 'bold'}}>닉네임</Text><Text>을</Text></Text>
-                        <Text style={styles.title_text}>설정해주세요</Text>
+                        <AppText style={styles.title_text}><AppText
+                            style={{fontWeight: 'bold'}}>닉네임</AppText><AppText>을</AppText></AppText>
+                        <AppText style={styles.title_text}>설정해주세요</AppText>
                     </View>
                     <InputBox
                         placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
@@ -131,7 +132,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={nickname ? false : true}
                 >
-                    <Text style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>가입완료</Text>
+                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>가입완료</AppText>
                 </TouchableOpacity>
             </View>
         </>

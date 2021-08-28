@@ -22,7 +22,7 @@ import {View, Platform} from "react-native";
 
 const ScreenContainerView = (props) => {
     return (
-        <View style={{marginHorizontal: 20, ...props.style}} flex={props.flex}>
+        <View style={{...props.style, marginHorizontal: 20}} flex={props.flex}>
             {props.children}
         </View>
     )

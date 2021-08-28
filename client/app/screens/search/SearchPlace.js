@@ -3,6 +3,7 @@ import {Image, Text, TouchableOpacity, View, StyleSheet} from "react-native";
 import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg'
 import Jewel from '../../assets/images/jewel.svg'
+import AppText from "../../components/AppText";
 
 const SearchPlace = (props) => {
     const {colors} = useTheme();
@@ -30,13 +31,13 @@ const SearchPlace = (props) => {
                 <Image source={require('../../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
                 <View flex={1} style={styles.info_container}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
-                        <Text style={{fontSize: 10, color: colors.mainColor}}>음식점</Text>
+                        <AppText style={{fontSize: 10, color: colors.mainColor}}>음식점</AppText>
                         <View style={styles.score_line}></View>
                         <Star width={14} height={14}/>
-                        <Text style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</Text>
+                        <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</AppText>
                     </View>
-                    <Text style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{props.name}</Text>
-                    <Text style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{props.address}</Text>
+                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{props.name}</AppText>
+                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{props.address}</AppText>
                 </View>
                 <TouchableOpacity onPress={() => setLike(likeState => !likeState)}>
                     <Jewel width={26} height={21} style={{color: like ? colors.red[3] : colors.red_gray[5]}}/>
