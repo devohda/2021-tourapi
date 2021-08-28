@@ -45,8 +45,9 @@ const AppText = (props) => {
         <Text {...props}
               style={{
                   ...props.style,
-                  fontFamily: fontFamily
-              }}>{props.children}</Text>
+                  fontFamily: fontFamily,
+              }}>{props.children}
+        </Text>
     )
 }
 

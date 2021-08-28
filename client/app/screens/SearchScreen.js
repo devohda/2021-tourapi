@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {View, Text, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from "react-native";
+import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 import {useTheme} from '@react-navigation/native';
 import NavigationTop from "../components/NavigationTop";
@@ -8,6 +8,7 @@ import ScreenContainerView from "../components/ScreenContainerView";
 import SearchTabNavigator from "../navigation/SearchTabNavigator";
 import ScreenDivideLine from "../components/ScreenDivideLine";
 import Star from "../assets/images/search/star.svg";
+import AppText from "../components/AppText";
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -47,13 +48,13 @@ const SearchScreen = ({navigation}) => {
                        style={{width: 141, height: 101, borderRadius: 10}}/>
                 <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
-                        <Text style={{fontSize: 10, color: colors.mainColor}}>음식점</Text>
+                        <AppText style={{fontSize: 10, color: colors.mainColor}}>음식점</AppText>
                         <View style={styles.score_line}></View>
                         <Star width={14} height={14}/>
-                        <Text style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</Text>
+                        <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</AppText>
                     </View>
-                    <Text style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{props.name}</Text>
-                    <Text style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{props.address}</Text>
+                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{props.name}</AppText>
+                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{props.address}</AppText>
                 </View>
             </View>
         )
@@ -85,14 +86,14 @@ const SearchScreen = ({navigation}) => {
                     <Image source={require('../assets/images/sea.jpeg')} style={{width: 81, height: 81}}/>
                 </View>
                 <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
-                    <Text style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
+                    <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
                         종로 25년 토박이가 알려주는 종로 사진스팟
-                    </Text>
-                    <Text style={{flexDirection : 'row', fontSize : 10, color : colors.gray[5]}}>
-                        <Text># 힐링</Text>
-                        <Text># 뚜벅</Text>
-                        <Text># 여유</Text>
-                    </Text>
+                    </AppText>
+                    <AppText style={{flexDirection : 'row', fontSize : 10, color : colors.gray[5]}}>
+                        <AppText># 힐링</AppText>
+                        <AppText># 뚜벅</AppText>
+                        <AppText># 여유</AppText>
+                    </AppText>
                 </View>
             </View>
         )
@@ -118,9 +119,9 @@ const SearchScreen = ({navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginVertical: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
-                            <Text style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 공간</Text>
+                            <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 공간</AppText>
                             <View style={styles.ad_sticker}>
-                                <Text style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</Text>
+                                <AppText style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</AppText>
                             </View>
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -137,7 +138,7 @@ const SearchScreen = ({navigation}) => {
                     </View>
                     <View style={{marginVertical: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
-                            <Text style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 보관함</Text>
+                            <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 보관함</AppText>
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <RecommendedCollection/>

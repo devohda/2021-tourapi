@@ -1,10 +1,11 @@
 import React from "react";
-import {Text, View} from "react-native";
+import {View} from "react-native";
+import AppText from "../../components/AppText";
 
 const SearchUser = (props) => {
     return (
         <View>
-            <Text>SearchUser</Text>
+            <AppText>SearchUser</AppText>
         </View>
     )
 }
