@@ -95,7 +95,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: nickname ? colors.mainColor : colors.notClicked,
+            backgroundColor: nickname ? colors.mainColor : colors.gray[6],
             height: 48,
             borderRadius: 10,
             alignItems: 'center',

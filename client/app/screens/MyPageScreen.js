@@ -10,6 +10,26 @@ const MyPageScreen = () => {
     useEffect(() => {
         getCollections();
     },[]);
+
+    const styles = StyleSheet.create({
+        myPageHashtag : {
+            borderWidth: 1,
+            borderRadius: 12,
+            paddingVertical: 2,
+            paddingHorizontal: 5,
+            marginRight: 10,
+            shadowColor: colors.red[8],
+            shadowOffset: {width: 0, height: 1},
+            shadowOpacity: 0.1,
+            elevation: 1,
+        },
+    
+        myPageHashtagText: {
+            fontSize: 12,
+            textAlign: 'center',
+        }
+    })
+
     const [DATA, useDATA] = useState({
         user_email: '',
         user_nickname: '',
@@ -67,8 +87,8 @@ const MyPageScreen = () => {
                     <View style={Platform.OS === 'ios' && {marginTop: 5}}>
                         <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: colors.mainColor}}>{DATA.user_nickname}</Text>
                         <View style={{flexDirection: 'row', marginTop: Platform.OS === 'ios' ? 8 : 3}}>
-                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.hashTagColor}]}>#조용한</Text></View>
-                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.hashTagColor}]}>#따뜻한</Text></View>
+                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#조용한</Text></View>
+                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#따뜻한</Text></View>
                         </View>
                     </View>
                 </View>
@@ -77,24 +97,5 @@ const MyPageScreen = () => {
         </ScreenContainer>
     )
 };
-
-const styles = StyleSheet.create({
-    myPageHashtag : {
-        borderWidth: 1,
-        borderRadius: 12,
-        paddingVertical: 2,
-        paddingHorizontal: 5,
-        marginRight: 10,
-        shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.1,
-        elevation: 1,
-    },
-
-    myPageHashtagText: {
-        fontSize: 12,
-        textAlign: 'center',
-    }
-})
 
 export default MyPageScreen;

@@ -57,7 +57,7 @@ function Like() {
                             <Text style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold', lineHeight: 28.8}}>{item.like_title}</Text>
                         </View>
                         <View>
-                            <Text style={{color: colors.detailSubTextColor, fontSize: 12, lineHeight: 19.2}}>{item.like_location}</Text>
+                            <Text style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>{item.like_location}</Text>
                         </View>
                     </View>
                 </View>
@@ -77,7 +77,7 @@ function Like() {
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
                         <Text style={{color: colors.mainColor}}>필터</Text>
                     </View>
-                    <View style={{marginHorizontal: 10}}><Text style={{color: colors.subColor}}>|</Text></View>
+                    <View style={{marginHorizontal: 10}}><Text style={{color: colors.gray[5]}}>|</Text></View>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
                         <Text style={{color: colors.mainColor}}>편집</Text>
@@ -170,8 +170,8 @@ function Collection() {
         <View style={styles.directoryContainer}>
             <View style={{height: '68%'}}>
                 <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
-                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.emphasizedColor}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
-                    {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock.png')}></Image></View>}
+                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.red[3]}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock_outline.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
@@ -179,19 +179,19 @@ function Collection() {
                 <Text style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</Text>
                 <View style={{flexDirection: 'row', marginBottom: 18}}>
                     {item.collection_keywords.split(',').map((word, idx) =>(
-                        (idx <= word.length) && <Text key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</Text>
+                        (idx <= word.length) && <Text key={idx} style={{color: colors.gray[2], fontSize: 10, marginEnd: 6.21}}># {word}</Text>
                     ))}
                 </View>
                 <View style={{flexDirection: 'row'}}>
                     <Text style={{fontSize: 8, width: '60%'}}>by minsun</Text>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
                         <Image source={require('../assets/images/here_icon.png')} style={{width: 8, height: 8, margin: 2}}></Image>
-                        <Text style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</Text>
+                        <Text style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>1.2k</Text>
                     </View>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
-                        <Icon type="ionicon" name={"location"} size={8} color={colors.hashTagColor}
+                        <Icon type="ionicon" name={"location"} size={8} color={colors.gray[2]}
                             style={{margin: 2}}></Icon>
-                        <Text style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</Text>
+                        <Text style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>9</Text>
                     </View>
                 </View>
             </View>
@@ -226,10 +226,10 @@ function Collection() {
                                 setSelectedDirType(newArr[type.id-1].name)
                                 getCollectionsFromUsers(type.id)
                             }
-                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.shadowColor}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.shadowColor}]}
+                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.red[7]}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[7]}]}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
-                            <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</Text>
+                            <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.gray[5]}]}>{type.name}</Text>
                 </TouchableOpacity>                     
             </View>
         )
@@ -256,7 +256,7 @@ function Collection() {
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
                             <Text style={{color: colors.mainColor}}>필터</Text>
                         </View>
-                        <View style={{marginHorizontal: 10}}><Text style={{color: colors.subColor}}>|</Text></View>
+                        <View style={{marginHorizontal: 10}}><Text style={{color: colors.gray[5]}}>|</Text></View>
                         <View style={{flexDirection: 'row'}}>
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
                             <Text style={{color: colors.mainColor}}>편집</Text>
@@ -287,7 +287,7 @@ const MypageNavigation = () => {
                     textAlign: 'center',
                 },
                 tabBarIndicatorStyle: {
-                    backgroundColor: colors.emphasizedColor,
+                    backgroundColor: colors.red[3],
                     height: 2,
                     width: Dimensions.get('screen').width/6 * 0.9,
                     marginLeft: Dimensions.get('screen').width/6 * 0.9
@@ -298,7 +298,7 @@ const MypageNavigation = () => {
                     height: 40,
                 },
                 tabBarActiveTintColor: colors.mainColor,
-                tabBarInactiveTintColor: colors.notClickedDirColor,
+                tabBarInactiveTintColor: colors.gray[3],
             }}
             style={{paddingBottom: 15, paddingHorizontal: 20}}
         >

@@ -30,7 +30,7 @@ const Star = (props) => {
         <View style={{flexDirection: 'row', justifyContent : 'center', alignItems : 'center'}}>
             {star.map((iconName, idx) =>
                 <View key={idx} style={{marginHorizontal : 2}}>
-                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? colors.red_gray[4] : colors.emphasizedColor}></FIcon>
+                    <FIcon name={iconName} size={props.starSize} color={iconName == 'star-o' ? colors.red_gray[4] : colors.red[3]}></FIcon>
                 </View>)}
         </View>
     )

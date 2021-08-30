@@ -25,7 +25,7 @@ const SearchTabNavigator = (props) => {
                 const textWidth = route.name.length * 12 + 5;
 
                 return ({
-                    tabBarActiveTintColor: colors.blue[2],
+                    tabBarActiveTintColor: colors.mainColor,
                     tabBarInactiveTintColor: colors.gray[5],
                     tabBarLabelStyle: {fontSize: 16, fontWeight: '700'},
                     tabBarStyle: {

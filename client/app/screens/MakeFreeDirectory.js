@@ -21,6 +21,74 @@ import ScreenDivideLine from "../components/ScreenDivideLine";
 export const navigationRef = React.createRef();
 
 const MakeFreeDirectory = ({navigation}) => {
+
+    const {colors} = useTheme();
+
+    const styles = StyleSheet.create({
+        plusComplete: {
+            marginBottom: '5%'
+        },
+        selectType: {
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12,
+            marginRight: 10,
+            shadowColor: colors.red[8],
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.2,
+            elevation: 1,
+            width: 58, height: 28,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        selectTypeClicked: {
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12,
+            marginRight: 10,
+            shadowColor: colors.red[8],
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.2,
+            elevation: 1,
+            width: 58, height: 28,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        selectTypeTextClicked: {
+            fontSize: 14,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            fontWeight: 'bold',
+            marginVertical: 2
+        },
+        selectTypeText: {
+            fontSize: 14,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            fontWeight: 'bold',
+            marginVertical: 2
+        },
+        selectTypeIcon: {
+            backgroundColor: 'rgb(141, 141, 141)',
+            borderColor: 'black',
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12
+        },
+        selectTypeIconDetail: {
+            paddingVertical: 1,
+            borderRadius: 12
+        },
+        defaultImage: {
+            backgroundColor: '#c4c4c4',
+            width: 287,
+            height: 243,
+        }
+    });
+
     //자유보관함이므로 type === 0
     //TODO 키워드 어떻게 받지
     const toastRef = useRef();
@@ -34,7 +102,6 @@ const MakeFreeDirectory = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
-    const {colors} = useTheme();
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
@@ -96,7 +163,7 @@ const MakeFreeDirectory = ({navigation}) => {
                     backgroundColor: colors.mainColor
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <Text
-                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.notClicked}]}>{keyword.keyword_title}</Text>
+                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.gray[6]}]}>{keyword.keyword_title}</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -186,7 +253,7 @@ const MakeFreeDirectory = ({navigation}) => {
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
                             <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
-                            <Text style={{fontSize: 12, color: '#BABFC8', alignSelf: 'center', marginLeft: 9}}>* 최대
+                            <Text style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대
                                 3개</Text>
                         </View>
                         <View style={{
@@ -206,7 +273,7 @@ const MakeFreeDirectory = ({navigation}) => {
                                         return [...addedKeywords, {keyword: '추가됨'}]
                                     })
                                 }}/> */}
-                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.notClicked}]} ></Icon></TouchableOpacity></View> */}
+                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.gray[6]}]} ></Icon></TouchableOpacity></View> */}
                             </View>
                         </View>
                     </View>
@@ -229,9 +296,9 @@ const MakeFreeDirectory = ({navigation}) => {
                     }}>
                         <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
                         <Switch
-                            trackColor={{false: colors.notClicked, true: colors.mainColor}}
+                            trackColor={{false: colors.gray[6], true: colors.mainColor}}
                             thumbColor={colors.defaultColor}
-                            ios_backgroundColor={colors.notClicked}
+                            ios_backgroundColor={colors.gray[6]}
                             onValueChange={toggleSwitch}
                             value={isEnabled}
                         />
@@ -270,70 +337,5 @@ const MakeFreeDirectory = ({navigation}) => {
     )
 
 }
-
-const styles = StyleSheet.create({
-    plusComplete: {
-        marginBottom: '5%'
-    },
-    selectType: {
-        borderWidth: 1,
-        paddingVertical: 1,
-        paddingHorizontal: 8.5,
-        borderRadius: 12,
-        marginRight: 10,
-        shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.2,
-        elevation: 1,
-        width: 58, height: 28,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    selectTypeClicked: {
-        borderWidth: 1,
-        paddingVertical: 1,
-        paddingHorizontal: 8.5,
-        borderRadius: 12,
-        marginRight: 10,
-        shadowColor: '#470000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.2,
-        elevation: 1,
-        width: 58, height: 28,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    selectTypeTextClicked: {
-        fontSize: 14,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        fontWeight: 'bold',
-        marginVertical: 2
-    },
-    selectTypeText: {
-        fontSize: 14,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        fontWeight: 'bold',
-        marginVertical: 2
-    },
-    selectTypeIcon: {
-        backgroundColor: 'rgb(141, 141, 141)',
-        borderColor: 'black',
-        borderWidth: 1,
-        paddingVertical: 1,
-        paddingHorizontal: 8.5,
-        borderRadius: 12
-    },
-    selectTypeIconDetail: {
-        paddingVertical: 1,
-        borderRadius: 12
-    },
-    defaultImage: {
-        backgroundColor: '#c4c4c4',
-        width: 287,
-        height: 243,
-    }
-});
 
 export default MakeFreeDirectory;

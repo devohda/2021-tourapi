@@ -86,7 +86,7 @@ const GetEmailTab = ({navigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: email ? colors.mainColor : colors.notClicked,
+            backgroundColor: email ? colors.mainColor : colors.gray[6],
             height: 48,
             borderRadius: 10,
             alignItems: 'center',

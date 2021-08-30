@@ -24,7 +24,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     const [password, setPassword] = useState(null)
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
 
-    const {colors} = useTheme()
+    const { colors } = useTheme()
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -52,19 +52,19 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                     <View style={{alignItems : 'center'}}>
                         <TouchableOpacity
                             style={{
-                                backgroundColor: '#FEE500',
+                                backgroundColor: colors.yellow[8],
                                 ...styles.socialLoginBtn
                             }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                         >
                             <View flexDirection="row" style={{alignItems : 'center'}}>
                                 <KakaotalkLogo />
-                                <Text style={{...styles.loginText, color: '#000'}}>카카오로 계속하기</Text>
+                                <Text style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로 계속하기</Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={{
-                                backgroundColor: '#000',
+                                backgroundColor: colors.defaultDarkColor,
                                 ...styles.socialLoginBtn
                             }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
@@ -79,7 +79,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}}>
                             <Text>이메일로 로그인</Text>
                         </TouchableOpacity>
-                        <Text style={{marginRight: 29, color: '#929292'}}>|</Text>
+                        <Text style={{marginRight: 29, color: colors.gray[8]}}>|</Text>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')}>
                             <Text>이메일 회원가입</Text>
                         </TouchableOpacity>
