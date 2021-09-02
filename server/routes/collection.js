@@ -10,12 +10,13 @@ router.post('/free', async (req, res, next) => {
 
     if (result) {
         return res.send({
-
+            code: 200,
+            'status': 'SUCCESS'
         })
     } else {
         return res.send({
-            code : 500,
-
+            code: 500,
+            'status': 'SERVER ERROR'
         })
     }
 })

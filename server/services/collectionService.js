@@ -33,3 +33,46 @@ exports.createCollectionFree = async (collectionData, userId, keywords) => {
         return result
     }
 }
+
+// 보관함 리스트 조회
+exports.selectCollectionList = async (keyword) => {
+
+    // TODO
+    //  - 좋아요
+    //  - 추가된 장소의 사진 가져오기
+
+    const conn = await db.pool.getConnection();
+    let result;
+    try {
+        const query1 = `SELECT collection_pk, collection_name, collection_type, user_nickname AS created_user_name
+                        FROM collections c
+                        INNER JOIN users u
+                        ON u.user_pk = c.user_pk 
+                        WHERE collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
+
+        const [result1] = await conn.query(query1);
+
+        result = await Promise.all(result1.map(async collection => {
+            const query2 = `SELECT keyword_title FROM keywords k
+                            LEFT OUTER JOIN keywords_collections_map kcm
+                            ON kcm.keyword_pk = k.keyword_pk
+                            WHERE kcm.collection_pk = ${collection.collection_pk}`
+            const [result2] = await conn.query(query2)
+
+            const keywords = result2.map(keyword => keyword.keyword_title)
+
+            return {
+                ...collection,
+                keywords
+            };
+        }))
+
+    } catch (err) {
+        console.error(err);
+    } finally {
+        conn.release();
+        return result
+    }
+
+    return result;
+}
