@@ -37,6 +37,10 @@ exports.createCollectionFree = async (collectionData, userId, keywords) => {
 // 보관함 리스트 조회
 exports.selectCollectionList = async (keyword) => {
 
+    // TODO
+    //  - 좋아요
+    //  - 추가된 장소의 사진 가져오기
+
     const conn = await db.pool.getConnection();
     let result;
     try {
