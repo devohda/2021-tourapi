@@ -122,7 +122,10 @@ const GetNicknameTab = ({route, authNavigation}) => {
                         placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
                         autoCapitalize="none"
                         style={{marginTop: 40}}
-                        onChangeText={(text) => setNickname(text)}
+                        onChangeText={(text) => {
+                            setNickname(text);
+                            console.log(nickname)
+                        }}
                     />
                 </Form>
             </View>

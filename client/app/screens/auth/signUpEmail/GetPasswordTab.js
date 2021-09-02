@@ -4,6 +4,7 @@ import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
 import AppText from "../../../components/AppText";
 import { useTheme } from '@react-navigation/native';
+import CustomTextInput from "../../../components/CustomTextInput";
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -29,13 +30,14 @@ const GetPasswordTab = ({route, navigation}) => {
     const {email} = route.params
     const [password, setPassword] = useState("");
     const { colors } = useTheme();
+    const [color, setColor] = useState(colors.gray[5]);
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+    const checkPassword = async () => {
+
+    }
 
     const checkIsValid = async () => {
-        if (password.length < 8) {
-            alert('비밀번호가 짧습니다.');
-            return 0;
-        }
-
         navigation.navigate('nicknameTab', {email, password})
     }
 
@@ -84,14 +86,40 @@ const GetPasswordTab = ({route, navigation}) => {
                             <AppText style={styles.title_text}>설정해주세요</AppText>
                         </View>
                     </AppText>
-                    <InputBox
+                    <CustomTextInput
                         placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
                         autoCapitalize="none"
                         password={true}
                         secureTextEntry={true}
-                        style={{marginTop: 40}}
-                        onChangeText={(text) => setPassword(text)}
+                        style={{
+                            marginTop : 40,
+                            fontSize: 16,
+                            borderBottomWidth: 1,
+                            borderBottomColor: color,
+                            marginBottom: 6,
+                            paddingBottom: 11
+                        }}
+                        onChangeText={async (text) => {
+                            if(text.length < 8 || text.length > 12) {
+                                setColor(colors.red[2]);
+                            }
+                            if(checkPassword(text)) {
+                                setColor(colors.red[2]);
+                            };
+                            if(text === '') setColor(colors.gray[5])   
+                            setPassword(text);
+                        }}
                     />
+                    <AppText style={{color: colors.red[2],
+                        display: password.length < 8 ? 'flex' : 'none'
+                    }}>
+                        비밀번호가 너무 짧아요. (8자 이상)
+                    </AppText>
+                    {/* <Text style={{color: colors.red[2],
+                        display: isEmailDuplicated ? 'flex' : 'none'
+                    }}>
+                        이미 사용중인 아이디예요.
+                    </Text> */}
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>

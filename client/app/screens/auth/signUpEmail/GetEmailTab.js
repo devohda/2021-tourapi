@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
+import {StyleSheet, TextInput, TouchableOpacity, View, Text} from "react-native";
 import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
 import CustomTextInput from "../../../components/CustomTextInput";
@@ -25,44 +25,36 @@ const InputBox = styled(TextInput)`
   paddingBottom: 11px;
 `
 
-const findSameEmail = async (email) => {
-    try {
-        const result = await fetch('http://34.146.140.88/auth/sameEmail', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({email})
-        }).then(res => res.json())
-            .then(response => {
-                return response.isDuplicated === true;
-            })
-            .catch(error => console.log(error));
-
-        return result
-    } catch (err) {
-        console.error(err);
-    }
-}
-
 const GetEmailTab = ({navigation}) => {
-    const [email, setEmail] = useState("");
     const { colors } = useTheme();
 
+    const [email, setEmail] = useState("");
+    const [isEmailDuplicated, setIsEmailDuplicated] = useState(undefined);
+    const [color, setColor] = useState(colors.gray[5]);
+    const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+    const findSameEmail = async (email) => {
+        try {
+            const result = await fetch('http://34.146.140.88/auth/sameEmail', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({email})
+            }).then(res => res.json())
+                .then(response => {
+                    setIsEmailDuplicated(response.isDuplicated === true);
+                    return response.isDuplicated === true;
+                })
+                .catch(error => console.log(error));
+            return result
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const checkIsValid = async () => {
-        const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-        if (!email.match(emailRegExp)) {
-            alert('Error');
-            return 0;
-        }
-
-        const isDuplicated = await findSameEmail(email)
-        if (isDuplicated) {
-            alert('이미 가입된 아이디입니다.');
-            return 0;
-        }
-
         navigation.navigate('passwordTab', {email})
     }
 
@@ -87,7 +79,7 @@ const GetEmailTab = ({navigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: email ? colors.mainColor : colors.gray[6],
+            backgroundColor: !email.match(emailRegExp) || isEmailDuplicated ? colors.gray[6] : colors.mainColor,
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -118,19 +110,40 @@ const GetEmailTab = ({navigation}) => {
                             marginTop : 40,
                             fontSize: 16,
                             borderBottomWidth: 1,
-                            borderBottomColor: '#C5C5C5',
-                            marginBottom: 38,
+                            borderBottomColor: color,
+                            marginBottom: 6,
                             paddingBottom: 11
                         }}
-                        onChangeText={(text) => setEmail(text)}
+                        onChangeText={async (text) => {
+                            await findSameEmail(text);
+                            if(!text.match(emailRegExp)) {
+                                setColor(colors.red[2]);
+                            }
+                            if(!isEmailDuplicated) {
+                                setColor(colors.red[2]);
+                            };
+                            if(text === '') setColor(colors.gray[5])   
+                            setEmail(text);
+                        }}
+
                     />
+                    <AppText style={{color: colors.red[2],
+                        display: email && !email.match(emailRegExp) ? 'flex' : 'none'
+                    }}>
+                        이메일 형식이 올바르지 않아요.
+                    </AppText>
+                    <AppText style={{color: colors.red[2],
+                        display: isEmailDuplicated ? 'flex' : 'none'
+                    }}>
+                        이미 사용중인 아이디예요.
+                    </AppText>
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
-                    disabled={email ? false : true}
+                    disabled={!email.match(emailRegExp) || isEmailDuplicated ? true : false}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>

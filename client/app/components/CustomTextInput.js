@@ -11,6 +11,7 @@ const CustomTextInput = (props) => {
                    onChangeText={props.onChangeText}
                    autoCapitalize="none"
                    autoCorrect={false}
+                   onFocus={props.onFocus}
         >
             {props.children}
         </TextInput>
