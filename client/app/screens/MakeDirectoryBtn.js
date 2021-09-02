@@ -12,9 +12,9 @@ export default function MakeDirectoryBtn({navigation}) {
     const { colors } = useTheme();
 
     return (
-        <View style={{justifyContent: 'flex-end', paddingBottom: '3%', width:'100%', height: '200%'}}>
+        <View style={{justifyContent: 'flex-end', width:'100%', height: '200%'}}>
         <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
-            <Image style={{alignSelf:'center', marginBottom: 3}} source={require('../assets/images/add_btn_nonclick.png')}></Image>
+            <Icon type="ionicon" name={"add-circle-outline"} size={36} color={colors.mainColor} iconStyle={Platform.OS === 'ios' ? {marginBottom: '5%'} : {marginBottom: '6%'}}></Icon>
                 <RBSheet
                     ref={refRBSheet}
                     closeOnDragDown={true}
@@ -24,7 +24,7 @@ export default function MakeDirectoryBtn({navigation}) {
                         backgroundColor: "rgba(0, 0, 0, 0.3)",
                     },
                     draggableIcon: {
-                        backgroundColor: "#000",
+                        backgroundColor: colors.defaultDarkColor,
                         display: 'none'
                     },
                     container: {
@@ -34,17 +34,17 @@ export default function MakeDirectoryBtn({navigation}) {
                     }
                     }}
                 >
-               <View style={{paddingTop: '5%', backgroundColor: colors.backgroundColor}}>
+               <View style={{paddingTop: '5%', backgroundColor: colors.yellow[7]}}>
                     <View style={{flexDirection: 'row'}}>
                         <AppText style={{fontSize: 18, fontWeight: 'bold', marginLeft: '5%', marginTop: '1%', color: colors.mainColor}}>보관함 만들기</AppText>
-                        <TouchableOpacity onPress={() => {refRBSheet.current.close()}} style={{marginLeft: '58%'}}><Icon type="ionicon" name={"close"}></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => {refRBSheet.current.close()}} style={{marginLeft: '58%', color: colors.mainColor}}><Icon type="ionicon" name={"close"}></Icon></TouchableOpacity>
                     </View>
                     <View style={{alignItems : "center", justifyContent : "center", marginTop: '1%'}}>
-                        <TouchableOpacity style={{backgroundColor: colors.linkColor, width: '90%', height: 72, borderRadius: 10, margin: 10}}>
+                        <TouchableOpacity style={{backgroundColor: colors.blue[3], width: '90%', height: 72, borderRadius: 10, margin: 10}}>
                             <AppText style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: colors.backgroundColor}}>일정 보관함</AppText>
                             <AppText style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: colors.backgroundColor}}>공간을 시간 순서대로 보관할 수 있어요</AppText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{backgroundColor: colors.linkColor, width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory'); navigation.setOptions({tabBarVisible: false})}}>
+                        <TouchableOpacity style={{backgroundColor: colors.blue[3], width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory'); navigation.setOptions({tabBarVisible: false})}}>
                             <AppText style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: colors.backgroundColor}}>자유 보관함</AppText>
                             <AppText style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: colors.backgroundColor}}>순서 상관없이 자유롭게 공간을 보관할 수 있어요</AppText>
                         </TouchableOpacity>

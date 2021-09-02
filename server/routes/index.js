@@ -6,6 +6,7 @@ const collectionRouter = require('./collection');
 const authRouter = require('./auth');
 const keywordRouter = require('./keywords');
 const userRouter = require('./users');
+const likeRouter = require('./likes');
 const tourApiRouter = require('./tourApi');
 
 
@@ -14,6 +15,7 @@ router.use('/collection', collectionRouter);
 router.use('/auth', authRouter);
 router.use('/user', userRouter);
 router.use('/keyword', keywordRouter);
+router.use('/like', likeRouter);
 router.use('/tourapi', tourApiRouter);
 
 module.exports = router;
