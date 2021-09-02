@@ -3,6 +3,7 @@ import {Platform, View, Text, TextInput, Image, ScrollView, Dimensions, StyleShe
 import ScreenContainer from "../components/ScreenContainer";
 import MyTabs from "../navigation/MypageNavigator";
 import { useTheme } from '@react-navigation/native';
+import AppText from "../components/AppText";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -85,10 +86,10 @@ const MyPageScreen = () => {
                         ></Image>
                     </View>
                     <View style={Platform.OS === 'ios' && {marginTop: 5}}>
-                        <Text style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: colors.mainColor}}>{DATA.user_nickname}</Text>
+                        <AppText style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: colors.mainColor}}>{DATA.user_nickname}</AppText>
                         <View style={{flexDirection: 'row', marginTop: Platform.OS === 'ios' ? 8 : 3}}>
-                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#조용한</Text></View>
-                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><Text style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#따뜻한</Text></View>
+                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><AppText style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#조용한</AppText></View>
+                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><AppText style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#따뜻한</AppText></View>
                         </View>
                     </View>
                 </View>

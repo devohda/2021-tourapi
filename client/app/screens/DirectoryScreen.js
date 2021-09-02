@@ -1,9 +1,11 @@
 import React, {useRef} from 'react';
-import {Text, View, TouchableOpacity} from "react-native";
+import { useTheme } from '@react-navigation/native';
+
+import {View, TouchableOpacity} from "react-native";
 import {Icon} from "react-native-elements";
 import RBSheet from "react-native-raw-bottom-sheet";
 import MakeDirectoryBtn from './MakeDirectoryBtn';
-import { useTheme } from '@react-navigation/native';
+import AppText from "../components/AppText";
 
 export default function DirectoryScreen() {
     const refRBSheet = useRef();

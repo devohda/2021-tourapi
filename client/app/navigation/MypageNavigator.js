@@ -69,18 +69,18 @@ function Like() {
         <View flex={1} backgroundColor={colors.backgroundColor}>
             <View style={{flexDirection: 'row', width: '90%', justifyContent: 'space-between', marginTop: 16, paddingBottom: 17}}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: colors.mainColor}}>최근 추가순</Text>
+                    <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
                     <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                 </View>
                 <View style={{flexDirection: 'row'}}>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                        <Text style={{color: colors.mainColor}}>필터</Text>
+                        <AppText style={{color: colors.mainColor}}>필터</AppText>
                     </View>
                     <View style={{marginHorizontal: 10}}><Text style={{color: colors.gray[5]}}>|</Text></View>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                        <Text style={{color: colors.mainColor}}>편집</Text>
+                        <AppText style={{color: colors.mainColor}}>편집</AppText>
                     </View>
                 </View>
             </View>
@@ -176,22 +176,22 @@ function Collection() {
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
             <View style={{marginLeft: 10}}>
-                <Text style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</Text>
+                <AppText style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</AppText>
                 <View style={{flexDirection: 'row', marginBottom: 18}}>
                     {item.collection_keywords.split(',').map((word, idx) =>(
-                        (idx <= word.length) && <Text key={idx} style={{color: colors.gray[2], fontSize: 10, marginEnd: 6.21}}># {word}</Text>
+                        (idx <= word.length) && <AppText key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</AppText>
                     ))}
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{fontSize: 8, width: '60%'}}>by minsun</Text>
+                    <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
                         <Image source={require('../assets/images/here_icon.png')} style={{width: 8, height: 8, margin: 2}}></Image>
-                        <Text style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>1.2k</Text>
+                        <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
                     </View>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
                         <Icon type="ionicon" name={"location"} size={8} color={colors.gray[2]}
                             style={{margin: 2}}></Icon>
-                        <Text style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>9</Text>
+                        <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</AppText>
                     </View>
                 </View>
             </View>
@@ -229,7 +229,7 @@ function Collection() {
                             }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.red[7]}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[7]}]}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
-                            <Text style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.gray[5]}]}>{type.name}</Text>
+                            <AppText style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</AppText>
                 </TouchableOpacity>                     
             </View>
         )
@@ -248,23 +248,23 @@ function Collection() {
 
                 <View style={{flexDirection: 'row', width: '90%', justifyContent: 'space-between'}}>
                     <View style={{flexDirection: 'row'}}>
-                        <Text style={{color: colors.mainColor}}>최근 추가순</Text>
+                        <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
                         <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon" name={"chevron-down-outline"} size={16}></Icon>
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <View style={{flexDirection: 'row'}}>
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
-                            <Text style={{color: colors.mainColor}}>필터</Text>
+                            <AppText style={{color: colors.mainColor}}>필터</AppText>
                         </View>
-                        <View style={{marginHorizontal: 10}}><Text style={{color: colors.gray[5]}}>|</Text></View>
+                        <View style={{marginHorizontal: 10}}><AppText style={{color: colors.subColor}}>|</AppText></View>
                         <View style={{flexDirection: 'row'}}>
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
-                            <Text style={{color: colors.mainColor}}>편집</Text>
+                            <AppText style={{color: colors.mainColor}}>편집</AppText>
                         </View>
                     </View>
                 </View>
             <View style={{marginVertical: '2.5%'}}>
-                <Text style={{color: colors.mainColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</Text>
+                <AppText style={{color: colors.mainColor, fontSize: 18, fontWeight: 'bold', marginTop: 5}}>{selectedDirType}</AppText>
             </View>
             <ScrollView horizontal={true} scrollEnabled={false}>
                 <SafeAreaView>

@@ -1194,6 +1194,7 @@
     xcode "^3.0.1"
     xml2js "^0.4.23"
 
+<<<<<<< HEAD
 "@expo/config-plugins@2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-2.0.4.tgz#955fd70a2aeefbe99ec71cecb1d7ea7b626dc79e"
@@ -1202,6 +1203,17 @@
     "@expo/config-types" "^41.0.0"
     "@expo/json-file" "8.2.30"
     "@expo/plist" "0.0.13"
+=======
+"@expo/config-plugins@3.1.0", "@expo/config-plugins@^3.0.7":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-3.1.0.tgz#0752ff33c5eab21cf42034a44e79df97f0f867f8"
+  integrity sha512-V5qxaxCAExBM0TXmbU1QKiZcAGP3ecu7KXede8vByT15cro5PkcWu2sSdJCYbHQ/gw6Vf/i8sr8gKlN8V8TSLg==
+  dependencies:
+    "@expo/config-types" "^42.0.0"
+    "@expo/json-file" "8.2.33"
+    "@expo/plist" "0.0.14"
+    chalk "^4.1.2"
+>>>>>>> bbf975912eb4cd88b15ce98a1a2aea2ab3d943e3
     debug "^4.3.1"
     find-up "~5.0.0"
     fs-extra "9.0.0"
@@ -6344,6 +6356,7 @@ react-native-mail@^6.1.0:
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/react-native-mail/-/react-native-mail-6.1.1.tgz#f1b1f8034c84d2510a93e4a2a795f0db5a13595e"
   integrity sha512-pTs180wwyh7hN/iyTC9SfOX579U4YhDlHOLxi47IGvhPJENqO/QFdBq+wWKxyhNqdQuVSy+LoeIxLreWnIeYmg==
+<<<<<<< HEAD
 
 react-native-maps@^0.28.0:
   version "0.28.0"
@@ -6351,6 +6364,8 @@ react-native-maps@^0.28.0:
   integrity sha512-F+k5ZT9hhl+iXR1H+5ZcoHOEB5lPu9gCIwtA4lI/LoI9nfa9xFvr1vMiLIv44jzeGNzbE3+/R81IpcNDMJ5uDg==
   dependencies:
     "@types/geojson" "^7946.0.7"
+=======
+>>>>>>> bbf975912eb4cd88b15ce98a1a2aea2ab3d943e3
 
 react-native-measure-text@^1.0.0-alpha.2:
   version "1.0.0-alpha.2"

@@ -1,9 +1,7 @@
 import React, {useEffect, useState, useRef, useCallback, useContext} from 'react';
 import {
-    Text,
     View,
     StyleSheet,
-    TextInput,
     Image,
     TouchableOpacity,
     Switch,
@@ -17,6 +15,7 @@ import NavigationTop from "../components/NavigationTop";
 import {useTheme} from '@react-navigation/native';
 import CustomTextInput from "../components/CustomTextInput";
 import ScreenDivideLine from "../components/ScreenDivideLine";
+import AppText from "../components/AppText";
 
 export const navigationRef = React.createRef();
 
@@ -162,8 +161,8 @@ const MakeFreeDirectory = ({navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
-                    <Text
-                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.gray[6]}]}>{keyword.keyword_title}</Text>
+                    <AppText
+                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.gray[6]}]}>{keyword.keyword_title}</AppText>
                 </TouchableOpacity>
             </View>
         )
@@ -252,9 +251,9 @@ const MakeFreeDirectory = ({navigation}) => {
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</Text>
-                            <Text style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대
-                                3개</Text>
+                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</AppText>
+                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대
+                                3개</AppText>
                         </View>
                         <View style={{
                             flexDirection: 'row',
@@ -278,7 +277,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         </View>
                     </View>
                     {/* <View style={{marginTop: 37, left: 24}}>
-                        <Text style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</Text>
+                        <AppText style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</AppText>
                         <View style={{flexDirection: 'row', marginTop: 16}}>
                             <SafeAreaView>
                                 <FlatList data={users} renderItem={showUsers} keyExtractor={(item) => item.id}
@@ -294,7 +293,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         alignItems: 'center',
                         justifyContent: 'space-between'
                     }}>
-                        <Text style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</Text>
+                        <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>비공개 설정</AppText>
                         <Switch
                             trackColor={{false: colors.gray[6], true: colors.mainColor}}
                             thumbColor={colors.defaultColor}
@@ -320,7 +319,7 @@ const MakeFreeDirectory = ({navigation}) => {
                                 }
                             }}
                             disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
-                        ><Text
+                        ><AppText
                             style={{
                                 textAlign: 'center',
                                 padding: 14,
@@ -328,7 +327,7 @@ const MakeFreeDirectory = ({navigation}) => {
                                 color: colors.defaultColor,
                                 fontWeight: 'bold'
                             }}
-                        >보관함 만들기</Text>
+                        >보관함 만들기</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>

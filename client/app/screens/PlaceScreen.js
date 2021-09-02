@@ -9,6 +9,18 @@ import NavigationTop from "../components/NavigationTop";
 import Score from "../components/Score";
 import Time from "../components/Time";
 import Facility from "../components/Facility";
+import styled, {css} from 'styled-components/native';
+
+import ScreenContainer from "../components/ScreenContainer";
+import Star from "../components/Star";
+import ScreenContainerView from "../components/ScreenContainerView";
+import ScreenDivideLine from "../components/ScreenDivideLine";
+import AppText from "../components/AppText";
+
+import LocationIcon from "../assets/images/place/location-icon.svg"
+import PhoneIcon from "../assets/images/place/phone-icon.svg"
+import TimeIcon from "../assets/images/place/time-icon.svg"
+import WebsiteIcon from "../assets/images/place/website-icon.svg"
 
 const PlaceScreen = ({navigation}) => {
     const refRBSheet = useRef();
