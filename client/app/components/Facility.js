@@ -1,6 +1,7 @@
 import React from "react";
 import {View, Text} from "react-native";
 import { useTheme } from "@react-navigation/native";
+import AppText from "./AppText";
 
 const Facility = (props) => {
     const { colors } = useTheme();
@@ -17,7 +18,7 @@ const Facility = (props) => {
             paddingHorizontal: 10,
             marginRight: 10,
         }}>
-            <Text style={{fontSize: 14}}>{props.name}</Text>
+            <AppText style={{fontSize: 14}}>{props.name}</AppText>
         </View>
     )
 };

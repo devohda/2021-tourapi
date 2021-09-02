@@ -54,7 +54,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         >
                             <View flexDirection="row" style={{alignItems : 'center'}}>
                                 <KakaotalkLogo />
-                                <Text style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로 계속하기</Text>
+                                <AppText style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로 계속하기</AppText>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -72,9 +72,9 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
                         <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}}>
-                            <Text>이메일로 로그인</Text>
+                            <AppText>이메일로 로그인</AppText>
                         </TouchableOpacity>
-                        <Text style={{marginRight: 29, color: colors.gray[8]}}>|</Text>
+                        <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')}>
                             <AppText>이메일 회원가입</AppText>
                         </TouchableOpacity>

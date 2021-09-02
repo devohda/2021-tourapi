@@ -16,6 +16,7 @@ import {useTheme} from '@react-navigation/native';
 import CustomTextInput from "../components/CustomTextInput";
 import ScreenDivideLine from "../components/ScreenDivideLine";
 import AppText from "../components/AppText";
+import {useIsUserData} from "../contexts/UserDataContextProvider";
 
 export const navigationRef = React.createRef();
 
@@ -34,8 +35,8 @@ const MakeFreeDirectory = ({navigation}) => {
             borderRadius: 12,
             marginRight: 10,
             shadowColor: colors.red[8],
-            shadowOffset: {width: 0, height: 2},
-            shadowOpacity: 0.2,
+            shadowOffset: {width: 0, height: 1},
+            shadowOpacity: 0.1,
             elevation: 1,
             width: 58, height: 28,
             alignItems: 'center',
@@ -48,14 +49,15 @@ const MakeFreeDirectory = ({navigation}) => {
             borderRadius: 12,
             marginRight: 10,
             shadowColor: colors.red[8],
-            shadowOffset: {width: 0, height: 2},
-            shadowOpacity: 0.2,
+            shadowOffset: {width: 0, height: 1},
+            shadowOpacity: 0.1,
             elevation: 1,
             width: 58, height: 28,
             alignItems: 'center',
             justifyContent: 'center'
         },
         selectTypeTextClicked: {
+            color : colors.defaultColor,
             fontSize: 14,
             textAlign: 'center',
             textAlignVertical: 'center',
@@ -63,6 +65,7 @@ const MakeFreeDirectory = ({navigation}) => {
             marginVertical: 2
         },
         selectTypeText: {
+            color: colors.gray[6],
             fontSize: 14,
             textAlign: 'center',
             textAlignVertical: 'center',
@@ -101,35 +104,40 @@ const MakeFreeDirectory = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
+    const [userData, setUserData] = useIsUserData();
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
-        var datas = '';
+        var datas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
-                datas = datas.concat(keywordData[i].keyword_title + ',')
+                datas.push(keywordData[i].keyword_title)
             }
         }
         try {
-            console.log(datas)
-            fetch('http://34.146.140.88/collections/collections_free', {
+            fetch('http://192.168.0.11:3000/collection/free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    collection_name: collectionName,
-                    collection_private: (isEnabled === true) ? 1 : 0,
-                    collection_keywords: datas,
-                    collection_type: 1,
+                    collectionData : {
+                        name: collectionName,
+                        private: 0,
+                        description: null,
+                    },
+                    userId : userData.user_pk,
+                    keywords: datas
                 })
             }).then((res) => res.text())
                 .then((responsedata) => {
-                    // console.log(responsedata)
+                    console.log(responsedata)
+                    Alert.alert('', '자유보관함이 생성되었습니다')
                 })
                 .catch((err) => {
                     console.error(err)
+                    Alert.alert('', '자유보관함 생성에 실패했습니다')
                 });
 
         } catch (err) {
@@ -162,7 +170,7 @@ const MakeFreeDirectory = ({navigation}) => {
                     backgroundColor: colors.mainColor
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
                     <AppText
-                        style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color: colors.gray[6]}]}>{keyword.keyword_title}</AppText>
+                        style={isPress[keyword.keyword_pk - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{keyword.keyword_title}</AppText>
                 </TouchableOpacity>
             </View>
         )
@@ -241,7 +249,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName && {color: colors.mainColor}, {fontSize: 20}]}
+                            style={[collectionName ? {color: colors.mainColor, fontSize: 20, fontWeight: 'bold'} : {fontSize: 20}]}
                             placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>
@@ -315,7 +323,6 @@ const MakeFreeDirectory = ({navigation}) => {
                                     postCollections();
                                     navigation.setOptions({tabBarVisible: true});
                                     navigation.goBack(null);
-                                    Alert.alert('', '자유보관함이 생성되었습니다')
                                 }
                             }}
                             disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}

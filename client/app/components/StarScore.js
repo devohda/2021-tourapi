@@ -1,6 +1,7 @@
 import React from "react";
 import {View, Text, StyleSheet} from "react-native";
 import Star from "./Star";
+import AppText from "./AppText";
 
 const StarScore = (props) => {
 

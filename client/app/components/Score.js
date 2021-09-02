@@ -1,19 +1,19 @@
 import React from "react";
 import {View, Text} from "react-native";
+import AppText from "./AppText";
 
 const Score = (props) => {
     return (
-        // <View flexDirection="row" style={{marginVertical: 8, alignItems: 'center'}}>
         <View style={{marginVertical: 8, alignItems: 'center'}}>
             <View width={70}>
-                <Text style={{
+                <AppText style={{
                     fontWeight: 'bold',
                     fontSize: props.fontSize,
                     color: props.color,
                     textAlign: props.textAlign,
                     marginBottom: props.marginBottom,
                     color: props.textColor,
-                }}>{props.name}</Text>
+                }}>{props.name}</AppText>
             </View>
             {props.children}
         </View>

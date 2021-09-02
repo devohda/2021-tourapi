@@ -12,6 +12,8 @@ const MyPageScreen = () => {
         getCollections();
     },[]);
 
+    const { colors } = useTheme();
+
     const styles = StyleSheet.create({
         myPageHashtag : {
             borderWidth: 1,
@@ -26,6 +28,7 @@ const MyPageScreen = () => {
         },
     
         myPageHashtagText: {
+            color : colors.gray[2],
             fontSize: 12,
             textAlign: 'center',
         }
@@ -39,7 +42,6 @@ const MyPageScreen = () => {
         user_profileImage: '',
     });
     const [directoryData, setDirectoryData] = useState([]);
-    const { colors } = useTheme();
 
     const getCollections = () => {
         try {
@@ -88,8 +90,8 @@ const MyPageScreen = () => {
                     <View style={Platform.OS === 'ios' && {marginTop: 5}}>
                         <AppText style={{fontSize: 18, fontWeight: "bold", textAlign: 'center', color: colors.mainColor}}>{DATA.user_nickname}</AppText>
                         <View style={{flexDirection: 'row', marginTop: Platform.OS === 'ios' ? 8 : 3}}>
-                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><AppText style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#조용한</AppText></View>
-                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><AppText style={[styles.myPageHashtagText, {color : colors.gray[2]}]}>#따뜻한</AppText></View>
+                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><AppText style={styles.myPageHashtagText}>#조용한</AppText></View>
+                            <View style={[styles.myPageHashtag, {borderColor: colors.defaultColor, backgroundColor : colors.defaultColor}]}><AppText style={styles.myPageHashtagText}>#따뜻한</AppText></View>
                         </View>
                     </View>
                 </View>

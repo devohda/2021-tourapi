@@ -5,11 +5,101 @@ import OIcon from 'react-native-vector-icons/Octicons'
 import React, {useEffect, useState, useContext} from "react";
 import { Icon } from 'react-native-elements';
 import { useTheme } from '@react-navigation/native';
+import AppText from '../components/AppText';
 
 const Tab = createMaterialTopTabNavigator();
 
 function Like() {
     const { colors } = useTheme();
+
+    const styles = StyleSheet.create({
+        directoryContainer: {
+            marginEnd: Dimensions.get('screen').width/14,
+            marginTop: 11,
+            width: 162,
+            height: 249,
+        },
+        likesContainer: {
+            width: Dimensions.get('screen').width/2.25,
+            marginTop: 16,
+        },
+        dirType: {
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8,
+            borderRadius: 14,
+            elevation: 1,
+            width: 43,
+            height: 22,
+            marginLeft: 9,
+            marginTop: 8,
+            flexDirection: 'row',
+            zIndex: 10000,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        dirFreeText: {
+            color: colors.mainColor,
+            fontSize: 12,
+            fontWeight: 'bold',
+        },
+        dirPlanText: {
+            color: colors.red[3],
+            fontSize: 12,
+            fontWeight: 'bold'
+        },
+        defaultImage: {
+            width: '100%',
+            height: 162,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            position: 'absolute',
+        },
+        selectType: {
+            borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[7],
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12,
+            marginRight: 10,
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.1,
+            elevation: 1,
+            height: 28,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        selectTypeClicked: {
+            borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.red[7],
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12,
+            marginRight: 10,
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.1,
+            elevation: 1,
+            height: 28,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        selectTypeTextClicked: {
+            color : colors.defaultColor,
+            fontSize: 14,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            fontWeight: 'bold',
+            marginVertical: 2
+        },
+        selectTypeText: {
+            color : colors.subColor,
+            fontSize: 14,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            marginVertical: 2
+        },
+    })
+    
     const [likedData, setLikedData] = useState({});
 
     useEffect(() => {
@@ -46,18 +136,18 @@ function Like() {
                                     style={{width: 163, height: 113, borderRadius: 10}}></Image></View>
                         <View style={{flexDirection: 'row', marginTop: 8}}>
                         {/* //TODO 리스트화 할필요 있음 */}
-                            <Text style={{color: colors.mainColor, fontSize: 10, marginTop: 2}}>{item.like_type ===0 && '음식점'}</Text>
-                            <Text style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6,}}>|</Text>
+                            <AppText style={{color: colors.mainColor, fontSize: 10, marginTop: 2}}>{item.like_type ===0 && '음식점'}</AppText>
+                            <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6,}}>|</AppText>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                 <Image source={require('../assets/images/here_icon.png')} style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                                <Text style={{color: colors.mainColor, fontSize: 10}}>{item.like_score}</Text>
+                                <AppText style={{color: colors.mainColor, fontSize: 10}}>{item.like_score}</AppText>
                             </View>
                         </View>
                         <View>
-                            <Text style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold', lineHeight: 28.8}}>{item.like_title}</Text>
+                            <AppText style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold', lineHeight: 28.8}}>{item.like_title}</AppText>
                         </View>
                         <View>
-                            <Text style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>{item.like_location}</Text>
+                            <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>{item.like_location}</AppText>
                         </View>
                     </View>
                 </View>
@@ -77,7 +167,7 @@ function Like() {
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"funnel"} size={13}></Icon>
                         <AppText style={{color: colors.mainColor}}>필터</AppText>
                     </View>
-                    <View style={{marginHorizontal: 10}}><Text style={{color: colors.gray[5]}}>|</Text></View>
+                    <View style={{marginHorizontal: 10}}><AppText style={{color: colors.gray[5]}}>|</AppText></View>
                     <View style={{flexDirection: 'row'}}>
                         <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon" name={"pencil"} size={13}></Icon>
                         <AppText style={{color: colors.mainColor}}>편집</AppText>
@@ -100,6 +190,95 @@ function Collection() {
     }, [])
 
     const { colors } = useTheme();
+
+    const styles = StyleSheet.create({
+        directoryContainer: {
+            marginEnd: Dimensions.get('screen').width/14,
+            marginTop: 11,
+            width: 162,
+            height: 249,
+        },
+        likesContainer: {
+            width: Dimensions.get('screen').width/2.25,
+            marginTop: 16,
+        },
+        dirType: {
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8,
+            borderRadius: 14,
+            elevation: 1,
+            width: 43,
+            height: 22,
+            marginLeft: 9,
+            marginTop: 8,
+            flexDirection: 'row',
+            zIndex: 10000,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        dirFreeText: {
+            color: colors.mainColor,
+            fontSize: 12,
+            fontWeight: 'bold',
+        },
+        dirPlanText: {
+            color: colors.red[3],
+            fontSize: 12,
+            fontWeight: 'bold'
+        },
+        defaultImage: {
+            width: '100%',
+            height: 162,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            position: 'absolute',
+        },
+        selectType: {
+            borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[7],
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12,
+            marginRight: 10,
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.1,
+            elevation: 1,
+            height: 28,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        selectTypeClicked: {
+            borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.red[7],
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8.5,
+            borderRadius: 12,
+            marginRight: 10,
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.1,
+            elevation: 1,
+            height: 28,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        selectTypeTextClicked: {
+            color : colors.defaultColor,
+            fontSize: 14,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            fontWeight: 'bold',
+            marginVertical: 2
+        },
+        selectTypeText: {
+            color : colors.subColor,
+            fontSize: 14,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            marginVertical: 2
+        },
+    })
+
     const [directoryData, setDirectoryData] = useState({});
     const [directoryType, setDirectoryType] = useState([
         {
@@ -170,18 +349,19 @@ function Collection() {
         <View style={styles.directoryContainer}>
             <View style={{height: '68%'}}>
                 <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
-                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><Text style={item.collection_type==1 ? [styles.dirFreeText, {color: colors.mainColor}] : [styles.dirPlanText, {color: colors.red[3]}]}>{item.collection_type===1 ? '자유' : '일정'}</Text></View>
+                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><AppText style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</AppText></View>
                     {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock_outline.png')}></Image></View>}
                 </View>
                 <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
             </View>
             <View style={{marginLeft: 10}}>
                 <AppText style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</AppText>
-                <View style={{flexDirection: 'row', marginBottom: 18}}>
+                <AppText>{item.collection_keywords}</AppText>
+                {/* <View style={{flexDirection: 'row', marginBottom: 18}}>
                     {item.collection_keywords.split(',').map((word, idx) =>(
                         (idx <= word.length) && <AppText key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</AppText>
                     ))}
-                </View>
+                </View> */}
                 <View style={{flexDirection: 'row'}}>
                     <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
                     <View style={{marginRight: 8, flexDirection: 'row'}}>
@@ -226,10 +406,10 @@ function Collection() {
                                 setSelectedDirType(newArr[type.id-1].name)
                                 getCollectionsFromUsers(type.id)
                             }
-                            }} style={directoryType[type.id-1].pressed ? [styles.selectTypeClicked, {borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.red[7]}] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[7]}]}
+                            }} style={directoryType[type.id-1].pressed ? styles.selectTypeClicked : styles.selectType}
                             disabled={directoryType[type.id-1].pressed && type.id != 1 ? true : false}
                             >
-                            <AppText style={directoryType[type.id-1].pressed ? [styles.selectTypeTextClicked, {color : colors.defaultColor}] : [styles.selectTypeText, {color : colors.subColor}]}>{type.name}</AppText>
+                            <AppText style={directoryType[type.id-1].pressed ? styles.selectTypeTextClicked : styles.selectTypeText}>{type.name}</AppText>
                 </TouchableOpacity>                     
             </View>
         )
@@ -312,105 +492,4 @@ const MypageNavigation = () => {
     );
 }
 
-
-const styles = StyleSheet.create({
-    // keyword_1 : {
-    //     backgroundColor: "black",
-    //     paddingVertical: 5,
-    //     paddingHorizontal: "3%",
-    //     borderRadius: 14,
-    //     alignItems: "center",
-    //     flexDirection: "row",
-    //     marginRight: "3%"
-    // },
-    // keyword_2 : {
-    //     backgroundColor : "#bbb",
-    //     paddingVertical: 5,
-    //     paddingHorizontal: "3%",
-    //     borderRadius: 14,
-    //     alignItems: "center",
-    //     flexDirection: "row",
-    //     marginRight: "3%"
-    // },
-    directoryContainer: {
-        marginEnd: Dimensions.get('screen').width/14,
-        marginTop: 11,
-        width: 162,
-        height: 249,
-    },
-    likesContainer: {
-        width: Dimensions.get('screen').width/2.25,
-        // marginEnd: Dimensions.get('screen').width/20,
-        marginTop: 16,
-    },
-    dirType: {
-        borderWidth: 1,
-        paddingVertical: 1,
-        paddingHorizontal: 8,
-        borderRadius: 14,
-        elevation: 1,
-        width: 43,
-        height: 22,
-        marginLeft: 9,
-        marginTop: 8,
-        flexDirection: 'row',
-        zIndex: 10000,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    dirFreeText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    dirPlanText: {
-        fontSize: 12,
-        fontWeight: 'bold'
-    },
-    defaultImage: {
-        width: '100%',
-        height: 162,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        position: 'absolute',
-    },
-    selectType: {
-        borderWidth: 1,
-        paddingVertical: 1,
-        paddingHorizontal: 8.5,
-        borderRadius: 12,
-        marginRight: 10,
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.1,
-        elevation: 1,
-        height: 28,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    selectTypeClicked: {
-        borderWidth: 1,
-        paddingVertical: 1,
-        paddingHorizontal: 8.5,
-        borderRadius: 12,
-        marginRight: 10,
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.1,
-        elevation: 1,
-        height: 28,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    selectTypeTextClicked: {
-        fontSize: 14,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        fontWeight: 'bold',
-        marginVertical: 2
-    },
-    selectTypeText: {
-        fontSize: 14,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        marginVertical: 2
-    },
-})
 export default MypageNavigation;

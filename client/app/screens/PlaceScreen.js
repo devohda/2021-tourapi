@@ -9,22 +9,37 @@ import NavigationTop from "../components/NavigationTop";
 import Score from "../components/Score";
 import Time from "../components/Time";
 import Facility from "../components/Facility";
-import styled, {css} from 'styled-components/native';
-
-import ScreenContainer from "../components/ScreenContainer";
-import Star from "../components/Star";
-import ScreenContainerView from "../components/ScreenContainerView";
-import ScreenDivideLine from "../components/ScreenDivideLine";
 import AppText from "../components/AppText";
-
-import LocationIcon from "../assets/images/place/location-icon.svg"
-import PhoneIcon from "../assets/images/place/phone-icon.svg"
-import TimeIcon from "../assets/images/place/time-icon.svg"
-import WebsiteIcon from "../assets/images/place/website-icon.svg"
 
 const PlaceScreen = ({navigation}) => {
     const refRBSheet = useRef();
     const { colors } = useTheme();
+
+    const styles = StyleSheet.create({
+        categoryBorder: {
+            borderWidth: 1,
+            borderRadius: 14,
+            height: 19,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        categoryText: {
+            color : colors.gray[1],
+            fontSize: 10,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            paddingVertical: 2,
+            paddingHorizontal: 8
+        },
+        reviewImage: {
+            width: 56,
+            height: 56,
+            backgroundColor: '#c4c4c4',
+            borderRadius: 50,
+    
+        },
+    })
+
     //TODO 유저의 보관함 안에 이 place_pk가 있는지 확인하는 작업 필요
     const [ isLiked, setIsLiked ] = useState(false);
     //데이터 받아서 다시해야함
@@ -113,7 +128,7 @@ const PlaceScreen = ({navigation}) => {
                         {/* 클릭했을 때 bordercolor 바뀌는건 makefreeDirectory 참고해서 데이터 들어온 다음에 바꾸기 */}
                         <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</Text>
+                                <AppText style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
                                 <Image source={require('../assets/images/folder.png')} style={{width: 32, height: 32}}></Image>
                             </View>
                             <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
@@ -122,12 +137,12 @@ const PlaceScreen = ({navigation}) => {
                                         <View style={{paddingRight: 8, flexDirection: 'row'}}>
                                             <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
                                                 style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <Text style={{fontSize: 12, color: colors.mainColor}}>9</Text>
+                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
                                         </View>
                                     </View>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
                                         <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <Text numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>하루만에 북촌 정복하기</Text>
+                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>하루만에 북촌 정복하기</AppText>
                                             <Image style={{width: 18, height: 18, marginLeft: 2}} source={require('../assets/images/lock_outline.png')}></Image>
                                         </View>
                                         <View style={{marginRight: '15%'}}>
@@ -139,7 +154,7 @@ const PlaceScreen = ({navigation}) => {
                                                 <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
                                                             width: 15, height: 15, borderRadius: 50,
                                                             alignItems: 'center', justifyContent: 'center'
-                                                        }}><Text style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</Text></View>
+                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
                                             </View>
                                         </View>
                                     </View>
@@ -152,12 +167,12 @@ const PlaceScreen = ({navigation}) => {
                                         <View style={{paddingRight: 8, flexDirection: 'row'}}>
                                             <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
                                                 style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <Text style={{fontSize: 12, color: colors.mainColor}}>9</Text>
+                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
                                         </View>
                                     </View>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
                                         <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <Text numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</Text>
+                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</AppText>
                                             <Image style={{width: 18, height: 18, marginLeft: 2}} source={require('../assets/images/lock_outline.png')}></Image>
                                         </View>
                                         <View style={{marginRight: '15%'}}>
@@ -169,7 +184,7 @@ const PlaceScreen = ({navigation}) => {
                                                 <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
                                                             width: 15, height: 15, borderRadius: 50,
                                                             alignItems: 'center', justifyContent: 'center'
-                                                        }}><Text style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</Text></View>
+                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
                                             </View>
                                         </View>
                                     </View>
@@ -182,12 +197,12 @@ const PlaceScreen = ({navigation}) => {
                                         <View style={{paddingRight: 8, flexDirection: 'row'}}>
                                             <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
                                                 style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <Text style={{fontSize: 12, color: colors.mainColor}}>9</Text>
+                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
                                         </View>
                                     </View>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
                                         <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <Text numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</Text>
+                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</AppText>
                                         </View>
                                         <View style={{marginRight: '15%'}}>
                                             <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
@@ -198,7 +213,7 @@ const PlaceScreen = ({navigation}) => {
                                                 <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
                                                             width: 15, height: 15, borderRadius: 50,
                                                             alignItems: 'center', justifyContent: 'center'
-                                                        }}><Text style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</Text></View>
+                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
                                             </View>
                                         </View>
                                     </View>
@@ -213,7 +228,7 @@ const PlaceScreen = ({navigation}) => {
                                         height: 48,
                                         borderRadius: 10
                                     }}
-                                ><Text
+                                ><AppText
                                     style={{
                                         textAlign: 'center',
                                         padding: 14,
@@ -221,7 +236,7 @@ const PlaceScreen = ({navigation}) => {
                                         color: colors.defaultColor,
                                         fontWeight: 'bold'
                                     }}
-                                >보관함에 추가하기</Text>
+                                >보관함에 추가하기</AppText>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -295,10 +310,10 @@ const PlaceScreen = ({navigation}) => {
                             alignItems: 'center'
                         }}>
                             <View style={{width: '90%', paddingTop: 20, justifyContent: "space-between", flexDirection: 'row'}}>
-                                <Text style={{fontSize: 22, fontWeight: "bold", color: colors.mainColor}}>{placeTitle}</Text>
+                                <AppText style={{fontSize: 22, fontWeight: "bold", color: colors.mainColor}}>{placeTitle}</AppText>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                     <View style={[styles.categoryBorder, {borderColor: colors.red_gray[6], backgroundColor: colors.red_gray[6]}]}>
-                                        <Text style={[styles.categoryText, {color : colors.gray[1]}]}>음식점</Text>
+                                        <AppText style={styles.categoryText}>음식점</AppText>
                                     </View>
                                 </View>
                             </View>
@@ -307,8 +322,8 @@ const PlaceScreen = ({navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 <Icon type="ionicon" name={"location"} size={14} color={colors.mainColor} style={{marginTop: 3}}></Icon>
                                 <View style={{marginLeft: 5}}>
-                                    <Text style={{color: colors.gray[1], fontSize: 14, marginBottom: 1, lineHeight: 22.4}}>{placeLocation}</Text>
-                                    <Text style={{color: colors.gray[4], fontSize: 14, lineHeight: 22.4}}>지번 : 능동 259-1</Text>
+                                    <AppText style={{color: colors.gray[1], fontSize: 14, marginBottom: 1, lineHeight: 22.4}}>{placeLocation}</AppText>
+                                    <AppText style={{color: colors.gray[4], fontSize: 14, lineHeight: 22.4}}>지번 : 능동 259-1</AppText>
                                 </View>
                             </View>
                         </View>
@@ -317,7 +332,7 @@ const PlaceScreen = ({navigation}) => {
                                 <Icon type="ionicon" name={"globe-outline"} size={14} color={colors.mainColor}></Icon>
                                 <View style={{marginLeft: 5}}>
                                     {/* 하이퍼링크 하도록 */}
-                                    <Text style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</Text>
+                                    <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
                                 </View>
                             </View>
                         </View>
@@ -325,7 +340,7 @@ const PlaceScreen = ({navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 <Icon type="ionicon" name={"time-outline"} size={14} color={colors.mainColor}></Icon>
                                 <View style={{marginLeft: 5}}>
-                                    <Text style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</Text>
+                                    <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
                                 </View>
                             </View>
                         </View>
@@ -333,7 +348,7 @@ const PlaceScreen = ({navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 <Icon type="ionicon" name={"call"} size={14} color={colors.mainColor}></Icon>
                                 <View style={{marginLeft: 5}}>
-                                    <Text style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</Text>
+                                    <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
                                 </View>
                             </View>
                         </View>
@@ -357,9 +372,9 @@ const PlaceScreen = ({navigation}) => {
                         <View flex={1} style={{alignItems: 'center', justifyContent: 'center'}}>
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
                                 <Image style={{width: 30, height: 26, marginTop: 3}} source={require('../assets/images/here_icon_nonclicked.png')}></Image>
-                                <View style={{marginLeft: 6, marginRight: 4}}><Text
-                                    style={{fontSize: 22, fontWeight: 'bold', marginRight: 5, color: colors.mainColor}}>{placeScore}점</Text></View>
-                                <View><Text style={{color: colors.gray[5]}}>(0명)</Text></View>
+                                <View style={{marginLeft: 6, marginRight: 4}}><AppText
+                                    style={{fontSize: 22, fontWeight: 'bold', marginRight: 5, color: colors.mainColor}}>{placeScore}점</AppText></View>
+                                <View><AppText style={{color: colors.gray[5]}}>(0명)</AppText></View>
                             </View>
                         </View>
                         <View style={{width: '90%', marginVertical: 16, paddingHorizontal: 26}}>
@@ -374,7 +389,7 @@ const PlaceScreen = ({navigation}) => {
                             <TouchableOpacity style={{flexDirection: 'row', backgroundColor: colors.red[3], width: '90%', height: 38, alignItems: 'center', justifyContent: 'center',
                                                     borderRadius: 35, paddingVertical: 6}}>
                                 <Image style={{width: 20.82, height: 27, marginTop: 3}} source={require('../assets/images/write_review_icon.png')}></Image>
-                                <Text style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점 남기기</Text>
+                                <AppText style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점 남기기</AppText>
                             </TouchableOpacity>
                         </View>
                         
@@ -427,16 +442,16 @@ const PlaceScreen = ({navigation}) => {
                         }}>
                             <View style={{width: '90%', paddingBottom: 12}}>
                                 <View style={{flexDirection: 'row'}}>
-                                    <Text style={{fontSize: 20, fontWeight: "bold", color: colors.mainColor, lineHeight: 32}}>한줄 TIP</Text>
+                                    <AppText style={{fontSize: 20, fontWeight: "bold", color: colors.mainColor, lineHeight: 32}}>한줄 TIP</AppText>
                                     <TouchableOpacity style={{alignItems: 'center', justifyContent: 'center'}}>
                                         <Icon type="ionicon" name={"chevron-forward"} size={20} color={colors.mainColor}></Icon>
                                     </TouchableOpacity>
                                 </View>
-                                <Text style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</Text>
+                                <AppText style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</AppText>
                             </View>
                             <View style={{width: '90%', marginBottom: 29}}>
                                 {/* count data 여야 */}
-                                <View style={{marginBottom: 6}}><Text style={{color: colors.gray[3], fontSize: 14, lineHeight: 20.72, fontWeight: 'bold'}}>총 20개</Text></View>
+                                <View style={{marginBottom: 6}}><AppText style={{color: colors.gray[3], fontSize: 14, lineHeight: 20.72, fontWeight: 'bold'}}>총 20개</AppText></View>
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                     <View><Image style={styles.reviewImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
@@ -444,18 +459,18 @@ const PlaceScreen = ({navigation}) => {
                                         <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 6, paddingLeft: 6, paddingRight: 61, marginBottom: 6,
                                                     justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
                                             <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                            <Text style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
+                                            <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
                                         </View>
-                                        <View><Text style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                                        <View><AppText style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
                                             종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                        </Text></View>
+                                        </AppText></View>
                                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 267, marginTop: 4}}>
                                             <View style={{flexDirection: 'row'}}>
-                                                <Text style={{color: colors.gray[3], fontWeight: 'bold', fontSize: 12}}>by. </Text>
-                                                <Text style={{color: colors.gray[3], fontSize: 12}}>minsun</Text>
+                                                <AppText style={{color: colors.gray[3], fontWeight: 'bold', fontSize: 12}}>by. </AppText>
+                                                <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.gray[3], fontSize: 12}}>21.06.24</Text>
+                                                <AppText style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
                                             </View>
                                         </View>
                                     </View>
@@ -470,18 +485,18 @@ const PlaceScreen = ({navigation}) => {
                                         <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 6, paddingLeft: 6, paddingRight: 61, marginBottom: 6,
                                                     justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
                                             <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                            <Text style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
+                                            <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
                                         </View>
-                                        <View><Text style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                                        <View><AppText style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
                                             종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                        </Text></View>
+                                        </AppText></View>
                                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 267, marginTop: 4}}>
                                             <View style={{flexDirection: 'row'}}>
-                                                <Text style={{color: colors.gray[3], fontWeight: 'bold', fontSize: 12}}>by. </Text>
-                                                <Text style={{color: colors.gray[3], fontSize: 12}}>minsun</Text>
+                                                <AppText style={{color: colors.gray[3], fontWeight: 'bold', fontSize: 12}}>by. </AppText>
+                                                <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.gray[3], fontSize: 12}}>21.06.24</Text>
+                                                <AppText style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
                                             </View>
                                         </View>
                                     </View>
@@ -496,18 +511,18 @@ const PlaceScreen = ({navigation}) => {
                                         <View style={{backgroundColor: colors.defaultColor, width: 267, height: 27, paddingVertical: 6, paddingLeft: 6, paddingRight: 61, marginBottom: 6,
                                                     justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row'}}>
                                             <Icon type="ionicon" name={"chatbox-ellipses-outline"} size={12} color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                            <Text style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</Text>
+                                            <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
                                         </View>
-                                        <View><Text style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                                        <View><AppText style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
                                             종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                        </Text></View>
+                                        </AppText></View>
                                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 267, marginTop: 4}}>
                                             <View style={{flexDirection: 'row'}}>
-                                                <Text style={{color: colors.gray[3], fontWeight: 'bold', fontSize: 12}}>by. </Text>
-                                                <Text style={{color: colors.gray[3], fontSize: 12}}>minsun</Text>
+                                                <AppText style={{color: colors.gray[3], fontWeight: 'bold', fontSize: 12}}>by. </AppText>
+                                                <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.gray[3], fontSize: 12}}>21.06.24</Text>
+                                                <AppText style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
                                             </View>
                                         </View>
                                     </View>
@@ -521,7 +536,7 @@ const PlaceScreen = ({navigation}) => {
                                 alignItems: 'center'
                             }}>
                                 <View style={{width: '90%', paddingTop: 24, paddingBottom: 24}}>
-                                    <Text style={{fontSize: 20, fontWeight: "bold", color: colors.mainColor, lineHeight: 28}}>근처 여긴 어때요?</Text>
+                                    <AppText style={{fontSize: 20, fontWeight: "bold", color: colors.mainColor, lineHeight: 28}}>근처 여긴 어때요?</AppText>
                                 </View>
                                 
                                 <View style={{marginBottom: 92, flexDirection: 'row', marginHorizontal: 20}}>
@@ -530,18 +545,18 @@ const PlaceScreen = ({navigation}) => {
                                             <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                             style={{width: 141, height: 101, borderRadius: 10}}></Image></View>
                                             <View style={{flexDirection: 'row', marginTop: 8}}>
-                                                <Text style={{color: colors.gray[3], fontSize: 10}}>음식점</Text>
-                                                <Text style={{color: colors.gray[3], fontSize: 10, marginHorizontal: 6}}>|</Text>
+                                                <AppText style={{color: colors.gray[3], fontSize: 10}}>음식점</AppText>
+                                                <AppText style={{color: colors.gray[3], fontSize: 10, marginHorizontal: 6}}>|</AppText>
                                                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2}}>
                                                     <Image source={require('../assets/images/here_icon.png')} style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                                                    <Text style={{color: colors.gray[3], fontSize: 10}}>4.84</Text>
+                                                    <AppText style={{color: colors.gray[3], fontSize: 10}}>4.84</AppText>
                                                 </View>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.blue[1], fontSize: 18, fontWeight: 'bold', lineHeight: 28.8}}>경복궁</Text>
+                                                <AppText style={{color: colors.blue[1], fontSize: 18, fontWeight: 'bold', lineHeight: 28.8}}>경복궁</AppText>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시 종로구</Text>
+                                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시 종로구</AppText>
                                             </View>
                                         </View>
 
@@ -549,18 +564,18 @@ const PlaceScreen = ({navigation}) => {
                                             <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                             style={{width: 141, height: 101, borderRadius: 10}}></Image></View>
                                             <View style={{flexDirection: 'row', marginTop: 8}}>
-                                                <Text style={{color: colors.gray[3], fontSize: 10}}>음식점</Text>
-                                                <Text style={{color: colors.gray[3], fontSize: 10, marginHorizontal: 6}}>|</Text>
+                                                <AppText style={{color: colors.gray[3], fontSize: 10}}>음식점</AppText>
+                                                <AppText style={{color: colors.gray[3], fontSize: 10, marginHorizontal: 6}}>|</AppText>
                                                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2}}>
                                                     <Image source={require('../assets/images/here_icon.png')} style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                                                    <Text style={{color: colors.gray[3], fontSize: 10}}>4.84</Text>
+                                                    <AppText style={{color: colors.gray[3], fontSize: 10}}>4.84</AppText>
                                                 </View>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.blue[1], fontSize: 18, fontWeight: 'bold', lineHeight: 28.8}}>경복궁</Text>
+                                                <AppText style={{color: colors.blue[1], fontSize: 18, fontWeight: 'bold', lineHeight: 28.8}}>경복궁</AppText>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시 종로구</Text>
+                                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시 종로구</AppText>
                                             </View>
                                         </View>
 
@@ -568,18 +583,18 @@ const PlaceScreen = ({navigation}) => {
                                             <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
                                             style={{width: 141, height: 101, borderRadius: 10}}></Image></View>
                                             <View style={{flexDirection: 'row', marginTop: 8}}>
-                                                <Text style={{color: colors.gray[3], fontSize: 10}}>음식점</Text>
-                                                <Text style={{color: colors.gray[3], fontSize: 10, marginHorizontal: 6}}>|</Text>
+                                                <AppText style={{color: colors.gray[3], fontSize: 10}}>음식점</AppText>
+                                                <AppText style={{color: colors.gray[3], fontSize: 10, marginHorizontal: 6}}>|</AppText>
                                                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2}}>
                                                     <Image source={require('../assets/images/here_icon.png')} style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                                                    <Text style={{color: colors.gray[3], fontSize: 10}}>4.84</Text>
+                                                    <AppText style={{color: colors.gray[3], fontSize: 10}}>4.84</AppText>
                                                 </View>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.blue[1], fontSize: 18, fontWeight: 'bold', lineHeight: 28.8}}>경복궁</Text>
+                                                <AppText style={{color: colors.blue[1], fontSize: 18, fontWeight: 'bold', lineHeight: 28.8}}>경복궁</AppText>
                                             </View>
                                             <View>
-                                                <Text style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시 종로구</Text>
+                                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시 종로구</AppText>
                                             </View>
                                         </View>
                                     </ScrollView>
@@ -592,27 +607,4 @@ const PlaceScreen = ({navigation}) => {
     )
 }
 
-const styles = StyleSheet.create({
-    categoryBorder: {
-        borderWidth: 1,
-        borderRadius: 14,
-        height: 19,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    categoryText: {
-        fontSize: 10,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        paddingVertical: 2,
-        paddingHorizontal: 8
-    },
-    reviewImage: {
-        width: 56,
-        height: 56,
-        backgroundColor: '#c4c4c4',
-        borderRadius: 50,
-
-    },
-})
 export default PlaceScreen;
