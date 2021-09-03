@@ -184,7 +184,7 @@ function Like() {
     );
 }
 
-function Collection() {
+const Collection = props => {
     useEffect(() => {
         getCollectionsFromUsers(1);
     }, [])
@@ -346,37 +346,38 @@ function Collection() {
     }
 
     const showDirectories = ({item}) => (
-        <View style={styles.directoryContainer}>
-            <View style={{height: '68%'}}>
-                <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
-                    <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><AppText style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</AppText></View>
-                    {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock_outline.png')}></Image></View>}
-                </View>
-                <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
-            </View>
-            <View style={{marginLeft: 10}}>
-                <AppText style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</AppText>
-                <AppText>{item.collection_keywords}</AppText>
-                {/* <View style={{flexDirection: 'row', marginBottom: 18}}>
-                    {item.collection_keywords.split(',').map((word, idx) =>(
-                        (idx <= word.length) && <AppText key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</AppText>
-                    ))}
-                </View> */}
-                <View style={{flexDirection: 'row'}}>
-                    <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
-                    <View style={{marginRight: 8, flexDirection: 'row'}}>
-                        <Image source={require('../assets/images/here_icon.png')} style={{width: 8, height: 8, margin: 2}}></Image>
-                        <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
+        <TouchableOpacity onPress={()=>props.navigation.navigate('ShowFreeDir')}>
+            <View style={styles.directoryContainer}>
+                <View style={{height: '68%'}}>
+                    <View style={[{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}]}>
+                        <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><AppText style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</AppText></View>
+                        {item.collection_private === 1 && <View style={{marginRight: 9, marginTop: 8}}><Image style={{width: 20, height: 20}} source={require('../assets/images/lock_outline.png')}></Image></View>}
                     </View>
-                    <View style={{marginRight: 8, flexDirection: 'row'}}>
-                        <Icon type="ionicon" name={"location"} size={8} color={colors.gray[2]}
-                            style={{margin: 2}}></Icon>
-                        <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</AppText>
+                    <Image style={styles.defaultImage} source={require('../assets/images/mountain.jpeg')}/>
+                </View>
+                <View style={{marginLeft: 10}}>
+                    <AppText style={{marginVertical: 4, fontSize: 14, fontWeight: 'bold'}}>{item.collection_name}</AppText>
+                    <AppText>{item.collection_keywords}</AppText>
+                    {/* <View style={{flexDirection: 'row', marginBottom: 18}}>
+                        {item.collection_keywords.split(',').map((word, idx) =>(
+                            (idx <= word.length) && <AppText key={idx} style={{color: colors.hashTagColor, fontSize: 10, marginEnd: 6.21}}># {word}</AppText>
+                        ))}
+                    </View> */}
+                    <View style={{flexDirection: 'row'}}>
+                        <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
+                        <View style={{marginRight: 8, flexDirection: 'row'}}>
+                            <Image source={require('../assets/images/here_icon.png')} style={{width: 8, height: 8, margin: 2}}></Image>
+                            <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
+                        </View>
+                        <View style={{marginRight: 8, flexDirection: 'row'}}>
+                            <Icon type="ionicon" name={"location"} size={8} color={colors.gray[2]}
+                                style={{margin: 2}}></Icon>
+                            <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>9</AppText>
+                        </View>
                     </View>
                 </View>
-            </View>
-    </View>
-
+        </View>
+    </TouchableOpacity>
     )
 
     const Keyword = ({type, idx}) => {
@@ -455,12 +456,12 @@ function Collection() {
     );
 }
 
-const MypageNavigation = () => {
+const MypageNavigation = props => {
     const { colors } = useTheme();
     return (
         <Tab.Navigator
-            swipeEnabled={true}
             screenOptions={{
+                swipeEnabled: true,
                 tabBarLabelStyle: {
                     fontSize: 16,
                     fontWeight: 'bold',
@@ -487,7 +488,7 @@ const MypageNavigation = () => {
                     focused: true
                 }
             }}/>
-            <Tab.Screen name="보관함" component={Collection}/>
+            <Tab.Screen name="보관함" component={Collection} navigation={props.navigation}/>
         </Tab.Navigator>
     );
 }

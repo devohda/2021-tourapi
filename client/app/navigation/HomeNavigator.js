@@ -22,7 +22,8 @@ export default function HomeNavigator({navigation}) {
             <Tab.Screen name="directory" component={MakeDirectoryBtn} options={{title:'', tabBarIcon:()=>(
                 MakeDirectoryBtn({navigation}))
             }}/>
-            <Tab.Screen name="mypage" component={MyPageScreen} options={{title: '마이페이지',
+            <Tab.Screen name="mypage" children={({navigation}) => <MyPageScreen navigation={navigation} />}
+            options={{title: '마이페이지',
                 tabBarIcon:({focused})=>(
                 <Icon type="ionicon" name={focused? "person" : "person-outline"} size={26} color={colors.mainColor}></Icon>),
                 tabBarLabel:()=>{return null}
