@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const {selectPlaceList} = require('../services/placeService');
-const {selectCollectionList} = require('../services/collectionService');
+const {readPlaceList} = require('../services/placeService');
+const {readCollectionList} = require('../services/collectionService');
 const {selectUserList} = require('../services/userService');
 
 router.get('/', async (req, res, next) => {
@@ -12,10 +12,10 @@ router.get('/', async (req, res, next) => {
     try {
         switch (type) {
             case "place":
-                data = await selectPlaceList(keyword);
+                data = await readPlaceList(keyword);
                 break;
             case 'collection':
-                data = await selectCollectionList(keyword);
+                data = await readCollectionList(keyword);
                 break;
             case 'user':
                 data = await selectUserList(keyword);

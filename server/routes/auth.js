@@ -53,13 +53,13 @@ router.post('/makeAccount', async (req, res, next) => {
     userInfo.user_password = password;
     userInfo.salt = salt;
 
-    const result = await authService.addUser(userInfo);
+    const result = await authService.createUser(userInfo);
     res.send({result: true});
 })
 
 router.post('/sameEmail', async (req, res, next) => {
     const {email} = req.body;
-    const [{count}] = await authService.findUser(email);
+    const [{count}] = await authService.readUserCnt(email);
 
     let isDuplicated = false;
     if (count >= 1) {
@@ -71,7 +71,7 @@ router.post('/sameEmail', async (req, res, next) => {
 router.post('/loginEmail', async (req, res, next) => {
     const {email, password: plainPassword} = req.body.user;
 
-    const userData = await authService.getUser(email);
+    const userData = await authService.readUser(email);
     if (userData.length !== 1) {
         return res.send({state: 'NOT EXIST'})
     }
