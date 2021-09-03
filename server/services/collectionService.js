@@ -35,7 +35,7 @@ exports.createCollectionFree = async (collectionData, userId, keywords) => {
 }
 
 // 보관함 리스트 조회
-exports.selectCollectionList = async (keyword) => {
+exports.readCollectionList = async (keyword) => {
 
     // TODO
     //  - 좋아요
