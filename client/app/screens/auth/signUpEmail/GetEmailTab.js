@@ -118,11 +118,13 @@ const GetEmailTab = ({navigation}) => {
                             await findSameEmail(text);
                             if(!text.match(emailRegExp)) {
                                 setColor(colors.red[2]);
-                            }
+                            } else setColor(colors.gray[5]);
+
                             if(!isEmailDuplicated) {
                                 setColor(colors.red[2]);
-                            };
-                            if(text === '') setColor(colors.gray[5])   
+                            } else setColor(colors.gray[5]);
+
+                            if(text === '') setColor(colors.gray[5]);
                             setEmail(text);
                         }}
 

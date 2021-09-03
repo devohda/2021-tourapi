@@ -33,8 +33,17 @@ const GetPasswordTab = ({route, navigation}) => {
     const [color, setColor] = useState(colors.gray[5]);
     const [isPasswordValid, setIsPasswordValid] = useState(false);
 
-    const checkPassword = async () => {
+    const checkPassword = async (pw) => {
+        var pattern1 = /[0-9]/; // 숫자
+        var pattern2 = /[a-zA-Z]/; // 문자
+        var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
 
+        if(!(pw.search(/\s/) != -1) &&
+        ((pattern1.test(pw) && pattern2.test(pw)) ||
+        (pattern1.test(pw) && pattern3.test(pw)) ||
+        (pattern2.test(pw) && pattern3.test(pw))
+        )) setIsPasswordValid(true)
+        else setIsPasswordValid(false)
     }
 
     const checkIsValid = async () => {
@@ -62,7 +71,7 @@ const GetPasswordTab = ({route, navigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: password ? colors.mainColor : colors.gray[6],
+            backgroundColor: password.length >= 8 && isPasswordValid ? colors.mainColor : colors.gray[6],
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -87,7 +96,7 @@ const GetPasswordTab = ({route, navigation}) => {
                         </View>
                     </AppText>
                     <CustomTextInput
-                        placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
+                        placeholder="영문, 숫자, 특수문자 2가지 조합 8자리 이상"
                         autoCapitalize="none"
                         password={true}
                         secureTextEntry={true}
@@ -100,33 +109,38 @@ const GetPasswordTab = ({route, navigation}) => {
                             paddingBottom: 11
                         }}
                         onChangeText={async (text) => {
-                            if(text.length < 8 || text.length > 12) {
+                            await checkPassword(text)
+                            if(text.length < 8) {
                                 setColor(colors.red[2]);
                             }
-                            if(checkPassword(text)) {
+
+                            if(!isPasswordValid) {
                                 setColor(colors.red[2]);
-                            };
-                            if(text === '') setColor(colors.gray[5])   
+                            }
+                            
+                            if(text.length >= 8 && isPasswordValid) setColor(colors.gray[5])
+                            if(text === '') setColor(colors.gray[5])
+                            
                             setPassword(text);
                         }}
                     />
                     <AppText style={{color: colors.red[2],
-                        display: password.length < 8 ? 'flex' : 'none'
+                        display: password && password.length < 8 ? 'flex' : 'none'
                     }}>
                         비밀번호가 너무 짧아요. (8자 이상)
                     </AppText>
-                    {/* <Text style={{color: colors.red[2],
-                        display: isEmailDuplicated ? 'flex' : 'none'
+                    <AppText style={{color: colors.red[2],
+                        display: password && !isPasswordValid ? 'flex' : 'none'
                     }}>
-                        이미 사용중인 아이디예요.
-                    </Text> */}
+                        영문, 숫자, 특수문자를 2가지 이상 조합해주세요.
+                    </AppText>
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
-                    disabled={password ? false : true}
+                    disabled={password.length >= 8 && isPasswordValid ? false : true}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>

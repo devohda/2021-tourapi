@@ -12,6 +12,7 @@ const CustomTextInput = (props) => {
                    autoCapitalize="none"
                    autoCorrect={false}
                    onFocus={props.onFocus}
+                   secureTextEntry={props.secureTextEntry}
         >
             {props.children}
         </TextInput>
