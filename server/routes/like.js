@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const likeService = require('../services/likeService');
-const placeService = require("../services/placeService");
-
 
 // 장소 좋아요
 router.post('/place', async (req, res, next) => {

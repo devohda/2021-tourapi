@@ -7,7 +7,7 @@ exports.createUser = async (userData) => {
     return result;
 }
 
-exports.readUserCnt = async (email) => {
+exports.readUserCntByEmail = async (email) => {
     const query = `SELECT COUNT(user_email) 
                    AS count 
                    FROM users 
@@ -16,7 +16,16 @@ exports.readUserCnt = async (email) => {
     return result;
 }
 
-exports.readUser = async (email) => {
+exports.readUserCntByNickname = async (nickname) => {
+    const query = `SELECT COUNT(user_nickname) 
+                   AS count 
+                   FROM users 
+                   WHERE user_nickname=${mysql.escape(nickname)};`
+    const result = await  db.query(query);
+    return result;
+}
+
+exports.readUserByEmail = async (email) => {
     const query = `SELECT *
                    FROM users
                    WHERE user_email=${mysql.escape(email)}`
