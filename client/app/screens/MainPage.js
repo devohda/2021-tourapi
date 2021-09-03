@@ -72,24 +72,14 @@ export default function MainPage({navigation}) {
                     </View>
                     <View style={{position: 'absolute'}}>
                         <View style={{flexDirection: 'row', left: 16, top: 145}}>
-                            <View style={{paddingEnd: 42}}><TouchableOpacity
-                                style={{...styles.selectedRankings, borderBottomColor: colors.emphasizedColor}}><AppText
-                                style={{
-                                    ...styles.selectedRankingsText,
-                                    color: colors.mainColor
-                                }}>일간</AppText></TouchableOpacity></View>
+                            <View style={{paddingEnd: 42}}><TouchableOpacity style={[styles.selectedRankings, {borderBottomColor: colors.red[3]}]}><AppText
+                                style={{...styles.selectedRankingsText, color: colors.mainColor}}>일간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><AppText
-                                style={{
-                                    ...styles.selectedRankingsText,
-                                    color: colors.notClicked
-                                }}>주간</AppText></TouchableOpacity></View>
+                                style={{...styles.selectedRankingsText, color: colors.gray[6]}}>주간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={styles.notSelectedRankings}><AppText
-                                style={{
-                                    ...styles.selectedRankingsText,
-                                    color: colors.notClicked
-                                }}>월간</AppText></TouchableOpacity></View>
+                                style={{...styles.selectedRankingsText, color: colors.gray[6]}}>월간</AppText></TouchableOpacity></View>
                         </View>
                         {/* 데이터 붙여서(for문?) 들어가게 */}
                         <View style={styles.rankingContainer}>
@@ -103,12 +93,8 @@ export default function MainPage({navigation}) {
                                 }}>하루만에 북촌
                                     정복하기</AppText>
                                 <View style={{flexDirection: 'row'}}>
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        marginEnd: 85,
-                                        color: colors.detailSubTextColor
-                                    }}>meeeeensun</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.detailSubTextColor}}>1.3k</AppText>
+                                    <AppText style={{fontSize: 12, marginEnd: 85, color: colors.gray[4]}}>meeeeensun</AppText>
+                                    <AppText style={{fontSize: 12, color: colors.gray[4]}}>1.3k</AppText>
                                 </View>
                             </View>
                         </View>
@@ -236,26 +222,20 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <AppText style={{
-                                            color: colors.notClickedDirColor,
+                                            color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
                                         }}>음식점</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8, color: '#BDC2CA',
+                                        <AppText style={{marginHorizontal:8, color: colors.gray[7], 
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
                                         }}>|</AppText>
                                         <Image source={require('../assets/images/review_star.png')}
-                                               style={{
-                                                   width: 10,
-                                                   height: 10,
-                                                   alignSelf: 'center',
-                                                   marginTop: '1%'
-                                               }}></Image>
+                                       style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <AppText style={{
-                                            color: colors.notClickedDirColor,
+                                            color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -268,7 +248,7 @@ export default function MainPage({navigation}) {
                                         color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.detailSubTextColor}}>서울시 종로구</AppText>
+                                    <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
                                 <View style={{justifyContent: 'center', marginLeft: '45%'}}>
                                     <Image source={require('../assets/images/here_nonclick.png')}></Image>
@@ -289,26 +269,20 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <AppText style={{
-                                            color: colors.notClickedDirColor,
+                                            color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
                                         }}>음식점</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8, color: '#BDC2CA',
+                                        <AppText style={{marginHorizontal:8, color: colors.gray[7], 
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
                                         }}>|</AppText>
                                         <Image source={require('../assets/images/review_star.png')}
-                                               style={{
-                                                   width: 10,
-                                                   height: 10,
-                                                   alignSelf: 'center',
-                                                   marginTop: '1%'
-                                               }}></Image>
+                                       style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <AppText style={{
-                                            color: colors.notClickedDirColor,
+                                            color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -321,7 +295,7 @@ export default function MainPage({navigation}) {
                                         color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.detailSubTextColor}}>서울시 종로구</AppText>
+                                    <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
                                 <View style={{justifyContent: 'center', marginLeft: '45%'}}>
                                     <Image source={require('../assets/images/here_nonclick.png')}></Image>
@@ -342,26 +316,20 @@ export default function MainPage({navigation}) {
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
                                         <AppText style={{
-                                            color: colors.notClickedDirColor,
+                                            color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
                                         }}>음식점</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8, color: '#BDC2CA',
+                                        <AppText style={{marginHorizontal:8, color: colors.gray[7], 
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
                                         }}>|</AppText>
                                         <Image source={require('../assets/images/review_star.png')}
-                                               style={{
-                                                   width: 10,
-                                                   height: 10,
-                                                   alignSelf: 'center',
-                                                   marginTop: '1%'
-                                               }}></Image>
+                                       style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
                                         <AppText style={{
-                                            color: colors.notClickedDirColor,
+                                            color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold',
@@ -374,7 +342,7 @@ export default function MainPage({navigation}) {
                                         color: colors.mainColor,
                                         marginVertical: 3
                                     }}>경복궁</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.detailSubTextColor}}>서울시 종로구</AppText>
+                                    <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
                                 <View style={{justifyContent: 'center', marginLeft: '45%'}}>
                                     <Image source={require('../assets/images/here_click.png')}></Image>

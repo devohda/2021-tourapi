@@ -11,25 +11,15 @@ const ColorTheme = {
     colors: {
         ...DefaultTheme.colors,
         defaultColor : '#FFFFFF',
+        defaultDarkColor : '#000000',
         mainColor : '#4C648D',
-        backgroundColor : '#FCF6F5',
-        notClicked : '#C9CFD9',
-        emphasizedColor : '#F07A7A',
-        subColor : '#BABFC8',
-        hashTagColor: '#90969F',
-        detailColor: '#F0E7E7',
-        detailTextColor: '#818792',
-        detailSubTextColor: '#AFB3BB',
-        linkColor: '#7E97C2',
-        notClickedDirColor: '#9DA2AB',
-        shadowColor: '#cbb4b4',
+        backgroundColor : '#FFF8F8',
         blue : {
             1 : '#3E557D',
-            2 : '#4C648D',
-            3 : '#637DA9',
-            4 : '#7E97C2',
-            5 : '#98B1DA',
-            6 : '#B8CDF0'
+            2 : '#637DA9',
+            3 : '#7E97C2',
+            4 : '#98B1DA',
+            5 : '#B8CDF0'
         },
         red : {
             1 : '#F74A4A',
@@ -37,7 +27,9 @@ const ColorTheme = {
             3 : '#F07A7A',
             4 : '#F39191',
             5 : '#FDADAD',
-            6 : '#FFC7C7'
+            6 : '#FFC7C7',
+            7 : '#CBB4B4',
+            8 : '#470000'
         },
         gray : {
             1 : '#818792',
@@ -45,7 +37,9 @@ const ColorTheme = {
             3 : '#9DA2AB',
             4 : '#AFB3BB',
             5 : '#BABFC8',
-            6 : '#C9CFD9'
+            6 : '#C9CFD9',
+            7 : '#BDC2CA',
+            8 : '#929292'
         },
         red_gray : {
             1 : '#BFAFAF',
@@ -61,7 +55,9 @@ const ColorTheme = {
             3 : '#FFC978',
             4 : '#FFD391',
             5 : '#FFDEAD',
-            6 : '#FFEBCD'
+            6 : '#FFEBCD',
+            7 : '#FCF6F5',
+            8 : '#FEE500'
         }
     }
 };
