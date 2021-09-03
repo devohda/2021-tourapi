@@ -9,7 +9,7 @@ import {useIsUserData} from "../../contexts/UserDataContextProvider";
 import ScreenContainerView from "../../components/ScreenContainerView";
 import NavigationTop from "../../components/NavigationTop";
 import AppText from "../../components/AppText";
-
+import { Icon } from 'react-native-elements';
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
 
@@ -95,19 +95,24 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                                onChangeText={(text) => setEmail(text)}
                                autoCapitalize="none"
                     />
-                    <TextInput style={{
+                    <View style={{flexDirection: 'row'}}>
+                    <TextInput flex={1}
+                    style={{
                         fontSize: 16,
                         borderBottomWidth: 1,
                         borderBottomColor: colors.gray[5],
                         marginBottom: 38,
-                        paddingBottom: 11
+                        paddingBottom: 11,
+                        flex: 1
                     }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
                                onChangeText={(text) => setPassword(text)}
                                autoCapitalize="none"
                     />
+                    <Icon type="ionicon" name={"eye"} size={20} color={colors.gray[5]}></Icon>
+                    </View>
                     <TouchableOpacity
                         style={{
-                            backgroundColor: colors.gray[6],
+                            backgroundColor: email && password ? colors.mainColor : colors.gray[6],
                             height: 52,
                             borderRadius: 10,
                             alignItems: 'center',
