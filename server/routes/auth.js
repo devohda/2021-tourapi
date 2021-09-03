@@ -65,7 +65,7 @@ router.post('/sameEmail', async (req, res, next) => {
     if (count >= 1) {
         isDuplicated = true;
     }
-    res.send({isDuplicated})
+    res.send({code: 200, status : 'SUCCESS', data: {isDuplicated}})
 })
 
 router.post('/sameNickname', async (req, res, next) => {
@@ -76,7 +76,7 @@ router.post('/sameNickname', async (req, res, next) => {
     if (count >= 1) {
         isDuplicated = true;
     }
-    res.send({isDuplicated})
+    res.send({code: 200, status : 'SUCCESS', data: {isDuplicated}})
 })
 
 router.post('/loginEmail', async (req, res, next) => {
@@ -100,11 +100,11 @@ router.post('/loginEmail', async (req, res, next) => {
 
     const password = await makePasswordHashed(plainPassword)
 
-    if(user_password !== password){
-        return res.send({state : 'NOT MATCHED'})
+    if (user_password !== password) {
+        return res.send({state: 'NOT MATCHED'})
     }
 
-    return res.send({state : 'SUCCESS', userData : user})
+    return res.send({state: 'SUCCESS', userData: user})
 })
 
 module.exports = router;
