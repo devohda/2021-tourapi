@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const {readPlace} = require('../services/placeService');
+const placeService = require('../services/placeService');
 
 router.get('/:placeId', async (req, res, next) => {
     const {placeId} = req.params
     let data;
 
     try {
-        data = await readPlace(placeId)
+        data = await placeService.readPlace(placeId)
     } catch (err) {
         return res.send({code:500, status : "SERVER ERROR"})
     }
