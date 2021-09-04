@@ -3,10 +3,10 @@ const router = express.Router();
 
 const collectionService = require('../services/collectionService')
 
-// 자유보관함 생성
-router.post('/free', async (req, res, next) => {
+// 보관함 생성
+router.post('/', async (req, res, next) => {
     const {collectionData, userId, keywords} = req.body;
-    const result = await collectionService.createCollectionFree(collectionData, userId, keywords);
+    const result = await collectionService.createCollection(collectionData, userId, keywords);
 
     if (result) {
         return res.send({
@@ -21,16 +21,25 @@ router.post('/free', async (req, res, next) => {
     }
 })
 
-// 자유보관함 가져오기
-router.get('/free/:id', async (req, res, next) => {
-    const collectionId = req.params.id;
+// 보관함 가져오기
+router.get('/:collectionId', async (req, res, next) => {
+    const {collectionId} = req.params;
+    const result = await collectionService.readCollection(collectionId);
 
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        })
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        })
+    }
 })
 
-// 일정보관함 가져오기
-router.get('/plan/:collection_id', async () => {
-
-})
 
 // 자유보관함
 router.post('/list', async (req, res, next) => {
@@ -64,12 +73,12 @@ router.post('/:collectionId/place', async (req, res, next) => {
             code: 200,
             status: 'SUCCESS'
         })
-    } else if(result.affectedRows === 0) {
+    } else if (result.affectedRows === 0) {
         return res.send({
-            code: 200,
+            code: 202,
             status: 'EXISTED'
         })
-    }else{
+    } else {
         return res.send({
             code: 500,
             status: 'SERVER ERROR'

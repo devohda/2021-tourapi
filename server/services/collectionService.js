@@ -2,7 +2,12 @@ const db = require('../database/database');
 const mysql = require('mysql2');
 
 // 자유 보관함 생성
-exports.createCollectionFree = async (collectionData, userId, keywords) => {
+exports.createCollection = async ({
+                                      name: collection_name,
+                                      description: collection_description,
+                                      private: collection_private,
+                                      type: collection_type
+                                  }, user_pk, keywords) => {
 
     const conn = await db.pool.getConnection();
     let result = false;
@@ -10,13 +15,13 @@ exports.createCollectionFree = async (collectionData, userId, keywords) => {
     try {
         // 보관함 생성
         const query1 = `INSERT INTO collections (collection_name, collection_type, collection_description, user_pk, collection_private)
-                        VALUES (${mysql.escape(collectionData.name)}, 0, ${mysql.escape(collectionData.description)}, ${userId}, ${collectionData.private})`;
+                        VALUES (${mysql.escape(collection_name)}, ${collection_type}, ${mysql.escape(collection_description)}, ${user_pk}, ${collection_private})`;
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
 
         // 보관함 수정 권한
-        const query2 = `INSERT INTO collection_user_map (collection_pk, user_pk) VALUES (${mysql.escape(collection_pk)}, ${userId})`;
+        const query2 = `INSERT INTO collection_user_map (collection_pk, user_pk) VALUES (${mysql.escape(collection_pk)}, ${user_pk})`;
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
@@ -73,8 +78,6 @@ exports.readCollectionList = async (keyword) => {
         conn.release();
         return result
     }
-
-    return result;
 }
 
 // 장소 추가할 보관함 리스트 조회
@@ -104,4 +107,22 @@ exports.createPlaceToCollection = async (collection_pk, place_pk) => {
     const result = await db.query(query);
 
     return result;
+}
+
+// 보관함 조회
+exports.readCollection = async (collection_pk) => {
+    const query = `SELECT * FROM collections WHERE collection_pk = ${collection_pk}`
+
+    const conn = await db.pool.getConnection();
+    let result;
+
+    try {
+
+
+    } catch (err) {
+        console.error(err);
+    } finally {
+        conn.release();
+        return result
+    }
 }
