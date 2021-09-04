@@ -39,7 +39,7 @@ exports.createCollection = async ({
     }
 }
 
-// 보관함 리스트 조회
+// 보관함 리스트 조회(검색)
 exports.readCollectionList = async (keyword) => {
 
     // TODO
@@ -80,25 +80,69 @@ exports.readCollectionList = async (keyword) => {
     }
 }
 
-// 장소 추가할 보관함 리스트 조회
+// 본인 보관함 리스트 조회
 exports.readCollectionListForPlaceInsert = async (user_pk) => {
 
     // TODO
     //  - 권한 있는 유저 리스트(사진)
+    //  - 사진 최대 4개
 
-    const query = `SELECT c.collection_pk, collection_name, collection_type, IFNULL(place_cnt, 0) AS place_cnt
-                   FROM collections c
-                   LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
-                   ON cpm.collection_pk = c.collection_pk
-                   WHERE user_pk = ${user_pk}`;
+    // 보관함 정보
+    // - 좋아요 수
+    // - 포함된 장소 수
+    // - 키워드
 
-    const result = await db.query(query);
-    console.log(result)
+    const conn = await db.pool.getConnection();
+    let result;
 
-    return result;
+    try {
+        const query1 = `SELECT c.*, IFNULL(place_cnt, 0) AS place_cnt,
+                        CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+                        FROM collections c
+                        LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
+                        ON cpm.collection_pk = c.collection_pk
+                        LEFT OUTER JOIN like_collection lc 
+                        ON lc.collection_pk = c.collection_pk
+                        AND lc.user_pk = c.user_pk
+                        WHERE c.user_pk = ${user_pk}`;
+
+        const [result1] = await conn.query(query1);
+
+        result = await Promise.all(result1.map(async collection => {
+            const query2 = `SELECT keyword_title FROM keywords k
+                            LEFT OUTER JOIN keywords_collections_map kcm
+                            ON kcm.keyword_pk = k.keyword_pk
+                            WHERE kcm.collection_pk = ${collection.collection_pk}`
+
+            const query3 = `SELECT place_img FROM places p 
+                            INNER JOIN collection_place_map cpm
+                            ON cpm.place_pk = p.place_pk 
+                            AND cpm.collection_pk = ${collection.collection_pk}
+                            Limit 4`
+
+            const [result2] = await conn.query(query2)
+            const [result3] = await conn.query(query3)
+
+            const keywords = result2.map(keyword => keyword.keyword_title)
+            const thumbnail_images = result3.map(image => image.place_img)
+
+            return {
+                ...collection,
+                keywords,
+                thumbnail_images
+            };
+        }))
+
+
+    }catch (err) {
+        console.error(err);
+    } finally {
+        conn.release();
+        return result
+    }
 }
 
-// 장소 추가할 보관함 리스트 조회
+// 보관함에 장소 추가
 exports.createPlaceToCollection = async (collection_pk, place_pk) => {
 
     const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk) 
@@ -109,7 +153,7 @@ exports.createPlaceToCollection = async (collection_pk, place_pk) => {
     return result;
 }
 
-// 보관함 조회
+// 보관함 상세 조회
 exports.readCollection = async (user_pk, collection_pk) => {
     const conn = await db.pool.getConnection();
     let result;
