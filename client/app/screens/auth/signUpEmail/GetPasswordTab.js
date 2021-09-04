@@ -4,6 +4,7 @@ import ScreenContainer from '../../../components/ScreenContainer'
 import styled from "styled-components/native";
 import AppText from "../../../components/AppText";
 import { useTheme } from '@react-navigation/native';
+import CustomTextInput from "../../../components/CustomTextInput";
 
 const ProgressBar = styled(View)`
   flexDirection: row;
@@ -29,13 +30,23 @@ const GetPasswordTab = ({route, navigation}) => {
     const {email} = route.params
     const [password, setPassword] = useState("");
     const { colors } = useTheme();
+    const [color, setColor] = useState(colors.gray[5]);
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+    const checkPassword = async (pw) => {
+        var pattern1 = /[0-9]/; // 숫자
+        var pattern2 = /[a-zA-Z]/; // 문자
+        var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
+
+        if(!(pw.search(/\s/) != -1) &&
+        ((pattern1.test(pw) && pattern2.test(pw)) ||
+        (pattern1.test(pw) && pattern3.test(pw)) ||
+        (pattern2.test(pw) && pattern3.test(pw))
+        )) setIsPasswordValid(true)
+        else setIsPasswordValid(false)
+    }
 
     const checkIsValid = async () => {
-        if (password.length < 8) {
-            alert('비밀번호가 짧습니다.');
-            return 0;
-        }
-
         navigation.navigate('nicknameTab', {email, password})
     }
 
@@ -60,7 +71,7 @@ const GetPasswordTab = ({route, navigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: password ? colors.mainColor : colors.notClicked,
+            backgroundColor: password.length >= 8 && isPasswordValid ? colors.mainColor : colors.gray[6],
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
@@ -84,21 +95,52 @@ const GetPasswordTab = ({route, navigation}) => {
                             <AppText style={styles.title_text}>설정해주세요</AppText>
                         </View>
                     </AppText>
-                    <InputBox
-                        placeholder="한글, 영문, 숫자 혼용 가능(영문 기준 12자 이내)"
+                    <CustomTextInput
+                        placeholder="영문, 숫자, 특수문자 2가지 조합 8자리 이상"
                         autoCapitalize="none"
                         password={true}
                         secureTextEntry={true}
-                        style={{marginTop: 40}}
-                        onChangeText={(text) => setPassword(text)}
+                        style={{
+                            marginTop : 40,
+                            fontSize: 16,
+                            borderBottomWidth: 1,
+                            borderBottomColor: color,
+                            marginBottom: 6,
+                            paddingBottom: 11
+                        }}
+                        onChangeText={async (text) => {
+                            await checkPassword(text)
+                            if(text.length < 8) {
+                                setColor(colors.red[2]);
+                            }
+
+                            if(!isPasswordValid) {
+                                setColor(colors.red[2]);
+                            }
+                            
+                            if(text.length >= 8 && isPasswordValid) setColor(colors.gray[5])
+                            if(text === '') setColor(colors.gray[5])
+                            
+                            setPassword(text);
+                        }}
                     />
+                    <AppText style={{color: colors.red[2],
+                        display: password && password.length < 8 ? 'flex' : 'none'
+                    }}>
+                        비밀번호가 너무 짧아요. (8자 이상)
+                    </AppText>
+                    <AppText style={{color: colors.red[2],
+                        display: password && !isPasswordValid ? 'flex' : 'none'
+                    }}>
+                        영문, 숫자, 특수문자를 2가지 이상 조합해주세요.
+                    </AppText>
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
-                    disabled={password ? false : true}
+                    disabled={password.length >= 8 && isPasswordValid ? false : true}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>

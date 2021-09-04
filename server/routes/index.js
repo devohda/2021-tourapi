@@ -2,18 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 // 라우터 파일 가져오기
-const collectionRouter = require('./collections');
+const collectionRouter = require('./collection');
 const authRouter = require('./auth');
-const keywordRouter = require('./keywords');
 const userRouter = require('./users');
-const tourApiRouter = require('./tourApi');
+const searchRouter = require('./search');
+const placeRouter = require('./place');
+const likeRouter = require('./like');
 
 
 // 라우터 파일 등록하기
-router.use('/collections', collectionRouter);
 router.use('/auth', authRouter);
+router.use('/collection', collectionRouter);
 router.use('/user', userRouter);
-router.use('/keyword', keywordRouter);
-router.use('/tourapi', tourApiRouter);
+router.use('/search', searchRouter);
+router.use('/place', placeRouter);
+router.use('/like', likeRouter);
 
 module.exports = router;

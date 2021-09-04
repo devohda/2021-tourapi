@@ -49,7 +49,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
             </Form>
             <TouchableOpacity
                 style={{
-                    backgroundColor: colors.notClicked,
+                    backgroundColor: colors.gray[6],
                     height: 52,
                     borderRadius: 10,
                     margin: 16,

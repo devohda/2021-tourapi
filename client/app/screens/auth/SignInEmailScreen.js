@@ -9,7 +9,7 @@ import {useIsUserData} from "../../contexts/UserDataContextProvider";
 import ScreenContainerView from "../../components/ScreenContainerView";
 import NavigationTop from "../../components/NavigationTop";
 import AppText from "../../components/AppText";
-
+import { Icon } from 'react-native-elements';
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
 
@@ -18,7 +18,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
     const [userData, setUserData] = useIsUserData()
 
-    const {colors} = useTheme();
+    const { colors } = useTheme();
 
     const styles = StyleSheet.create({
         button: {
@@ -36,7 +36,6 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             fontWeight: 'bold'
         }
     });
-
     const signIn = async () => {
         try {
             let url = 'http://34.146.140.88/auth/loginEmail';
@@ -79,16 +78,15 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             <NavigationTop navigation={navigation}/>
             <ScreenContainerView>
                 <View style={{marginTop: 60}}>
-                    <View >
-                        <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의</AppText>
-                        <AppText style={{fontSize: 28, color: colors.mainColor}}><AppText style={{fontWeight: "bold", fontSize: 28, color: colors.mainColor}}>공간 보관함</AppText>을</AppText>
+                    <View>
+                        <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의 <AppText style={{fontSize: 28, color: colors.mainColor,fontWeight: "bold"}}>공간 보관함</AppText>을</AppText>
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</AppText>
                     </View>
                     <TextInput style={{
                         marginTop: 38,
                         fontSize: 16,
                         borderBottomWidth: 1,
-                        borderBottomColor: colors.subColor,
+                        borderBottomColor: colors.gray[5],
                         marginBottom: 27,
                         paddingBottom: 11
                     }}
@@ -96,19 +94,24 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                                onChangeText={(text) => setEmail(text)}
                                autoCapitalize="none"
                     />
-                    <TextInput style={{
+                    <View style={{flexDirection: 'row'}}>
+                    <TextInput flex={1}
+                    style={{
                         fontSize: 16,
                         borderBottomWidth: 1,
-                        borderBottomColor: colors.subColor,
+                        borderBottomColor: colors.gray[5],
                         marginBottom: 38,
-                        paddingBottom: 11
+                        paddingBottom: 11,
+                        flex: 1
                     }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
                                onChangeText={(text) => setPassword(text)}
                                autoCapitalize="none"
                     />
+                    <Icon type="ionicon" name={"eye"} size={20} color={colors.gray[5]}></Icon>
+                    </View>
                     <TouchableOpacity
                         style={{
-                            backgroundColor: colors.notClicked,
+                            backgroundColor: email && password ? colors.mainColor : colors.gray[6],
                             height: 52,
                             borderRadius: 10,
                             alignItems: 'center',
@@ -123,7 +126,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}}>
                             <AppText>회원가입</AppText>
                         </TouchableOpacity>
-                        <AppText style={{marginRight: 29, color: '#929292'}}>|</AppText>
+                        <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
                         <TouchableOpacity onPress={() => navigation.navigate('FindPassword')}>
                             <AppText>비밀번호 재설정</AppText>
                         </TouchableOpacity>
