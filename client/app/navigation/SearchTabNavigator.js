@@ -15,7 +15,7 @@ const totalWidth = Dimensions.get("screen").width;
 
 var placeListLength = 0;
 
-const SearchPlace = (props) => {
+const SearchPlace = (props, {navigation}) => {
     const {colors} = useTheme();
     const [placeList, setPlaceList] = useState([]);
     const [collectionList, setCollectionList] = useState([]);
@@ -23,7 +23,6 @@ const SearchPlace = (props) => {
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
     const [keyword, setKeyword] = searchKeyword()
-    console.log(keyword)
 
     const styles = StyleSheet.create({
         info_container : {
@@ -42,7 +41,7 @@ const SearchPlace = (props) => {
 
     useEffect(() => {
         getResults();
-    }, []);
+    }, [keyword]);
 
     const getResults = () => {
         try {
@@ -55,6 +54,7 @@ const SearchPlace = (props) => {
             }).then((res) => res.json())
                 .then((response) => {
                     setPlaceList(response.data);
+                    console.log(placeList)
                 })
                 .catch((err) => {
                     console.error(err)
@@ -65,40 +65,56 @@ const SearchPlace = (props) => {
         }
     };
 
+    const checkType = (type) => {
+        if(type === 12) {
+            return '관광지'
+        } else if(type === 14) {
+            return '문화시설'
+        } else if(type === 15) {
+            return '축제/공연/행사'
+        } else if(type === 28) {
+            return '레포츠'
+        } else if(type === 32) {
+            return '숙박'
+        } else if(type === 38) {
+            return '쇼핑'
+        } else if(type === 39) {
+            return '음식'
+        }
+    }
+
     const PlaceContainer = ({item}) => (
-        <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22}}>
-            <Image source={require('../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
-            <View flex={1} style={styles.info_container}>
-                <View flexDirection="row" style={{alignItems: 'center'}}>
-                    {/* <AppText style={{fontSize: 10, color: colors.mainColor}}>{}</AppText> */}
-                    <View style={styles.score_line}></View>
-                    <Star width={14} height={14}/>
-                    <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</AppText>
+        <TouchableOpacity onPress={()=>props.navigation.navigate('Place')}>
+            <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22}}>
+                <Image source={require('../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
+                <View flex={1} style={styles.info_container}>
+                    <View flexDirection="row" style={{alignItems: 'center'}}>
+                        <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
+                        <View style={styles.score_line}></View>
+                        <Star width={14} height={14}/>
+                        <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                    </View>
+                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
+                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
                 </View>
-                <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
-                <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
+                <TouchableOpacity onPress={() => setLike(likeState => !likeState)}>
+                    <Jewel width={26} height={21} style={{color: like ? colors.red[3] : colors.red_gray[5]}}/>
+                </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={() => setLike(likeState => !likeState)}>
-                <Jewel width={26} height={21} style={{color: like ? colors.red[3] : colors.red_gray[5]}}/>
-            </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     )
 
         return (
             <View style={{backgroundColor: colors.backgroundColor}}>
-                <SafeAreaView>
+                <SafeAreaView flex={1}>
                     <FlatList data={placeList} renderItem={PlaceContainer} keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
                 </SafeAreaView>
             </View>
         )
 }
 
-const SearchTabNavigator = (props, {route}) => {
+const SearchTabNavigator = (props, {route, navigation}) => {
     const {colors} = useTheme();
-    // const keyword = props.keyword
-    const [keyword, setKeyword] = searchKeyword()
-    console.log(keyword)
-
     return (
         <Tab.Navigator
             sceneContainerStyle={{
@@ -135,7 +151,7 @@ const SearchTabNavigator = (props, {route}) => {
                 })
             }}
         >
-            <Tab.Screen name={`공간 ${placeListLength}`} component={SearchPlace}/>
+            <Tab.Screen name={`공간 ${placeListLength}`} component={SearchPlace} initialParams={{navigation: props.navigation}}/>
             <Tab.Screen name={`보관함`} component={SearchCollection}/>
             <Tab.Screen name={`유저`} component={SearchUser}/>
         </Tab.Navigator>

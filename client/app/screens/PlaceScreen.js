@@ -48,57 +48,6 @@ const PlaceScreen = ({navigation}) => {
     const [ placeScore, setPlaceScore ] = useState('4.84');
     const [ clicked, setClicked ] = useState(false);
 
-    const postLikes = async () => {
-        try {
-            fetch('http://192.168.0.11:3000/like/likes', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    //임의로 음식점이라서 0으로 넣음
-                    like_type: 0,
-                    like_title: placeTitle,
-                    like_location: placeLocation.split(' ')[0] + ' ' + placeLocation.split(' ')[1],
-                    //이것도 불러와야 함
-                    like_score: parseFloat(placeScore).toFixed(1),
-                })
-            }).then((res) => res.text())
-                .then((responsedata) => {
-                    console.log(responsedata);
-                })
-                .catch((err) => {
-                    console.error(err)
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-        setIsLiked(true)
-    }
-
-    const deleteLikes = async () => {
-        try {
-            fetch('http://192.168.0.11:3000/like/likes/'+ 32, {
-                method: 'DELETE',
-                body: {
-                    like_type: 0,
-                    like_pk: 34
-                }
-            }).then((res) => res.text())
-                .then((responsedata) => {
-                    console.log(responsedata);
-                })
-                .catch((err) => {
-                    console.error(err)
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-        setIsLiked(false)
-    };
 
     const ShowDirectories = () => {
         return (
@@ -354,7 +303,8 @@ const PlaceScreen = ({navigation}) => {
                         </View>
                         <View style={{flexDirection: 'row', paddingVertical: 32, justifyContent: 'center', alignItems: 'center'}}>
                             {/* 이 부분도 유저 정보에 따라 바뀔수 있도록 하기 */}
-                            <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}>
+                            {/* <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}> */}
+                            <TouchableOpacity>
                                 <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image>
                             </TouchableOpacity>
                             <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>

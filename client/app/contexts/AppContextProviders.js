@@ -8,7 +8,9 @@ const AppContextProviders = props => {
         <>
             <SignedInContextProvider>
                 <UserDataContextProvider>
-                    {props.children}
+                    <SearchKeywordContextProvider>
+                        {props.children}
+                    </SearchKeywordContextProvider>
                 </UserDataContextProvider>
             </SignedInContextProvider>
         </>

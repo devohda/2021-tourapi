@@ -142,7 +142,6 @@ const SearchScreen = ({navigation}) => {
     }
 
     return (
-        <SearchKeywordContextProvider>
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop title="검색" navigation={navigation}/>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -154,14 +153,14 @@ const SearchScreen = ({navigation}) => {
                                    placeholder="원하는 공간을 검색해보세요"
                                    placeholderTextColor={colors.gray[5]}
                                    onChangeText={(text) => setSearchText(text)}/>
-                        <Pressable style={{marginLeft: 5}} onPress={() => {setKeyword(''); setKeyword(searchText); setK(keyword)}}>
+                        <Pressable style={{marginLeft: 5}} onPress={() => {setKeyword(''); setKeyword(searchText); setK(searchText)}}>
                             <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
                         </Pressable>
                     </View>
                     {
                         keyword === '' ?
                         <RecommendedDefault /> :
-                        <SearchTabNavigator />
+                        <SearchTabNavigator navigation={navigation} />
                     }
                 </ScreenContainerView>
 
@@ -203,7 +202,6 @@ const SearchScreen = ({navigation}) => {
                 </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>
-        </SearchKeywordContextProvider>
     )
 };
 
