@@ -36,7 +36,6 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             fontWeight: 'bold'
         }
     });
-
     const signIn = async () => {
         try {
             let url = 'http://34.146.140.88/auth/loginEmail';

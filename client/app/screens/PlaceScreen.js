@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking} from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useTheme } from '@react-navigation/native';
@@ -11,7 +11,7 @@ import Time from "../components/Time";
 import Facility from "../components/Facility";
 import AppText from "../components/AppText";
 
-const PlaceScreen = ({navigation}) => {
+const PlaceScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
     const { colors } = useTheme();
 
@@ -38,35 +38,27 @@ const PlaceScreen = ({navigation}) => {
             borderRadius: 50,
     
         },
-    })
+    });
 
-    //TODO 유저의 보관함 안에 이 place_pk가 있는지 확인하는 작업 필요
-    const [ isLiked, setIsLiked ] = useState(false);
-    //데이터 받아서 다시해야함
-    const [ placeTitle, setPlaceTitle ] = useState('주왕산 주산지');
-    const [ placeLocation, setPlaceLocation ] = useState('서울시 광진구 능동로 216 (우)04991');
-    const [ placeScore, setPlaceScore ] = useState('4.84');
-    const [ clicked, setClicked ] = useState(false);
+    const { data } = route.params;
+    const [placeId, setPlaceId] = useState(getResults)
+    const [placeData, setPlaceData] = useState(data);
 
-    const postLikes = async () => {
+    useEffect(() => {
+        getResults();
+    }, []);
+
+    const getResults = () => {
         try {
-            fetch('http://192.168.0.11:3000/like/likes', {
-                method: 'POST',
+            fetch(`http://34.146.140.88:3000/place/${data.place_pk}`, {
+                method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    //임의로 음식점이라서 0으로 넣음
-                    like_type: 0,
-                    like_title: placeTitle,
-                    like_location: placeLocation.split(' ')[0] + ' ' + placeLocation.split(' ')[1],
-                    //이것도 불러와야 함
-                    like_score: parseFloat(placeScore).toFixed(1),
-                })
-            }).then((res) => res.text())
-                .then((responsedata) => {
-                    console.log(responsedata);
+            }).then((res) => res.json())
+                .then((response) => {
+                    return response.data;
                 })
                 .catch((err) => {
                     console.error(err)
@@ -75,30 +67,127 @@ const PlaceScreen = ({navigation}) => {
         } catch (err) {
             console.error(err);
         }
-        setIsLiked(true)
+    };
+
+    const checkType = (type) => {
+        if(type === 12) {
+            return '관광지'
+        } else if(type === 14) {
+            return '문화시설'
+        } else if(type === 15) {
+            return '축제/공연/행사'
+        } else if(type === 28) {
+            return '레포츠'
+        } else if(type === 32) {
+            return '숙박'
+        } else if(type === 38) {
+            return '쇼핑'
+        } else if(type === 39) {
+            return '음식'
+        } else {
+            return '기타'
+        }
+    };
+
+    const PlaceInfo = () => {
+        return (
+            <View>
+                <View style={{flexDirection: 'row'}}>
+                    <Image style={{width: "50%", height: 200}}
+                        source={require('../assets/images/mountain.jpeg')}
+                        resizeMode="cover"
+                    />
+                    <View style={{width: '50%', height: 200}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <Image style={{width: "50%", height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                            <Image style={{width: "50%", height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <Image style={{width: "50%", height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                            <Image style={{width: "50%", height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                        </View>
+                    </View>
+                </View>
+                <View style={{
+                    alignItems: 'center'
+                }}>
+                    <View style={{width: '90%', paddingTop: 20, justifyContent: "space-between", flexDirection: 'row'}}>
+                        <AppText style={{fontSize: 22, fontWeight: "bold", color: colors.mainColor}}>{placeData.place_name}</AppText>
+                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <View style={[styles.categoryBorder, {borderColor: colors.red_gray[6], backgroundColor: colors.red_gray[6]}]}>
+                                <AppText style={styles.categoryText}>{checkType(placeData.place_type)}</AppText>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+                <View style={{width: '90%', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 4.5}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Icon type="ionicon" name={"location"} size={14} color={colors.mainColor} style={{marginTop: 3}}></Icon>
+                        <View style={{marginLeft: 5}}>
+                            <AppText style={{color: colors.gray[1], fontSize: 14, marginBottom: 1, lineHeight: 22.4}}>{placeData.place_addr}</AppText>
+                            <AppText style={{color: colors.gray[4], fontSize: 14, lineHeight: 22.4}}>{placeData.place_addr !== '' && '지번 :'} {placeData.place_addr}</AppText>
+                        </View>
+            </View>
+                </View>
+                <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Icon type="ionicon" name={"globe-outline"} size={14} color={colors.mainColor}></Icon>
+                        <View style={{marginLeft: 5}}>
+                            {/* 하이퍼링크 하도록 */}
+                            <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
+                        </View>
+                    </View>
+                </View>
+                <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Icon type="ionicon" name={"time-outline"} size={14} color={colors.mainColor}></Icon>
+                        <View style={{marginLeft: 5}}>
+                            <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
+                        </View>
+                    </View>
+                </View>
+                <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Icon type="ionicon" name={"call"} size={14} color={colors.mainColor}></Icon>
+                        <View style={{marginLeft: 5}}>
+                            <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
+                        </View>
+                    </View>
+                </View>
+                <View style={{flexDirection: 'row', paddingVertical: 32, justifyContent: 'center', alignItems: 'center'}}>
+                    {/* 이 부분도 유저 정보에 따라 바뀔수 있도록 하기 */}
+                    {/* <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}> */}
+                    <TouchableOpacity>
+                        <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image>
+                    </TouchableOpacity>
+                    <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>
+                    <ShowDirectories />
+                    <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>
+                    <TouchableOpacity onPress={onShare}>
+                        <Icon type="ionicon" name={"share-social"} color={colors.red_gray[6]} size={28}></Icon>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
     }
 
-    const deleteLikes = async () => {
-        try {
-            fetch('http://192.168.0.11:3000/like/likes/'+ 32, {
-                method: 'DELETE',
-                body: {
-                    like_type: 0,
-                    like_pk: 34
-                }
-            }).then((res) => res.text())
-                .then((responsedata) => {
-                    console.log(responsedata);
-                })
-                .catch((err) => {
-                    console.error(err)
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-        setIsLiked(false)
-    };
+    //TODO 유저의 보관함 안에 이 place_pk가 있는지 확인하는 작업 필요
+    const [ isLiked, setIsLiked ] = useState(false);
+    //데이터 받아서 다시해야함
+    const [ placeScore, setPlaceScore ] = useState('4.84');
+    const [ clicked, setClicked ] = useState(false);
 
     const ShowDirectories = () => {
         return (
@@ -276,96 +365,10 @@ const PlaceScreen = ({navigation}) => {
                 backgroundColor: colors.backgroundColor,
                 width: "100%",
             }}>
+                
                 <ScrollView style={{width: "100%"}}>
-                    <View>
-                        <View style={{flexDirection: 'row'}}>
-                            <Image style={{width: "50%", height: 200}}
-                                source={require('../assets/images/mountain.jpeg')}
-                                resizeMode="cover"
-                            />
-                            <View style={{width: '50%', height: 200}}>
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <Image style={{width: "50%", height: 100}}
-                                        source={require('../assets/images/mountain.jpeg')}
-                                        resizeMode="cover"
-                                    />
-                                    <Image style={{width: "50%", height: 100}}
-                                        source={require('../assets/images/mountain.jpeg')}
-                                        resizeMode="cover"
-                                    />
-                                </View>
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <Image style={{width: "50%", height: 100}}
-                                        source={require('../assets/images/mountain.jpeg')}
-                                        resizeMode="cover"
-                                    />
-                                    <Image style={{width: "50%", height: 100}}
-                                        source={require('../assets/images/mountain.jpeg')}
-                                        resizeMode="cover"
-                                    />
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{
-                            alignItems: 'center'
-                        }}>
-                            <View style={{width: '90%', paddingTop: 20, justifyContent: "space-between", flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 22, fontWeight: "bold", color: colors.mainColor}}>{placeTitle}</AppText>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <View style={[styles.categoryBorder, {borderColor: colors.red_gray[6], backgroundColor: colors.red_gray[6]}]}>
-                                        <AppText style={styles.categoryText}>음식점</AppText>
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{width: '90%', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 4.5}}>
-                            <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={"location"} size={14} color={colors.mainColor} style={{marginTop: 3}}></Icon>
-                                <View style={{marginLeft: 5}}>
-                                    <AppText style={{color: colors.gray[1], fontSize: 14, marginBottom: 1, lineHeight: 22.4}}>{placeLocation}</AppText>
-                                    <AppText style={{color: colors.gray[4], fontSize: 14, lineHeight: 22.4}}>지번 : 능동 259-1</AppText>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
-                            <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={"globe-outline"} size={14} color={colors.mainColor}></Icon>
-                                <View style={{marginLeft: 5}}>
-                                    {/* 하이퍼링크 하도록 */}
-                                    <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
-                            <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={"time-outline"} size={14} color={colors.mainColor}></Icon>
-                                <View style={{marginLeft: 5}}>
-                                    <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{width: '90%', paddingHorizontal: 20, paddingVertical: 4.5}}>
-                            <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={"call"} size={14} color={colors.mainColor}></Icon>
-                                <View style={{marginLeft: 5}}>
-                                    <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{flexDirection: 'row', paddingVertical: 32, justifyContent: 'center', alignItems: 'center'}}>
-                            {/* 이 부분도 유저 정보에 따라 바뀔수 있도록 하기 */}
-                            <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}>
-                                <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image>
-                            </TouchableOpacity>
-                            <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>
-                            <ShowDirectories />
-                            <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>
-                            <TouchableOpacity onPress={onShare}>
-                                <Icon type="ionicon" name={"share-social"} color={colors.red_gray[6]} size={28}></Icon>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    
+                    <PlaceInfo />
+
                     <View style={{width: '100%', height: 8, backgroundColor: colors.red_gray[6], zIndex: -1000}}></View>
                     
                     <View style={{alignItems: 'center', paddingVertical: 22}}>

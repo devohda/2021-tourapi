@@ -44,8 +44,8 @@ const GetEmailTab = ({navigation}) => {
                 body: JSON.stringify({email})
             }).then(res => res.json())
                 .then(response => {
-                    setIsEmailDuplicated(response.isDuplicated === true);
-                    return response.isDuplicated === true;
+                    setIsEmailDuplicated(response.data.isDuplicated === true);
+                    return response.data.isDuplicated === true;
                 })
                 .catch(error => console.log(error));
             return result
@@ -118,13 +118,14 @@ const GetEmailTab = ({navigation}) => {
                             await findSameEmail(text);
                             if(!text.match(emailRegExp)) {
                                 setColor(colors.red[2]);
-                            } else setColor(colors.gray[5]);
+                            }
 
                             if(!isEmailDuplicated) {
                                 setColor(colors.red[2]);
-                            } else setColor(colors.gray[5]);
+                            }
 
                             if(text === '') setColor(colors.gray[5]);
+                            if(text.match(emailRegExp) && isEmailDuplicated) setColor(colors.gray[5])
                             setEmail(text);
                         }}
 
