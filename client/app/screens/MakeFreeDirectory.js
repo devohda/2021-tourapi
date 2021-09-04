@@ -115,7 +115,7 @@ const MakeFreeDirectory = ({navigation}) => {
             }
         }
         try {
-            fetch('http://192.168.0.11:3000/collection/free', {
+            fetch('http://34.146.140.88:3000/collection/free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

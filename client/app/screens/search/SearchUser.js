@@ -1,10 +1,44 @@
-import React from "react";
-import {View, ScrollView, Image, StyleSheet} from "react-native";
+import React, {useEffect, useState} from "react";
+import {View, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Dimensions} from "react-native";
 import AppText from "../../components/AppText";
 import { useTheme } from "@react-navigation/native";
+import { searchKeyword } from "../../contexts/SearchkeywordContextProvider";
+import ShowEmpty from "../../components/ShowEmpty";
 
 const SearchUser = (props) => {
-    const { colors } = useTheme();
+    const {colors} = useTheme();
+    const [userList, setUserList] = useState([]);
+    const [searchType, setSearchType] = useState('user');
+    const [like, setLike] = useState(false);
+    const [keyword, setKeyword] = searchKeyword();
+
+    useEffect(() => {
+        getResults();
+    }, [keyword]);
+
+    const getResults = () => {
+        try {
+            fetch(`http://34.146.140.88:3000/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserList(response.data);
+                    console.log(userList)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const collectionMargin = (Dimensions.get("screen").width - 88 * 2) / 5
 
     const styles = StyleSheet.create({
         authorImage: {
@@ -26,9 +60,9 @@ const SearchUser = (props) => {
         },
     });
 
-    const SearchedUsers = () => {
+    const UserContainer = ({item}) => {
         return(
-            <View style={{alignItems: 'center', paddingBottom: 20}}>
+            <View style={{alignItems: 'center', paddingBottom: 20, marginHorizontal: collectionMargin}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Image style={styles.authorImage}
                     source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
@@ -42,19 +76,13 @@ const SearchUser = (props) => {
                     fontWeight: 'bold',
                     color: colors.mainColor,
                     marginTop: 8
-                }}>K-민선</AppText>
+                }}>{item.user_nickname}</AppText>
 
-                <View style={{flexDirection: 'row'}}>
-                    <View
-                        style={{
-                            ...styles.keywordHashTagView,
-                        }}><AppText
-                        style={styles.keywordHashTag}>#조용한</AppText></View>
-                    <View
-                        style={{
-                            ...styles.keywordHashTagView,
-                        }}><AppText
-                        style={styles.keywordHashTag}>#따뜻한</AppText></View>
+                <View style={{flexDirection : 'row', alignItems: 'center', marginTop: 4}}>
+                            {item.keywords.length != 0 &&
+                                item.keywords.map((k) => {
+                                    return <View style={{marginEnd: 3}}><AppText style={{fontSize : 12, color : colors.gray[4]}}># {k}</AppText></View>
+                            })}
                 </View>
             </View>
         )
@@ -62,20 +90,15 @@ const SearchUser = (props) => {
     }
 
     return (
-        <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22}}>
-            <ScrollView scrollEnabled={false}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: '10%'}}>
-                    <SearchedUsers/>
-                    <SearchedUsers/>
-                </View>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: '10%'}}>
-                    <SearchedUsers/>
-                    <SearchedUsers/>
-                </View>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: '10%'}}>
-                    <SearchedUsers/>
-                </View>
-            </ScrollView>
+        <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22}, userList.length === 0 && {justifyContent: 'center'}}>
+            {
+                userList.length === 0 ?
+                <ShowEmpty /> :
+                <SafeAreaView>
+                    <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={userList} renderItem={UserContainer} keyExtractor={(item) => item.user_pk.toString()} nestedScrollEnabled />
+                </SafeAreaView>
+            }
+
         </View>
     )
 }

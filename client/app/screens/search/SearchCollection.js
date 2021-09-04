@@ -1,17 +1,49 @@
-import React from "react";
-import {Image, Text, View, ScrollView, FlatList} from "react-native";
+import React, {useState, useEffect} from "react";
+import {Image, Text, View, ScrollView, FlatList, SafeAreaView, Dimensions} from "react-native";
 import {useTheme} from "@react-navigation/native";
 import AppText from "../../components/AppText";
-import ScreenContainer from "../../components/ScreenContainer";
 import { Icon } from "react-native-elements";
+import { searchKeyword } from "../../contexts/SearchkeywordContextProvider";
+import ShowEmpty from "../../components/ShowEmpty";
 
 const SearchCollection = (props) => {
     const {colors} = useTheme();
+    const [collectionList, setCollectionList] = useState([]);
+    const [searchType, setSearchType] = useState('collection');
+    const [like, setLike] = useState(false);
+    const [keyword, setKeyword] = searchKeyword();
+
+    useEffect(() => {
+        getResults();
+    }, [keyword]);
+
+    const getResults = () => {
+        try {
+            fetch(`http://34.146.140.88:3000/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setCollectionList(response.data);
+                    console.log(collectionList)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
     
-    const SearchedCollections = () => {
+    const CollectionContainer = ({item}) => {
+        const collectionMargin = (Dimensions.get("screen").width - 162 * 2) / 9
         return (
             <View style={{
-                width: '45%',
+                width: 162,
                 height: 249,
                 shadowColor: colors.shadowColor,
                 shadowOffset: {width: 0, height: 0},
@@ -19,14 +51,14 @@ const SearchCollection = (props) => {
                 shadowRadius: 1,
                 elevation: 1,
                 marginBottom: 12,
-                marginRight : '2.5%',
+                marginHorizontal : collectionMargin,
                 borderRadius : 10,
                 overflow: 'hidden'
             }}>
                 <View flexDirection="row" style={{
                     flexWrap: "wrap",
+                    width: 162,
                     height: 162,
-                    width: '100%',
                 }}>
                     <Image source={require('../../assets/images/flower.jpeg')} style={{width: '50%', height: 81}}/>
                     <Image source={require('../../assets/images/mountain.jpeg')} style={{width: '50%', height: 81}}/>
@@ -36,24 +68,25 @@ const SearchCollection = (props) => {
                 <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
                     <View style={{paddingBottom: 10}}>
                         <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
-                            종로 25년 토박이가 알려주는 종로 사진스팟
+                            {item.collection_name}
                         </AppText>
-                        <AppText style={{flexDirection : 'row', fontSize : 10, color : colors.gray[5]}}>
-                            <AppText># 힐링</AppText>
-                            <AppText># 뚜벅</AppText>
-                            <AppText># 여유</AppText>
-                        </AppText>
+                        <View style={{flexDirection : 'row', alignItems: 'center', marginTop: 4}}>
+                            {item.keywords.length != 0 &&
+                                item.keywords.map((k) => {
+                                    return <View style={{marginEnd: 3}}><AppText style={{fontSize : 10, color : colors.gray[5]}}># {k}</AppText></View>
+                                })}
+                        </View>
                     </View>
                     <View style={{flexDirection: 'row', paddingBottom: 6}}>
-                        <AppText style={{fontSize: 8, width: '60%', color: colors.subColor}}>by minsun</AppText>
+                        <AppText style={{fontSize: 8, width: '60%', color: colors.gray[5]}}>by {item.created_user_name}</AppText>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Image source={require('../../assets/images/here_icon.png')} style={{width: 8, height: 8, marginVertical: 1.5, marginHorizontal: 2}}></Image>
-                            <AppText style={{fontSize: 8, color: colors.subColor, fontWeight: 'bold'}}>1.2k</AppText>
+                            <AppText style={{fontSize: 8, color: colors.gray[5], fontWeight: 'bold'}}>1.2k</AppText>
                         </View>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Icon type="ionicon" name={"location"} size={8} color={colors.hashTagColor}
                                 style={{marginVertical: 1, marginHorizontal: 2}}></Icon>
-                            <AppText style={{fontSize: 8, color: colors.subColor, fontWeight: 'bold'}}>9</AppText>
+                            <AppText style={{fontSize: 8, color: colors.gray[5], fontWeight: 'bold'}}>9</AppText>
                         </View>
                     </View>
                 </View>
@@ -61,35 +94,18 @@ const SearchCollection = (props) => {
         )
     }
 
-    const PlaceContainer = (props) => {
-        return (
-            <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22, width: '100%'}}>
-                {/* <ScrollView horizontal={true} scrollEnabled={false}>
-                    <SafeAreaView>
-                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={directoryData} renderItem={showDirectories} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
-                    </SafeAreaView>
-                </ScrollView> */}
-                <ScrollView scrollEnabled={false}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <SearchedCollections/>
-                        <SearchedCollections/>
-                    </View>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <SearchedCollections/>
-                        <SearchedCollections/>
-                    </View>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <SearchedCollections/>
-                        <SearchedCollections/>
-                    </View>
-                </ScrollView>
-            </View>
-        )
-    }
-
     return (
         <View>
-            <PlaceContainer />
+            <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22, width: '100%'}, collectionList.length === 0 && {justifyContent: 'center'}}>
+                {
+                    collectionList.length === 0 ?
+                    <ShowEmpty /> :
+                    <SafeAreaView>
+                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={collectionList} renderItem={CollectionContainer} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled />
+                    </SafeAreaView>
+                }
+
+            </View>
         </View>
     )
 }
