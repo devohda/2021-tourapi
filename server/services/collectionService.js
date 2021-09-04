@@ -110,14 +110,46 @@ exports.createPlaceToCollection = async (collection_pk, place_pk) => {
 }
 
 // 보관함 조회
-exports.readCollection = async (collection_pk) => {
-    const query = `SELECT * FROM collections WHERE collection_pk = ${collection_pk}`
-
+exports.readCollection = async (user_pk, collection_pk) => {
     const conn = await db.pool.getConnection();
     let result;
 
     try {
+        // 보관함 정보 & 보관함 좋아요 상태
+        const query1 = `SELECT c.*, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+                        FROM collections c
+                        LEFT OUTER JOIN like_collection lc
+                        ON lc.collection_pk = c.collection_pk
+                        AND lc.user_pk = ${user_pk}
+                        WHERE c.collection_pk = ${collection_pk}`;
+        const [[result1]] = await conn.query(query1);
 
+        // 보관함 키워드
+        const query2 = `SELECT keyword_title FROM keywords k
+                        LEFT OUTER JOIN keywords_collections_map kcm
+                        ON kcm.keyword_pk = k.keyword_pk
+                        WHERE kcm.collection_pk = ${collection_pk}`;
+        const [result2] = await conn.query(query2);
+        const keywords = result2.map(keyword => keyword.keyword_title)
+
+        // 장소 정보 & 장소 좋아요 상태
+        const query3 = `SELECT cpm.place_pk, place_name, place_addr, place_img, place_type, 
+                               CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
+                        FROM collection_place_map cpm
+                        INNER JOIN places p
+                        ON p.place_pk = cpm.place_pk
+                        LEFT OUTER JOIN like_place lp
+                        ON lp.place_pk = cpm.place_pk
+                        AND lp.user_pk = ${user_pk}
+                        WHERE collection_pk = ${collection_pk}`
+
+        const [result3] = await conn.query(query3);
+
+        result = {
+            ...result1,
+            keywords,
+            places : result3
+        }
 
     } catch (err) {
         console.error(err);

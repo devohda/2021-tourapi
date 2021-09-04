@@ -22,9 +22,10 @@ router.post('/', async (req, res, next) => {
 })
 
 // 보관함 가져오기
-router.get('/:collectionId', async (req, res, next) => {
+router.post('/:collectionId', async (req, res, next) => {
     const {collectionId} = req.params;
-    const result = await collectionService.readCollection(collectionId);
+    const {userId} = req.body;
+    const result = await collectionService.readCollection(userId, collectionId);
 
     if (result) {
         return res.send({
