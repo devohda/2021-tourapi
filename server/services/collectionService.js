@@ -83,13 +83,25 @@ exports.readCollectionListForPlaceInsert = async (user_pk) => {
     // TODO
     //  - 권한 있는 유저 리스트(사진)
 
-    const query1 = `SELECT c.collection_pk, collection_name, collection_type, IFNULL(place_cnt, 0) AS place_cnt
-                        FROM collections c
-                        LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
-                        ON cpm.collection_pk = c.collection_pk
-                        WHERE user_pk = ${user_pk}`;
+    const query = `SELECT c.collection_pk, collection_name, collection_type, IFNULL(place_cnt, 0) AS place_cnt
+                   FROM collections c
+                   LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
+                   ON cpm.collection_pk = c.collection_pk
+                   WHERE user_pk = ${user_pk}`;
 
-    const result = await db.query(query1);
+    const result = await db.query(query);
+    console.log(result)
+
+    return result;
+}
+
+// 장소 추가할 보관함 리스트 조회
+exports.createPlaceToCollection = async (collection_pk, place_pk) => {
+
+    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk) 
+                   VALUES (${collection_pk}, ${place_pk})`;
+
+    const result = await db.query(query);
 
     return result;
 }
