@@ -24,7 +24,6 @@ export const navigationRef = React.createRef();
 const MakeFreeDirectory = ({navigation}) => {
 
     const {colors} = useTheme();
-
     const styles = StyleSheet.create({
         plusComplete: {
             marginBottom: '5%'
@@ -115,7 +114,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 datas.push(keywordData[i].keyword_title)
             }
         }
-        console.log(userData.user_pk)
+
         try {
             fetch('http://34.146.140.88/collection', {
                 method: 'POST',
@@ -126,7 +125,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 body: JSON.stringify({
                     collectionData : {
                         name: collectionName,
-                        private: 0,
+                        private: isEnabled,
                         description: null,
                         type: 0,
                     },
@@ -186,7 +185,11 @@ const MakeFreeDirectory = ({navigation}) => {
         collection_type: 1,
     }
 
-    const getKeywords = () => {
+    useEffect(() => {
+        getKeywords();
+    }, []);
+
+    const getKeywords = useCallback(() => {
         try {
 
             fetch('http://34.146.140.88/keyword/list', {
@@ -196,10 +199,10 @@ const MakeFreeDirectory = ({navigation}) => {
                     'Content-Type': 'application/json'
                 },
             }).then((res) => res.json())
-                .then((responsedata) => {
-                    setKeywordData(responsedata)
+                .then((response) => {
+                    setKeywordData(response.data)
                     setFalse()
-                    // console.log(keywordData)
+                    console.log(keywordData)
                 })
                 .catch((err) => {
                     console.error(err)
@@ -208,7 +211,7 @@ const MakeFreeDirectory = ({navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    };
+    }, []);
 
     //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
     //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
@@ -241,30 +244,6 @@ const MakeFreeDirectory = ({navigation}) => {
         setIsPress(pressed)
     }
 
-    useEffect(() => {
-        getKeywords();
-    }, []);
-
-    // const showKeywords = ({ item }) => (
-    //     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-    //         <TouchableOpacity onPress={() => {
-    //                 let newArr = [...isPress];
-    //                 if (isPress[item.id - 1]) {
-    //                     newArr[item.id - 1] = false;
-    //                     setIsPress(newArr);
-    //                 } else {
-    //                     newArr[item.id - 1] = true;
-    //                     setIsPress(newArr);
-    //                 }
-    //             }} style={isPress[item.id - 1] ? [styles.selectTypeClicked, {
-    //                 borderColor: colors.mainColor,
-    //                 backgroundColor: colors.mainColor
-    //             }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
-                
-    //             <AppText style={isPress[item.id - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{item.key}</AppText></TouchableOpacity>
-    //     </View>
-    // )
-
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
@@ -294,9 +273,11 @@ const MakeFreeDirectory = ({navigation}) => {
                             <View flexDirection="row">
                                 <Image source={require('../assets/images/add_keyword.png')}
                                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                                {keywordData.map((keyword, idx) => (
-                                    <Keyword keyword={keyword} key={idx}/>
-                                ))}
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <Keyword keyword={keyword} key={idx} />
+                                    ))
+                                }
                                 {/* <FlatList data={keywordData} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/> */}
                             </View>
                         </View>

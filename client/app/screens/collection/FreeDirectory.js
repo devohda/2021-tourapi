@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -9,7 +9,8 @@ import {
     Dimensions,
     Platform,
     TextInput,
-    Pressable 
+    Pressable,
+    FlatList
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from "styled-components/native";
@@ -20,15 +21,51 @@ import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
+import { useIsUserData } from '../../contexts/UserDataContextProvider';
 
 // import {   Menu,
 //     Divider,
 //     HamburgerIcon,
 //     Center, NativeBaseProvider } from 'native-base';
 
-export default function FreeDirectory({navigation}) {
+const FreeDirectory = ({route, navigation}) => {
     const {colors} = useTheme();
-    const [directoryTitle, setDirectoryTitle] = useState('종로 25년 토박이가 알려주는 종로 사진스팟')
+    const { data } = route.params;
+    const [directoryTitle, setDirectoryTitle] = useState('종로 25년 토박이가 알려주는 종로 사진스팟');
+    const [userData, setUserData] = useIsUserData();
+    const [directoryData, setDirectoryData] = useState({});
+    const [placeLength, setPlaceLength] = useState(0);
+    const [isLimited, setIsLimited] = useState(true);
+
+    useEffect(() => {
+        getResults();
+    }, []);
+
+    const getResults = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId : userData.user_pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    setDirectoryData(response.data)
+                    setPlaceLength(response.data.places.length)
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const InputBox = styled(TextInput)`
     fontSize: 16px;
@@ -36,10 +73,106 @@ export default function FreeDirectory({navigation}) {
     borderBottomColor: #C5C5C5;
     paddingBottom: 11px;
   `
+    const Keyword = ({item}) => {
+        return(
+            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
+        )
+    };
+
+    const checkType = (type) => {
+        if(type === 12) {
+            return '관광지'
+        } else if(type === 14) {
+            return '문화시설'
+        } else if(type === 15) {
+            return '축제/공연/행사'
+        } else if(type === 28) {
+            return '레포츠'
+        } else if(type === 32) {
+            return '숙박'
+        } else if(type === 38) {
+            return '쇼핑'
+        } else if(type === 39) {
+            return '음식'
+        } else {
+            return '기타'
+        }
+    };
+
+    const ShowPlaces = ({item}) => {
+        console.log(directoryData)
+        return (
+            <>
+            {item.place_pk !== directoryData.places[0].place_pk && <View style={{width: '100%', height: 1, backgroundColor: colors.red_gray[6], zIndex: -1000, marginVertical: 13}}></View>}
+
+            <View>
+                <View style={{flexDirection: 'row'}}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
+                        <View style={{flexDirection: 'row', width: '90%'}}>
+                            <Image source={{uri: item.place_img}}
+                                style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                            <View style={{justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', width: '78%'}}>
+                                <View style={{marginLeft: 8, marginTop: '2%'}}>
+                                    <View style={{flexDirection: 'row'}}>
+                                        <AppText style={{
+                                            color: colors.gray[3],
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: 'bold'
+                                        }}>{checkType(item.place_type)}</AppText>
+                                        <AppText style={{marginHorizontal:4, color: colors.gray[7], 
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: 'bold'
+                                        }}>|</AppText>
+                                        <Image source={require('../../assets/images/review_star.png')}
+                                    style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
+                                        <AppText style={{
+                                            color: colors.gray[3],
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: 'bold',
+                                            marginLeft: 2
+                                        }}>4.8</AppText>
+                                    </View>
+                                    <View style={{width: '100%'}}>
+                                        <AppText style={{
+                                            fontSize: 16,
+                                            fontWeight: 'bold',
+                                            color: colors.mainColor,
+                                            marginVertical: 5,
+                                        }}>{item.place_name}</AppText>
+                                    </View>
+                                    <AppText style={{fontSize: 12,color: colors.gray[4]}}>{item.place_addr}</AppText>
+                                </View>
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                        {item.like_flag === 0 ? 
+                        <Image source={require('../../assets/images/here_nonclick.png')} style={{width: 26, height: 21}}></Image>
+                        : <Image source={require('../../assets/images/here_click.png')} style={{width: 26, height: 21}}></Image>}
+                    </View>
+                </View>
+                <View style={{backgroundColor: colors.defaultColor, height: 30, paddingVertical: 6, paddingLeft: 6, paddingRight: 5,
+                                marginBottom: 6, marginRight: 10, marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                                }}>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Image source={require('../../assets/images/tipIcon.png')} style={{width: 12, height: 12, marginEnd: 8}}></Image>
+                        <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
+                    </View>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Image style={{width: 28, height: 28}} source={require('../../assets/images/default_profile_2.png')}></Image>
+                    </View>
+                </View>
+            </View>
+            </>
+        )
+    }
 
     return (
         <>
-        <View style={{paddingHorizontal: 20, paddingTop: 25, paddingBottom: Platform.OS === 'ios'? 20 : 0,backgroundColor: colors.backgroundColor}}>
+        <View style={{paddingHorizontal: 5, paddingTop: 25, paddingBottom: Platform.OS === 'ios'? 20 : 0,backgroundColor: colors.backgroundColor}}>
             <NavigationTop navigation={navigation} title="" type="freeDir"/>
         </View>
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -54,25 +187,22 @@ export default function FreeDirectory({navigation}) {
                                 <View style={[styles.dirType, 
                                 {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]
                                 }]}><AppText style={{...styles.dirFreeText, color: colors.mainColor }}>자유</AppText></View>
-                                {/* flatList로 바꿀 예정 */}
-                                <View style={{flexDirection: 'row'}}>
-                                    <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># 힐링</AppText>
-                                    <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># 뚜벅</AppText>
-                                    <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># 자유</AppText>
-                                </View>
                             </View>
                             <View>
-                                <Image source={require('../../assets/images/lock_forDir.png')} style={{width: 22, height: 22}}></Image>
+                                {userData.user_nickname === data.created_user_name && directoryData.collection_private && <Image source={require('../../assets/images/lock_forDir.png')} style={{width: 22, height: 22}}></Image>}
                             </View>
                         </View>
                         <View style={{marginHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                             <View style={{justifyContent: 'center', alignItems: 'center', width: '70%'}}>
                                 <AppText style={{fontSize: 22, fontWeight: '700', color: colors.mainColor}}>{directoryTitle}</AppText>
                             </View>
-                            <View style={{justifyContent: 'center', alignItems: 'center', marginRight: 20, marginTop: 20}}>
-                                <Image source={require('../../assets/images/here_click.png')} style={{width: 26, height: 21, marginBottom: 2}}></Image>
-                                <AppText style={{fontSize: 10, fontWeight: '700', color: colors.red[3]}}>1,820</AppText>
-                            </View>
+                            {
+                                userData.user_nickname !== data.created_user_name &&
+                                <View style={{justifyContent: 'center', alignItems: 'center', marginRight: 20, marginTop: 20}}>
+                                    <Image source={require('../../assets/images/here_click.png')} style={{width: 26, height: 21, marginBottom: 2}}></Image>
+                                    <AppText style={{fontSize: 10, fontWeight: '700', color: colors.red[3]}}>1,820</AppText>
+                                </View>
+                            }
                         </View>
                         <View style={{marginRight: '15%', marginTop: '10%', marginLeft: 10}}>
                             <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
@@ -107,186 +237,38 @@ export default function FreeDirectory({navigation}) {
                         </View>
                     </View>
 
-                    <View style={{marginTop: 16, marginHorizontal: 20}}>
-                        <View style={{marginBottom: 16}}>
-                            <AppText style={{color: colors.gray[4]}}>총 <AppText style={{fontWeight: '700'}}>20개</AppText> 공간</AppText>
-                        </View>
-                        <View>
-                            <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                    <View style={{justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', width: '78%'}}>
-                                        <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                            <View style={{flexDirection: 'row'}}>
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold'
-                                                }}>음식점</AppText>
-                                                <AppText style={{marginHorizontal:4, color: colors.gray[7], 
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold'
-                                                }}>|</AppText>
-                                                <Image source={require('../../assets/images/review_star.png')}
-                                            style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold',
-                                                    marginLeft: 2
-                                                }}>4.8</AppText>
-                                            </View>
-                                            <AppText style={{
-                                                fontSize: 16,
-                                                fontWeight: 'bold',
-                                                color: colors.mainColor,
-                                                marginVertical: 5
-                                            }}>경복궁</AppText>
-                                            <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
-                                        </View>
-                                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                            <Image source={require('../../assets/images/here_nonclick.png')} style={{width: 26, height: 21}}></Image>
-                                        </View>
-                                    </View>
+                    {
+                        placeLength !== 0 ?
+                        <View style={{marginTop: 16, marginHorizontal: 20}}>
+                            <View style={{marginBottom: 16}}>
+                                <AppText style={{color: colors.gray[4]}}>총 <AppText style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
+                            </View>
+                            <SafeAreaView>
+                                {/* {
+                                    placeData.length > 5 ?
+                                } */}
+                                {/* {directoryData.place.map((item, idx) =>(
+                                    <ShowPlaces item={item} idx={idx} key={idx}/>
+                                ))} */}
+                              <FlatList data={directoryData.places} renderItem={ShowPlaces} keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
+
+                            </SafeAreaView>
+                            <TouchableOpacity onPress={()=>{
+                                // if(isLimited) setIsLimited(false);
+                                // else setIsLimited(true);
+                                // console.log(isLimited)
+                            }}>
+                            <View style={{flexDirection: 'row', marginTop: 26, justifyContent: 'center', alignItems: 'center'}}>
+                                <AppText style={{fontSize: 14, fontWeight: '400', color: colors.gray[2]}}>전체보기</AppText>
+                                    <Image source={require('../../assets/images/showWhole_forDir.png')} style={{width: 15, height: 15, marginLeft: 10, marginBottom: 5}}></Image>
                                 </View>
                             </TouchableOpacity>
+                        </View> :
+                        <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 40, marginBottom: 52}}>
+                            <Image source={require('../../assets/images/empty_forDir.png')} style={{width: 150, height: 120, justifyContent: 'center', alignItems: 'center', marginBottom: 12}}></Image>
+                            <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이 담겨있지 않아요!</AppText>
                         </View>
-
-                        <View style={{width: '100%', height: 1, backgroundColor: colors.red_gray[6], zIndex: -1000, marginVertical: 13}}></View>
-
-                        <View>
-                            <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                    <View style={{justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', width: '78%'}}>
-                                        <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                            <View style={{flexDirection: 'row'}}>
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold'
-                                                }}>음식점</AppText>
-                                                <AppText style={{marginHorizontal:4, color: colors.gray[7], 
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold'
-                                                }}>|</AppText>
-                                                <Image source={require('../../assets/images/review_star.png')}
-                                            style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold',
-                                                    marginLeft: 2
-                                                }}>4.8</AppText>
-                                            </View>
-                                            <AppText style={{
-                                                fontSize: 16,
-                                                fontWeight: 'bold',
-                                                color: colors.mainColor,
-                                                marginVertical: 5
-                                            }}>경복궁</AppText>
-                                            <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
-                                        </View>
-                                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                            <Image source={require('../../assets/images/here_nonclick.png')} style={{width: 26, height: 21}}></Image>
-                                        </View>
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                            <View style={{backgroundColor: colors.defaultColor, height: 30, paddingVertical: 6, paddingLeft: 6, paddingRight: 5,
-                                            marginBottom: 6, marginRight: 10, marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                                            }}>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={require('../../assets/images/tipIcon.png')} style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                                    <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                </View>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image style={{width: 28, height: 28}} source={require('../../assets/images/default_profile_2.png')}></Image>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={{width: '100%', height: 1, backgroundColor: colors.red_gray[6], zIndex: -1000, marginVertical: 13}}></View>
-                        
-                        <View>
-                            <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                    <View style={{justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', width: '78%'}}>
-                                        <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                            <View style={{flexDirection: 'row'}}>
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold'
-                                                }}>음식점</AppText>
-                                                <AppText style={{marginHorizontal:4, color: colors.gray[7], 
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold'
-                                                }}>|</AppText>
-                                                <Image source={require('../../assets/images/review_star.png')}
-                                            style={{width: 10, height: 10, alignSelf:'center', marginTop: '1%'}}></Image>
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold',
-                                                    marginLeft: 2
-                                                }}>4.8</AppText>
-                                            </View>
-                                            <AppText style={{
-                                                fontSize: 16,
-                                                fontWeight: 'bold',
-                                                color: colors.mainColor,
-                                                marginVertical: 5
-                                            }}>경복궁</AppText>
-                                            <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
-                                        </View>
-                                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                            <Image source={require('../../assets/images/here_click.png')} style={{width: 26, height: 21}}></Image>
-                                        </View>
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                            <View style={{backgroundColor: colors.defaultColor, height: 30, paddingVertical: 6, paddingLeft: 6, paddingRight: 5,
-                                            marginBottom: 6, marginRight: 10, marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                                            }}>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={require('../../assets/images/tipIcon.png')} style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                                    <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                </View>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image style={{width: 28, height: 28}} source={require('../../assets/images/default_profile_2.png')}></Image>
-                                </View>
-                            </View>
-                            {/* 클릭하면 전체 다 받아지고, isEnable 같은 데이터 이용해서 이미지 바꾸는걸로 수정 */}
-                            <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 18}}>
-                                <Image source={require('../../assets/images/clickBottom_forDir.png')} style={{width: 24, height: 6}}></Image>
-                            </View>
-                        </View>
-
-                        <View style={{flexDirection: 'row', marginTop: 26, justifyContent: 'center', alignItems: 'center'}}>
-                            <AppText style={{fontSize: 14, fontWeight: '400', color: colors.gray[2]}}>전체보기</AppText>
-                            <Image source={require('../../assets/images/showWhole_forDir.png')} style={{width: 15, height: 15, marginLeft: 10, marginBottom: 5}}></Image>
-                        </View>
-                    </View>
-
-                    {/* 들어온 공간 배열의 값이 0이면 이거 띄우는 컨디셔널 렌더링 필요 */}
-                    <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 40, marginBottom: 52, display: 'none'}}>
-                        <Image source={require('../../assets/images/empty_forDir.png')} style={{width: 150, height: 120, justifyContent: 'center', alignItems: 'center', marginBottom: 12}}></Image>
-                        <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이 담겨있지 않아요!</AppText>
-                    </View>
+                    }
 
                     <ScreenDivideLine style={{marginVertical: 16}} />
                 </View>
@@ -401,3 +383,4 @@ const styles = StyleSheet.create({
     },
 });
 
+export default FreeDirectory;
