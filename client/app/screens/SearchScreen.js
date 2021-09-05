@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 import {useTheme} from '@react-navigation/native';
@@ -9,14 +9,13 @@ import SearchTabNavigator from "../navigation/SearchTabNavigator";
 import ScreenDivideLine from "../components/ScreenDivideLine";
 import Star from "../assets/images/search/star.svg";
 import AppText from "../components/AppText";
-
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
-
+import SearchKeywordContextProvider, {searchKeyword} from "../contexts/SearchkeywordContextProvider";
 
 const SearchScreen = ({navigation}) => {
     const {colors} = useTheme();
-    const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState('');
+    const [keyword, setKeyword] = useState('');
+    const [k, setK] = searchKeyword();
 
     const styles = StyleSheet.create({
         search_box: {
@@ -38,8 +37,51 @@ const SearchScreen = ({navigation}) => {
             paddingHorizontal: 6,
             paddingVertical: 2,
             marginLeft: 8
-        }
-    })
+        },
+        dirType: {
+            borderWidth: 1,
+            paddingVertical: 1,
+            paddingHorizontal: 8,
+            borderRadius: 14,
+            shadowColor: colors.red_gray[7],
+            shadowOffset: {width: 0, height: 1},
+            shadowOpacity: 0.1,
+            elevation: 1,
+            height: 22,
+            marginRight: 9,
+            marginTop: 8,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        dirFreeText: {
+            color: colors.gray[3],
+            fontSize: 14,
+            fontWeight: '400',
+            textAlign: 'center',
+        },
+    });
+
+    const RecommendedDefault = (props) => {
+        return (
+            <View style={{marginTop: 16}}>
+                <AppText style={{fontSize: 12, fontWeight: '500', color: colors.gray[5]}}>추천 검색어</AppText>
+                <View>
+                    <View style={{flexDirection: 'row'}}>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>고급스러운</AppText></View>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>한국적인</AppText></View>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>아기자기한</AppText></View>
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>힐링</AppText></View>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>관광</AppText></View>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>여유</AppText></View>
+                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>화려한</AppText></View>
+                    </View>
+                </View>
+            </View>
+        )
+    }
 
     const RecommendedPlace = (props) => {
         return (
@@ -65,11 +107,11 @@ const SearchScreen = ({navigation}) => {
             <View style={{
                 width: 162,
                 height: 249,
-                shadowColor: 'black',
-                shadowOffset: {width: 0, height: 0},
+                shadowColor: colors.red_gray[7],
+                shadowOffset: {width: 0, height: 1},
                 shadowOpacity: 0.27,
                 shadowRadius: 6,
-                elevation: 6,
+                elevation: 1,
 
                 marginRight : 8,
                 borderRadius : 10,
@@ -108,14 +150,22 @@ const SearchScreen = ({navigation}) => {
                         <TextInput flex={1} style={{fontSize: 16}}
                                    autoCapitalize="none"
                                    autoCorrect={false}
+                                   placeholder="원하는 공간을 검색해보세요"
+                                   placeholderTextColor={colors.gray[5]}
                                    onChangeText={(text) => setSearchText(text)}/>
-                        <Pressable style={{marginLeft: 5}} onPress={() => alert(searchText)}>
+                        <Pressable style={{marginLeft: 5}} onPress={() => {setKeyword(''); setKeyword(searchText); setK(searchText)}}>
                             <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
                         </Pressable>
                     </View>
-                    <SearchTabNavigator/>
+                    {
+                        keyword === '' ?
+                        <RecommendedDefault /> :
+                        <SearchTabNavigator navigation={navigation} />
+                    }
                 </ScreenContainerView>
+
                 <ScreenDivideLine/>
+                
                 <ScreenContainerView>
                     <View style={{marginVertical: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>

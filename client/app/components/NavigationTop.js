@@ -19,10 +19,11 @@ const NavigationTop = props => {
         <View flexDirection="row" style={{
             height: 24,
             marginVertical: 20,
+            marginHorizontal: 5,
             alignItems: 'center',
             justifyContent: 'center'
         }}>
-            <View style={{position: 'absolute', left: 0}}>
+            <View style={{position: 'absolute', left: 10}}>
                 <TouchableOpacity onPress={() => {
                     props.navigation.goBack()
                 }}>

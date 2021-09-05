@@ -53,25 +53,36 @@ router.post('/makeAccount', async (req, res, next) => {
     userInfo.user_password = password;
     userInfo.salt = salt;
 
-    const result = await authService.addUser(userInfo);
+    const result = await authService.createUser(userInfo);
     res.send({result: true});
 })
 
 router.post('/sameEmail', async (req, res, next) => {
     const {email} = req.body;
-    const [{count}] = await authService.findUser(email);
+    const [{count}] = await authService.readUserCntByEmail(email);
 
     let isDuplicated = false;
     if (count >= 1) {
         isDuplicated = true;
     }
-    res.send({isDuplicated})
+    res.send({code: 200, status : 'SUCCESS', data: {isDuplicated}})
+})
+
+router.post('/sameNickname', async (req, res, next) => {
+    const {nickname} = req.body;
+    const [{count}] = await authService.readUserCntByNickname(nickname);
+
+    let isDuplicated = false;
+    if (count >= 1) {
+        isDuplicated = true;
+    }
+    res.send({code: 200, status : 'SUCCESS', data: {isDuplicated}})
 })
 
 router.post('/loginEmail', async (req, res, next) => {
     const {email, password: plainPassword} = req.body.user;
 
-    const userData = await authService.getUser(email);
+    const userData = await authService.readUserByEmail(email);
     if (userData.length !== 1) {
         return res.send({state: 'NOT EXIST'})
     }
@@ -89,11 +100,11 @@ router.post('/loginEmail', async (req, res, next) => {
 
     const password = await makePasswordHashed(plainPassword)
 
-    if(user_password !== password){
-        return res.send({state : 'NOT MATCHED'})
+    if (user_password !== password) {
+        return res.send({state: 'NOT MATCHED'})
     }
 
-    return res.send({state : 'SUCCESS', userData : user})
+    return res.send({state: 'SUCCESS', userData: user})
 })
 
 module.exports = router;

@@ -47,7 +47,8 @@ const ColorTheme = {
             3 : '#D5C6C6',
             4 : '#E0D4D4',
             5 : '#EAE0E0',
-            6 : '#F0E7E7'
+            6 : '#F0E7E7',
+            7 : '#CBB4B4'
         },
         yellow : {
             1 : '#FFB84B',
