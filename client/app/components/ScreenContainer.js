@@ -6,14 +6,9 @@ const ScreenContainer = props => {
         <SafeAreaView style={{
             flex: 1,
             backgroundColor: props.backgroundColor,
-            width: "100%",
             paddingTop: Platform.OS === 'android' ? 25 : 0
         }}>
-            <KeyboardAvoidingView flex={1}
-                                  behavior={Platform.OS === "ios" ? "padding" : "height"}
-                                  style={{marginHorizontal: 20}}>
-                {props.children}
-            </KeyboardAvoidingView>
+            {props.children}
         </SafeAreaView>
     )
 }

@@ -1,6 +1,8 @@
 import React from "react";
-import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {StyleSheet, TextInput, TouchableOpacity, View} from "react-native";
 import styled from "styled-components/native";
+import { useTheme } from '@react-navigation/native';
+import AppText from "./AppText";
 
 const ProgressBar = styled(View)`
   left: 300px;
@@ -28,15 +30,16 @@ const InputBox = styled(TextInput)`
 `
 
 const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, setValue, userValue) => {
+    const { colors } = useTheme();
     return (
         <>
             <ProgressBar>
                 {btnStyles.map((btnStyle, idx) => <View key={idx} style={btnStyle}></View>)}
             </ProgressBar>
             <Form>
-                <Text style={{fontSize : 30, color : '#40516E'}}>
+                <AppText style={{fontSize : 30, color : colors.mainColor}}>
                     {question}
-                </Text>
+                </AppText>
                 <InputBox
                     defaultValue={userValue}
                     placeholder={placeHolder}
@@ -46,7 +49,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
             </Form>
             <TouchableOpacity
                 style={{
-                    backgroundColor: '#DCDCDC',
+                    backgroundColor: colors.gray[6],
                     height: 52,
                     borderRadius: 10,
                     margin: 16,
@@ -54,15 +57,15 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                 }}
                 onPress={() => goToNextTab(tab => tab + 1)}
             >
-                <Text style={{
+                <AppText style={{
                     textAlign: 'center',
                     padding: 14,
                     fontSize: 16,
-                    color: '#fff',
+                    color: colors.defaultColor,
                     fontWeight: 'bold'
                 }}>
                     {nextBtnText}
-                </Text>
+                </AppText>
             </TouchableOpacity>
         </>
     )

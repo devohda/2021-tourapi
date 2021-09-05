@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import ScreenContainer from '../../components/ScreenContainer'
-import {View, TextInput, Text, Button} from "react-native";
+import {View, TextInput, Button} from "react-native";
 import * as SMS from 'expo-sms';
+import AppText from "../../components/AppText";
 import PhoneInput from "react-native-phone-number-input";
 
 
@@ -10,7 +11,7 @@ const FindPasswordScreen = () => {
     const [phoneNumber, setPhoneNumber] = useState(null)
     const sendSMS = () => {
         try {
-            fetch('http://localhost:3000/auth/authPhone', {
+            fetch('http://34.146.140.88/auth/authPhone', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -27,11 +28,11 @@ const FindPasswordScreen = () => {
     return (
         <ScreenContainer>
             <View>
-                <Text>이메일을 입력하세요.</Text>
+                <AppText>이메일을 입력하세요.</AppText>
                 <TextInput autoCapitalize="none" onChangeText={(text) => setEmail(email)}/>
                 <Button title="확인 코드 입력" onPress={() => {
                 }}/>
-                <Text>전화번호를 입력하세요.</Text>
+                <AppText>전화번호를 입력하세요.</AppText>
                 <TextInput autoCapitalize="none" onChangeText={(text) => setEmail(email)}/>
                 <PhoneInput
                     defaultCode="KR"

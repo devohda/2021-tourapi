@@ -1,33 +1,34 @@
 import React from "react";
 import {View, Text, StyleSheet} from "react-native";
 import Star from "./Star";
+import AppText from "./AppText";
 
 const StarScore = (props) => {
 
     return (
         <View flexDirection="row" style={{alignItems : 'center', justifyContent : 'center'}}>
-            <View style={styles.score_container}>
-                <Text style={styles.score_text}>{props.score}</Text>
-            </View>
-            <Star score={props.score} starSize={props.starSize}/>
+            {/* <View style={styles.score_container}>
+                <AppText style={styles.score_text}>{props.score}</AppText>
+            </View> */}
+            <Star score={props.score} starSize={props.starSize} />
         </View>
     )
 }
-const styles = StyleSheet.create({
-    score_container: {
-        width: 25,
-        height: 15,
-        backgroundColor: 'black',
-        borderRadius: 70,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight : 3
-    },
-    score_text: {
-        color: 'white',
-        textAlign: 'center',
-        fontSize: 10,
-        fontWeight: 'bold'
-    }
-})
+// const styles = StyleSheet.create({
+//     score_container: {
+//         width: 25,
+//         height: 15,
+//         backgroundColor: 'black',
+//         borderRadius: 70,
+//         alignItems: 'center',
+//         justifyContent: 'center',
+//         marginRight : 3
+//     },
+//     score_text: {
+//         color: 'white',
+//         textAlign: 'center',
+//         fontSize: 10,
+//         fontWeight: 'bold'
+//     }
+// })
 export default StarScore;
