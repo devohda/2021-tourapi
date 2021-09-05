@@ -37,7 +37,7 @@ const CollectionTab = ({navigation}) => {
 
     useEffect(() => {
         getCollectionsFromUsers();
-    }, [])
+    })
 
     const {colors} = useTheme();
     const styles = StyleSheet.create({

@@ -158,7 +158,7 @@ const FreeDirectory = ({route, navigation}) => {
     const ShowPlaces = ({item, index}) => {
         return (
             <>
-                {item.place_pk !== directoryData.places[0].place_pk && <View style={{
+                {item.place_pk !== collectionData.places[0].place_pk && <View style={{
                     width: '100%',
                     height: 1,
                     backgroundColor: colors.red_gray[6],
@@ -299,7 +299,7 @@ const FreeDirectory = ({route, navigation}) => {
                                         style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText></View>
                                 </View>
                                 <View>
-                                    {userData.user_nickname === data.created_user_name && directoryData.collection_private &&
+                                    {userData.user_nickname === data.created_user_name && collectionData.collection_private &&
                                     <Image source={require('../../assets/images/lock_forDir.png')}
                                            style={{width: 22, height: 22}}></Image>}
                                 </View>
@@ -400,10 +400,10 @@ const FreeDirectory = ({route, navigation}) => {
                                         {/* {
                                     placeData.length > 5 ?
                                 } */}
-                                        {/* {directoryData.place.map((item, idx) =>(
+                                        {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                        <FlatList data={directoryData.places} renderItem={ShowPlaces}
+                                        <FlatList data={collectionData.places} renderItem={ShowPlaces}
                                                   keyExtractor={(item) => item.place_pk.toString()}
                                                   nestedScrollEnabled/>
 
