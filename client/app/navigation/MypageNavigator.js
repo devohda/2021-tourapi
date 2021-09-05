@@ -7,7 +7,7 @@ const Tab = createMaterialTopTabNavigator();
 import PlaceTab from "../screens/mypage/placeTab";
 import CollectionTab from "../screens/mypage/collectionTab";
 
-const MyPageNavigation = () => {
+const MyPageNavigation = ({navigation}) => {
     const { colors } = useTheme();
     return (
         <Tab.Navigator
@@ -36,8 +36,8 @@ const MyPageNavigation = () => {
                 swipeEnabled : true
             }}
         >
-            <Tab.Screen name="공간" component={PlaceTab}/>
-            <Tab.Screen name="보관함" component={CollectionTab}/>
+            <Tab.Screen name="공간" children={() => <PlaceTab navigation={navigation} />}/>
+            <Tab.Screen name="보관함" children={() => <CollectionTab navigation={navigation}/>}/>
         </Tab.Navigator>
     );
 }

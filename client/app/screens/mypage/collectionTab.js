@@ -7,7 +7,7 @@ import AppText from "../../components/AppText";
 import {Icon} from "react-native-elements";
 import {useIsUserData} from "../../contexts/UserDataContextProvider";
 
-const CollectionTab = () => {
+const CollectionTab = ({navigation}) => {
 
     const [userData, setUserData] = useIsUserData()
     const [collectionList, setCollectionList] = useState({});
@@ -46,13 +46,13 @@ const CollectionTab = () => {
             height: 249,
             borderRadius: 10,
             backgroundColor: '#fff',
-            marginTop: 11,
+            marginBottom: 11,
             shadowColor: colors.red_gray[6],
             shadowOffset: {
                 width: 0,
                 height: 0,
             },
-            shadowOpacity : 1,
+            shadowOpacity: 1,
             shadowRadius: 6,
             elevation: 5,
         },
@@ -87,7 +87,7 @@ const CollectionTab = () => {
         },
         defaultImage: {
             width: '100%',
-            height : '100%',
+            height: '100%',
             position: 'absolute',
         },
         selectType: {
@@ -166,40 +166,53 @@ const CollectionTab = () => {
     }
 
     const showDirectories = ({item}) => (
-        <View style={styles.directoryContainer}>
-            <View flex={1} style={{overflow : "hidden", borderRadius : 10}}>
+
+        <TouchableOpacity style={styles.directoryContainer} onPress={() => {
+            navigation.navigate('Place', {data : item})
+        }}>
+            <View flex={1} style={{overflow: "hidden", borderRadius: 10}}>
                 <View style={{height: '68%'}}>
                     <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
-                        <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}>
-                            <AppText style={item.collection_type == 1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type === 1 ? '자유' : '일정'}</AppText>
+                        <View style={[styles.dirType, {
+                            borderColor: colors.backgroundColor,
+                            backgroundColor: colors.backgroundColor
+                        }]}>
+                            <AppText
+                                style={item.collection_type == 1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type === 1 ? '자유' : '일정'}</AppText>
                         </View>
                         {item.collection_private === 1 &&
-                            <View style={{marginRight: 9, marginTop: 8}}>
-                                <Image style={{width: 20, height: 20}}
-                                       source={require('../../assets/images/lock_outline.png')}></Image>
-                            </View>
+                        <View style={{marginRight: 9, marginTop: 8}}>
+                            <Image style={{width: 20, height: 20}}
+                                   source={require('../../assets/images/lock_outline.png')}></Image>
+                        </View>
                         }
                     </View>
-                    <Image style={styles.defaultImage} source={item.thumbnail_images.length !== 0 ? {uri: item.thumbnail_images[0]} : require('../../assets/images/mountain.jpeg')}/>
+                    <Image style={styles.defaultImage}
+                           source={item.thumbnail_images.length !== 0 ? {uri: item.thumbnail_images[0]} : require('../../assets/images/mountain.jpeg')}/>
                 </View>
-                <View flex={1} style={{marginLeft: 10, marginTop : 8}}>
-                    <AppText style={{fontSize: 14, fontWeight: '400', color : colors.mainColor}}>{item.collection_name}</AppText>
-                    <View style={{marginTop : 4}}>
+                <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                    <AppText style={{
+                        fontSize: 14,
+                        fontWeight: '400',
+                        color: colors.mainColor
+                    }}>{item.collection_name}</AppText>
+                    <View style={{marginTop: 4}}>
                         {item.keywords.map((keyword, idx) => {
                             return (
                                 <AppText key={idx} style={{
                                     color: colors.gray[4],
                                     fontSize: 10,
-                                    marginRight : 6.21
+                                    marginRight: 6.21
                                 }}># {keyword}</AppText>)
                         })}
                     </View>
-                    <View flexDirection="row" style={{position : 'absolute', bottom : 10}}>
+                    <View flexDirection="row" style={{position: 'absolute', bottom: 10}}>
                         <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Image source={require('../../assets/images/here_icon.png')}
                                    style={{width: 8, height: 8, margin: 2}}></Image>
-                            <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
+                            <AppText
+                                style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
                         </View>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Icon type="ionicon" name={"location"} size={8} color={colors.gray[2]}
@@ -213,9 +226,7 @@ const CollectionTab = () => {
                     </View>
                 </View>
             </View>
-        </View>
-
-
+        </TouchableOpacity>
     )
 
     const Keyword = ({type, idx}) => {
@@ -274,13 +285,11 @@ const CollectionTab = () => {
                         </View>
                     </View>
                 </View>
-                <SafeAreaView>
-                    <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-                              showsVerticalScrollIndicator={false}
-                              data={collectionList} renderItem={showDirectories}
-                              keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
-                    />
-                </SafeAreaView>
+                <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
+                          showsVerticalScrollIndicator={false}
+                          data={collectionList} renderItem={showDirectories}
+                          keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
+                />
             </ScreenContainerView>
         </ScreenContainer>
     );
