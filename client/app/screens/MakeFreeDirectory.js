@@ -186,29 +186,29 @@ const MakeFreeDirectory = ({navigation}) => {
         collection_type: 1,
     }
 
-    // const getKeywords = useCallback(() => {
-    //     try {
+    const getKeywords = useCallback(() => {
+        try {
 
-    //         fetch('http://34.146.140.88/keyword/keywords', {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json'
-    //             },
-    //         }).then((res) => res.json())
-    //             .then((responsedata) => {
-    //                 setKeywordData(responsedata)
-    //                 setFalse()
-    //                 // console.log(keywordData)
-    //             })
-    //             .catch((err) => {
-    //                 console.error(err)
-    //             });
+            fetch('http://34.146.140.88/keyword/list', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((res) => res.json())
+                .then((responsedata) => {
+                    setKeywordData(responsedata)
+                    setFalse()
+                    // console.log(keywordData)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
 
-    //     } catch (err) {
-    //         console.error(err);
-    //     }
-    // }, []);
+        } catch (err) {
+            console.error(err);
+        }
+    }, []);
 
     //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
     //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
