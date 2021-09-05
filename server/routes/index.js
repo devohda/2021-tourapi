@@ -8,6 +8,7 @@ const userRouter = require('./users');
 const searchRouter = require('./search');
 const placeRouter = require('./place');
 const likeRouter = require('./like');
+const keywordRouter = require('./keyword');
 
 
 // 라우터 파일 등록하기
@@ -17,5 +18,7 @@ router.use('/user', userRouter);
 router.use('/search', searchRouter);
 router.use('/place', placeRouter);
 router.use('/like', likeRouter);
+router.use('/keyword', keywordRouter);
+
 
 module.exports = router;
