@@ -251,7 +251,7 @@ export default function MainPage({navigation}) {
                                     <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
                                 <View style={{justifyContent: 'center', marginLeft: '45%'}}>
-                                    <Image source={require('../assets/images/here_nonclick.png')}></Image>
+                                    <Image source={require('../assets/images/here_nonclick.png')} style={{width: 26, height: 21}}></Image>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -298,7 +298,7 @@ export default function MainPage({navigation}) {
                                     <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
                                 <View style={{justifyContent: 'center', marginLeft: '45%'}}>
-                                    <Image source={require('../assets/images/here_nonclick.png')}></Image>
+                                    <Image source={require('../assets/images/here_nonclick.png')} style={{width: 26, height: 21}}></Image>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -345,7 +345,7 @@ export default function MainPage({navigation}) {
                                     <AppText style={{fontSize: 12,color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
                                 <View style={{justifyContent: 'center', marginLeft: '45%'}}>
-                                    <Image source={require('../assets/images/here_click.png')}></Image>
+                                    <Image source={require('../assets/images/here_click.png')} style={{width: 26, height: 21}}></Image>
                                 </View>
                             </View>
                         </TouchableOpacity>

@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from "react";
-import {Image, Text, View, ScrollView, FlatList, SafeAreaView, Dimensions} from "react-native";
+import {Image, Text, View, ScrollView, FlatList, SafeAreaView, Dimensions, TouchableOpacity} from "react-native";
 import {useTheme} from "@react-navigation/native";
 import AppText from "../../components/AppText";
 import { Icon } from "react-native-elements";
 import { searchKeyword } from "../../contexts/SearchkeywordContextProvider";
 import ShowEmpty from "../../components/ShowEmpty";
 
-const SearchCollection = (props) => {
+const SearchCollection = (props, {navigation}) => {
     const {colors} = useTheme();
     const [collectionList, setCollectionList] = useState([]);
     const [searchType, setSearchType] = useState('collection');
@@ -42,6 +42,7 @@ const SearchCollection = (props) => {
     const CollectionContainer = ({item}) => {
         const collectionMargin = (Dimensions.get("screen").width - 162 * 2) / 9
         return (
+            <TouchableOpacity onPress={()=>props.navigation.navigate('ShowFreeDir', {data : item})}>
             <View style={{
                 width: 162,
                 height: 249,
@@ -49,19 +50,17 @@ const SearchCollection = (props) => {
                 shadowOffset: {width: 0, height: 0},
                 shadowOpacity: 0.27,
                 shadowRadius: 1,
-                elevation: 1,
                 marginBottom: 12,
                 marginHorizontal : collectionMargin,
                 borderRadius : 10,
-                overflow: 'hidden'
-            }}>
+            }} key={item.collection_pk}>
                 <View flexDirection="row" style={{
                     flexWrap: "wrap",
                     width: 162,
                     height: 162,
                 }}>
-                    <Image source={require('../../assets/images/flower.jpeg')} style={{width: '50%', height: 81}}/>
-                    <Image source={require('../../assets/images/mountain.jpeg')} style={{width: '50%', height: 81}}/>
+                    <Image source={require('../../assets/images/flower.jpeg')} style={{width: '50%', height: 81, borderTopLeftRadius: 10}}/>
+                    <Image source={require('../../assets/images/mountain.jpeg')} style={{width: '50%', height: 81, borderTopRightRadius: 10}}/>
                     <Image source={require('../../assets/images/autumn.jpeg')} style={{width: '50%', height: 81}}/>
                     <Image source={require('../../assets/images/sea.jpeg')} style={{width: '50%', height: 81}}/>
                 </View>
@@ -91,6 +90,7 @@ const SearchCollection = (props) => {
                     </View>
                 </View>
             </View>
+            </TouchableOpacity>
         )
     }
 

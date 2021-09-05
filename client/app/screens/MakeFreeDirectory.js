@@ -24,7 +24,6 @@ export const navigationRef = React.createRef();
 const MakeFreeDirectory = ({navigation}) => {
 
     const {colors} = useTheme();
-
     const styles = StyleSheet.create({
         plusComplete: {
             marginBottom: '5%'
@@ -112,10 +111,10 @@ const MakeFreeDirectory = ({navigation}) => {
         var datas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
-                datas.push(keywordData[i].key)
+                datas.push(keywordData[i].keyword_title)
             }
         }
-        console.log(userData.user_pk)
+
         try {
             fetch('http://34.146.140.88/collection', {
                 method: 'POST',
@@ -126,7 +125,7 @@ const MakeFreeDirectory = ({navigation}) => {
                 body: JSON.stringify({
                     collectionData : {
                         name: collectionName,
-                        private: 0,
+                        private: isEnabled,
                         description: null,
                         type: 0,
                     },
@@ -186,6 +185,10 @@ const MakeFreeDirectory = ({navigation}) => {
         collection_type: 1,
     }
 
+    useEffect(() => {
+        getKeywords();
+    }, []);
+
     const getKeywords = useCallback(() => {
         try {
 
@@ -196,10 +199,10 @@ const MakeFreeDirectory = ({navigation}) => {
                     'Content-Type': 'application/json'
                 },
             }).then((res) => res.json())
-                .then((responsedata) => {
-                    setKeywordData(responsedata)
+                .then((response) => {
+                    setKeywordData(response.data)
                     setFalse()
-                    // console.log(keywordData)
+                    console.log(keywordData)
                 })
                 .catch((err) => {
                     console.error(err)
@@ -241,48 +244,6 @@ const MakeFreeDirectory = ({navigation}) => {
         setIsPress(pressed)
     }
 
-    useEffect(() => {
-        setKeywordData([
-            {
-                id: '1',
-                key: '힐링',
-            },
-            {
-                id: '2',
-                key: '관광',
-            },
-            {
-                id: '3',
-                key: '여유',
-            },
-            {
-                id: '4',
-                key: '뚜벅'
-            }
-        ])
-        setFalse();
-    }, []);
-
-    const showKeywords = ({ item }) => (
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            <TouchableOpacity onPress={() => {
-                    let newArr = [...isPress];
-                    if (isPress[item.id - 1]) {
-                        newArr[item.id - 1] = false;
-                        setIsPress(newArr);
-                    } else {
-                        newArr[item.id - 1] = true;
-                        setIsPress(newArr);
-                    }
-                }} style={isPress[item.id - 1] ? [styles.selectTypeClicked, {
-                    borderColor: colors.mainColor,
-                    backgroundColor: colors.mainColor
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
-                
-                <AppText style={isPress[item.id - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{item.key}</AppText></TouchableOpacity>
-        </View>
-    )
-
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
@@ -312,10 +273,12 @@ const MakeFreeDirectory = ({navigation}) => {
                             <View flexDirection="row">
                                 <Image source={require('../assets/images/add_keyword.png')}
                                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                                {/* {keywordData.map((keyword, idx) => (
-                                    <Keyword keyword={keyword} key={idx}/>
-                                ))} */}
-                                <FlatList data={keywordData} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <Keyword keyword={keyword} key={idx} />
+                                    ))
+                                }
+                                {/* <FlatList data={keywordData} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/> */}
                             </View>
                         </View>
                     </View>
@@ -354,13 +317,13 @@ const MakeFreeDirectory = ({navigation}) => {
                                 borderRadius: 10
                             }}
                             onPress={() => {
-                                if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
+                                // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
                                     postCollections();
                                     navigation.setOptions({tabBarVisible: true});
                                     navigation.goBack(null);
-                                }
+                                // }
                             }}
-                            disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
+                            // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
                         ><AppText
                             style={{
                                 textAlign: 'center',

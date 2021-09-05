@@ -75,7 +75,7 @@ const SearchPlace = (props, {navigation}) => {
         }
     }
 
-    const PlaceContainer = ({item}) => (
+    const PlaceContainer = ({item}) => ( 
         <TouchableOpacity onPress={()=>props.navigation.navigate('Place', {data : item})}>
             <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22}}>
                 <Image source={require('../../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
@@ -98,7 +98,7 @@ const SearchPlace = (props, {navigation}) => {
 
         return (
             <View style={{backgroundColor: colors.backgroundColor}}>
-                <ScrollView scrollEnabled={false}>
+                <ScrollView>
                     {
                         placeList.length === 0 ? 
                         <ShowEmpty /> :
