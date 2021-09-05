@@ -108,7 +108,7 @@ function Like() {
 
     const getLikesFromUsers = () => {
         try {
-            fetch('http://34.146.140.88:3000/like/likes', {
+            fetch('http://34.146.140.88/like/likes', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

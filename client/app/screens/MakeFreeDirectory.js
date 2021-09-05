@@ -7,7 +7,8 @@ import {
     Switch,
     Alert,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    FlatList
 } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
@@ -111,11 +112,12 @@ const MakeFreeDirectory = ({navigation}) => {
         var datas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
-                datas.push(keywordData[i].keyword_title)
+                datas.push(keywordData[i].key)
             }
         }
+        console.log(userData.user_pk)
         try {
-            fetch('http://34.146.140.88:3000/collection/free', {
+            fetch('http://34.146.140.88/collection', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -126,11 +128,12 @@ const MakeFreeDirectory = ({navigation}) => {
                         name: collectionName,
                         private: 0,
                         description: null,
+                        type: 0,
                     },
                     userId : userData.user_pk,
                     keywords: datas
                 })
-            }).then((res) => res.text())
+            }).then((res) => res.json())
                 .then((responsedata) => {
                     console.log(responsedata)
                     Alert.alert('', '자유보관함이 생성되었습니다')
@@ -183,29 +186,29 @@ const MakeFreeDirectory = ({navigation}) => {
         collection_type: 1,
     }
 
-    const getKeywords = useCallback(() => {
-        try {
+    // const getKeywords = useCallback(() => {
+    //     try {
 
-            fetch('http://34.146.140.88/keyword/keywords', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            }).then((res) => res.json())
-                .then((responsedata) => {
-                    setKeywordData(responsedata)
-                    setFalse()
-                    // console.log(keywordData)
-                })
-                .catch((err) => {
-                    console.error(err)
-                });
+    //         fetch('http://34.146.140.88/keyword/keywords', {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json'
+    //             },
+    //         }).then((res) => res.json())
+    //             .then((responsedata) => {
+    //                 setKeywordData(responsedata)
+    //                 setFalse()
+    //                 // console.log(keywordData)
+    //             })
+    //             .catch((err) => {
+    //                 console.error(err)
+    //             });
 
-        } catch (err) {
-            console.error(err);
-        }
-    }, []);
+    //     } catch (err) {
+    //         console.error(err);
+    //     }
+    // }, []);
 
     //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
     //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
@@ -239,8 +242,46 @@ const MakeFreeDirectory = ({navigation}) => {
     }
 
     useEffect(() => {
-        getKeywords();
-    }, [])
+        setKeywordData([
+            {
+                id: '1',
+                key: '힐링',
+            },
+            {
+                id: '2',
+                key: '관광',
+            },
+            {
+                id: '3',
+                key: '여유',
+            },
+            {
+                id: '4',
+                key: '뚜벅'
+            }
+        ])
+        setFalse();
+    }, []);
+
+    const showKeywords = ({ item }) => (
+        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <TouchableOpacity onPress={() => {
+                    let newArr = [...isPress];
+                    if (isPress[item.id - 1]) {
+                        newArr[item.id - 1] = false;
+                        setIsPress(newArr);
+                    } else {
+                        newArr[item.id - 1] = true;
+                        setIsPress(newArr);
+                    }
+                }} style={isPress[item.id - 1] ? [styles.selectTypeClicked, {
+                    borderColor: colors.mainColor,
+                    backgroundColor: colors.mainColor
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
+                
+                <AppText style={isPress[item.id - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{item.key}</AppText></TouchableOpacity>
+        </View>
+    )
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -271,16 +312,10 @@ const MakeFreeDirectory = ({navigation}) => {
                             <View flexDirection="row">
                                 <Image source={require('../assets/images/add_keyword.png')}
                                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                                {keywordData.map((keyword, idx) => (
+                                {/* {keywordData.map((keyword, idx) => (
                                     <Keyword keyword={keyword} key={idx}/>
-                                ))}
-                                {/*{버튼 추가 가능하도록 만들었음.}*/}
-                                {/* <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
-                                    setKeywords((addedKeywords) => {
-                                        return [...addedKeywords, {keyword: '추가됨'}]
-                                    })
-                                }}/> */}
-                                {/* <View style={{paddingEnd: 18}}><TouchableOpacity style={styles.selectTypeIcon}><Icon type="ionicon" name={"add-outline"} size={16} style={[styles.selectTypeIconDetail, {color : colors.gray[6]}]} ></Icon></TouchableOpacity></View> */}
+                                ))} */}
+                                <FlatList data={keywordData} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/>
                             </View>
                         </View>
                     </View>

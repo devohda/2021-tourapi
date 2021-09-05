@@ -107,7 +107,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                                onChangeText={(text) => setPassword(text)}
                                autoCapitalize="none"
                     />
-                    <Icon type="ionicon" name={"eye"} size={20} color={colors.gray[5]}></Icon>
+                    {/* <Icon type="ionicon" name={"eye"} size={20} color={colors.gray[5]}></Icon> */}
                     </View>
                     <TouchableOpacity
                         style={{
