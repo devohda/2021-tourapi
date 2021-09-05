@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking} from "react-native";
+import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking,
+    FlatList, Alert
+} from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useTheme } from '@react-navigation/native';
 import { Icon } from "react-native-elements";
@@ -10,6 +12,8 @@ import Score from "../components/Score";
 import Time from "../components/Time";
 import Facility from "../components/Facility";
 import AppText from "../components/AppText";
+import { useIsUserData } from "../contexts/UserDataContextProvider";
+import Jewel from '../assets/images/jewel.svg';
 
 const PlaceScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
@@ -43,9 +47,11 @@ const PlaceScreen = ({route, navigation}) => {
     const { data } = route.params;
     const [placeId, setPlaceId] = useState(getResults)
     const [placeData, setPlaceData] = useState(data);
+    const [collectionData, setCollectionData] = useState([]);
 
     useEffect(() => {
         getResults();
+        getCollectionList();
     }, []);
 
     const getResults = () => {
@@ -68,6 +74,110 @@ const PlaceScreen = ({route, navigation}) => {
             console.error(err);
         }
     };
+
+    const getCollectionList = () => {
+        try {
+            fetch('http://34.146.140.88/collection/list', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId : userData.user_pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response.data)
+                    setCollectionData(response.data)
+                    setFalse()
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const postPlace = (pressed) => {
+        var index = pressed.findIndex((element)=>element === true)
+            var pk = collectionData[index].collection_pk
+            try {
+                fetch(`http://34.146.140.88/collection/${pk}/place`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: data.place_pk,
+                    })
+                }).then((res) => res.json())
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    });
+    
+            } catch (err) {
+                console.error(err);
+            }
+            Alert.alert('', '보관함에 공간이 저장되었습니다.')
+    };
+
+    const likePlace = () => {
+            try {
+                fetch(`http://34.146.140.88/like/place`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userData.user_pk,
+                        placeId: placeData.place_pk,
+                    })
+                }).then((res) => res.json())
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    });
+
+            } catch (err) {
+                console.error(err);
+            }
+    }
+
+    const deletePlace = () => {
+        try {
+            fetch(`http://34.146.140.88/like/place`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userData.user_pk,
+                    placeId: placeData.place_pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
 
     const checkType = (type) => {
         if(type === 12) {
@@ -167,10 +277,18 @@ const PlaceScreen = ({route, navigation}) => {
                     </View>
                 </View>
                 <View style={{flexDirection: 'row', paddingVertical: 32, justifyContent: 'center', alignItems: 'center'}}>
-                    {/* 이 부분도 유저 정보에 따라 바뀔수 있도록 하기 */}
-                    {/* <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}> */}
-                    <TouchableOpacity>
-                        <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image>
+                    <TouchableOpacity onPress={()=>{
+                        if(isLiked) {
+                            setIsLiked(false);
+                            deletePlace();
+                        }
+                        else {
+                            setIsLiked(true);
+                            likePlace();
+                        }
+                    }}>
+                        <Jewel width={26} height={21} style={isLiked ? {color: colors.red[3]} : {color: colors.red_gray[5]}}/>
+                        {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
                     </TouchableOpacity>
                     <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>
                     <ShowDirectories />
@@ -188,8 +306,134 @@ const PlaceScreen = ({route, navigation}) => {
     //데이터 받아서 다시해야함
     const [ placeScore, setPlaceScore ] = useState('4.84');
     const [ clicked, setClicked ] = useState(false);
+    const [ userData, setUserData ] = useIsUserData();
+    const [ clickedData, setClickedData ] = useState([]);
+    const [isPress, setIsPress] = useState([]);
+    var cData = [];
 
+    const setFalse = () => {
+        var pressed = [];
+        for (let i = 0; i < collectionData.length; i++) {
+            pressed.push(false)
+        }
+        setIsPress(pressed)
+    }
+    
     const ShowDirectories = () => {
+
+        const [height, setHeight ] = useState(150+90*collectionData.length);
+        const maxHeight = Dimensions.get('screen').height;
+        const [iP, setIP] = useState(isPress);
+
+        const ShowFreeDir = ({item, idx}) => {
+            const [borderColor, setBorderColor] = useState(colors.defaultColor);
+
+            return (
+            <>
+            <View key={idx} style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
+                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5, borderWidth: 3, borderColor: iP[idx] ? colors.blue[6] : colors.defaultColor}}>   
+                    <TouchableOpacity onPress={()=>{
+                        // if(borderColor === colors.blue[6]){
+                        //     for(let i=0;i<cData.length;i++) {
+                        //         if(cData[i] === idx) {
+                        //             cData.splice(i, 1)
+                        //             i--;
+                        //         }
+                        //     }
+                        //     setBorderColor(colors.defaultColor);
+                        // }
+                        // else {
+                        //     if(cData.length === 0){
+                        //         setBorderColor(colors.blue[6]);
+                        //         cData.push(idx);
+                        //     }
+                        //     else {
+                        //         for(let i=0;i<item.length;i++) {
+                        //             console.log(i != idx)
+                        //             if(i != idx){
+                        //                 setBorderColor(colors.defaultColor);
+                        //                 cData.splice(i, 1);
+                        //                 i--;
+                        //             } else {
+                        //                 setBorderColor(colors.blue[6]);
+                        //                 cData.push(idx);
+                        //             }
+    
+                        //         }
+                        //     }
+                        // }
+                        let newArr = [...iP];
+                        if(newArr[idx]) {
+                            newArr[idx] = false;
+                            setIP(newArr);
+                        } else {
+                            for(let i=0;i<newArr.length;i++) {
+                                if(i == idx) continue;
+                                else newArr[i] = false;
+                            }
+                            newArr[idx] = true;
+                            setIP(newArr);
+                        }
+                        }}>
+                        <View style={{paddingTop: 12}}>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginLeft: 10, marginRight: 15}}>
+                            <View style={{paddingRight: 8, flexDirection: 'row'}}>
+                                <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
+                                    style={{marginVertical: 2, marginRight: 2}}></Icon>
+                                <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
+                            </View>
+                            {item.collection_private == 1 && <Image style={{width: 10, height: 10, marginLeft: 2}} source={require('../assets/images/lock_outline.png')}></Image>}
+                            </View>
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
+                            <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
+                                <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>{item.collection_name}</AppText>
+                            </View>
+                            <View style={{marginRight: '15%'}}>
+                                <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
+                                    {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
+                                    <View style={{zIndex: 0, flex: 1, position:'absolute'}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_1.png')}></Image></View>
+                                    <View style={{zIndex: 1, flex: 1, position:'absolute', marginLeft: 10}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_2.png')}></Image></View>
+                                    <View style={{zIndex: 2, flex: 1, position:'absolute', marginLeft: 20}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_3.png')}></Image></View>
+                                    <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
+                                                width: 15, height: 15, borderRadius: 50,
+                                                alignItems: 'center', justifyContent: 'center'
+                                    }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
+                                </View>
+                                
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            {idx === collectionData.length - 1 &&
+            <View style={{marginTop: 22, borderRadius: 10}}>
+                <TouchableOpacity
+                    style={{
+                        height: 48,
+                        borderRadius: 10,
+                        backgroundColor: iP.filter(element => element === true).length > 0 ? colors.mainColor : colors.gray[6]
+                    }
+                }
+                    onPress={()=>{
+                        refRBSheet.current.close()
+                        postPlace(iP);
+                        setIP([])
+                    }}
+                ><AppText
+                    style={{
+                    textAlign: 'center',
+                    padding: 14,
+                    fontSize: 16,
+                    color: colors.defaultColor,
+                    fontWeight: 'bold'
+                }}
+                >보관함에 추가하기</AppText>
+                </TouchableOpacity>
+            </View>}
+        </>
+        )}
+
         return (
             <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
                 <Icon type="ionicon" name={"add"} color={colors.red_gray[6]} size={28}></Icon>
@@ -197,7 +441,7 @@ const PlaceScreen = ({route, navigation}) => {
                     ref={refRBSheet}
                     closeOnDragDown={true}
                     closeOnPressMask={true}
-                    height={448}
+                    height={collectionData.length > 6 ? maxHeight : height}
                     customStyles={{
                     wrapper: {
                         backgroundColor: "rgba(0, 0, 0, 0.3)",
@@ -213,121 +457,18 @@ const PlaceScreen = ({route, navigation}) => {
                     }
                     }}
                     >
-                        {/* 데이터가 많아질 수 있으므로 스크롤뷰를 넣는것이 좋을듯 */}
-                        {/* 클릭했을 때 bordercolor 바뀌는건 makefreeDirectory 참고해서 데이터 들어온 다음에 바꾸기 */}
                         <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                 <AppText style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
                                 <Image source={require('../assets/images/folder.png')} style={{width: 32, height: 32}}></Image>
                             </View>
-                            <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
-                                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5}}>
-                                    <View style={{paddingLeft: 10, paddingTop: 12}}>
-                                        <View style={{paddingRight: 8, flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
-                                                style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
-                                        </View>
-                                    </View>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
-                                        <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>하루만에 북촌 정복하기</AppText>
-                                            <Image style={{width: 18, height: 18, marginLeft: 2}} source={require('../assets/images/lock_outline.png')}></Image>
-                                        </View>
-                                        <View style={{marginRight: '15%'}}>
-                                            <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
-                                                {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                                <View style={{zIndex: 0, flex: 1, position:'absolute'}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_1.png')}></Image></View>
-                                                <View style={{zIndex: 1, flex: 1, position:'absolute', marginLeft: 10}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_2.png')}></Image></View>
-                                                <View style={{zIndex: 2, flex: 1, position:'absolute', marginLeft: 20}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_3.png')}></Image></View>
-                                                <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                                            width: 15, height: 15, borderRadius: 50,
-                                                            alignItems: 'center', justifyContent: 'center'
-                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
 
-                            <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
-                                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5}}>
-                                    <View style={{paddingLeft: 10, paddingTop: 12}}>
-                                        <View style={{paddingRight: 8, flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
-                                                style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
-                                        </View>
-                                    </View>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
-                                        <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</AppText>
-                                            <Image style={{width: 18, height: 18, marginLeft: 2}} source={require('../assets/images/lock_outline.png')}></Image>
-                                        </View>
-                                        <View style={{marginRight: '15%'}}>
-                                            <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
-                                                {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                                <View style={{zIndex: 0, flex: 1, position:'absolute'}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_1.png')}></Image></View>
-                                                <View style={{zIndex: 1, flex: 1, position:'absolute', marginLeft: 10}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_2.png')}></Image></View>
-                                                <View style={{zIndex: 2, flex: 1, position:'absolute', marginLeft: 20}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_3.png')}></Image></View>
-                                                <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                                            width: 15, height: 15, borderRadius: 50,
-                                                            alignItems: 'center', justifyContent: 'center'
-                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-
-                            <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
-                                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5}}>
-                                    <View style={{paddingLeft: 10, paddingTop: 12}}>
-                                        <View style={{paddingRight: 8, flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
-                                                style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
-                                        </View>
-                                    </View>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
-                                        <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</AppText>
-                                        </View>
-                                        <View style={{marginRight: '15%'}}>
-                                            <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
-                                                {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                                <View style={{zIndex: 0, flex: 1, position:'absolute'}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_1.png')}></Image></View>
-                                                <View style={{zIndex: 1, flex: 1, position:'absolute', marginLeft: 10}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_2.png')}></Image></View>
-                                                <View style={{zIndex: 2, flex: 1, position:'absolute', marginLeft: 20}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_3.png')}></Image></View>
-                                                <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                                            width: 15, height: 15, borderRadius: 50,
-                                                            alignItems: 'center', justifyContent: 'center'
-                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={{marginTop: 22}}>
-                                <TouchableOpacity
-                                    style={{
-                                        // 들어왔을때 length를 이용하여 바꿀 필요있음
-                                        // backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : colors.gray[5],
-                                        backgroundColor: colors.gray[6],
-                                        height: 48,
-                                        borderRadius: 10
-                                    }}
-                                ><AppText
-                                    style={{
-                                        textAlign: 'center',
-                                        padding: 14,
-                                        fontSize: 16,
-                                        color: colors.defaultColor,
-                                        fontWeight: 'bold'
-                                    }}
-                                >보관함에 추가하기</AppText>
-                                </TouchableOpacity>
-                            </View>
+                            <SafeAreaView>
+                                {collectionData.map((item, idx) =>(
+                                    <ShowFreeDir item={item} idx={idx} key={idx}/>
+                                ))}
+                                {/* <FlatList data={collectionData} renderItem={showFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
+                            </SafeAreaView>
                         </View>
                 </RBSheet>
             </TouchableOpacity>

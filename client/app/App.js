@@ -19,7 +19,8 @@ const ColorTheme = {
             2 : '#637DA9',
             3 : '#7E97C2',
             4 : '#98B1DA',
-            5 : '#B8CDF0'
+            5 : '#B8CDF0',
+            6 : '#B8CDF0'
         },
         red : {
             1 : '#F74A4A',

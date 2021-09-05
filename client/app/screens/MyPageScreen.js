@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Platform, View, Text, TextInput, Image, ScrollView, Dimensions, StyleSheet} from "react-native";
+import {Platform, View, Text, TextInput, Image, ScrollView, Dimensions, StyleSheet, TouchableOpacity} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 import MyPageNavigation from "../navigation/MypageNavigator";
 import {useTheme} from '@react-navigation/native';
@@ -90,7 +90,7 @@ const MyPageScreen = ({navigation}) => {
                                source={require('../assets/images/default_profile.png')}
                         />
                         <Image style={{width: 30, height: 30, marginLeft: '20%', marginBottom: '17.5%'}}
-                               source={require('../assets/images/setting.png')}
+                            source={require('../assets/images/setting.png')}
                         ></Image>
                     </View>
                     <View style={Platform.OS === 'ios' && {marginTop: 5}}>

@@ -6,6 +6,7 @@ import {createStackNavigator} from "@react-navigation/stack";
 import SearchScreen from "../screens/SearchScreen";
 import PlaceScreen from "../screens/PlaceScreen";
 import MakeFreeDirectory from "../screens/MakeFreeDirectory";
+import FreeDirectory from "../screens/collection/FreeDirectory";
 
 const MainStack = createStackNavigator()
 
@@ -21,6 +22,7 @@ const AppNavigator = () => {
                     <MainStack.Screen name="Search" children={SearchScreen}/>
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
                     <MainStack.Screen name="Directory" component={MakeFreeDirectory}/>
+                    <MainStack.Screen name="ShowFreeDir" component={FreeDirectory} />
                 </>
             }
         </MainStack.Navigator>
