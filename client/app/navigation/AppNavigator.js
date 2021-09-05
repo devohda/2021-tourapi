@@ -14,12 +14,12 @@ const AppNavigator = () => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn()
 
     return (
-        <MainStack.Navigator screenOptions={{headerShown: false, defaultComponent : 'App'}}>
+        <MainStack.Navigator screenOptions={{headerShown: false}}>
             {!isSignedIn ?
                 <MainStack.Screen name="Authentication" component={AuthenticationNavigator}/> :
                 <>
                     <MainStack.Screen name="App" children={({navigation}) => <HomeNavigator navigation={navigation}/>}/>
-                    <MainStack.Screen name="Search" children={SearchScreen}/>
+                    <MainStack.Screen name="Search" component={SearchScreen} />
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
                     <MainStack.Screen name="Directory" component={MakeFreeDirectory}/>
                     <MainStack.Screen name="ShowFreeDir" component={FreeDirectory} />
