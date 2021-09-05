@@ -13,6 +13,7 @@ import Time from "../components/Time";
 import Facility from "../components/Facility";
 import AppText from "../components/AppText";
 import { useIsUserData } from "../contexts/UserDataContextProvider";
+import Jewel from '../assets/images/jewel.svg';
 
 const PlaceScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
@@ -47,7 +48,6 @@ const PlaceScreen = ({route, navigation}) => {
     const [placeId, setPlaceId] = useState(getResults)
     const [placeData, setPlaceData] = useState(data);
     const [collectionData, setCollectionData] = useState([]);
-    const [isPress, setIsPress] = useState([]);
 
     useEffect(() => {
         getResults();
@@ -101,11 +101,9 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const postPlace = (cpk) => {
-        
-        if(typeof cpk === 'undefined') Alert.alert("", "선택된 보관함이 없습니다")
-        else {
-            var pk = collectionData[cpk].collection_pk
+    const postPlace = (pressed) => {
+        var index = pressed.findIndex((element)=>element === true)
+            var pk = collectionData[index].collection_pk
             try {
                 fetch(`http://34.146.140.88/collection/${pk}/place`, {
                     method: 'POST',
@@ -128,16 +126,58 @@ const PlaceScreen = ({route, navigation}) => {
                 console.error(err);
             }
             Alert.alert('', '보관함에 공간이 저장되었습니다.')
+    };
+
+    const likePlace = () => {
+            try {
+                fetch(`http://34.146.140.88/like/place`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userData.user_pk,
+                        placeId: placeData.place_pk,
+                    })
+                }).then((res) => res.json())
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    });
+
+            } catch (err) {
+                console.error(err);
+            }
+    }
+
+    const deletePlace = () => {
+        try {
+            fetch(`http://34.146.140.88/like/place`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userData.user_pk,
+                    placeId: placeData.place_pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
         }
     }
 
-    const setFalse = () => {
-        var pressed = [];
-        for (let i = 0; i < collectionData.length; i++) {
-            pressed.push(false)
-        }
-        setIsPress(pressed)
-    }
 
     const checkType = (type) => {
         if(type === 12) {
@@ -237,10 +277,18 @@ const PlaceScreen = ({route, navigation}) => {
                     </View>
                 </View>
                 <View style={{flexDirection: 'row', paddingVertical: 32, justifyContent: 'center', alignItems: 'center'}}>
-                    {/* 이 부분도 유저 정보에 따라 바뀔수 있도록 하기 */}
-                    {/* <TouchableOpacity onPress={() => {isLiked ? deleteLikes() : postLikes()}}> */}
-                    <TouchableOpacity>
-                        <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image>
+                    <TouchableOpacity onPress={()=>{
+                        if(isLiked) {
+                            setIsLiked(false);
+                            deletePlace();
+                        }
+                        else {
+                            setIsLiked(true);
+                            likePlace();
+                        }
+                    }}>
+                        <Jewel width={26} height={21} style={isLiked ? {color: colors.red[3]} : {color: colors.red_gray[5]}}/>
+                        {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
                     </TouchableOpacity>
                     <View style={{borderWidth: 0.5, transform: [{rotate: '90deg'}], width: 42, borderColor: colors.red_gray[6], marginHorizontal: 30}}></View>
                     <ShowDirectories />
@@ -260,13 +308,22 @@ const PlaceScreen = ({route, navigation}) => {
     const [ clicked, setClicked ] = useState(false);
     const [ userData, setUserData ] = useIsUserData();
     const [ clickedData, setClickedData ] = useState([]);
+    const [isPress, setIsPress] = useState([]);
     var cData = [];
+
+    const setFalse = () => {
+        var pressed = [];
+        for (let i = 0; i < collectionData.length; i++) {
+            pressed.push(false)
+        }
+        setIsPress(pressed)
+    }
     
     const ShowDirectories = () => {
 
         const [height, setHeight ] = useState(150+90*collectionData.length);
         const maxHeight = Dimensions.get('screen').height;
-       
+        const [iP, setIP] = useState(isPress);
 
         const ShowFreeDir = ({item, idx}) => {
             const [borderColor, setBorderColor] = useState(colors.defaultColor);
@@ -274,36 +331,48 @@ const PlaceScreen = ({route, navigation}) => {
             return (
             <>
             <View key={idx} style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
-                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5, borderWidth: 3, borderColor: borderColor}}>   
+                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5, borderWidth: 3, borderColor: iP[idx] ? colors.blue[6] : colors.defaultColor}}>   
                     <TouchableOpacity onPress={()=>{
-                        if(borderColor === colors.blue[6]){
-                            for(let i=0;i<cData.length;i++) {
-                                if(cData[i] === idx) {
-                                    cData.splice(i, 1)
-                                    i--;
-                                }
-                            }
-                            setBorderColor(colors.defaultColor);
-                        }
-                        else {
-                            if(cData.length === 0){
-                                setBorderColor(colors.blue[6]);
-                                cData.push(idx);
-                            }
-                            else {
-                                for(let i=0;i<item.length;i++) {
-                                    console.log(i != idx)
-                                    if(i != idx){
-                                        setBorderColor(colors.defaultColor);
-                                        cData.splice(i, 1);
-                                        i--;
-                                    } else {
-                                        setBorderColor(colors.blue[6]);
-                                        cData.push(idx);
-                                    }
+                        // if(borderColor === colors.blue[6]){
+                        //     for(let i=0;i<cData.length;i++) {
+                        //         if(cData[i] === idx) {
+                        //             cData.splice(i, 1)
+                        //             i--;
+                        //         }
+                        //     }
+                        //     setBorderColor(colors.defaultColor);
+                        // }
+                        // else {
+                        //     if(cData.length === 0){
+                        //         setBorderColor(colors.blue[6]);
+                        //         cData.push(idx);
+                        //     }
+                        //     else {
+                        //         for(let i=0;i<item.length;i++) {
+                        //             console.log(i != idx)
+                        //             if(i != idx){
+                        //                 setBorderColor(colors.defaultColor);
+                        //                 cData.splice(i, 1);
+                        //                 i--;
+                        //             } else {
+                        //                 setBorderColor(colors.blue[6]);
+                        //                 cData.push(idx);
+                        //             }
     
-                                }
+                        //         }
+                        //     }
+                        // }
+                        let newArr = [...iP];
+                        if(newArr[idx]) {
+                            newArr[idx] = false;
+                            setIP(newArr);
+                        } else {
+                            for(let i=0;i<newArr.length;i++) {
+                                if(i == idx) continue;
+                                else newArr[i] = false;
                             }
+                            newArr[idx] = true;
+                            setIP(newArr);
                         }
                         }}>
                         <View style={{paddingTop: 12}}>
@@ -343,14 +412,13 @@ const PlaceScreen = ({route, navigation}) => {
                     style={{
                         height: 48,
                         borderRadius: 10,
-                        backgroundColor: colors.mainColor
+                        backgroundColor: iP.filter(element => element === true).length > 0 ? colors.mainColor : colors.gray[6]
                     }
-                    // cData.length > 0 ? {backgroundColor: colors.mainColor, borderRadius: 10} : {backgroundColor: colors.gray[6], borderRadius: 10}
                 }
                     onPress={()=>{
                         refRBSheet.current.close()
-                        postPlace(cData[0]);
-                        cData = []
+                        postPlace(iP);
+                        setIP([])
                     }}
                 ><AppText
                     style={{

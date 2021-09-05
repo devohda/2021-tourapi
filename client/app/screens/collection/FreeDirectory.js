@@ -22,6 +22,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import { useIsUserData } from '../../contexts/UserDataContextProvider';
+import Jewel from '../../assets/images/jewel.svg';
 
 // import {   Menu,
 //     Divider,
@@ -34,6 +35,7 @@ const FreeDirectory = ({route, navigation}) => {
     const [directoryTitle, setDirectoryTitle] = useState('종로 25년 토박이가 알려주는 종로 사진스팟');
     const [userData, setUserData] = useIsUserData();
     const [directoryData, setDirectoryData] = useState({});
+    const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
 
@@ -56,7 +58,7 @@ const FreeDirectory = ({route, navigation}) => {
                 .then((response) => {
                     setDirectoryData(response.data)
                     setPlaceLength(response.data.places.length)
-                    console.log(response)
+                    setFalse()
                 })
                 .catch((err) => {
                     console.error(err)
@@ -66,6 +68,65 @@ const FreeDirectory = ({route, navigation}) => {
             console.error(err);
         }
     };
+
+    const [isPress, setIsPress] = useState([]);
+    const setFalse = () => {
+        var pressed = [];
+        for (let i = 0; i < placeLength; i++) {
+            pressed.push(false)
+        }
+        setIsPress(pressed)
+    };
+
+    const likePlace = (pk) => {
+            try {
+                fetch(`http://34.146.140.88/like/place`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userData.user_pk,
+                        placeId: pk,
+                    })
+                }).then((res) => res.json())
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    });
+
+            } catch (err) {
+                console.error(err);
+            }
+    }
+
+    const deletePlace = (pk) => {
+        try {
+            fetch(`http://34.146.140.88/like/place`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userData.user_pk,
+                    placeId: pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     const InputBox = styled(TextInput)`
     fontSize: 16px;
@@ -99,8 +160,7 @@ const FreeDirectory = ({route, navigation}) => {
         }
     };
 
-    const ShowPlaces = ({item}) => {
-        console.log(directoryData)
+    const ShowPlaces = ({item, index}) => {
         return (
             <>
             {item.place_pk !== directoryData.places[0].place_pk && <View style={{width: '100%', height: 1, backgroundColor: colors.red_gray[6], zIndex: -1000, marginVertical: 13}}></View>}
@@ -149,9 +209,25 @@ const FreeDirectory = ({route, navigation}) => {
                         </View>
                     </TouchableOpacity>
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                        {item.like_flag === 0 ? 
-                        <Image source={require('../../assets/images/here_nonclick.png')} style={{width: 26, height: 21}}></Image>
-                        : <Image source={require('../../assets/images/here_click.png')} style={{width: 26, height: 21}}></Image>}
+                        {/* {item.like_flag === 0 ?  */}
+                        <TouchableOpacity onPress={() =>{
+                            let newArr = [...isPress];
+                            if(newArr[index]) {
+                                newArr[index] = false;
+                                setIsPress(newArr);
+                                deletePlace(item.place_pk)
+                            } else {
+                                // for(let i=0;i<newArr.length;i++) {
+                                //     if(i == index) continue;
+                                //     else newArr[i] = false;
+                                // }
+                                newArr[index] = true;
+                                setIsPress(newArr);
+                                likePlace(item.place_pk)
+                            }
+                        }}>
+                            <Jewel width={26} height={21} style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={{backgroundColor: colors.defaultColor, height: 30, paddingVertical: 6, paddingLeft: 6, paddingRight: 5,
