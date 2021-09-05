@@ -21,10 +21,10 @@ import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 
-import {   Menu,
-    Divider,
-    HamburgerIcon,
-    Center, NativeBaseProvider } from 'native-base';
+// import {   Menu,
+//     Divider,
+//     HamburgerIcon,
+//     Center, NativeBaseProvider } from 'native-base';
 
 export default function FreeDirectory({navigation}) {
     const {colors} = useTheme();
@@ -38,25 +38,7 @@ export default function FreeDirectory({navigation}) {
   `
 
     return (
-        <NativeBaseProvider>
-                  <Center flex={1}>
-            <Menu
-      trigger={(triggerProps) => {
-        return (
-          <Pressable accessibilityLabel="More options menu" {...triggerProps}>
-            <HamburgerIcon />
-          </Pressable>
-        )
-      }}
-    >
-      <Menu.Item>Arial</Menu.Item>
-      <Menu.Item>Nunito Sans</Menu.Item>
-      <Menu.Item isDisabled>Tahoma</Menu.Item>
-      <Divider />
-      <Menu.Item>Roboto</Menu.Item>
-      <Menu.Item>Montserrat</Menu.Item>
-    </Menu>
-      </Center>
+        <>
         <View style={{paddingHorizontal: 20, paddingTop: 25, paddingBottom: Platform.OS === 'ios'? 20 : 0,backgroundColor: colors.backgroundColor}}>
             <NavigationTop navigation={navigation} title="" type="freeDir"/>
         </View>
@@ -380,7 +362,7 @@ export default function FreeDirectory({navigation}) {
             </ScrollView>
         </SafeAreaView>
         </ScreenContainer>
-        </NativeBaseProvider>
+        </>
     );
 }
 

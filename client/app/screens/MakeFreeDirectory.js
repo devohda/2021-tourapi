@@ -115,7 +115,7 @@ const MakeFreeDirectory = ({navigation}) => {
             }
         }
         try {
-            fetch('http://34.146.140.88:3000/collection/free', {
+            fetch('http://34.146.140.88/collection/free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -128,9 +128,9 @@ const MakeFreeDirectory = ({navigation}) => {
                         description: null,
                     },
                     userId : userData.user_pk,
-                    keywords: datas
+                    keywords: [ "힐링"]
                 })
-            }).then((res) => res.text())
+            }).then((res) => res.json())
                 .then((responsedata) => {
                     console.log(responsedata)
                     Alert.alert('', '자유보관함이 생성되었습니다')
@@ -183,29 +183,30 @@ const MakeFreeDirectory = ({navigation}) => {
         collection_type: 1,
     }
 
-    const getKeywords = useCallback(() => {
-        try {
+    // const getKeywords = () => {
+    //     try {
 
-            fetch('http://34.146.140.88/keyword/keywords', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            }).then((res) => res.json())
-                .then((responsedata) => {
-                    setKeywordData(responsedata)
-                    setFalse()
-                    // console.log(keywordData)
-                })
-                .catch((err) => {
-                    console.error(err)
-                });
+    //         fetch('http://34.146.140.88/keyword/keywords', {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json'
+    //             },
+    //         }).then((res) => res.json())
+    //             .then((responsedata) => {
+    //                 setKeywordData(responsedata)
+    //                 setFalse()
+    //                 console.log(responsedata)
+    //                 // console.log(keywordData)
+    //             })
+    //             .catch((err) => {
+    //                 console.error(err)
+    //             });
 
-        } catch (err) {
-            console.error(err);
-        }
-    }, []);
+    //     } catch (err) {
+    //         console.error(err);
+    //     }
+    // };
 
     //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
     //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
@@ -239,7 +240,25 @@ const MakeFreeDirectory = ({navigation}) => {
     }
 
     useEffect(() => {
-        getKeywords();
+        setKeywordData([
+            {
+                id: '1',
+                key: '힐링',
+            },
+            {
+                id: '2',
+                key: '관광',
+            },
+            {
+                id: '3',
+                key: '여유',
+            },
+            {
+                id: '4',
+                key: '뚜벅'
+            }
+        ])
+        setFalse()
     }, [])
 
     return (
@@ -271,8 +290,8 @@ const MakeFreeDirectory = ({navigation}) => {
                             <View flexDirection="row">
                                 <Image source={require('../assets/images/add_keyword.png')}
                                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                                {keywordData.map((keyword, idx) => (
-                                    <Keyword keyword={keyword} key={idx}/>
+                                {keywordData.map((key, idx) => (
+                                    <Keyword keyword={key} key={idx}/>
                                 ))}
                                 {/*{버튼 추가 가능하도록 만들었음.}*/}
                                 {/* <Keyword keyword={{keyword: '+'}} key={0} pressFunc={() => {
@@ -319,13 +338,13 @@ const MakeFreeDirectory = ({navigation}) => {
                                 borderRadius: 10
                             }}
                             onPress={() => {
-                                if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
+                                // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
                                     postCollections();
                                     navigation.setOptions({tabBarVisible: true});
                                     navigation.goBack(null);
-                                }
+                                // }
                             }}
-                            disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
+                            // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
                         ><AppText
                             style={{
                                 textAlign: 'center',

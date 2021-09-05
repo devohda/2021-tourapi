@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking} from "react-native";
+import {View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking,
+    FlatList
+} from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useTheme } from '@react-navigation/native';
 import { Icon } from "react-native-elements";
@@ -10,6 +12,7 @@ import Score from "../components/Score";
 import Time from "../components/Time";
 import Facility from "../components/Facility";
 import AppText from "../components/AppText";
+import { useIsUserData } from "../contexts/UserDataContextProvider";
 
 const PlaceScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
@@ -50,7 +53,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88:3000/place/${data.place_pk}`, {
+            fetch(`http://34.146.140.88/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -188,38 +191,39 @@ const PlaceScreen = ({route, navigation}) => {
     //데이터 받아서 다시해야함
     const [ placeScore, setPlaceScore ] = useState('4.84');
     const [ clicked, setClicked ] = useState(false);
-
+    
     const ShowDirectories = () => {
-        return (
-            <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
-                <Icon type="ionicon" name={"add"} color={colors.red_gray[6]} size={28}></Icon>
-                <RBSheet
-                    ref={refRBSheet}
-                    closeOnDragDown={true}
-                    closeOnPressMask={true}
-                    height={448}
-                    customStyles={{
-                    wrapper: {
-                        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        useEffect(() => {
+            getCollectionList();
+        }, []);
+        const [userData, setUserData] = useIsUserData();
+
+        const getCollectionList = () => {
+            try {
+                fetch('http://192.168.0.11:3000/collection/list', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    draggableIcon: {
-                        backgroundColor: colors.gray[4],
-                        width: 110
-                    },
-                    container: {
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
-                        backgroundColor: colors.yellow[7]
-                    }
-                    }}
-                    >
-                        {/* 데이터가 많아질 수 있으므로 스크롤뷰를 넣는것이 좋을듯 */}
-                        {/* 클릭했을 때 bordercolor 바뀌는건 makefreeDirectory 참고해서 데이터 들어온 다음에 바꾸기 */}
-                        <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <AppText style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
-                                <Image source={require('../assets/images/folder.png')} style={{width: 32, height: 32}}></Image>
-                            </View>
+                    body: JSON.stringify({
+                        userId : userData.user_pk,
+                    })
+                }).then((res) => res.json())
+                    .then((responsedata) => {
+                        console.log(responsedata)
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    });
+    
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        const showFreeDir = () => (
+
                             <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
                                 <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5}}>
                                     <View style={{paddingLeft: 10, paddingTop: 12}}>
@@ -249,65 +253,38 @@ const PlaceScreen = ({route, navigation}) => {
                                     </View>
                                 </View>
                             </View>
+        )
 
-                            <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
-                                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5}}>
-                                    <View style={{paddingLeft: 10, paddingTop: 12}}>
-                                        <View style={{paddingRight: 8, flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
-                                                style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
-                                        </View>
-                                    </View>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
-                                        <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</AppText>
-                                            <Image style={{width: 18, height: 18, marginLeft: 2}} source={require('../assets/images/lock_outline.png')}></Image>
-                                        </View>
-                                        <View style={{marginRight: '15%'}}>
-                                            <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
-                                                {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                                <View style={{zIndex: 0, flex: 1, position:'absolute'}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_1.png')}></Image></View>
-                                                <View style={{zIndex: 1, flex: 1, position:'absolute', marginLeft: 10}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_2.png')}></Image></View>
-                                                <View style={{zIndex: 2, flex: 1, position:'absolute', marginLeft: 20}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_3.png')}></Image></View>
-                                                <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                                            width: 15, height: 15, borderRadius: 50,
-                                                            alignItems: 'center', justifyContent: 'center'
-                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
+
+        return (
+            <TouchableOpacity onPress={() => {refRBSheet.current.open(); setClicked(true)}}>
+                <Icon type="ionicon" name={"add"} color={colors.red_gray[6]} size={28}></Icon>
+                <RBSheet
+                    ref={refRBSheet}
+                    closeOnDragDown={true}
+                    closeOnPressMask={true}
+                    height={448}
+                    customStyles={{
+                    wrapper: {
+                        backgroundColor: "rgba(0, 0, 0, 0.3)",
+                    },
+                    draggableIcon: {
+                        backgroundColor: colors.gray[4],
+                        width: 110
+                    },
+                    container: {
+                        borderTopLeftRadius: 10,
+                        borderTopRightRadius: 10,
+                        backgroundColor: colors.yellow[7]
+                    }
+                    }}
+                    >
+                        <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                <AppText style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
+                                <Image source={require('../assets/images/folder.png')} style={{width: 32, height: 32}}></Image>
                             </View>
 
-                            <View style={{alignItems : "center", justifyContent : "center", marginTop: 12}}>
-                                <View style={{width: '100%', backgroundColor: colors.defaultColor, borderRadius: 5}}>
-                                    <View style={{paddingLeft: 10, paddingTop: 12}}>
-                                        <View style={{paddingRight: 8, flexDirection: 'row'}}>
-                                            <Icon type="ionicon" name={"location"} size={10} color={colors.mainColor}
-                                                style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                            <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
-                                        </View>
-                                    </View>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 11}}>
-                                        <View style={{flexDirection: 'row', marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText numberOfLines={2} style={{color: colors.mainColor, lineHeight: 28.8, fontSize: 18, fontWeight: '500', width: 236}}>종로 25년 토박이가 알려주는 종로 사진스팟</AppText>
-                                        </View>
-                                        <View style={{marginRight: '15%'}}>
-                                            <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
-                                                {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                                <View style={{zIndex: 0, flex: 1, position:'absolute'}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_1.png')}></Image></View>
-                                                <View style={{zIndex: 1, flex: 1, position:'absolute', marginLeft: 10}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_2.png')}></Image></View>
-                                                <View style={{zIndex: 2, flex: 1, position:'absolute', marginLeft: 20}}><Image style={{width: 24, height: 24}} source={require('../assets/images/default_profile_3.png')}></Image></View>
-                                                <View style={{zIndex: 3, flex: 1, position:'absolute', marginLeft: 24.5, backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                                            width: 15, height: 15, borderRadius: 50,
-                                                            alignItems: 'center', justifyContent: 'center'
-                                                        }}><AppText style={{color: colors.defaultColor, fontSize: 10, textAlign: 'center'}}>+2</AppText></View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
                             <View style={{marginTop: 22}}>
                                 <TouchableOpacity
                                     style={{
