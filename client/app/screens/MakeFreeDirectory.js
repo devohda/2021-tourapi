@@ -235,7 +235,7 @@ const MakeFreeDirectory = ({navigation}) => {
             {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
         </View>
     )
-
+    
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < keywordData.length; i++) {

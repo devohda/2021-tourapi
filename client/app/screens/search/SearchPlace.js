@@ -2,17 +2,19 @@ import React, {useState, useEffect, useContext} from "react";
 import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from "react-native";
 import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg'
-import Jewel from '../../assets/images/jewel.svg'
+import Jewel from '../../assets/images/jewel.svg';
 import AppText from "../../components/AppText";
 import { searchKeyword } from "../../contexts/SearchkeywordContextProvider";
 import ShowEmpty from "../../components/ShowEmpty";
+import { useIsUserData } from "../../contexts/UserDataContextProvider";
 
 const SearchPlace = (props, {navigation}) => {
     const {colors} = useTheme();
     const [placeList, setPlaceList] = useState([]);
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
-    const [keyword, setKeyword] = searchKeyword()
+    const [keyword, setKeyword] = searchKeyword();
+    const [userData, setUserData] = useIsUserData();
 
     const styles = StyleSheet.create({
         info_container : {
@@ -44,7 +46,8 @@ const SearchPlace = (props, {navigation}) => {
             }).then((res) => res.json())
                 .then((response) => {
                     setPlaceList(response.data);
-                    console.log(placeList)
+                    console.log(placeList);
+                    setFalse()
                 })
                 .catch((err) => {
                     console.error(err)
@@ -54,6 +57,57 @@ const SearchPlace = (props, {navigation}) => {
             console.error(err);
         }
     };
+
+    const likePlace = (pk) => {
+            try {
+                fetch(`http://34.146.140.88/like/place`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userData.user_pk,
+                        placeId: pk,
+                    })
+                }).then((res) => res.json())
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    });
+    
+            } catch (err) {
+                console.error(err);
+            }
+    }
+
+    const deletePlace = (pk) => {
+        console.log(pk)
+        try {
+            fetch(`http://34.146.140.88/like/place`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userData.user_pk,
+                    placeId: pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     const checkType = (type) => {
         if(type === 12) {
@@ -75,22 +129,48 @@ const SearchPlace = (props, {navigation}) => {
         }
     }
 
-    const PlaceContainer = ({item}) => ( 
+    const [isPress, setIsPress] = useState([]);
+    const setFalse = () => {
+        var pressed = [];
+        for (let i = 0; i < placeList.length; i++) {
+            pressed.push(false)
+        }
+        setIsPress(pressed)
+    }
+
+    const PlaceContainer = ({item, index}) => ( 
         <TouchableOpacity onPress={()=>props.navigation.navigate('Place', {data : item})}>
-            <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22}}>
-                <Image source={require('../../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
-                <View flex={1} style={styles.info_container}>
-                    <View flexDirection="row" style={{alignItems: 'center'}}>
-                        <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
-                        <View style={styles.score_line}></View>
-                        <Star width={11} height={11} style={{marginTop: 2}} />
-                        <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+            <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{flexDirection: 'row', width: '85%'}}>
+                    <Image source={require('../../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
+                    <View flex={1} style={styles.info_container}>
+                        <View flexDirection="row" style={{alignItems: 'center'}}>
+                            <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
+                            <View style={styles.score_line}></View>
+                            <Star width={11} height={11} style={{marginTop: 2}} />
+                            <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                        </View>
+                        <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
+                        <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
                     </View>
-                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
-                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
                 </View>
-                <TouchableOpacity onPress={() => setLike(likeState => !likeState)}>
-                    <Jewel width={26} height={21} style={{color: like ? colors.red[3] : colors.red_gray[5]}}/>
+                <TouchableOpacity onPress={() =>{
+                    let newArr = [...isPress];
+                    if(newArr[index]) {
+                        newArr[index] = false;
+                        setIsPress(newArr);
+                        deletePlace(item.place_pk)
+                    } else {
+                        for(let i=0;i<newArr.length;i++) {
+                            if(i == index) continue;
+                            else newArr[i] = false;
+                        }
+                        newArr[index] = true;
+                        setIsPress(newArr);
+                        likePlace(item.place_pk)
+                    }
+                }}>
+                    <Jewel width={26} height={21} style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
@@ -103,7 +183,7 @@ const SearchPlace = (props, {navigation}) => {
                         placeList.length === 0 ? 
                         <ShowEmpty /> :
                         <SafeAreaView>
-                            <FlatList data={placeList} renderItem={PlaceContainer} keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
+                            <FlatList data={placeList} renderItem={PlaceContainer} keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
                     }
                 </ScrollView>
