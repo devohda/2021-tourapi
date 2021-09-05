@@ -50,7 +50,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88:3000/place/${data.place_pk}`, {
+            fetch(`http://34.146.140.88/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

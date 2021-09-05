@@ -35,7 +35,7 @@ const SearchPlace = (props, {navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88:3000/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
+            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
