@@ -273,189 +273,185 @@ const FreeDirectory = ({route, navigation}) => {
     }
 
     return (
-
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title="" type="freeDir"/>
-            <ScreenContainerView>
-                <ScrollView>
-                    <View>
-                        <View>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginHorizontal: 20,
-                                marginBottom: 8
-                            }}>
-                                <View
-                                    style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    {/* <View style={[styles.dirType, {borderColor: colors.backgroundColor, backgroundColor: colors.backgroundColor}]}><AppText style={item.collection_type==1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type===1 ? '자유' : '일정'}</AppText></View> */}
-                                    <View style={[styles.dirType,
-                                        {
-                                            borderColor: colors.defaultColor,
-                                            backgroundColor: colors.defaultColor,
-                                            shadowColor: colors.red[8]
-                                        }]}><AppText
-                                        style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText></View>
-                                </View>
-                                <View>
-                                    {userData.user_nickname === data.created_user_name && collectionData.collection_private &&
-                                    <Image source={require('../../assets/images/lock_forDir.png')}
-                                           style={{width: 22, height: 22}}></Image>}
-                                </View>
-                            </View>
-                            <View style={{
-                                marginHorizontal: 20,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View style={{justifyContent: 'center', alignItems: 'center', width: '70%'}}>
-                                    <AppText style={{
-                                        fontSize: 22,
-                                        fontWeight: '700',
-                                        color: colors.mainColor
-                                    }}>{data.collection_name}</AppText>
-                                </View>
+            <ScrollView>
+                <ScreenContainerView>
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 8
+                    }}>
+                        <View
+                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <View style={[styles.dirType,
                                 {
-                                    userData.user_nickname !== data.created_user_name &&
-                                    <View style={{
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        marginRight: 20,
-                                        marginTop: 20
-                                    }}>
-                                        <Image source={require('../../assets/images/here_click.png')}
-                                               style={{width: 26, height: 21, marginBottom: 2}}></Image>
-                                        <AppText style={{
-                                            fontSize: 10,
-                                            fontWeight: '700',
-                                            color: colors.red[3]
-                                        }}>1,820</AppText>
-                                    </View>
-                                }
-                            </View>
-                            <View style={{marginRight: '15%', marginTop: '10%', marginLeft: 10}}>
-                                <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}}
-                                      flex={1}>
-                                    {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                    <View style={{zIndex: 0, flex: 1, position: 'absolute'}}><Image
-                                        style={{width: 60, height: 60}}
-                                        source={require('../../assets/images/default_profile_1.png')}></Image></View>
-                                    <View style={{zIndex: 1, flex: 1, position: 'absolute', marginLeft: 20}}><Image
-                                        style={{width: 60, height: 60}}
-                                        source={require('../../assets/images/default_profile_2.png')}></Image></View>
-                                    <View style={{zIndex: 2, flex: 1, position: 'absolute', marginLeft: 40}}><Image
-                                        style={{width: 60, height: 60}}
-                                        source={require('../../assets/images/default_profile_3.png')}></Image></View>
-                                    <View style={{
-                                        zIndex: 3,
-                                        flex: 1,
-                                        position: 'absolute',
-                                        marginLeft: 51,
-                                        backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                        width: 38,
-                                        height: 38,
-                                        borderRadius: 50,
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}><AppText style={{
-                                        color: colors.defaultColor,
-                                        fontSize: 10,
-                                        textAlign: 'center'
-                                    }}>+2</AppText></View>
-                                </View>
+                                    borderColor: colors.defaultColor,
+                                    backgroundColor: colors.defaultColor,
+                                    shadowColor: colors.red[8]
+                                }]}>
+                                <AppText style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText>
                             </View>
                         </View>
-
-                        <View style={{marginTop: 45}}>
-                            {/* TODO 카카오 지도 api 가져오기 */}
-                            <View>
-                                {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
-                                <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                                         initialRegion={{
-                                             latitude: 37.56633546113615,
-                                             longitude: 126.9779482762618,
-                                             latitudeDelta: 0.0015,
-                                             longitudeDelta: 0.0015,
-                                         }}
-                                ><Marker coordinate={{
-                                    latitude: 37.56633546113615,
-                                    longitude: 126.9779482762618
-                                }}
-                                         title="서울시청"
-                                         description="기본값입니다"/>
-                                </MapView>
-                            </View>
+                        <View>
+                            {userData.user_nickname === data.created_user_name && collectionData.collection_private &&
+                            <Image source={require('../../assets/images/lock_forDir.png')}
+                                   style={{width: 22, height: 22}}></Image>}
                         </View>
-
+                    </View>
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <View style={{justifyContent: 'center', alignItems: 'flex-start'}}>
+                            <AppText style={{
+                                fontSize: 22,
+                                fontWeight: '700',
+                                color: colors.mainColor
+                            }}>{data.collection_name}</AppText>
+                        </View>
                         {
-                            placeLength !== 0 ?
-                                <View style={{marginTop: 16, marginHorizontal: 20}}>
-                                    <View style={{marginBottom: 16}}>
-                                        <AppText style={{color: colors.gray[4]}}>총 <AppText
-                                            style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
-                                    </View>
-                                    <SafeAreaView>
-                                        {/* {
+                            userData.user_nickname !== data.created_user_name &&
+                            <View style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginTop: 20
+                            }}>
+                                <Image source={require('../../assets/images/here_click.png')}
+                                       style={{width: 26, height: 21, marginBottom: 2}}></Image>
+                                <AppText style={{
+                                    fontSize: 10,
+                                    fontWeight: '700',
+                                    color: colors.red[3]
+                                }}>1,820</AppText>
+                            </View>
+                        }
+                    </View>
+                    <View style={{marginTop: '10%'}}>
+                        <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
+                            {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
+                            <View style={{zIndex: 0, flex: 1, position: 'absolute'}}><Image
+                                style={{width: 60, height: 60}}
+                                source={require('../../assets/images/default_profile_1.png')}></Image></View>
+                            <View style={{zIndex: 1, flex: 1, position: 'absolute', marginLeft: 20}}><Image
+                                style={{width: 60, height: 60}}
+                                source={require('../../assets/images/default_profile_2.png')}></Image></View>
+                            <View style={{zIndex: 2, flex: 1, position: 'absolute', marginLeft: 40}}><Image
+                                style={{width: 60, height: 60}}
+                                source={require('../../assets/images/default_profile_3.png')}></Image></View>
+                            <View style={{
+                                zIndex: 3,
+                                flex: 1,
+                                position: 'absolute',
+                                marginLeft: 51,
+                                backgroundColor: 'rgba(0, 0, 0, 0.37);',
+                                width: 38,
+                                height: 38,
+                                borderRadius: 50,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}><AppText style={{
+                                color: colors.defaultColor,
+                                fontSize: 10,
+                                textAlign: 'center'
+                            }}>+2</AppText></View>
+                        </View>
+                    </View>
+                </ScreenContainerView>
+
+                <View style={{marginTop: 45}}>
+                    {/* TODO 카카오 지도 api 가져오기 */}
+                    <View>
+                        {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
+                        <MapView style={{width: Dimensions.get('window').width, height: 200}}
+                                 initialRegion={{
+                                     latitude: 37.56633546113615,
+                                     longitude: 126.9779482762618,
+                                     latitudeDelta: 0.0015,
+                                     longitudeDelta: 0.0015,
+                                 }}
+                        ><Marker coordinate={{
+                            latitude: 37.56633546113615,
+                            longitude: 126.9779482762618
+                        }}
+                                 title="서울시청"
+                                 description="기본값입니다"/>
+                        </MapView>
+                    </View>
+                </View>
+
+                <ScreenContainerView>
+                    {
+                        placeLength !== 0 ?
+                            <View style={{marginTop: 16}}>
+                                <View style={{marginBottom: 16}}>
+                                    <AppText style={{color: colors.gray[4]}}>총 <AppText
+                                        style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
+                                </View>
+                                <SafeAreaView>
+                                    {/* {
                                     placeData.length > 5 ?
                                 } */}
-                                        {/* {collectionData.place.map((item, idx) =>(
+                                    {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                        <FlatList data={collectionData.places} renderItem={ShowPlaces}
-                                                  keyExtractor={(item) => item.place_pk.toString()}
-                                                  nestedScrollEnabled/>
+                                    <FlatList data={collectionData.places} renderItem={ShowPlaces}
+                                              keyExtractor={(item) => item.place_pk.toString()}
+                                              nestedScrollEnabled/>
 
-                                    </SafeAreaView>
-                                    <TouchableOpacity onPress={() => {
-                                        // if(isLimited) setIsLimited(false);
-                                        // else setIsLimited(true);
-                                        // console.log(isLimited)
+                                </SafeAreaView>
+                                <TouchableOpacity onPress={() => {
+                                    // if(isLimited) setIsLimited(false);
+                                    // else setIsLimited(true);
+                                    // console.log(isLimited)
+                                }}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        marginTop: 26,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
                                     }}>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            marginTop: 26,
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }}>
-                                            <AppText style={{
-                                                fontSize: 14,
-                                                fontWeight: '400',
-                                                color: colors.gray[2]
-                                            }}>전체보기</AppText>
-                                            <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                                   style={{
-                                                       width: 15,
-                                                       height: 15,
-                                                       marginLeft: 10,
-                                                       marginBottom: 5
-                                                   }}></Image>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View> :
-                                <View style={{
+                                        <AppText style={{
+                                            fontSize: 14,
+                                            fontWeight: '400',
+                                            color: colors.gray[2]
+                                        }}>전체보기</AppText>
+                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                               style={{
+                                                   width: 15,
+                                                   height: 15,
+                                                   marginLeft: 10,
+                                                   marginBottom: 5
+                                               }}></Image>
+                                    </View>
+                                </TouchableOpacity>
+                            </View> :
+                            <View style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginTop: 40,
+                                marginBottom: 52
+                            }}>
+                                <Image source={require('../../assets/images/empty_forDir.png')} style={{
+                                    width: 150,
+                                    height: 120,
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    marginTop: 40,
-                                    marginBottom: 52
-                                }}>
-                                    <Image source={require('../../assets/images/empty_forDir.png')} style={{
-                                        width: 150,
-                                        height: 120,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        marginBottom: 12
-                                    }}></Image>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
-                                        담겨있지 않아요!</AppText>
-                                </View>
-                        }
+                                    marginBottom: 12
+                                }}></Image>
+                                <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
+                                    담겨있지 않아요!</AppText>
+                            </View>
+                    }
 
-                        <ScreenDivideLine style={{marginVertical: 16}}/>
-                    </View>
+                </ScreenContainerView>
 
-                    <View style={{marginHorizontal: '5%', marginBottom: 143}}>
+                <ScreenDivideLine style={{marginVertical: 16}}/>
+
+                <ScreenContainerView>
+                    <View style={{marginBottom: 143}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
                             <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
                             <AppText style={{
@@ -603,8 +599,9 @@ const FreeDirectory = ({route, navigation}) => {
                             </View>
                         </View>
                     </View>
-                </ScrollView>
-            </ScreenContainerView>
+                </ScreenContainerView>
+
+            </ScrollView>
         </ScreenContainer>
     );
 }
