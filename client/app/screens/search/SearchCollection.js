@@ -42,7 +42,7 @@ const SearchCollection = (props, {navigation}) => {
     const CollectionContainer = ({item}) => {
         const collectionMargin = (Dimensions.get("screen").width - 162 * 2) / 9
         return (
-            <TouchableOpacity onPress={()=>props.navigation.navigate('ShowFreeDir', {data : item})}>
+            <TouchableOpacity onPress={()=> props.navigation.navigate('ShowFreeDir', {data : item})}>
             <View style={{
                 width: 162,
                 height: 249,
