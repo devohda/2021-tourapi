@@ -152,7 +152,7 @@ const SearchScreen = ({navigation}) => {
                                    autoCorrect={false}
                                    placeholder="원하는 공간을 검색해보세요"
                                    placeholderTextColor={colors.gray[5]}
-                                   onChangeText={(text) => setSearchText(text)}/>
+                                   onChangeText={(text) => {setSearchText(text)}}/>
                         <Pressable style={{marginLeft: 5}} onPress={() => {setKeyword(''); setKeyword(searchText); setK(searchText)}}>
                             <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
                         </Pressable>

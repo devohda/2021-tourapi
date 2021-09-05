@@ -168,7 +168,7 @@ const CollectionTab = ({navigation}) => {
     const showDirectories = ({item}) => (
 
         <TouchableOpacity style={styles.directoryContainer} onPress={() => {
-            navigation.navigate('Place', {data : item})
+            navigation.navigate('ShowFreeDir', {data : item})
         }}>
             <View flex={1} style={{overflow: "hidden", borderRadius: 10}}>
                 <View style={{height: '68%'}}>
