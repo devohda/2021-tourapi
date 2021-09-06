@@ -68,7 +68,8 @@ const FreeDirectory = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        return userData.user_pk === data.user_pk && collectionData.collection_private === 0
+        if(userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false
+        return true
     }
 
     const [isPress, setIsPress] = useState([]);
@@ -303,7 +304,7 @@ const FreeDirectory = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            {!checkTrue() &&
+                            {checkTrue() &&
                             <Image source={require('../../assets/images/lock_forDir.png')}
                                    style={{width: 22, height: 22}}></Image>}
                         </View>
