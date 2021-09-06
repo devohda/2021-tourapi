@@ -16,7 +16,7 @@ import {useTheme} from '@react-navigation/native';
 import styled from "styled-components/native";
 import {Icon} from 'react-native-elements';
 
-import MapView, {Marker} from 'react-native-maps';
+// import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
@@ -373,9 +373,8 @@ const FreeDirectory = ({route, navigation}) => {
                 </ScreenContainerView>
 
                 <View style={{marginTop: 45}}>
-                    {/* TODO 카카오 지도 api 가져오기 */}
+                    {/* TODO 카카오 지도 api 가져오기
                     <View>
-                        {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
                                      latitude: 37.56633546113615,
@@ -390,7 +389,7 @@ const FreeDirectory = ({route, navigation}) => {
                                  title="서울시청"
                                  description="기본값입니다"/>
                         </MapView>
-                    </View>
+                    </View> */}
                 </View>
 
                 <ScreenContainerView>
