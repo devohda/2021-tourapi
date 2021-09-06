@@ -7,12 +7,11 @@ const Score = (props) => {
         <View style={{marginVertical: 8, alignItems: 'center'}}>
             <View width={70}>
                 <AppText style={{
-                    fontWeight: 'bold',
+                    fontWeight: '500',
                     fontSize: props.fontSize,
                     color: props.color,
                     textAlign: props.textAlign,
-                    marginBottom: props.marginBottom,
-                    color: props.textColor,
+                    marginBottom: props.marginBottom
                 }}>{props.name}</AppText>
             </View>
             {props.children}

@@ -16,7 +16,7 @@ import {useTheme} from '@react-navigation/native';
 import styled from "styled-components/native";
 import {Icon} from 'react-native-elements';
 
-import MapView, {Marker} from 'react-native-maps';
+// import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
@@ -24,6 +24,8 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from "../../components/ScreenContainerView";
+
+const windowWidth = Dimensions.get('window').width;
 
 const FreeDirectory = ({route, navigation}) => {
     const {colors} = useTheme();
@@ -371,9 +373,8 @@ const FreeDirectory = ({route, navigation}) => {
                 </ScreenContainerView>
 
                 <View style={{marginTop: 45}}>
-                    {/* TODO 카카오 지도 api 가져오기 */}
+                    {/* TODO 카카오 지도 api 가져오기
                     <View>
-                        {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
                                      latitude: 37.56633546113615,
@@ -388,7 +389,7 @@ const FreeDirectory = ({route, navigation}) => {
                                  title="서울시청"
                                  description="기본값입니다"/>
                         </MapView>
-                    </View>
+                    </View> */}
                 </View>
 
                 <ScreenContainerView>
@@ -470,47 +471,37 @@ const FreeDirectory = ({route, navigation}) => {
                                 marginTop: 5
                             }}>총 <AppText style={{fontWeight: '700'}}>20개</AppText></AppText>
                         </View>
-                        <InputBox
-                            placeholder="보관함에 댓글을 남겨보세요!"
-                            style={{marginVertical: 20}}
-                        ></InputBox>
+                        <InputBox placeholder="보관함에 댓글을 남겨보세요!" style={{marginVertical: 20}}/>
 
-                        <View>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={require('../../assets/images/default_profile_3.png')}
-                                           style={{width: 80, height: 80, borderRadius: 50}}></Image>
+                        <View flexDirection="row" style={{ flex : 1, alignItems: 'flex-start'}}>
+                            <View style={{marginRight : 8}}>
+                                <Image source={require('../../assets/images/mountain.jpeg')} style={{width : 40, height : 40, borderRadius : 40, resizeMode : 'stretch'}}/>
+                            </View>
+                            <View>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    marginBottom: 8,
+                                    flexWrap: 'wrap'
+                                }}>
+                                    <AppText style={{color: colors.mainColor, fontSize: 12}}>minsun</AppText>
+                                    <AppText style={{
+                                        marginHorizontal: 8,
+                                        color: colors.gray[5],
+                                        fontSize: 10
+                                    }}>|</AppText>
+                                    <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
                                 </View>
-                                <View style={{marginRight: 20}}>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4,
-                                        marginBottom: 8
-                                    }}>
-                                        <AppText style={{color: colors.mainColor, fontSize: 12}}>minsun</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8,
-                                            color: colors.gray[5],
-                                            fontSize: 10
-                                        }}>|</AppText>
-                                        <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
-                                    </View>
-                                    <View><AppText style={{
-                                        fontSize: 12,
-                                        color: colors.mainColor,
-                                        width: 267,
-                                        lineHeight: 16,
-                                        fontWeight: '700'
-                                    }}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                </View>
+                                <View style={{ flex : 1, width : '100%'}}><AppText style={{
+                                    fontSize: 12,
+                                    color: colors.mainColor,
+                                    lineHeight: 16,
+                                    fontWeight: '700',
+                                    flexWrap: 'wrap',
+                                    width : windowWidth - 100
+                                }}>
+                                    종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는
+                                </AppText></View>
                             </View>
                         </View>
 
@@ -522,94 +513,8 @@ const FreeDirectory = ({route, navigation}) => {
                             marginVertical: 12
                         }}></View>
 
-                        <View>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={require('../../assets/images/default_profile_3.png')}
-                                           style={{width: 80, height: 80, borderRadius: 50}}></Image>
-                                </View>
-                                <View style={{marginRight: 20}}>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4,
-                                        marginBottom: 8
-                                    }}>
-                                        <AppText style={{color: colors.mainColor, fontSize: 12}}>minsun</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8,
-                                            color: colors.gray[5],
-                                            fontSize: 10
-                                        }}>|</AppText>
-                                        <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
-                                    </View>
-                                    <View><AppText style={{
-                                        fontSize: 12,
-                                        color: colors.mainColor,
-                                        width: 267,
-                                        lineHeight: 16,
-                                        fontWeight: '700'
-                                    }}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={{
-                            width: '100%',
-                            height: 1,
-                            backgroundColor: colors.red_gray[6],
-                            zIndex: -1000,
-                            marginVertical: 12
-                        }}></View>
-
-                        <View>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={require('../../assets/images/default_profile_3.png')}
-                                           style={{width: 80, height: 80, borderRadius: 50}}></Image>
-                                </View>
-                                <View style={{marginRight: 20}}>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4,
-                                        marginBottom: 8
-                                    }}>
-                                        <AppText style={{color: colors.mainColor, fontSize: 12}}>minsun</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8,
-                                            color: colors.gray[5],
-                                            fontSize: 10
-                                        }}>|</AppText>
-                                        <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
-                                    </View>
-                                    <View><AppText style={{
-                                        fontSize: 12,
-                                        color: colors.mainColor,
-                                        width: 267,
-                                        lineHeight: 16,
-                                        fontWeight: '700'
-                                    }}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                </View>
-                            </View>
-                        </View>
                     </View>
                 </ScreenContainerView>
-
             </ScrollView>
         </ScreenContainer>
     );
