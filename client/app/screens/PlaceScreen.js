@@ -19,8 +19,10 @@ import ScreenContainer from "../components/ScreenContainer";
 import ScreenContainerView from "../components/ScreenContainerView";
 import ScreenDivideLine from "../components/ScreenDivideLine";
 
-const PlaceInfo = ({userData, placeData, colors, styles}) => {
+const PlaceInfo = ({userData, placeData, collectionList, colors, styles}) => {
     const [isLiked, setIsLiked] = useState(false);
+    const refRBSheet = useRef();
+
     const checkType = (type) => {
         if (type === 12) {
             return '관광지'
@@ -145,17 +147,22 @@ const PlaceInfo = ({userData, placeData, colors, styles}) => {
                     width: 42,
                     borderColor: colors.red_gray[6],
                     marginHorizontal: 30
-                }}></View>
-                {/*<ShowDirectories/>*/}
+                }}/>
+                <TouchableOpacity onPress={() => {
+                    refRBSheet.current.open();
+                }}>
+                    <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
+                                     collectionList={collectionList}/>
+                </TouchableOpacity>
                 <View style={{
                     borderWidth: 0.5,
                     transform: [{rotate: '90deg'}],
                     width: 42,
                     borderColor: colors.red_gray[6],
                     marginHorizontal: 30
-                }}></View>
+                }}/>
                 <TouchableOpacity onPress={onShare}>
-                    <Icon type="ionicon" name={"share-social"} color={colors.red_gray[6]} size={28}></Icon>
+                    <Icon type="ionicon" name={"share-social"} color={colors.red_gray[6]} size={28}/>
                 </TouchableOpacity>
             </View>
         )
@@ -196,7 +203,7 @@ const PlaceInfo = ({userData, placeData, colors, styles}) => {
             {/*장소 데이터*/}
             <ScreenContainerView>
                 <View style={{marginVertical: 18}}>
-                    <View flexDirection="row" style={{justifyContent: "space-between", marginBottom : 8}}>
+                    <View flexDirection="row" style={{justifyContent: "space-between", marginBottom: 8}}>
                         <AppText style={styles.placeName}>{placeData.place_name}</AppText>
                         <View style={{
                             ...styles.categoryBorder,
@@ -234,11 +241,38 @@ const PlaceInfo = ({userData, placeData, colors, styles}) => {
     )
 }
 
-const ShowDirectories = () => {
+const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
-    const [height, setHeight] = useState(150 + 90 * collectionData.length);
+    const [height, setHeight] = useState(150 + 90 * collectionList.length);
     const maxHeight = Dimensions.get('screen').height;
-    const [iP, setIP] = useState(isPress);
+    const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
+
+    const postPlace = () => {
+        const index = isCollectionClicked.findIndex((element) => element === true)
+        const collectionId = collectionList[index].collection_pk
+        try {
+            fetch(`http://34.146.140.88/collection/${collectionId}/place`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: placeData.place_pk,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response)
+                    alert('보관함에 공간이 저장되었습니다.')
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const ShowFreeDir = ({item, idx}) => {
         const [borderColor, setBorderColor] = useState(colors.defaultColor);
@@ -251,7 +285,7 @@ const ShowDirectories = () => {
                         backgroundColor: colors.defaultColor,
                         borderRadius: 5,
                         borderWidth: 3,
-                        borderColor: iP[idx] ? colors.blue[6] : colors.defaultColor
+                        borderColor: isCollectionClicked[idx] ? colors.blue[6] : colors.defaultColor
                     }}>
                         <TouchableOpacity onPress={() => {
                             // if(borderColor === colors.blue[6]){
@@ -283,17 +317,17 @@ const ShowDirectories = () => {
                             //         }
                             //     }
                             // }
-                            let newArr = [...iP];
+                            const newArr = [...isCollectionClicked];
                             if (newArr[idx]) {
                                 newArr[idx] = false;
-                                setIP(newArr);
+                                setIsCollectionClicked(arr => newArr);
                             } else {
                                 for (let i = 0; i < newArr.length; i++) {
                                     if (i == idx) continue;
                                     else newArr[i] = false;
                                 }
                                 newArr[idx] = true;
-                                setIP(newArr);
+                                setIsCollectionClicked(arr => newArr);
                             }
                         }}>
                             <View style={{paddingTop: 12}}>
@@ -374,19 +408,19 @@ const ShowDirectories = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                {idx === collectionData.length - 1 &&
+                {idx === collectionList.length - 1 &&
                 <View style={{marginTop: 22, borderRadius: 10}}>
                     <TouchableOpacity
                         style={{
                             height: 48,
                             borderRadius: 10,
-                            backgroundColor: iP.filter(element => element === true).length > 0 ? colors.mainColor : colors.gray[6]
+                            backgroundColor: isCollectionClicked.filter(element => element === true).length > 0 ? colors.mainColor : colors.gray[6]
                         }
                         }
                         onPress={() => {
                             refRBSheet.current.close()
-                            postPlace(iP);
-                            setIP([])
+                            postPlace(isCollectionClicked);
+                            setIsCollectionClicked([])
                         }}
                     ><AppText
                         style={{
@@ -404,16 +438,13 @@ const ShowDirectories = () => {
     }
 
     return (
-        <TouchableOpacity onPress={() => {
-            refRBSheet.current.open();
-            setClicked(true)
-        }}>
+        <>
             <Icon type="ionicon" name={"add"} color={colors.red_gray[6]} size={28}></Icon>
             <RBSheet
                 ref={refRBSheet}
                 closeOnDragDown={true}
                 closeOnPressMask={true}
-                height={collectionData.length > 6 ? maxHeight : height}
+                height={collectionList.length > 6 ? maxHeight : height}
                 customStyles={{
                     wrapper: {
                         backgroundColor: "rgba(0, 0, 0, 0.3)",
@@ -439,24 +470,28 @@ const ShowDirectories = () => {
                     </View>
 
                     <SafeAreaView>
-                        {collectionData.map((item, idx) => (
+                        {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
-                        {/* <FlatList data={collectionData} renderItem={showFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
+                        {/* <FlatList data={collectionList} renderItem={showFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
                     </SafeAreaView>
                 </View>
             </RBSheet>
-        </TouchableOpacity>
-
+        </>
     )
 }
 
+
 const PlaceScreen = ({route, navigation}) => {
-    const refRBSheet = useRef();
     const {colors} = useTheme();
     const {data} = route.params;
     const [placeData, setPlaceData] = useState({});
-    const [collectionData, setCollectionData] = useState([]);
+    const [collectionList, setCollectionList] = useState([]);
+    const [userData, setUserData] = useIsUserData();
+
+    //데이터 받아서 다시해야함
+    const [placeScore, setPlaceScore] = useState('4.84');
+
 
     const styles = StyleSheet.create({
         categoryBorder: {
@@ -523,90 +558,44 @@ const PlaceScreen = ({route, navigation}) => {
 
     useEffect(() => {
         getInitialData();
-        // getCollectionList();
+        getCollectionList();
     }, []);
 
 
-    // const getCollectionList = () => {
-    //     try {
-    //         fetch('http://34.146.140.88/collection/list', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: JSON.stringify({
-    //                 userId : userData.user_pk,
-    //             })
-    //         }).then((res) => res.json())
-    //             .then((response) => {
-    //                 console.log(response.data)
-    //                 setCollectionData(response.data)
-    //                 setFalse()
-    //             })
-    //             .catch((err) => {
-    //                 console.error(err)
-    //             });
-    //
-    //     } catch (err) {
-    //         console.error(err);
-    //     }
-    // };
+    const getCollectionList = () => {
+        try {
+            fetch('http://34.146.140.88/collection/list', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userData.user_pk
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    setCollectionList(response.data)
+                })
+                .catch((err) => {
+                    console.error(err)
+                });
 
-    // const postPlace = (pressed) => {
-    //     var index = pressed.findIndex((element)=>element === true)
-    //         var pk = collectionData[index].collection_pk
-    //         try {
-    //             fetch(`http://34.146.140.88/collection/${pk}/place`, {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Accept': 'application/json',
-    //                     'Content-Type': 'application/json'
-    //                 },
-    //                 body: JSON.stringify({
-    //                     userId: data.place_pk,
-    //                 })
-    //             }).then((res) => res.json())
-    //                 .then((response) => {
-    //                     console.log(response)
-    //                 })
-    //                 .catch((err) => {
-    //                     console.error(err)
-    //                 });
-    //
-    //         } catch (err) {
-    //             console.error(err);
-    //         }
-    //         Alert.alert('', '보관함에 공간이 저장되었습니다.')
-    // };
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
 
     //TODO 유저의 보관함 안에 이 place_pk가 있는지 확인하는 작업 필요
-
-    //데이터 받아서 다시해야함
-    const [placeScore, setPlaceScore] = useState('4.84');
-    const [clicked, setClicked] = useState(false);
-    const [userData, setUserData] = useIsUserData();
-    const [clickedData, setClickedData] = useState([]);
-    const [isPress, setIsPress] = useState([]);
-    var cData = [];
-
-    const setFalse = () => {
-        var pressed = [];
-        for (let i = 0; i < collectionData.length; i++) {
-            pressed.push(false)
-        }
-        setIsPress(pressed)
-    }
-
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
             <ScrollView showsVerticalScrollIndicator={false}>
-                <PlaceInfo userData={userData} placeData={placeData} colors={colors} styles={styles}/>
+                <PlaceInfo userData={userData} placeData={placeData} collectionList={collectionList} colors={colors}
+                           styles={styles}/>
                 <ScreenDivideLine/>
                 <ScreenContainerView>
-
                     <View style={{alignItems: 'center'}}>
                         <View flex={1} style={{alignItems: 'center', justifyContent: 'center'}}>
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
@@ -704,7 +693,6 @@ const PlaceScreen = ({route, navigation}) => {
                         </MapView>
                     </View>
                 </View>
-
                 <View>
                     <View style={{alignItems: 'center'}}>
                         <View style={{width: '90%', paddingBottom: 12}}>
@@ -1041,6 +1029,4 @@ const PlaceScreen = ({route, navigation}) => {
         </ScreenContainer>
     )
 }
-
-
 export default PlaceScreen;
