@@ -6,7 +6,7 @@ import {
 import RBSheet from "react-native-raw-bottom-sheet";
 import {useTheme} from '@react-navigation/native';
 import {Icon} from "react-native-elements";
-import MapView, {Marker, UrlTile} from 'react-native-maps';
+// import MapView, {Marker, UrlTile} from 'react-native-maps';
 import StarScore from '../components/StarScore';
 import NavigationTop from "../components/NavigationTop";
 import Score from "../components/Score";
@@ -674,9 +674,8 @@ const PlaceScreen = ({route, navigation}) => {
 
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
-                    {/* TODO 카카오 지도 api 가져오기 */}
+                    {/* TODO 카카오 지도 api 가져오기
                     <View>
-                        {/* 여기에 위도, 경도 받아온 값 넣으면 될듯 */}
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
                                      latitude: 37.56633546113615,
@@ -691,7 +690,7 @@ const PlaceScreen = ({route, navigation}) => {
                                  title="서울시청"
                                  description="기본값입니다"/>
                         </MapView>
-                    </View>
+                    </View> */}
                 </View>
                 <View>
                     <View style={{alignItems: 'center'}}>
