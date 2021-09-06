@@ -35,7 +35,8 @@
         "foregroundImage": "./app/assets/images/appicon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.ohda.Here"
+      "package": "com.ohda.Here",
+      "versionCode": "0.0.2"
     },
     "web": {
       "favicon": "./app/assets/images/favicon.png"
