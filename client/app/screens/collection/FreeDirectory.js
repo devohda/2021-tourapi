@@ -33,11 +33,12 @@ const FreeDirectory = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
+    const [isTrue, setIsTrue] = useState(false)
 
     useEffect(() => {
         getInitialData();
     }, []);
-
+    
     const getInitialData = () => {
         try {
             fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
@@ -53,7 +54,9 @@ const FreeDirectory = ({route, navigation}) => {
                 .then((response) => {
                     setCollectionData(response.data)
                     setPlaceLength(response.data.places.length)
-                    setFalse()
+                    setFalse();
+                    setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0)
+                    
                 })
                 .catch((err) => {
                     console.error(err)
@@ -63,6 +66,10 @@ const FreeDirectory = ({route, navigation}) => {
             console.error(err);
         }
     };
+
+    const checkTrue = () => {
+        return userData.user_pk === data.user_pk && collectionData.collection_private === 0
+    }
 
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
@@ -87,7 +94,7 @@ const FreeDirectory = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response)
+                    // console.log(response)
                 })
                 .catch((err) => {
                     console.error(err)
@@ -96,7 +103,7 @@ const FreeDirectory = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const deletePlace = (pk) => {
         try {
@@ -112,7 +119,7 @@ const FreeDirectory = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response)
+                    // console.log(response)
                 })
                 .catch((err) => {
                     console.error(err)
@@ -154,6 +161,7 @@ const FreeDirectory = ({route, navigation}) => {
             return '기타'
         }
     };
+
 
     const ShowPlaces = ({item, index}) => {
         return (
@@ -295,7 +303,7 @@ const FreeDirectory = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            {userData.user_nickname === data.created_user_name && collectionData.collection_private &&
+                            {!checkTrue() &&
                             <Image source={require('../../assets/images/lock_forDir.png')}
                                    style={{width: 22, height: 22}}></Image>}
                         </View>
@@ -313,7 +321,7 @@ const FreeDirectory = ({route, navigation}) => {
                             }}>{data.collection_name}</AppText>
                         </View>
                         {
-                            userData.user_nickname !== data.created_user_name &&
+                            userData.user_pk !== data.user_pk &&
                             <View style={{
                                 justifyContent: 'center',
                                 alignItems: 'center',
@@ -464,7 +472,7 @@ const FreeDirectory = ({route, navigation}) => {
                         <InputBox
                             placeholder="보관함에 댓글을 남겨보세요!"
                             style={{marginVertical: 20}}
-                        />
+                        ></InputBox>
 
                         <View>
                             <View style={{
