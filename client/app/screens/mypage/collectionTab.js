@@ -178,7 +178,7 @@ const CollectionTab = ({navigation}) => {
                             backgroundColor: colors.backgroundColor
                         }]}>
                             <AppText
-                                style={item.collection_type == 1 ? styles.dirFreeText : styles.dirPlanText}>{item.collection_type === 1 ? '자유' : '일정'}</AppText>
+                                style={item.collection_type == 1 ? styles.dirPlanText : styles.dirFreeText}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
                         </View>
                         {item.collection_private === 1 &&
                         <View style={{marginRight: 9, marginTop: 8}}>
