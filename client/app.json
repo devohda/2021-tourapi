@@ -2,9 +2,9 @@
   "expo": {
     "name": "Here",
     "slug": "Here",
-    "version": "1.0.0",
+    "version": "0.0.2",
     "orientation": "portrait",
-    "icon": "./app/assets/images/icon.png",
+    "icon": "./app/assets/images/appicon.png",
     "splash": {
       "image": "./app/assets/images/splash.png",
       "resizeMode": "contain",
@@ -28,11 +28,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.1"
+      "buildNumber": "0.0.2"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./app/assets/images/adaptive-icon.png",
+        "foregroundImage": "./app/assets/images/appicon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ohda.Here"
