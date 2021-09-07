@@ -7,6 +7,7 @@ import {useTheme} from '@react-navigation/native';
 import MyPageScreen from "../screens/MyPageScreen";
 import MakeDirectoryBtn from '../screens/MakeDirectoryBtn';
 import MainPage from "../screens/MainPage";
+import SystemSetting from '../screens/settings/SystemSetting';
 
 const Tab = createBottomTabNavigator();
 

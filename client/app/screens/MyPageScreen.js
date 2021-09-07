@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Platform, View, Image, StyleSheet} from "react-native";
+import {Platform, View, Image, StyleSheet, Button} from "react-native";
 import ScreenContainer from "../components/ScreenContainer";
 import MyPageNavigation from "../navigation/MypageNavigator";
 import {useTheme} from '@react-navigation/native';
@@ -42,6 +42,7 @@ const MyPageScreen = ({navigation}) => {
                 <View style={{
                     alignItems: "center"
                 }}>
+                    <Button title="시스템 설정" color={colors.mainColor} onPress={()=>navigation.navigate('SystemSetting')}></Button>
                     <View className="profile-img-container" style={{justifyContent: 'center', alignItems: 'center'}}>
                         <Image style={{
                             width: 90,

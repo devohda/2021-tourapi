@@ -7,6 +7,7 @@ import SearchScreen from "../screens/SearchScreen";
 import PlaceScreen from "../screens/PlaceScreen";
 import MakeFreeDirectory from "../screens/MakeFreeDirectory";
 import FreeDirectory from "../screens/collection/FreeDirectory";
+import SystemSetting from "../screens/settings/SystemSetting";
 
 const MainStack = createStackNavigator()
 
@@ -23,6 +24,7 @@ const AppNavigator = () => {
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
                     <MainStack.Screen name="Directory" component={MakeFreeDirectory}/>
                     <MainStack.Screen name="ShowFreeDir" component={FreeDirectory} />
+                    <MainStack.Screen name="SystemSetting" component={SystemSetting} />
                 </>
             }
         </MainStack.Navigator>
