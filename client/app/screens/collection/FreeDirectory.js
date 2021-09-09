@@ -373,6 +373,7 @@ const FreeDirectory = ({route, navigation}) => {
                 </ScreenContainerView>
 
                 <View style={{marginTop: 45}}>
+                    <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
                     {/* TODO 카카오 지도 api 가져오기
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}

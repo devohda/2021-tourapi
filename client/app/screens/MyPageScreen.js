@@ -42,7 +42,7 @@ const MyPageScreen = ({navigation}) => {
                 <View style={{
                     alignItems: "center"
                 }}>
-                    <Button title="시스템 설정" color={colors.mainColor} onPress={()=>navigation.navigate('SystemSetting')}></Button>
+                    {/* <Button title="시스템 설정" color={colors.mainColor} onPress={()=>navigation.navigate('SystemSetting')}></Button> */}
                     <View className="profile-img-container" style={{justifyContent: 'center', alignItems: 'center'}}>
                         <Image style={{
                             width: 90,

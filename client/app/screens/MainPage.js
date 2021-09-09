@@ -19,37 +19,38 @@ export default function MainPage({navigation}) {
 
     return (
         <SafeAreaView style={{backgroundColor: colors.backgroundColor}}>
-            <ScrollView>
-                <View style={{
-                    marginTop: 20,
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexDirection: 'row'
-                }}>
-                    <View><AppText style={{
-                        color: colors.mainColor,
-                        fontSize: 28,
-                        fontWeight: 'bold',
-                        marginLeft: 20
-                    }}>Here.</AppText></View>
-                    <View>
-                        <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-                            <Icon type="ionicon"
-                                  name={"md-search"}
-                                  color={colors.mainColor}
-                                  style={{marginEnd: 20}}
-                                  size={28}>
-                            </Icon>
-                        </TouchableOpacity>
-                    </View>
+            <View style={{
+                marginTop: 20,
+                marginBottom: 10,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row'
+            }}>
+                <View><AppText style={{
+                    color: colors.mainColor,
+                    fontSize: 28,
+                    fontWeight: 'bold',
+                    marginLeft: 18
+                }}>Here.</AppText></View>
+                <View>
+                    <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+                        <Icon type="ionicon"
+                            name={"md-search"}
+                            color={colors.mainColor}
+                            style={{marginEnd: 20}}
+                            size={28}>
+                        </Icon>
+                    </TouchableOpacity>
                 </View>
+            </View>
+            <ScrollView>
                 <View>
                     <View style={styles.blackRect}>
                         <View>
                             <AppText style={{
                                 color: colors.mainColor,
                                 left: 16,
-                                top: 50,
+                                top: 40,
                                 fontSize: 24,
                                 lineHeight: 36,
                                 fontWeight: 'bold'
@@ -58,12 +59,12 @@ export default function MainPage({navigation}) {
                                 <AppText style={{
                                     color: colors.mainColor,
                                     left: 16,
-                                    top: 50,
+                                    top: 40,
                                     fontSize: 24,
                                     lineHeight: 36,
                                     fontWeight: 'bold'
                                 }}>보관함</AppText>
-                                <TouchableOpacity style={{top: 54.5, left: 16}}><Icon type="ionicon"
+                                <TouchableOpacity style={{top: 44.5, left: 16}}><Icon type="ionicon"
                                                                                       name={"chevron-forward-outline"}
                                                                                       color={colors.mainColor}
                                                                                       size={26}></Icon></TouchableOpacity>
