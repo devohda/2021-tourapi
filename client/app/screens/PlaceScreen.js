@@ -138,14 +138,14 @@ const PlaceInfo = ({userData, placeData, collectionList, colors, styles}) => {
                     }
                 }}>
                     <Jewel width={26} height={21}
-                           style={isLiked ? {color: colors.red[3]} : {color: colors.red_gray[5]}}/>
+                           style={isLiked ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                     {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
                 </TouchableOpacity>
                 <View style={{
                     borderWidth: 0.5,
                     transform: [{rotate: '90deg'}],
                     width: 42,
-                    borderColor: colors.red_gray[6],
+                    borderColor: colors.red_gray[5],
                     marginHorizontal: 30
                 }}/>
                 <TouchableOpacity onPress={() => {
@@ -158,11 +158,11 @@ const PlaceInfo = ({userData, placeData, collectionList, colors, styles}) => {
                     borderWidth: 0.5,
                     transform: [{rotate: '90deg'}],
                     width: 42,
-                    borderColor: colors.red_gray[6],
+                    borderColor: colors.red_gray[5],
                     marginHorizontal: 30
                 }}/>
                 <TouchableOpacity onPress={onShare}>
-                    <Icon type="ionicon" name={"share-social"} color={colors.red_gray[6]} size={28}/>
+                    <Icon type="ionicon" name={"share-social"} color={colors.red_gray[3]} size={28}/>
                 </TouchableOpacity>
             </View>
         )
@@ -225,7 +225,7 @@ const PlaceInfo = ({userData, placeData, collectionList, colors, styles}) => {
                         }}>{placeData.place_addr}</AppText>
                     </PlaceInfo>
                     <PlaceInfo icon={"globe-outline"}>
-                        <AppText style={{color: colors.blue[3], fontSize: 12}}>http://child</AppText>
+                        <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
                     </PlaceInfo>
                     <PlaceInfo icon={"time-outline"}>
                         <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
@@ -439,7 +439,9 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
 
     return (
         <>
-            <Icon type="ionicon" name={"add"} color={colors.red_gray[6]} size={28}></Icon>
+            <View style={{width: '100%'}}>
+                <Icon type="ionicon" name={"add"} color={colors.red_gray[3]} size={28}></Icon>
+            </View>
             <RBSheet
                 ref={refRBSheet}
                 closeOnDragDown={true}
@@ -586,8 +588,6 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-
-    //TODO 유저의 보관함 안에 이 place_pk가 있는지 확인하는 작업 필요
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
@@ -674,6 +674,7 @@ const PlaceScreen = ({route, navigation}) => {
 
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
+                    <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
                     {/* TODO 카카오 지도 api 가져오기
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}

@@ -1,5 +1,6 @@
 import React from 'react';
 import {DefaultTheme, NavigationContainer} from "@react-navigation/native";
+import { StatusBar, Platform } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font';
 
@@ -83,6 +84,7 @@ export default function App() {
         return (
             <AppContextProviders>
                 <NavigationContainer theme={ColorTheme}>
+                    {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
                     <AppNavigator/>
                 </NavigationContainer>
             </AppContextProviders>

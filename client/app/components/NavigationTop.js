@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, TouchableOpacity, View} from "react-native";
+import {Image, Platform, TouchableOpacity, View} from "react-native";
 import {useTheme} from '@react-navigation/native';
 import AppText from "./AppText";
 import BackIcon from '../assets/images/back-icon.svg';
@@ -18,7 +18,8 @@ const NavigationTop = props => {
     return (
         <View flexDirection="row" style={{
             height: 24,
-            marginVertical: 20,
+            marginBottom: 20,
+            marginVertical: Platform.OS === 'ios' ? 20 : 0,
             marginHorizontal: 5,
             alignItems: 'center',
             justifyContent: 'center'
