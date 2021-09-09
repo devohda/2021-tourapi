@@ -5,7 +5,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "lint": "eslint --ext .tsx --ext .ts app/",
+    "format": "prettier --check ./app"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^3.6.6",
@@ -29,6 +31,7 @@
     "expo-sharing": "^9.2.1",
     "expo-sms": "~9.1.2",
     "expo-status-bar": "~1.0.4",
+    "prettier": "^2.4.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
@@ -63,6 +66,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-react": "^7.25.1",
     "react-native-svg-transformer": "^0.14.3"
   },
   "private": true

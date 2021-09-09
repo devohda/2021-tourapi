@@ -8,30 +8,14 @@ import ScreenContainer from "../../components/ScreenContainer";
 import NavigationTop from "../../components/NavigationTop";
 import ScreenContainerView from "../../components/ScreenContainerView";
 import { useIsUserData } from "../../contexts/UserDataContextProvider";
-import hereIcon from '../../assets/images/appicon.png';
+import ListItem from "./ListItem";
 
 const SystemSetting = ({navigation}) => {
     const { colors } = useTheme();
     const [userData, setUserData] = useIsUserData();
-    //enable 다시
-    const [isEnabled, setIsEnabled] = useState([
-        [false],
-        [false],
-        [false]
-    ]);
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
-    }
-    const switchIndividually = (data, dataIndex) => {
-        console.log(dataIndex)
-        // if(data === '위치 서비스') {
-        //     return 0;
-        // } else if(data === '알림') {
-        //     return 1;
-        // } else if(data === '마케팅 수신 동의') {
-        //     return 2;
-        // }
     }
 
     const systemMenu = [
@@ -63,41 +47,10 @@ const SystemSetting = ({navigation}) => {
         </View>
     )
 
-    const ListItem = ({data, index, dataIndex}) => {
+    const SettingListItem = ({data, index}) => {
+        const isSelected = data;
         return(
-        <>
-        {
-            index === 1 || index === 2 ?
-                <View style={index === 1 ? {...styles.list_style, ...styles.list_style_version1} : {...styles.list_style, ...styles.list_style_version2}}>
-                    {index === 1 && <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
-                    <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{data}</AppText>
-                    {index === 2 && <Switch
-                            trackColor={{false: colors.gray[6], true: colors.mainColor}}
-                            thumbColor={colors.defaultColor}
-                            ios_backgroundColor={colors.gray[6]}
-                            onValueChange={toggleSwitch}
-                            onChange={()=>{
-                                console.log(isEnabled[0])
-                                // if (isEnabled[dataIndex]) {
-                                //     newArr[dataIndex-1] = false;
-                                //     setIsEnabled(newArr);
-                                // } else {
-                                //     newArr[dataIndex-1] = true;
-                                //     setIsEnabled(newArr);
-                                // }
-                            }}
-                            value={isEnabled}
-                        />}
-                </View> :
-                <View style={{...styles.list_style}}>
-                    {
-                        index === 4 ?
-                        <AppText style={{color: data === '로그아웃' ? colors.gray[5] : colors.red[3], fontSize: 16, lineHeight: 20}}>{data}</AppText> :
-                        <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{data}</AppText>
-                    }
-                </View>
-        }
-        </>
+            <ListItem data={data} index={index} isSelected={isSelected}/>
     )}
 
     const FooterItem = ({index}) => (
@@ -120,7 +73,7 @@ const SystemSetting = ({navigation}) => {
             <ScreenContainerView>
                 <SectionList sections={systemMenu}
                     keyExtractor={(item, index) => item + index}
-                    renderItem={({item, section: {index}}) => <ListItem data={item.name} index={index} dataIndex={item.index}/>}
+                    renderItem={({item, section: {index}}) => <SettingListItem data={item.name} index={index}/>}
                     renderSectionHeader={({section: {title, index}}) => <HeaderItem title={title} index={index}/>}
                     renderSectionFooter={({section: {index}})=> <FooterItem index={index}/>}
                     stickySectionHeadersEnabled={false}
