@@ -13,7 +13,7 @@ import {
     FlatList
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 import {Icon} from 'react-native-elements';
 
 // import MapView, {Marker} from 'react-native-maps';
@@ -23,11 +23,11 @@ import NavigationTop from '../../components/NavigationTop';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
-import ScreenContainerView from "../../components/ScreenContainerView";
+import ScreenContainerView from '../../components/ScreenContainerView';
 
 const windowWidth = Dimensions.get('window').width;
 
-const FreeDirectory = ({route, navigation}) => {
+const FreeCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const {data} = route.params;
     const [userData, setUserData] = useIsUserData();
@@ -35,7 +35,7 @@ const FreeDirectory = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
-    const [isTrue, setIsTrue] = useState(false)
+    const [isTrue, setIsTrue] = useState(false);
 
     useEffect(() => {
         getInitialData();
@@ -54,14 +54,14 @@ const FreeDirectory = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    setCollectionData(response.data)
-                    setPlaceLength(response.data.places.length)
+                    setCollectionData(response.data);
+                    setPlaceLength(response.data.places.length);
                     setFalse();
-                    setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0)
+                    setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                     
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {
@@ -70,22 +70,22 @@ const FreeDirectory = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        if(userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false
-        return true
-    }
+        if(userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+        return true;
+    };
 
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < placeLength; i++) {
-            pressed.push(false)
+            pressed.push(false);
         }
-        setIsPress(pressed)
+        setIsPress(pressed);
     };
 
     const likePlace = (pk) => {
         try {
-            fetch(`http://34.146.140.88/like/place`, {
+            fetch('http://34.146.140.88/like/place', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -100,7 +100,7 @@ const FreeDirectory = ({route, navigation}) => {
                     // console.log(response)
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {
@@ -110,7 +110,7 @@ const FreeDirectory = ({route, navigation}) => {
 
     const deletePlace = (pk) => {
         try {
-            fetch(`http://34.146.140.88/like/place`, {
+            fetch('http://34.146.140.88/like/place', {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -125,43 +125,43 @@ const FreeDirectory = ({route, navigation}) => {
                     // console.log(response)
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const InputBox = styled(TextInput)`
       fontSize: 16px;
       borderBottomWidth: 1px;
       borderBottomColor: #C5C5C5;
       paddingBottom: 11px;
-    `
+    `;
     const Keyword = ({item}) => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
-        )
+        );
     };
 
     const checkType = (type) => {
         if (type === 12) {
-            return '관광지'
+            return '관광지';
         } else if (type === 14) {
-            return '문화시설'
+            return '문화시설';
         } else if (type === 15) {
-            return '축제/공연/행사'
+            return '축제/공연/행사';
         } else if (type === 28) {
-            return '레포츠'
+            return '레포츠';
         } else if (type === 32) {
-            return '숙박'
+            return '숙박';
         } else if (type === 38) {
-            return '쇼핑'
+            return '쇼핑';
         } else if (type === 39) {
-            return '음식'
+            return '음식';
         } else {
-            return '기타'
+            return '기타';
         }
     };
 
@@ -182,7 +182,7 @@ const FreeDirectory = ({route, navigation}) => {
                         <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
                             <View style={{flexDirection: 'row', width: '90%'}}>
                                 <Image source={{uri: item.place_img}}
-                                       style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                                    style={{width: 72, height: 72, borderRadius: 15}}></Image>
                                 <View style={{
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
@@ -204,12 +204,12 @@ const FreeDirectory = ({route, navigation}) => {
                                                 fontWeight: 'bold'
                                             }}>|</AppText>
                                             <Image source={require('../../assets/images/review_star.png')}
-                                                   style={{
-                                                       width: 10,
-                                                       height: 10,
-                                                       alignSelf: 'center',
-                                                       marginTop: '1%'
-                                                   }}></Image>
+                                                style={{
+                                                    width: 10,
+                                                    height: 10,
+                                                    alignSelf: 'center',
+                                                    marginTop: '1%'
+                                                }}></Image>
                                             <AppText style={{
                                                 color: colors.gray[3],
                                                 textAlign: 'center',
@@ -239,7 +239,7 @@ const FreeDirectory = ({route, navigation}) => {
                                 if (newArr[index]) {
                                     newArr[index] = false;
                                     setIsPress(newArr);
-                                    deletePlace(item.place_pk)
+                                    deletePlace(item.place_pk);
                                 } else {
                                     // for(let i=0;i<newArr.length;i++) {
                                     //     if(i == index) continue;
@@ -247,11 +247,11 @@ const FreeDirectory = ({route, navigation}) => {
                                     // }
                                     newArr[index] = true;
                                     setIsPress(newArr);
-                                    likePlace(item.place_pk)
+                                    likePlace(item.place_pk);
                                 }
                             }}>
                                 <Jewel width={26} height={21}
-                                       style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
+                                    style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -270,18 +270,18 @@ const FreeDirectory = ({route, navigation}) => {
                     }}>
                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                             <Image source={require('../../assets/images/tipIcon.png')}
-                                   style={{width: 12, height: 12, marginEnd: 8}}></Image>
+                                style={{width: 12, height: 12, marginEnd: 8}}></Image>
                             <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                             <Image style={{width: 28, height: 28}}
-                                   source={require('../../assets/images/default_profile_2.png')}></Image>
+                                source={require('../../assets/images/default_profile_2.png')}></Image>
                         </View>
                     </View>
                 </View>
             </>
-        )
-    }
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -308,7 +308,7 @@ const FreeDirectory = ({route, navigation}) => {
                         <View>
                             {checkTrue() &&
                             <Image source={require('../../assets/images/lock_forDir.png')}
-                                   style={{width: 22, height: 22}}></Image>}
+                                style={{width: 22, height: 22}}></Image>}
                         </View>
                     </View>
                     <View style={{
@@ -331,7 +331,7 @@ const FreeDirectory = ({route, navigation}) => {
                                 marginTop: 20
                             }}>
                                 <Image source={require('../../assets/images/here_click.png')}
-                                       style={{width: 26, height: 21, marginBottom: 2}}></Image>
+                                    style={{width: 26, height: 21, marginBottom: 2}}></Image>
                                 <AppText style={{
                                     fontSize: 10,
                                     fontWeight: '700',
@@ -364,10 +364,10 @@ const FreeDirectory = ({route, navigation}) => {
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}><AppText style={{
-                                color: colors.defaultColor,
-                                fontSize: 10,
-                                textAlign: 'center'
-                            }}>+2</AppText></View>
+                                    color: colors.defaultColor,
+                                    fontSize: 10,
+                                    textAlign: 'center'
+                                }}>+2</AppText></View>
                         </View>
                     </View>
                 </ScreenContainerView>
@@ -409,8 +409,8 @@ const FreeDirectory = ({route, navigation}) => {
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
                                     <FlatList data={collectionData.places} renderItem={ShowPlaces}
-                                              keyExtractor={(item) => item.place_pk.toString()}
-                                              nestedScrollEnabled/>
+                                        keyExtractor={(item) => item.place_pk.toString()}
+                                        nestedScrollEnabled/>
 
                                 </SafeAreaView>
                                 <TouchableOpacity onPress={() => {
@@ -430,12 +430,12 @@ const FreeDirectory = ({route, navigation}) => {
                                             color: colors.gray[2]
                                         }}>전체보기</AppText>
                                         <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                               style={{
-                                                   width: 15,
-                                                   height: 15,
-                                                   marginLeft: 10,
-                                                   marginBottom: 5
-                                               }}></Image>
+                                            style={{
+                                                width: 15,
+                                                height: 15,
+                                                marginLeft: 10,
+                                                marginBottom: 5
+                                            }}></Image>
                                     </View>
                                 </TouchableOpacity>
                             </View> :
@@ -519,7 +519,7 @@ const FreeDirectory = ({route, navigation}) => {
             </ScrollView>
         </ScreenContainer>
     );
-}
+};
 
 
 const styles = StyleSheet.create({
@@ -556,4 +556,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FreeDirectory;
+export default FreeCollectionScreen;
