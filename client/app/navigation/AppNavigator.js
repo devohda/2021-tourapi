@@ -5,7 +5,7 @@ import {useIsSignedIn} from "../contexts/SignedInContextProvider";
 import {createStackNavigator} from "@react-navigation/stack";
 import SearchScreen from "../screens/SearchScreen";
 import PlaceScreen from "../screens/PlaceScreen";
-import MakeFreeDirectory from "../screens/MakeFreeDirectory";
+import MakeFreeDirectory from '../screens/collection/MakeFreeDirectory';
 import FreeDirectory from "../screens/collection/FreeDirectory";
 import SystemSetting from "../screens/settings/SystemSetting";
 

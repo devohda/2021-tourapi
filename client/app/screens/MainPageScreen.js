@@ -13,7 +13,7 @@ import {Icon} from 'react-native-elements';
 import {useIsUserData} from "../contexts/UserDataContextProvider";
 import AppText from "../components/AppText";
 
-export default function MainPage({navigation}) {
+export default function MainPageScreen({navigation}) {
     const [userData, setUserData] = useIsUserData();
     const {colors} = useTheme();
 
