@@ -4,7 +4,7 @@ import {View, TouchableOpacity, Image} from "react-native";
 import {Icon} from 'react-native-elements';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useTheme } from '@react-navigation/native';
-import AppText from "../components/AppText";
+import AppText from "../../components/AppText";
 
 export default function MakeDirectoryBtn({navigation}) {
     const refRBSheet = useRef();

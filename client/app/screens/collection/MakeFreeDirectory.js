@@ -10,14 +10,14 @@ import {
     Platform,
     FlatList
 } from 'react-native';
-import ScreenContainer from '../components/ScreenContainer';
-import ScreenContainerView from '../components/ScreenContainerView';
-import NavigationTop from "../components/NavigationTop";
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import NavigationTop from "../../components/NavigationTop";
 import {useTheme} from '@react-navigation/native';
-import CustomTextInput from "../components/CustomTextInput";
-import ScreenDivideLine from "../components/ScreenDivideLine";
-import AppText from "../components/AppText";
-import {useIsUserData} from "../contexts/UserDataContextProvider";
+import CustomTextInput from "../../components/CustomTextInput";
+import ScreenDivideLine from "../../components/ScreenDivideLine";
+import AppText from "../../components/AppText";
+import {useIsUserData} from "../../contexts/UserDataContextProvider";
 
 export const navigationRef = React.createRef();
 
@@ -271,7 +271,7 @@ const MakeFreeDirectory = ({navigation}) => {
                         }}>
 
                             <View flexDirection="row">
-                                <Image source={require('../assets/images/add_keyword.png')}
+                                <Image source={require('../../assets/images/add_keyword.png')}
                                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                                 {
                                     keywordData.map((keyword, idx) => (

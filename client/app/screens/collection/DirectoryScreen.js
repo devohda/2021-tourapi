@@ -5,7 +5,7 @@ import {View, TouchableOpacity} from "react-native";
 import {Icon} from "react-native-elements";
 import RBSheet from "react-native-raw-bottom-sheet";
 import MakeDirectoryBtn from './MakeDirectoryBtn';
-import AppText from "../components/AppText";
+import AppText from "../../components/AppText";
 
 export default function DirectoryScreen() {
     const refRBSheet = useRef();
