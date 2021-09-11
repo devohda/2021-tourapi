@@ -13,7 +13,7 @@ const NavigationTop = props => {
         <View flexDirection="row" style={{
             height: 24,
             marginBottom: 20,
-            marginTop: Platform.OS === 'ios' ? 20 : 0,
+            marginTop: Platform.OS === 'android' ? 20 : 10,
             marginHorizontal: 20,
             alignItems: 'center',
             justifyContent: 'center'

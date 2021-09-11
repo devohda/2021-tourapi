@@ -13,11 +13,11 @@ export default function MakeCollectionBtn({navigation}) {
 
     return (
         <>
-            <TouchableOpacity style={{height: 50, top : 8, justifyContent: 'center'}}onPress={() => {
+            <TouchableOpacity style={{height: 50, top : 6, justifyContent: 'center'}}onPress={() => {
                 refRBSheet.current.open();
                 setClicked(true);
             }}>
-                <Icon type="ionicon" name={'add-circle-outline'} size={36} color={colors.mainColor}></Icon>
+                <Icon type="ionicon" name={'add-circle-outline'} size={32} color={colors.mainColor}></Icon>
             </TouchableOpacity>
             <RBSheet
                 ref={refRBSheet}

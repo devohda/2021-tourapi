@@ -6,38 +6,41 @@ import {
     Image,
     SafeAreaView,
     ScrollView,
-    ImageBackground,
+    ImageBackground, Platform,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import {useIsUserData} from '../contexts/UserDataContextProvider';
 import AppText from '../components/AppText';
+import BackIcon from '../assets/images/back-icon.svg';
+import ScreenContainer from '../components/ScreenContainer';
 
 export default function MainPageScreen({navigation}) {
     const [userData, setUserData] = useIsUserData();
     const {colors} = useTheme();
 
     return (
-        <SafeAreaView style={{backgroundColor: colors.backgroundColor}}>
-            <View style={{
-                marginTop: 20,
-                marginBottom: 10,
+        <ScreenContainer backgroundColor={colors.backgroundColor}>
+            <View flexDirection="row" style={{
+                height: 24,
+                marginBottom: 20,
+                marginTop: Platform.OS === 'android' ? 20 : 10,
+                marginHorizontal: 20,
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                flexDirection: 'row'
+                justifyContent: 'center'
             }}>
-                <View><AppText style={{
-                    color: colors.mainColor,
-                    fontSize: 28,
-                    fontWeight: 'bold',
-                    marginLeft: 18
-                }}>Here.</AppText></View>
-                <View>
+                <View style={{position: 'absolute', left: 0}}>
+                    <AppText style={{
+                        color: colors.mainColor,
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                    }}>Here.</AppText>
+                </View>
+                <View style={{position: 'absolute', right: 0}}>
                     <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                         <Icon type="ionicon"
                             name={'md-search'}
                             color={colors.mainColor}
-                            style={{marginEnd: 20}}
                             size={28}>
                         </Icon>
                     </TouchableOpacity>
@@ -388,7 +391,7 @@ export default function MainPageScreen({navigation}) {
                     </View>
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </ScreenContainer>
     );
 }
 

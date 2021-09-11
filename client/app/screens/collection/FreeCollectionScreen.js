@@ -24,6 +24,8 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
+import BackIcon from '../../assets/images/back-icon.svg';
+import MoreIcon from '../../assets/images/more-icon.svg';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -40,7 +42,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     useEffect(() => {
         getInitialData();
     }, []);
-    
+
     const getInitialData = () => {
         try {
             fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
@@ -58,7 +60,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setPlaceLength(response.data.places.length);
                     setFalse();
                     setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
-                    
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -70,7 +72,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        if(userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+        if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
         return true;
     };
 
@@ -283,9 +285,82 @@ const FreeCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const [showMenu, setShowMenu] = useState(false);
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <NavigationTop navigation={navigation} title="" type="freeDir"/>
+            {showMenu && (
+                <View style={{
+                    position: 'absolute',
+                    width: 140,
+                    height: 80,
+                    top: 50,
+                    right: 60,
+                    backgroundColor: '#fff',
+                    flex: 1,
+                    borderRadius: 10,
+                    zIndex: 100000000,
+
+                    shadowColor: '#000',
+                    shadowOffset: {
+                        width: 0,
+                        height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+
+                    overflow: 'visible'
+                }}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            // 수정 코드
+                        }}
+                        style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}><AppText>수정</AppText>
+                    </TouchableOpacity>
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                    }}></View>
+                    <TouchableOpacity
+                        onPress={() => {
+                            // 삭제 코드
+                        }}
+                        style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}><AppText>삭제</AppText></TouchableOpacity>
+                </View>
+            )}
+
+            <View flexDirection="row" style={{
+                height: 24,
+                marginBottom: 20,
+                marginTop: 20,
+                marginHorizontal: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <View style={{position: 'absolute', left: 0}}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <BackIcon style={{color: colors.mainColor}}/>
+                    </TouchableOpacity>
+                </View>
+                <View style={{position: 'absolute', right: 0}}>
+                    <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                        style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                        <MoreIcon style={{color: colors.mainColor}}/>
+                    </TouchableOpacity>
+                </View>
+            </View>
+
             <ScrollView>
                 <ScreenContainerView>
                     <View style={{
@@ -474,9 +549,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         </View>
                         <InputBox placeholder="보관함에 댓글을 남겨보세요!" style={{marginVertical: 20}}/>
 
-                        <View flexDirection="row" style={{ flex : 1, alignItems: 'flex-start'}}>
-                            <View style={{marginRight : 8}}>
-                                <Image source={require('../../assets/images/mountain.jpeg')} style={{width : 40, height : 40, borderRadius : 40, resizeMode : 'stretch'}}/>
+                        <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
+                            <View style={{marginRight: 8}}>
+                                <Image source={require('../../assets/images/mountain.jpeg')}
+                                    style={{width: 40, height: 40, borderRadius: 40, resizeMode: 'stretch'}}/>
                             </View>
                             <View>
                                 <View style={{
@@ -493,15 +569,16 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     }}>|</AppText>
                                     <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
                                 </View>
-                                <View style={{ flex : 1, width : '100%'}}><AppText style={{
+                                <View style={{flex: 1, width: '100%'}}><AppText style={{
                                     fontSize: 12,
                                     color: colors.mainColor,
                                     lineHeight: 16,
                                     fontWeight: '700',
                                     flexWrap: 'wrap',
-                                    width : windowWidth - 100
+                                    width: windowWidth - 100
                                 }}>
-                                    종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는
+                                    종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년
+                                    토박종로 25년 토박이가 알려주는
                                 </AppText></View>
                             </View>
                         </View>
