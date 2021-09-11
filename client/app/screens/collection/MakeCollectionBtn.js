@@ -13,7 +13,7 @@ export default function MakeCollectionBtn({navigation}) {
 
     return (
         <>
-            <TouchableOpacity style={{height: 50, top : 8, backgroundColor : 'yellow', justifyContent: 'center'}}onPress={() => {
+            <TouchableOpacity style={{height: 50, top : 8, justifyContent: 'center'}}onPress={() => {
                 refRBSheet.current.open();
                 setClicked(true);
             }}>
