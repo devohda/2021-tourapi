@@ -10,18 +10,24 @@ import {
     Platform,
     FlatList
 } from 'react-native';
+import {useTheme} from '@react-navigation/native';
+import { Layout, NativeDateService, RangeCalendar } from '@ui-kitten/components';
+import RBSheet from "react-native-raw-bottom-sheet";
+import moment from 'moment';
+import 'moment/locale/ko';
+
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import NavigationTop from "../../components/NavigationTop";
-import {useTheme} from '@react-navigation/native';
 import CustomTextInput from "../../components/CustomTextInput";
 import ScreenDivideLine from "../../components/ScreenDivideLine";
 import AppText from "../../components/AppText";
 import {useIsUserData} from "../../contexts/UserDataContextProvider";
+import CalendarTexts from './CalendarTexts';
 
 export const navigationRef = React.createRef();
 
-const MakeFreeDirectory = ({navigation}) => {
+const MakePlanDirectory = ({navigation}) => {
 
     const {colors} = useTheme();
     const styles = StyleSheet.create({
@@ -93,6 +99,8 @@ const MakeFreeDirectory = ({navigation}) => {
 
     //자유보관함이므로 type === 0
     const toastRef = useRef();
+    const refRBSheet = useRef();
+
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
         console.log('완료')
@@ -104,47 +112,34 @@ const MakeFreeDirectory = ({navigation}) => {
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
     const [userData, setUserData] = useIsUserData();
-
-    // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
-    const postCollections = () => {
-        var datas = [];
-        for (let i = 0; i < keywordData.length; i++) {
-            if (isPress[i] === true) {
-                datas.push(keywordData[i].keyword_title)
-            }
-        }
-
-        try {
-            fetch('http://34.146.140.88/collection', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    collectionData : {
-                        name: collectionName,
-                        private: isEnabled,
-                        description: null,
-                        type: 0,
-                    },
-                    userId : userData.user_pk,
-                    keywords: datas
-                })
-            }).then((res) => res.json())
-                .then((responsedata) => {
-                    console.log(responsedata)
-                    Alert.alert('', '자유보관함이 생성되었습니다')
-                })
-                .catch((err) => {
-                    console.error(err)
-                    Alert.alert('', '자유보관함 생성에 실패했습니다')
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    const [range, setRange] = useState({
+        startDate: new Date(),
+        endDate: new Date()
+    });
+    const i18n = {
+        dayNames: {
+          short: ['일', '월', '화', '수', '목', '금', '토'],
+          long: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+        },
+        monthNames: {
+          short: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+          long: [
+            '1월',
+            '2월',
+            '3월',
+            '4월',
+            '5월',
+            '6월',
+            '7월',
+            '8월',
+            '9월',
+            '10월',
+            '11월',
+            '12월',
+          ],
+        },
+      };
+    const formatDateService = new NativeDateService('ko', {i18n, format: `YY. MM. DD`});
 
     const Keyword = ({keyword, idx}) => {
         return (
@@ -241,11 +236,105 @@ const MakeFreeDirectory = ({navigation}) => {
             pressed.push(false)
         }
         setIsPress(pressed)
+    };
+
+    const ShowCalendar = () => {
+        const [date, setDate] = useState({
+            startDate: new Date(),
+            endDate: new Date()
+        });
+        const [textColor, setTextColor] = useState(colors.mainColor)
+
+        return (
+            <TouchableOpacity onPress={()=>{
+                refRBSheet.current.open(); 
+                setDate({
+                    startDate: new Date(),
+                    endDate: new Date
+                })
+            }}><AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '400', lineHeight: 22.4}}>{moment(range.startDate).format('YY. MM. DD (dd)')} - {moment(range.endDate).format('YY. MM. DD (dd)')}</AppText>
+            <RBSheet
+            ref={refRBSheet}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            height={600}
+            customStyles={{
+                wrapper: {
+                    backgroundColor: "rgba(0, 0, 0, 0.3)",
+                },
+                draggableIcon: {
+                    backgroundColor: colors.gray[4],
+                    width: 110
+                },
+                container: {
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10,
+                    backgroundColor: colors.yellow[7]
+                }
+            }}
+            >
+                <ScreenContainerView>
+                <View style={{
+                    marginTop: 24,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
+                    <AppText style={{color: colors.mainColor}}>{date.startDate ? moment(date.startDate).locale('ko').format('YY. MM. DD (dd)') : moment().format('YY. MM. DD (dd)')} - {date.endDate ? moment(date.endDate).locale('ko').format('YY. MM. DD (dd)') : moment().format('YY. MM. DD (dd)')}</AppText>
+                </View>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <RangeCalendar
+                        range={date}
+                        onSelect={(nextRange) => {
+                            setDate(nextRange);
+                        }}
+                        dateService={formatDateService}
+                        style={{color: colors.mainColor, marginVertical: 20, borderColor: 'transparent'}}
+                        renderDay={(Date)=>{
+                            return(
+                                <View>
+                                    <AppText style={{color: Date.date >= date.startDate && Date.date <= date.endDate ? colors.backgroundColor : colors.mainColor,
+                                        fontSize: 12, lineHeight: 24, fontWeight: '500', justifyContent: 'center', textAlign: 'center', paddingTop: 10}}>
+                                    {Platform.OS === 'ios' ?
+                                    Date.date.toLocaleDateString().split('.')[2]
+                                    : Date.date.toLocaleDateString().split('/')[1]}
+                                    </AppText>
+                                </View>
+                            )}}
+                        />
+                </View>
+                <View flex={1} style={{marginBottom: 20}}>
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: (date.startDate && date.endDate && moment(date.startDate).format('YY. MM. DD (dd)') !== moment(date.endDate).format('YY. MM. DD (dd)')) ? colors.mainColor : colors.gray[5],
+                            height: 48,
+                            borderRadius: 10
+                        }}
+                        onPress={() => {
+                            refRBSheet.current.close();
+                            setRange(date)
+                        }}
+                    ><AppText
+                        style={{
+                            textAlign: 'center',
+                            padding: 14,
+                            fontSize: 16,
+                            color: colors.defaultColor,
+                            fontWeight: 'bold'
+                        }}
+                    >선택완료</AppText>
+                    </TouchableOpacity>
+                </View>
+                </ScreenContainerView>
+            </RBSheet>
+            </TouchableOpacity>
+        )
     }
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
+            <NavigationTop navigation={navigation} title="일정보관함 만들기"/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
@@ -307,6 +396,15 @@ const MakeFreeDirectory = ({navigation}) => {
                             value={isEnabled}
                         />
                     </View>
+                    <View style={{
+                        marginTop: 24,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}>
+                        <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
+                        <ShowCalendar />
+                    </View>
                     <View flex={1} style={{marginBottom: 20, justifyContent: "flex-end"}}>
                         <TouchableOpacity
                             testID="completed"
@@ -317,7 +415,7 @@ const MakeFreeDirectory = ({navigation}) => {
                             }}
                             onPress={() => {
                                 // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
-                                    postCollections();
+                                    // postCollections();
                                     navigation.setOptions({tabBarVisible: true});
                                     navigation.goBack(null);
                                 // }
@@ -341,4 +439,4 @@ const MakeFreeDirectory = ({navigation}) => {
 
 }
 
-export default MakeFreeDirectory;
+export default MakePlanDirectory;

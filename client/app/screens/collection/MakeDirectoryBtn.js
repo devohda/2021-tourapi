@@ -40,11 +40,11 @@ export default function MakeDirectoryBtn({navigation}) {
                         <TouchableOpacity onPress={() => {refRBSheet.current.close()}} style={{marginLeft: '58%', color: colors.mainColor}}><Icon type="ionicon" name={"close"}></Icon></TouchableOpacity>
                     </View>
                     <View style={{alignItems : "center", justifyContent : "center", marginTop: '1%'}}>
-                        <TouchableOpacity style={{backgroundColor: colors.blue[3], width: '90%', height: 72, borderRadius: 10, margin: 10}}>
+                        <TouchableOpacity style={{backgroundColor: colors.blue[3], width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('PlanDirectory'); navigation.setOptions({tabBarVisible: false})}}>
                             <AppText style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: colors.backgroundColor}}>일정 보관함</AppText>
                             <AppText style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: colors.backgroundColor}}>공간을 시간 순서대로 보관할 수 있어요</AppText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{backgroundColor: colors.blue[3], width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('Directory'); navigation.setOptions({tabBarVisible: false})}}>
+                        <TouchableOpacity style={{backgroundColor: colors.blue[3], width: '90%', height: 72, borderRadius: 10, margin: 10}} onPress={()=> {refRBSheet.current.close(); navigation.navigate('FreeDirectory'); navigation.setOptions({tabBarVisible: false})}}>
                             <AppText style={{textAlign: 'center', paddingTop: 13, fontSize: 18, fontWeight: 'bold', color: colors.backgroundColor}}>자유 보관함</AppText>
                             <AppText style={{textAlign: 'center', paddingTop: 5, paddingBottom: 15, fontSize: 12, fontWeight: 'bold', color: colors.backgroundColor}}>순서 상관없이 자유롭게 공간을 보관할 수 있어요</AppText>
                         </TouchableOpacity>
