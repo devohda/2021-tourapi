@@ -547,8 +547,19 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 marginTop: 5
                             }}>총 <AppText style={{fontWeight: '700'}}>20개</AppText></AppText>
                         </View>
-                        <InputBox placeholder="보관함에 댓글을 남겨보세요!" style={{marginVertical: 20}}/>
-
+                        <View style={{marginVertical: 20}}>
+                            <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
+                                <TextInput flex={1} style={{fontSize: 16}}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    placeholder="보관함에 댓글을 남겨보세요!"
+                                    placeholderTextColor={colors.gray[5]} />
+                                <Pressable style={{marginLeft: 5}}>
+                                    <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
+                                    name={"pencil"} size={16}></Icon>
+                                </Pressable>
+                            </View>
+                        </View>
                         <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
                             <View style={{marginRight: 8}}>
                                 <Image source={require('../../assets/images/mountain.jpeg')}
@@ -630,6 +641,12 @@ const styles = StyleSheet.create({
         height: 56,
         borderRadius: 50,
 
+    },
+    comment_box: {
+        borderBottomWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 5
     },
 });
 

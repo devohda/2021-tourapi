@@ -22,8 +22,8 @@ export default function HomeNavigator({navigation}) {
                 }
             }}/>
             <Tab.Screen name="directory" component={MakeCollectionBtn} options={{
-                title: '', tabBarIcon: () => (
-                    MakeCollectionBtn({navigation}))
+                title: '', tabBarButton: () => (
+                    MakeCollectionBtn({navigation})),
             }}/>
             <Tab.Screen name="mypage" children={() => <MyPageScreen navigation={navigation}/>} options={{
                 title: '마이페이지',
