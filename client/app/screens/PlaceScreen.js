@@ -1,8 +1,5 @@
 import React, {useState, useRef, useEffect} from "react";
-import {
-    View, Text, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Platform, Linking,
-    FlatList, Alert
-} from "react-native";
+import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert } from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 import {useTheme} from '@react-navigation/native';
 import {Icon} from "react-native-elements";
@@ -110,7 +107,7 @@ const PlaceInfo = ({userData, placeData, collectionList, colors, styles}) => {
             try {
                 const result = await Share.share({
                     message:
-                    placeTitle,
+                    placeData.place_name,
                 });
                 if (result.action === Share.sharedAction) {
                     if (result.activityType) {
@@ -122,7 +119,7 @@ const PlaceInfo = ({userData, placeData, collectionList, colors, styles}) => {
                     // dismissed
                 }
             } catch (error) {
-                alert(error.message);
+                Alert.alert('', error.message);
             }
         };
 
@@ -263,7 +260,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
             }).then((res) => res.json())
                 .then((response) => {
                     console.log(response)
-                    alert('보관함에 공간이 저장되었습니다.')
+                    Alert.alert('', '보관함에 공간이 저장되었습니다.')
                 })
                 .catch((err) => {
                     console.error(err)
