@@ -7,7 +7,7 @@
     "icon": "./app/assets/images/appicon.png",
     "splash": {
       "image": "./app/assets/images/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "packagerOpts": {
@@ -17,7 +17,7 @@
         "jsx",
         "svg"
       ],
-      "transformer" : "node_modules/react-native-svg-transformer/index.js"
+      "transformer": "node_modules/react-native-svg-transformer/index.js"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

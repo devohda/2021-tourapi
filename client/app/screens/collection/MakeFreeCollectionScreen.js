@@ -10,18 +10,18 @@ import {
     Platform,
     FlatList
 } from 'react-native';
-import ScreenContainer from '../components/ScreenContainer';
-import ScreenContainerView from '../components/ScreenContainerView';
-import NavigationTop from "../components/NavigationTop";
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import NavigationTop from '../../components/NavigationTop';
 import {useTheme} from '@react-navigation/native';
-import CustomTextInput from "../components/CustomTextInput";
-import ScreenDivideLine from "../components/ScreenDivideLine";
-import AppText from "../components/AppText";
-import {useIsUserData} from "../contexts/UserDataContextProvider";
+import CustomTextInput from '../../components/CustomTextInput';
+import ScreenDivideLine from '../../components/ScreenDivideLine';
+import AppText from '../../components/AppText';
+import {useIsUserData} from '../../contexts/UserDataContextProvider';
 
 export const navigationRef = React.createRef();
 
-const MakeFreeDirectory = ({navigation}) => {
+const MakeFreeCollectionScreen = ({navigation}) => {
 
     const {colors} = useTheme();
     const styles = StyleSheet.create({
@@ -96,7 +96,7 @@ const MakeFreeDirectory = ({navigation}) => {
     const toastRef = useRef();
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
-        console.log('완료')
+        console.log('완료');
     }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
@@ -111,7 +111,7 @@ const MakeFreeDirectory = ({navigation}) => {
         var datas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
-                datas.push(keywordData[i].keyword_title)
+                datas.push(keywordData[i].keyword_title);
             }
         }
 
@@ -134,27 +134,27 @@ const MakeFreeDirectory = ({navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((responsedata) => {
-                    console.log(responsedata)
-                    Alert.alert('', '자유보관함이 생성되었습니다')
+                    console.log(responsedata);
+                    Alert.alert('', '자유보관함이 생성되었습니다');
                 })
                 .catch((err) => {
-                    console.error(err)
-                    Alert.alert('', '자유보관함 생성에 실패했습니다')
+                    console.error(err);
+                    Alert.alert('', '자유보관함 생성에 실패했습니다');
                 });
 
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const Keyword = ({keyword, idx}) => {
         return (
             <View key={idx}
-                  style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                  }}
+                style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
 
             >
                 {/* <TouchableOpacity style={styles.selectType} onPress={pressFunc}> */}
@@ -175,15 +175,15 @@ const MakeFreeDirectory = ({navigation}) => {
                         style={isPress[keyword.keyword_pk - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{keyword.keyword_title}</AppText>
                 </TouchableOpacity>
             </View>
-        )
-    }
+        );
+    };
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const DATA = {
         collection_name: collectionName,
         collection_private: (isEnabled === true) ? 1 : 0,
         collection_keywords: putKeywords,
         collection_type: 1,
-    }
+    };
 
     useEffect(() => {
         getKeywords();
@@ -200,12 +200,12 @@ const MakeFreeDirectory = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    setKeywordData(response.data)
-                    setFalse()
-                    console.log(keywordData)
+                    setKeywordData(response.data);
+                    setFalse();
+                    console.log(keywordData);
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {
@@ -228,31 +228,31 @@ const MakeFreeDirectory = ({navigation}) => {
             id: '3',
             key: '../assets/images/image3',
         }
-    ]
+    ];
 
     const showUsers = ({item}) => (
         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
             {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
         </View>
-    )
+    );
     
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < keywordData.length; i++) {
-            pressed.push(false)
+            pressed.push(false);
         }
-        setIsPress(pressed)
-    }
+        setIsPress(pressed);
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
-            <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
                             style={[collectionName ? {color: colors.mainColor, fontSize: 20, fontWeight: 'bold'} : {fontSize: 20}]}
-                            placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
+                            placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>
                     </View>
@@ -271,8 +271,8 @@ const MakeFreeDirectory = ({navigation}) => {
                         }}>
 
                             <View flexDirection="row">
-                                <Image source={require('../assets/images/add_keyword.png')}
-                                       style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
+                                <Image source={require('../../assets/images/add_keyword.png')}
+                                    style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                                 {
                                     keywordData.map((keyword, idx) => (
                                         <Keyword keyword={keyword} key={idx} />
@@ -308,7 +308,7 @@ const MakeFreeDirectory = ({navigation}) => {
                             value={isEnabled}
                         />
                     </View>
-                    <View flex={1} style={{marginBottom: 20, justifyContent: "flex-end"}}>
+                    <View flex={1} style={{marginBottom: 20, justifyContent: 'flex-end'}}>
                         <TouchableOpacity
                             testID="completed"
                             style={{
@@ -318,28 +318,28 @@ const MakeFreeDirectory = ({navigation}) => {
                             }}
                             onPress={() => {
                                 // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
-                                    postCollections();
-                                    navigation.setOptions({tabBarVisible: true});
-                                    navigation.goBack(null);
+                                postCollections();
+                                navigation.setOptions({tabBarVisible: true});
+                                navigation.goBack(null);
                                 // }
                             }}
                             // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
                         ><AppText
-                            style={{
-                                textAlign: 'center',
-                                padding: 14,
-                                fontSize: 16,
-                                color: colors.defaultColor,
-                                fontWeight: 'bold'
-                            }}
-                        >보관함 만들기</AppText>
+                                style={{
+                                    textAlign: 'center',
+                                    padding: 14,
+                                    fontSize: 16,
+                                    color: colors.defaultColor,
+                                    fontWeight: 'bold'
+                                }}
+                            >보관함 만들기</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>
             </KeyboardAvoidingView>
         </ScreenContainer>
-    )
+    );
 
-}
+};
 
-export default MakeFreeDirectory;
+export default MakeFreeCollectionScreen;
