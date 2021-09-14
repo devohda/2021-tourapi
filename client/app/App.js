@@ -1,11 +1,11 @@
 import React from 'react';
-import {DefaultTheme, NavigationContainer} from "@react-navigation/native";
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import { StatusBar, Platform } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font';
 
-import AppNavigator from "./navigation/AppNavigator";
-import AppContextProviders from "./contexts/AppContextProviders";
+import AppNavigator from './navigation/AppNavigator';
+import AppContextProviders from './contexts/AppContextProviders';
 
 const ColorTheme = {
     ...DefaultTheme,
