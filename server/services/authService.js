@@ -39,7 +39,7 @@ exports.readUserByEmail = async (email) => {
 
 exports.createToken = async function (user) {
     // refresh token 의 유효시간 = 200days
-    const refreshToken = jwt.sign({}, process.env.JWT_SECRET, {expiresIn: 17280000000, issuer: 'here'});
+    const refreshToken = jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 17280000000, issuer: 'here'});
 
     // access token 의 유효시간 = 30 minutes
     const accessToken = jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 1800000, issuer: 'here'});
@@ -49,4 +49,13 @@ exports.createToken = async function (user) {
     await db.query(query);
 
     return {accessToken, refreshToken};
+};
+
+exports.readUserTokenByUserPk = async (user_pk) => {
+    const query = `SELECT access_token, refresh_token 
+                   FROM user_token 
+                   WHERE user_pk = ${user_pk}`;
+
+    const tokens = await db.query(query);
+    return tokens;
 };

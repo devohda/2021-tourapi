@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const router = require('./routes/index');
@@ -16,6 +17,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(morgan('dev'));
 }
 
+app.use(cookieParser());
 app.use(express.json());
 app.use('/', router);
 

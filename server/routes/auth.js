@@ -8,10 +8,6 @@ const client = require('twilio')(accountSid, authToken);
 
 const authService = require('../services/authService');
 
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const JWT_SECRET = process.env.JWT_SECRET;
-
 /*
 * 비밀번호 찾기
 *
@@ -166,10 +162,9 @@ router.post('/loginJWT', async (req, res, next) => {
             return res.send({state: 'NOT MATCHED'});
         }
 
-        console.log(`userdata : ${user}`);
-
         // jwt 토큰 발급.
         const tokens = await authService.createToken(user);
+        res.cookie('tokens', tokens);
 
         return res.send({code: 200, state: 'SUCCESS', tokens});
     } catch (err) {
