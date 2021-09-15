@@ -11,20 +11,17 @@ import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
 
 // jwt 토큰 refresh token 저장을 위한 암호화된 async storage
-import SecureStore from 'expo-secure-store';
+// import SecureStore from 'expo-secure-store';
+//
+// async function save(key, value) {
+//     await SecureStore.setItemAsync(key, value);
+// }
+//
+//
+// await SecureStore.setItemAsync('secure_token','sahdkfjaskdflas$%^&');
+// const token = await SecureStore.getItemAsync('secure_token');
+// console.log(token); // output: sahdkfjaskdflas$%^&
 
-async function save(key, value) {
-    await SecureStore.setItemAsync(key, value);
-}
-
-async function getValueFor(key) {
-    let result = await SecureStore.getItemAsync(key);
-    if (result) {
-        alert('🔐 Here\'s your value 🔐 \n' + result);
-    } else {
-        alert('No values stored under that key.');
-    }
-}
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
 

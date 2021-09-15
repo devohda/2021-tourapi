@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from "react";
-import {useTheme} from "@react-navigation/native";
-import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
-import ScreenContainer from "../../components/ScreenContainer";
-import ScreenContainerView from "../../components/ScreenContainerView";
-import AppText from "../../components/AppText";
-import {Icon} from "react-native-elements";
-import {useIsUserData} from "../../contexts/UserDataContextProvider";
+import React, {useEffect, useState} from 'react';
+import {useTheme} from '@react-navigation/native';
+import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import AppText from '../../components/AppText';
+import {Icon} from 'react-native-elements';
+import {useIsUserData} from '../../contexts/UserDataContextProvider';
 
 const CollectionTab = ({navigation}) => {
 
-    const [userData, setUserData] = useIsUserData()
+    const [userData, setUserData] = useIsUserData();
     const [collectionList, setCollectionList] = useState({});
     const [selectedDirType, setSelectedDirType] = useState(1);
     const [directoryType, setDirectoryType] = useState([
@@ -33,16 +33,16 @@ const CollectionTab = ({navigation}) => {
             name: '자유보관함',
             isClicked: false
         }
-    ])
+    ]);
 
     useEffect(() => {
         getCollectionsFromUsers();
-    })
+    });
 
     const {colors} = useTheme();
     const styles = StyleSheet.create({
         directoryContainer: {
-            width: "49%",
+            width: '49%',
             height: 249,
             borderRadius: 10,
             backgroundColor: '#fff',
@@ -138,7 +138,7 @@ const CollectionTab = ({navigation}) => {
             justifyContent: 'center',
             alignItems: 'center'
         },
-    })
+    });
 
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
@@ -157,20 +157,20 @@ const CollectionTab = ({navigation}) => {
                     setCollectionList(data);
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const showDirectories = ({item}) => (
 
         <TouchableOpacity style={styles.directoryContainer} onPress={() => {
-            navigation.navigate('ShowFreeDir', {data : item})
+            navigation.navigate('MakeFreeCollection', {data : item});
         }}>
-            <View flex={1} style={{overflow: "hidden", borderRadius: 10}}>
+            <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                 <View style={{height: '68%'}}>
                     <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                         <View style={[styles.dirType, {
@@ -183,12 +183,12 @@ const CollectionTab = ({navigation}) => {
                         {item.collection_private === 1 &&
                         <View style={{marginRight: 9, marginTop: 8}}>
                             <Image style={{width: 20, height: 20}}
-                                   source={require('../../assets/images/lock_outline.png')}></Image>
+                                source={require('../../assets/images/lock_outline.png')}></Image>
                         </View>
                         }
                     </View>
                     <Image style={styles.defaultImage}
-                           source={item.thumbnail_images.length !== 0 ? {uri: item.thumbnail_images[0]} : require('../../assets/images/mountain.jpeg')}/>
+                        source={item.thumbnail_images.length !== 0 ? {uri: item.thumbnail_images[0]} : require('../../assets/images/mountain.jpeg')}/>
                 </View>
                 <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                     <AppText style={{
@@ -203,20 +203,20 @@ const CollectionTab = ({navigation}) => {
                                     color: colors.gray[4],
                                     fontSize: 10,
                                     marginRight: 6.21
-                                }}># {keyword}</AppText>)
+                                }}># {keyword}</AppText>);
                         })}
                     </View>
                     <View flexDirection="row" style={{position: 'absolute', bottom: 10}}>
                         <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Image source={require('../../assets/images/here_icon.png')}
-                                   style={{width: 8, height: 8, margin: 2}}></Image>
+                                style={{width: 8, height: 8, margin: 2}}></Image>
                             <AppText
                                 style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
                         </View>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
-                            <Icon type="ionicon" name={"location"} size={8} color={colors.gray[2]}
-                                  style={{margin: 2}}></Icon>
+                            <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
+                                style={{margin: 2}}></Icon>
                             <AppText style={{
                                 fontSize: 8,
                                 color: colors.hashTagColor,
@@ -227,7 +227,7 @@ const CollectionTab = ({navigation}) => {
                 </View>
             </View>
         </TouchableOpacity>
-    )
+    );
 
     const Keyword = ({type, idx}) => {
         return (
@@ -242,15 +242,15 @@ const CollectionTab = ({navigation}) => {
                                     name: val.name,
                                     isClicked: false
                                 })
-                        )
+                        );
                     }}
                 >
                     <AppText
                         style={type.isClicked ? styles.selectTypeTextClicked : styles.selectTypeText}>{type.name}</AppText>
                 </TouchableOpacity>
             </View>
-        )
-    }
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -268,31 +268,31 @@ const CollectionTab = ({navigation}) => {
                     <View flexDirection="row">
                         <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
                         <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                              name={"chevron-down-outline"} size={16}></Icon>
+                            name={'chevron-down-outline'} size={16}></Icon>
                     </View>
                     <View flexDirection="row">
                         <View flexDirection="row">
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                  name={"funnel"} size={13}></Icon>
+                                name={'funnel'} size={13}></Icon>
                             <AppText style={{color: colors.mainColor}}>필터</AppText>
                         </View>
                         <View style={{marginHorizontal: 10}}><AppText
                             style={{color: colors.subColor}}>|</AppText></View>
                         <View flexDirection="row">
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                  name={"pencil"} size={13}></Icon>
+                                name={'pencil'} size={13}></Icon>
                             <AppText style={{color: colors.mainColor}}>편집</AppText>
                         </View>
                     </View>
                 </View>
                 <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-                          showsVerticalScrollIndicator={false}
-                          data={collectionList} renderItem={showDirectories}
-                          keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
+                    showsVerticalScrollIndicator={false}
+                    data={collectionList} renderItem={showDirectories}
+                    keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
                 />
             </ScreenContainerView>
         </ScreenContainer>
     );
-}
+};
 
 export default CollectionTab;

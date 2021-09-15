@@ -10,7 +10,7 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import ListItem from './ListItem';
 
-const SystemSetting = ({navigation}) => {
+const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
     const [userData, setUserData] = useIsUserData();
 
@@ -110,4 +110,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SystemSetting;
+export default SystemSettingScreen;

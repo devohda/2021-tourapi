@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import { StatusBar, Platform } from 'react-native';
 import AppLoading from 'expo-app-loading';
@@ -66,7 +66,9 @@ const ColorTheme = {
     }
 };
 
+
 export default function App() {
+
     let [fontsLoaded] = useFonts({
         'Pretendard-Thin': require('./assets/fonts/Pretendard-Thin.otf'),
         'Pretendard-ExtraLight': require('./assets/fonts/Pretendard-ExtraLight.otf'),

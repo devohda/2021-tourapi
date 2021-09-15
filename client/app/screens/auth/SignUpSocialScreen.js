@@ -12,6 +12,7 @@ import MainBoxIcon from '../../assets/images/login/main_box_icon.svg';
 import AppleLogo from '../../assets/images/login/apple.svg';
 import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg';
 
+
 const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
     const [email, setEmail] = useState(null);
