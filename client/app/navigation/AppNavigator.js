@@ -11,8 +11,7 @@ import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionSc
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
 
-import SecureStore from 'expo-secure-store';
-
+import * as SecureStore from 'expo-secure-store';
 const MainStack = createStackNavigator();
 
 
@@ -20,9 +19,9 @@ const AppNavigator = () => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn(false);
 
     const getTokenAndLogin = async () => {
-
         const tokens = await SecureStore.getItemAsync('tokens');
         if(tokens){
+            console.log(tokens);
 
             // 토큰으로 정보 조회해서 로그인 됐으면 main으로 이동 아니면 그대로.
             setIsSignedIn(true);
@@ -34,7 +33,7 @@ const AppNavigator = () => {
 
         // 저장된 토큰 꺼내기
         getTokenAndLogin().catch(err => console.log(err));
-    }, [isSignedIn]);
+    }, []);
 
     return (
         <MainStack.Navigator screenOptions={{headerShown: false}}>
@@ -47,7 +46,7 @@ const AppNavigator = () => {
                     <MainStack.Screen name="MakeFreeCollection" component={MakeFreeCollectionScreen}/>
                     <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />
                     <MainStack.Screen name="SystemSetting" component={SystemSettingScreen} />
-                    <MainStack.Screen name="Authentication" component={AuthenticationNavigator2}/>
+                    <MainStack.Screen name="Authentication2" component={AuthenticationNavigator2}/>
                 </>
             }
         </MainStack.Navigator>
