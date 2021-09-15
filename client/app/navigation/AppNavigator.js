@@ -1,19 +1,18 @@
-import HomeNavigator from "./HomeNavigator";
-import AuthenticationNavigator from "./AuthenticationNavigator";
-import React, {useState} from "react";
-import {useIsSignedIn} from "../contexts/SignedInContextProvider";
-import {createStackNavigator} from "@react-navigation/stack";
-import SearchScreen from "../screens/SearchScreen";
-import PlaceScreen from "../screens/PlaceScreen";
-import MakePlanDirectory from "../screens/collection/MakePlanDirectory";
-import MakeFreeDirectory from '../screens/collection/MakeFreeDirectory';
-import FreeDirectory from "../screens/collection/FreeDirectory";
-import SystemSetting from "../screens/settings/SystemSetting";
+import HomeNavigator from './HomeNavigator';
+import AuthenticationNavigator from './AuthenticationNavigator';
+import React, {useState} from 'react';
+import {useIsSignedIn} from '../contexts/SignedInContextProvider';
+import {createStackNavigator} from '@react-navigation/stack';
+import SearchScreen from '../screens/SearchScreen';
+import PlaceScreen from '../screens/PlaceScreen';
+import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionScreen';
+import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
+import SystemSetting from '../screens/settings/SystemSetting';
 
-const MainStack = createStackNavigator()
+const MainStack = createStackNavigator();
 
 const AppNavigator = () => {
-    const [isSignedIn, setIsSignedIn] = useIsSignedIn()
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     return (
         <MainStack.Navigator screenOptions={{headerShown: false}}>
@@ -30,7 +29,7 @@ const AppNavigator = () => {
                 </>
             }
         </MainStack.Navigator>
-    )
-}
+    );
+};
 
 export default AppNavigator;

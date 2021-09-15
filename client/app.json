@@ -17,7 +17,7 @@
         "jsx",
         "svg"
       ],
-      "transformer" : "node_modules/react-native-svg-transformer/index.js"
+      "transformer": "node_modules/react-native-svg-transformer/index.js"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

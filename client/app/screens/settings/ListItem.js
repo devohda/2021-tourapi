@@ -30,7 +30,7 @@ const ListItem = props => {
             <View style={{...styles.list_style}}>
                 {
                     props.index === 4 ?
-                    <AppText style={{color: props.data === '로그아웃' ? colors.gray[5] : colors.red[3], fontSize: 16, lineHeight: 20}}>{props.data}</AppText> :
+                    <AppText style={{color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3], fontSize: 16, lineHeight: 20}}>{props.data}</AppText> :
                     <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
                 }
             </View>

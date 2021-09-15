@@ -1,6 +1,6 @@
-import React, {useState, useContext} from "react";
-import {StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
-import ScreenContainer from '../../../components/ScreenContainer'
+import React, {useState} from "react";
+import {StyleSheet, TextInput, TouchableOpacity, View, Pressable} from "react-native";
+import { Icon } from "react-native-elements";
 import styled from "styled-components/native";
 import AppText from "../../../components/AppText";
 import { useTheme } from '@react-navigation/native';
@@ -32,21 +32,27 @@ const GetPasswordTab = ({route, navigation}) => {
     const { colors } = useTheme();
     const [color, setColor] = useState(colors.gray[5]);
     const [isPasswordValid, setIsPasswordValid] = useState(false);
+    const [showPassword, setShowPassword] = useState(true);
 
     const checkPassword = async (pw) => {
         var pattern1 = /[0-9]/; // 숫자
         var pattern2 = /[a-zA-Z]/; // 문자
         var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
 
-        if(!(pw.search(/\s/) != -1) &&
-        ((pattern1.test(pw) && pattern2.test(pw)) ||
-        (pattern1.test(pw) && pattern3.test(pw)) ||
-        (pattern2.test(pw) && pattern3.test(pw))
-        )) setIsPasswordValid(true)
-        else setIsPasswordValid(false)
+        if(!pattern1.test(pw) || !pattern2.test(pw) || !pattern3.test(pw)) {
+            setIsPasswordValid(false);
+            // setColor(colors.gray[5]);
+        }
+        else {
+            setIsPasswordValid(true);
+            // setColor(colors.red[2]);
+        }
     }
 
     const checkIsValid = async () => {
+        if(!isPasswordValid) {
+            setColor(colors.red[2]);
+        }
         navigation.navigate('nicknameTab', {email, password})
     }
 
@@ -76,7 +82,15 @@ const GetPasswordTab = ({route, navigation}) => {
             borderRadius: 10,
             alignItems: 'center',
             justifyContent: 'center'
-        }
+        },
+        password_box: {
+            borderBottomWidth: 1,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingBottom: 11,
+            marginTop: 40,
+            marginBottom: 6
+        },
     })
 
     return (
@@ -95,35 +109,66 @@ const GetPasswordTab = ({route, navigation}) => {
                             <AppText style={styles.title_text}>설정해주세요</AppText>
                         </View>
                     </AppText>
-                    <CustomTextInput
-                        placeholder="영문, 숫자, 특수문자 2가지 조합 8자리 이상"
-                        autoCapitalize="none"
-                        password={true}
-                        secureTextEntry={true}
-                        style={{
-                            marginTop : 40,
-                            fontSize: 16,
-                            borderBottomWidth: 1,
-                            borderBottomColor: color,
-                            marginBottom: 6,
-                            paddingBottom: 11
-                        }}
-                        onChangeText={async (text) => {
-                            await checkPassword(text)
-                            if(text.length < 8) {
-                                setColor(colors.red[2]);
-                            }
+                    <View flexDirection="row" style={{...styles.password_box, borderColor: color}}>
+                        <CustomTextInput
+                            placeholder="영문, 숫자, 특수문자 2가지 조합 8자리 이상"
+                            autoCapitalize="none"
+                            password={true}
+                            secureTextEntry={showPassword}
+                            style={{
+                                fontSize: 16,
+                            }}
+                            flex={1}
+                            onChangeText={async (text) => {
+                                await checkPassword(text);
 
-                            if(!isPasswordValid) {
-                                setColor(colors.red[2]);
-                            }
-                            
-                            if(text.length >= 8 && isPasswordValid) setColor(colors.gray[5])
-                            if(text === '') setColor(colors.gray[5])
-                            
-                            setPassword(text);
-                        }}
-                    />
+                                var pattern1 = /[0-9]/; // 숫자
+                                var pattern2 = /[a-zA-Z]/; // 문자
+                                var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
+                        
+                                if(pattern1.test(text) && pattern2.test(text)) {
+                                    setColor(colors.gray[5]);
+                                    setIsPasswordValid(true);
+                                    if(text.length >= 8) {
+                                        setColor(colors.gray[5]);
+                                    } else setColor(colors.red[2]);
+
+                                } else if(pattern1.test(text) && pattern3.test(text)) {
+                                    setColor(colors.gray[5]);
+                                    setIsPasswordValid(true);
+                                    if(text.length >= 8) {
+                                        setColor(colors.gray[5]);
+                                    } else setColor(colors.red[2]);
+
+                                } else if(pattern2.test(text) && pattern3.test(text)) {
+                                    setColor(colors.gray[5]);
+                                    setIsPasswordValid(true); 
+                                    if(text.length >= 8) {
+                                        setColor(colors.gray[5]);
+                                    } else setColor(colors.red[2]);
+                                    
+                                }
+                                else {
+                                    setColor(colors.red[2]);
+                                    setIsPasswordValid(false);
+                                }
+                                
+                                if(text === '') setColor(colors.gray[5]);
+                                
+                                setPassword(text);
+                            }}
+                        />
+                        <Pressable style={{marginLeft: 5}} onPress={()=>{setShowPassword(!showPassword); console.log(showPassword)}}>
+                                {
+                                    showPassword ?
+                                    <Icon style={{marginTop: 3, marginRight: 5}} name={'eye'} type="ionicon"
+                                    size={18} color={colors.gray[9]}></Icon>
+                                    :
+                                    <Icon style={{marginTop: 3, marginRight: 5}} name={'eye-off'} type="ionicon"
+                                    size={18} color={colors.gray[9]}></Icon>
+                                }
+                        </Pressable>
+                    </View>
                     <AppText style={{color: colors.red[2],
                         display: password && password.length < 8 ? 'flex' : 'none'
                     }}>

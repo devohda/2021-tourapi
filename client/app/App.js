@@ -41,7 +41,8 @@ const ColorTheme = {
             5 : '#BABFC8',
             6 : '#C9CFD9',
             7 : '#BDC2CA',
-            8 : '#929292'
+            8 : '#929292',
+            9 : '#C4C4C4'
         },
         red_gray : {
             1 : '#BFAFAF',

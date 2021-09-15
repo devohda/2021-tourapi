@@ -13,6 +13,7 @@ const CustomTextInput = (props) => {
                    autoCorrect={false}
                    onFocus={props.onFocus}
                    secureTextEntry={props.secureTextEntry}
+                   flex={props.flex}
         >
             {props.children}
         </TextInput>
