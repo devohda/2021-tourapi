@@ -15,12 +15,14 @@ import {
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {Icon} from 'react-native-elements';
+import {Modal, Card} from '@ui-kitten/components';
 
 // import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
+import { tipsList } from '../../contexts/TipsListContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
@@ -28,52 +30,76 @@ import MoreIcon from '../../assets/images/more-icon.svg';
 
 const windowWidth = Dimensions.get('window').width;
 
-const FreeCollectionScreen = ({route, navigation}) => {
+const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const {data} = route.params;
+    // const {data} = route.params;
     const [userData, setUserData] = useIsUserData();
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
+    const [tmpData, setTmpData] = tipsList();
+    const [tmpPlaceData, setTmpPlaceData] = useState([]);
+    const [visible, setVisible] = useState(false);
+    const [changedTip, setChangedTip] = useState({
+        index: 0,
+        tip : ''
+    });
 
     useEffect(() => {
-        getInitialData();
+        setTmpData([
+            {
+                id: 1,
+                tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
+            }, {
+                id: 2,
+                tip: '두번째 팁'
+            }
+        ], [
+            {
+                id: 1,
+                tip: '우와',
+            }, {
+                id: 2,
+                tip: '두번째 팁'
+            }
+        ]);
+        // getInitialData();
     }, []);
 
-    const getInitialData = () => {
-        try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: userData.user_pk,
-                })
-            }).then((res) => res.json())
-                .then((response) => {
-                    setCollectionData(response.data);
-                    setPlaceLength(response.data.places.length);
-                    setFalse();
-                    setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+    // const getInitialData = () => {
+    //     try {
+    //         fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({
+    //                 userId: userData.user_pk,
+    //             })
+    //         }).then((res) => res.json())
+    //             .then((response) => {
+    //                 setCollectionData(response.data);
+    //                 setPlaceLength(response.data.places.length);
+    //                 setFalse();
+    //                 setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
 
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
+    //             })
+    //             .catch((err) => {
+    //                 console.error(err);
+    //             });
 
-        } catch (err) {
-            console.error(err);
-        }
-    };
+    //     } catch (err) {
+    //         console.error(err);
+    //     }
+    // };
 
-    const checkTrue = () => {
-        if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
-        return true;
-    };
+    // const checkTrue = () => {
+    //     if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+    //     return true;
+    // };
 
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
@@ -166,38 +192,98 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-
-    const ShowPlaces = ({item, index}) => {
+    const ShowPlans = ({item, index}) => {
         return (
             <>
-                {item.place_pk !== collectionData.places[0].place_pk && <View style={{
+            <View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View>
+                        <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {item.id}</AppText>
+                    </View>
+                    <View style={{marginStart: 8}}>
+                        <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '400'}}>2021.09.21</AppText>
+                    </View>
+                </View>
+            </View>
+            <FlatList data={tmpData} renderItem={ShowPlaces}
+            keyExtractor={(item) => item.id.toString()}
+            nestedScrollEnabled/>
+            <TouchableOpacity onPress={() => {
+                // if(isLimited) setIsLimited(false);
+                // else setIsLimited(true);
+                // console.log(isLimited)
+            }}>
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <AppText style={{
+                        fontSize: 14,
+                        fontWeight: '400',
+                        color: colors.gray[2]
+                        }}>전체보기</AppText>
+                    <Image source={require('../../assets/images/showWhole_forDir.png')}
+                        style={{
+                            width: 15,
+                            height: 15,
+                            marginLeft: 10,
+                            marginBottom: 5
+                    }}></Image>
+                </View>
+            </TouchableOpacity>
+            <View style={{
                     width: '100%',
                     height: 1,
                     backgroundColor: colors.red_gray[6],
                     zIndex: -1000,
                     marginVertical: 13
-                }}></View>}
+                }}></View>
+            </>
+        )
+    }
+
+    const ShowPlaces = ({item, index}) => {
+        console.log(item)
+        return (
+            <>
+                {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
+                    width: '100%',
+                    height: 1,
+                    backgroundColor: colors.red_gray[6],
+                    zIndex: -1000,
+                    marginVertical: 13
+                }}></View>} */}
+                {/* pk로 바꾸기 */}
 
                 <View>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4}}>
                         <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
                             <View style={{flexDirection: 'row', width: '90%'}}>
-                                <Image source={{uri: item.place_img}}
+                                {/* <Image source={{uri: item.place_img}} */}
+                                <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
+                                    <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
+                                        <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
+                                            {item.id}    
+                                        </AppText>
+                                    </View>
+                                </View>
+                                <Image source={require('../../assets/images/flower.jpeg')}
                                     style={{width: 72, height: 72, borderRadius: 15}}></Image>
                                 <View style={{
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     flexDirection: 'row',
-                                    width: '78%'
+                                    width: '67%'
                                 }}>
                                     <View style={{marginLeft: 8, marginTop: '2%'}}>
                                         <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
+                                            {/* <AppText style={{
                                                 color: colors.gray[3],
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
-                                            }}>{checkType(item.place_type)}</AppText>
+                                            }}>{checkType(item.place_type)}</AppText> */}
                                             <AppText style={{
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
@@ -220,22 +306,30 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             }}>4.8</AppText>
                                         </View>
                                         <View style={{width: '100%'}}>
-                                            <AppText style={{
+                                            {/* <AppText style={{
                                                 fontSize: 16,
                                                 fontWeight: 'bold',
                                                 color: colors.mainColor,
                                                 marginVertical: 5,
-                                            }}>{item.place_name}</AppText>
+                                            }}>{item.place_name}</AppText> */}
+                                                                                        <AppText style={{
+                                                fontSize: 16,
+                                                fontWeight: 'bold',
+                                                color: colors.mainColor,
+                                                marginVertical: 5,
+                                            }}>제목</AppText>
                                         </View>
-                                        <AppText
-                                            style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText>
+                                        {/* <AppText
+                                            style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText> */}
+                                                                                    <AppText
+                                            style={{fontSize: 12, color: colors.gray[4]}}>서울시 구로구 연동로</AppText>
                                     </View>
                                 </View>
                             </View>
                         </TouchableOpacity>
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
                             {/* {item.like_flag === 0 ?  */}
-                            <TouchableOpacity onPress={() => {
+                            {/* <TouchableOpacity onPress={() => {
                                 let newArr = [...isPress];
                                 if (newArr[index]) {
                                     newArr[index] = false;
@@ -250,35 +344,167 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     setIsPress(newArr);
                                     likePlace(item.place_pk);
                                 }
-                            }}>
+                            }}> */}
+                            <TouchableOpacity>
                                 <Jewel width={26} height={21}
                                     style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style={{
-                        backgroundColor: colors.defaultColor,
-                        height: 30,
-                        paddingVertical: 6,
-                        paddingLeft: 6,
-                        paddingRight: 5,
-                        marginBottom: 6,
-                        marginRight: 10,
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image source={require('../../assets/images/tipIcon.png')}
-                                style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                            <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
+                    {
+                        item.id === 2 ?
+                        <>
+                        <View style={{
+                            backgroundColor: colors.defaultColor,
+                            height: 30,
+                            paddingVertical: 6,
+                            paddingHorizontal: 8,
+                            marginBottom: 6,
+                            marginRight: 10,
+                            marginTop: 4,
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            marginLeft: 36,
+                            borderRadius: 10,
+                        }}>
+                            <View>
+                                <AppText style={{color: colors.blue[1], fontSize: 14, textAlign: 'left'}}>대체 공간 2</AppText>
+                            </View>
+                            <View>
+                                <BackIcon width={10} height={14} style={{color: colors.mainColor, transform: [{rotate: '180deg'}], width: 4, height: 8}}/>
+                            </View>
                         </View>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image style={{width: 28, height: 28}}
-                                source={require('../../assets/images/default_profile_2.png')}></Image>
+                        <TouchableOpacity onPress={() => setVisible(true)}>
+                            <View style={{
+                                backgroundColor: colors.defaultColor,
+                                height: 30,
+                                paddingVertical: 6,
+                                paddingLeft: 6,
+                                paddingRight: 5,
+                                marginBottom: 6,
+                                marginRight: 10,
+                                marginTop: 4,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginLeft: 36
+                            }}>
+                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                    <Image source={require('../../assets/images/tipIcon.png')}
+                                        style={{width: 12, height: 12, marginEnd: 8}}></Image>
+                                    <AppText style={{color: colors.blue[1], fontSize: 14}}>{item.tip}</AppText>
+                                </View>
+                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                    <Image style={{width: 28, height: 28}}
+                                        source={require('../../assets/images/default_profile_2.png')}></Image>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                        {/* independent rendering 필요 */}
+                        <Modal
+                            visible={visible}
+                            backdropStyle={{backgroundColor: 'rbga(0,0,0,0.5)'}}
+                            style={{backgroundColor: colors.defaultColor, borderWidth: 0, width: '30%'}}
+                            onBackdropPress={() => setVisible(false)}
+                        >
+                            <Card disabled={true}>
+                                <TextInput placeholder={item.tip} onChangeText={(text)=>{
+                                    const newArr = [...changedTip];
+                                    newArr.index = index;
+                                    newArr.tip = text;
+                                    setChangedTip(newArr);
+                                }}></TextInput>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <TouchableOpacity onPress={() => {setVisible(false)}}>
+                                        <View style={{height: 20, borderRadius: 10, backgroundColor: colors.gray[6]}}>
+                                            <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 12}}>취소</AppText>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => {
+                                        const newArr = [...tmpData];
+                                        newArr[changedTip.index].tip = changedTip.tip;
+                                        setTmpData(newArr);
+                                        setVisible(false)}}>
+                                        <View style={{height: 20, borderRadius: 10, backgroundColor: colors.mainColor}}>
+                                            <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 12}}>확인</AppText>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            </Card>
+                        </Modal>
+                        <TouchableOpacity onPress={() => {
+                                    // if(isLimited) setIsLimited(false);
+                                    // else setIsLimited(true);
+                                    // console.log(isLimited)
+                                }}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}>
+                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                            style={{
+                                                width: 15,
+                                                height: 15,
+                                                marginLeft: 10,
+                                                marginBottom: 5
+                                            }}></Image>
+                                    </View>
+                        </TouchableOpacity>
+                        </> :
+                        <>
+                        <View style={{
+                            backgroundColor: colors.defaultColor,
+                            height: 30,
+                            paddingVertical: 6,
+                            paddingLeft: 6,
+                            paddingRight: 5,
+                            marginBottom: 6,
+                            marginRight: 10,
+                            marginTop: 4,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginLeft: 36
+                        }}>
+                            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image source={require('../../assets/images/tipIcon.png')}
+                                    style={{width: 12, height: 12, marginEnd: 8}}></Image>
+                                <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
+                            </View>
+                            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image style={{width: 28, height: 28}}
+                                    source={require('../../assets/images/default_profile_2.png')}></Image>
+                            </View>
                         </View>
-                    </View>
+                        <View style={{
+                            height: 30,
+                            paddingVertical: 6,
+                            paddingLeft: 6,
+                            paddingRight: 5,
+                            marginBottom: 6,
+                            marginRight: 10,
+                            marginTop: 4,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginLeft: 36
+                        }}>
+                            <View style={{
+                                width: '90%',
+                                borderStyle: 'dotted',
+                                borderRadius: 1,
+                                borderWidth: 1,
+                                borderColor: colors.gray[4],
+                                zIndex: -1000
+                                }}></View>
+                            <View style={{marginStart: 6}}>
+                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>12PM</AppText>
+                            </View>
+                        </View>
+                        </>
+                    }
                 </View>
             </>
         );
@@ -291,7 +517,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             {showMenu && (
                 <View style={{
                     position: 'absolute',
-                    width: 140,
+                    width: 80,
                     height: 80,
                     top: 50,
                     right: 60,
@@ -376,13 +602,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     backgroundColor: colors.defaultColor,
                                     shadowColor: colors.red[8]
                                 }]}>
-                                <AppText style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText>
+                                <AppText style={{...styles.dirFreeText, color: colors.red[3]}}>일정</AppText>
                             </View>
                         </View>
                         <View>
-                            {checkTrue() &&
+                            {/* {checkTrue() &&
                             <Image source={require('../../assets/images/lock_forDir.png')}
-                                style={{width: 22, height: 22}}></Image>}
+                                style={{width: 22, height: 22}}></Image>} */}
                         </View>
                     </View>
                     <View style={{
@@ -391,18 +617,26 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         alignItems: 'center'
                     }}>
                         <View style={{justifyContent: 'center', alignItems: 'flex-start'}}>
+                            <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '500'}}>
+                                2021.09.21-29
+                            </AppText>
                             <AppText style={{
                                 fontSize: 22,
                                 fontWeight: '700',
                                 color: colors.mainColor
-                            }}>{data.collection_name}</AppText>
+                            }}>보관함 제목</AppText>
+                            {/* <AppText style={{
+                                fontSize: 22,
+                                fontWeight: '700',
+                                color: colors.mainColor
+                            }}>{data.collection_name}</AppText> */}
                         </View>
-                        {
+                        {/* {
                             userData.user_pk !== data.user_pk &&
-                            <View style={{
+                        <View style={{
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                marginTop: 20
+                                marginTop: 10
                             }}>
                                 <Image source={require('../../assets/images/here_click.png')}
                                     style={{width: 26, height: 21, marginBottom: 2}}></Image>
@@ -412,7 +646,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     color: colors.red[3]
                                 }}>1,820</AppText>
                             </View>
-                        }
+                        } */}
                     </View>
                 </ScreenContainerView>
 
@@ -438,9 +672,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 </View>
 
                 <ScreenContainerView>
-                    {
-                        placeLength !== 0 ?
-                            <View style={{marginTop: 16}}>
+                <View style={{marginTop: 16}}>
                                 <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
                                     <View>
                                         <AppText style={{color: colors.gray[4]}}>총 <AppText
@@ -454,13 +686,53 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </TouchableOpacity>
                                 </View>
                                 <SafeAreaView>
+                                    {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
+                                        keyExtractor={(item) => item.place_pk.toString()}
+                                        nestedScrollEnabled/> */}
+                                    <FlatList data={tmpData} renderItem={ShowPlans}
+                                        keyExtractor={(item) => item.id.toString()}
+                                        nestedScrollEnabled/>
+                                </SafeAreaView>
+                                <TouchableOpacity onPress={() => {
+                                    // if(isLimited) setIsLimited(false);
+                                    // else setIsLimited(true);
+                                    // console.log(isLimited)
+                                }}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}>
+                                        <AppText style={{
+                                            fontSize: 14,
+                                            fontWeight: '400',
+                                            color: colors.gray[2]
+                                        }}>전체보기</AppText>
+                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                            style={{
+                                                width: 15,
+                                                height: 15,
+                                                marginLeft: 10,
+                                                marginBottom: 5
+                                            }}></Image>
+                                    </View>
+                                </TouchableOpacity>
+                            </View> 
+                    {
+                        placeLength !== 0 ?
+                            <View style={{marginTop: 16}}>
+                                <View style={{marginBottom: 16}}>
+                                    <AppText style={{color: colors.gray[4]}}>총 <AppText
+                                        style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
+                                </View>
+                                <SafeAreaView>
                                     {/* {
                                     placeData.length > 5 ?
                                 } */}
                                     {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                    <FlatList data={collectionData.places} renderItem={ShowPlaces}
+                                    <FlatList data={collectionData.places} renderItem={(item, index) => <ShowPlaces item={item} index={index}/>}
                                         keyExtractor={(item) => item.place_pk.toString()}
                                         nestedScrollEnabled/>
 
@@ -472,7 +744,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 }}>
                                     <View style={{
                                         flexDirection: 'row',
-                                        marginTop: 26,
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }}>
@@ -627,4 +898,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FreeCollectionScreen;
+export default PlanCollectionScreen;

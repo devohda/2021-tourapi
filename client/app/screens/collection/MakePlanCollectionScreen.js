@@ -27,7 +27,7 @@ import CalendarTexts from './CalendarTexts';
 
 export const navigationRef = React.createRef();
 
-const MakePlanDirectory = ({navigation}) => {
+const MakePlanCollectionScreen = ({navigation}) => {
 
     const {colors} = useTheme();
     const styles = StyleSheet.create({
@@ -97,7 +97,6 @@ const MakePlanDirectory = ({navigation}) => {
         }
     });
 
-    //자유보관함이므로 type === 0
     const toastRef = useRef();
     const refRBSheet = useRef();
 
@@ -417,7 +416,8 @@ const MakePlanDirectory = ({navigation}) => {
                                 // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
                                     // postCollections();
                                     navigation.setOptions({tabBarVisible: true});
-                                    navigation.goBack(null);
+                                    // navigation.goBack(null);
+                                    navigation.navigate('ShowPlanDir')
                                 // }
                             }}
                             // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
@@ -439,4 +439,4 @@ const MakePlanDirectory = ({navigation}) => {
 
 }
 
-export default MakePlanDirectory;
+export default MakePlanCollectionScreen;

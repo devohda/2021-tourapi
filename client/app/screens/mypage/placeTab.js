@@ -166,7 +166,7 @@ const PlaceTab = () => {
     )
 
     return (
-        <ScreenContainer backgroundColor={colors.backgroundColor}>
+        <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
             <ScreenContainerView flex={1}>
                 <View style={{
                     flexDirection: 'row',
@@ -200,7 +200,7 @@ const PlaceTab = () => {
                               keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
                 </SafeAreaView>
             </ScreenContainerView>
-        </ScreenContainer>
+        </View>
     );
 }
 

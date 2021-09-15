@@ -253,7 +253,7 @@ const CollectionTab = ({navigation}) => {
     }
 
     return (
-        <ScreenContainer backgroundColor={colors.backgroundColor}>
+        <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
             <ScreenContainerView flex={1}>
                 {/* 키워드 선택 */}
                 <View flexDirection="row" style={{alignItems: 'center', justifyContent: 'center', marginVertical: 4}}>
@@ -291,7 +291,7 @@ const CollectionTab = ({navigation}) => {
                           keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
                 />
             </ScreenContainerView>
-        </ScreenContainer>
+        </View>
     );
 }
 
