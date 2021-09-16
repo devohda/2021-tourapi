@@ -7,15 +7,16 @@ import {
     SafeAreaView,
     ScrollView,
     Dimensions,
-    Platform,
     TextInput,
     Pressable,
-    FlatList
+    FlatList,
+    Animated,
+    TouchableHighlight
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {Icon} from 'react-native-elements';
-import {Modal, Card} from '@ui-kitten/components';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 // import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
@@ -23,6 +24,8 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import { tipsList } from '../../contexts/TipsListContextProvider';
+import TipsList from './TipsList';
+
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
@@ -42,28 +45,33 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [tmpData, setTmpData] = tipsList();
     const [tmpPlaceData, setTmpPlaceData] = useState([]);
     const [visible, setVisible] = useState(false);
-    const [changedTip, setChangedTip] = useState({
-        index: 0,
-        tip : ''
-    });
 
     useEffect(() => {
-        setTmpData([
-            {
-                id: 1,
-                tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
-            }, {
-                id: 2,
-                tip: '두번째 팁'
-            }
-        ], [
-            {
-                id: 1,
-                tip: '우와',
-            }, {
-                id: 2,
-                tip: '두번째 팁'
-            }
+        setTmpData([{
+            day: 1,
+            places : [
+                {
+                    id: 1,
+                    tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
+                },
+                {
+                    id: 2,
+                    tip: '두번째 팁'
+                }
+            ]
+        }, {
+            day: 2,
+            places: [
+                {
+                    id: 1,
+                    tip: '와웅',
+                },
+                {
+                    id: 2,
+                    tip: '두번째 팁'
+                }  
+            ]
+        }
         ]);
         // getInitialData();
     }, []);
@@ -192,22 +200,54 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const ShowPlans = ({item, index}) => {
+    const rowSwipeAnimatedValues = {};
+    Array(20)
+    .fill('')
+    .forEach((_, i) => {
+        rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
+    });
+
+    const ShowDays = ({item, index}) => {
+        const idx = index;
         return (
             <>
             <View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <View>
-                        <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {item.id}</AppText>
+                        <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {item.day}</AppText>
                     </View>
                     <View style={{marginStart: 8}}>
                         <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '400'}}>2021.09.21</AppText>
                     </View>
                 </View>
             </View>
-            <FlatList data={tmpData} renderItem={ShowPlaces}
-            keyExtractor={(item) => item.id.toString()}
-            nestedScrollEnabled/>
+            {/* <FlatList data={item.places} renderItem={({item, index}) => <ShowPlaces day={idx} item={item} index={index}/>}
+            keyExtractor={(item, idx) => {idx.toString();}}
+            nestedScrollEnabled/> */}
+            <SwipeListView
+                data={item.places}
+                renderItem={({item, index}) => <ShowPlaces day={idx} item={item} index={index}/>}
+                keyExtractor={(item, idx) => {idx.toString()}}
+                key={(item, idx) => {idx.toString()}}
+                renderHiddenItem={(item, rowMap) => {
+                    return (
+                    <View style={styles.rowBack} key={item.index}>
+                    <TouchableOpacity
+                        style={[styles.backRightBtn, styles.backRightBtnRight]}
+                        onPress={() => deleteRow(rowMap, item.index)}
+                    >
+                        <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                    </TouchableOpacity>
+                </View>
+                )}}
+                rightOpenValue={-75}
+                previewRowKey={'0'}
+                previewOpenDelay={3000}
+                disableRightSwipe={true}
+                closeOnRowOpen={true}
+                closeOnRowPress={true}
+                nestedScrollEnabled
+            />
             <TouchableOpacity onPress={() => {
                 // if(isLimited) setIsLimited(false);
                 // else setIsLimited(true);
@@ -243,8 +283,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         )
     }
 
-    const ShowPlaces = ({item, index}) => {
-        console.log(item)
+    const ShowPlaces = props => {
         return (
             <>
                 {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
@@ -255,8 +294,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     marginVertical: 13
                 }}></View>} */}
                 {/* pk로 바꾸기 */}
-
-                <View>
+                <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
+                <View flex={1}>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4}}>
                         <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
                             <View style={{flexDirection: 'row', width: '90%'}}>
@@ -264,7 +303,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                            {item.id}    
+                                            {props.item.id}    
                                         </AppText>
                                     </View>
                                 </View>
@@ -347,12 +386,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             }}> */}
                             <TouchableOpacity>
                                 <Jewel width={26} height={21}
-                                    style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
+                                    style={{color: isPress[props.index] ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity>
                         </View>
                     </View>
                     {
-                        item.id === 2 ?
+                        props.item.id === 2 ?
                         <>
                         <View style={{
                             backgroundColor: colors.defaultColor,
@@ -375,64 +414,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 <BackIcon width={10} height={14} style={{color: colors.mainColor, transform: [{rotate: '180deg'}], width: 4, height: 8}}/>
                             </View>
                         </View>
-                        <TouchableOpacity onPress={() => setVisible(true)}>
-                            <View style={{
-                                backgroundColor: colors.defaultColor,
-                                height: 30,
-                                paddingVertical: 6,
-                                paddingLeft: 6,
-                                paddingRight: 5,
-                                marginBottom: 6,
-                                marginRight: 10,
-                                marginTop: 4,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginLeft: 36
-                            }}>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={require('../../assets/images/tipIcon.png')}
-                                        style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                                    <AppText style={{color: colors.blue[1], fontSize: 14}}>{item.tip}</AppText>
-                                </View>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image style={{width: 28, height: 28}}
-                                        source={require('../../assets/images/default_profile_2.png')}></Image>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                        {/* independent rendering 필요 */}
-                        <Modal
-                            visible={visible}
-                            backdropStyle={{backgroundColor: 'rbga(0,0,0,0.5)'}}
-                            style={{backgroundColor: colors.defaultColor, borderWidth: 0, width: '30%'}}
-                            onBackdropPress={() => setVisible(false)}
-                        >
-                            <Card disabled={true}>
-                                <TextInput placeholder={item.tip} onChangeText={(text)=>{
-                                    const newArr = [...changedTip];
-                                    newArr.index = index;
-                                    newArr.tip = text;
-                                    setChangedTip(newArr);
-                                }}></TextInput>
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <TouchableOpacity onPress={() => {setVisible(false)}}>
-                                        <View style={{height: 20, borderRadius: 10, backgroundColor: colors.gray[6]}}>
-                                            <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 12}}>취소</AppText>
-                                        </View>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => {
-                                        const newArr = [...tmpData];
-                                        newArr[changedTip.index].tip = changedTip.tip;
-                                        setTmpData(newArr);
-                                        setVisible(false)}}>
-                                        <View style={{height: 20, borderRadius: 10, backgroundColor: colors.mainColor}}>
-                                            <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 12}}>확인</AppText>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            </Card>
-                        </Modal>
+
+                        <TipsList data={props.item} idx={props.index} day={props.day}/>
+
                         <TouchableOpacity onPress={() => {
                                     // if(isLimited) setIsLimited(false);
                                     // else setIsLimited(true);
@@ -454,30 +438,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </TouchableOpacity>
                         </> :
                         <>
-                        <View style={{
-                            backgroundColor: colors.defaultColor,
-                            height: 30,
-                            paddingVertical: 6,
-                            paddingLeft: 6,
-                            paddingRight: 5,
-                            marginBottom: 6,
-                            marginRight: 10,
-                            marginTop: 4,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginLeft: 36
-                        }}>
-                            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                <Image source={require('../../assets/images/tipIcon.png')}
-                                    style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                                <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                            </View>
-                            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                <Image style={{width: 28, height: 28}}
-                                    source={require('../../assets/images/default_profile_2.png')}></Image>
-                            </View>
-                        </View>
+                        <TipsList data={props.item} idx={props.index} day={props.day}/>
                         <View style={{
                             height: 30,
                             paddingVertical: 6,
@@ -506,6 +467,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </>
                     }
                 </View>
+                </TouchableHighlight>
             </>
         );
     };
@@ -689,8 +651,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
                                         keyExtractor={(item) => item.place_pk.toString()}
                                         nestedScrollEnabled/> */}
-                                    <FlatList data={tmpData} renderItem={ShowPlans}
-                                        keyExtractor={(item) => item.id.toString()}
+                                    <FlatList data={tmpData} renderItem={ShowDays}
+                                        keyExtractor={(item, index) => index.toString()}
                                         nestedScrollEnabled/>
                                 </SafeAreaView>
                                 <TouchableOpacity onPress={() => {
@@ -895,6 +857,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: 5
+    },
+
+    //swipe style
+    rowBack: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+    },
+    backRightBtn: {
+        alignItems: 'center',
+        bottom: 0,
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        width: 75,
+    },
+    backRightBtnRight: {
+        backgroundColor: 'red',
+        right: 0,
     },
 });
 

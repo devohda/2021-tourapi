@@ -5,7 +5,6 @@ import AppText from '../../components/AppText';
 
 const CalendarTexts = props => {
     const {colors} = useTheme();
-    console.log(props.Date.date >= props.startDate + 'hi')
 
     return(
         <View>

@@ -7,14 +7,15 @@ import {
     SafeAreaView,
     ScrollView,
     Dimensions,
-    Platform,
     TextInput,
     Pressable,
-    FlatList
+    FlatList,
+    TouchableHighlight
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {Icon} from 'react-native-elements';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 // import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
@@ -23,6 +24,9 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
+import { tipsList } from '../../contexts/TipsListContextProvider';
+import TipsList from './TipsList';
+
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 
@@ -37,9 +41,20 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
+    const [tmpData, setTmpData] = tipsList();
 
     useEffect(() => {
         getInitialData();
+        setTmpData([
+            {
+                id: 1,
+                tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
+            },
+            {
+                id: 2,
+                tip: '두번째 팁'
+            }
+        ]);
     }, []);
 
     const getInitialData = () => {
@@ -169,7 +184,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const ShowPlaces = ({item, index}) => {
         return (
-            <>
+            <View style={{backgroundColor: colors.backgroundColor}}>
                 {item.place_pk !== collectionData.places[0].place_pk && <View style={{
                     width: '100%',
                     height: 1,
@@ -256,7 +271,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style={{
+                    {/* conditional 빼주기 */}
+                    {index < 2 && <TipsList data={item} idx={index}/>}
+                    {/* <View style={{
                         backgroundColor: colors.defaultColor,
                         height: 30,
                         paddingVertical: 6,
@@ -278,9 +295,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             <Image style={{width: 28, height: 28}}
                                 source={require('../../assets/images/default_profile_2.png')}></Image>
                         </View>
-                    </View>
+                    </View> */}
                 </View>
-            </>
+            </View>
         );
     };
 
@@ -460,9 +477,33 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                    <FlatList data={collectionData.places} renderItem={ShowPlaces}
+                                    <SwipeListView
+                                        data={collectionData.places}
+                                        renderItem={ShowPlaces}
                                         keyExtractor={(item) => item.place_pk.toString()}
-                                        nestedScrollEnabled/>
+                                        key={(item, idx) => {idx.toString()}}
+                                        renderHiddenItem={(item, rowMap) => {
+                                            return (
+                                            <View style={styles.rowBack} key={item.place_pk}>
+                                            <TouchableOpacity
+                                                style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                                onPress={() => deleteRow(rowMap, item.place_pk)}
+                                            >
+                                                <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                                            </TouchableOpacity>
+                                        </View>
+                                        )}}
+                                        rightOpenValue={-75}
+                                        previewRowKey={'0'}
+                                        previewOpenDelay={3000}
+                                        disableRightSwipe={true}
+                                        closeOnRowOpen={true}
+                                        closeOnRowPress={true}
+                                        nestedScrollEnabled
+                                    />
+                                    {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
+                                        keyExtractor={(item) => item.place_pk.toString()}
+                                        nestedScrollEnabled/> */}
 
                                 </SafeAreaView>
                                 <TouchableOpacity onPress={() => {
@@ -590,7 +631,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 const styles = StyleSheet.create({
     titles: {
         fontSize: 20,
-        // marginLeft: '5%',
         fontWeight: 'bold'
     },
     dirType: {
@@ -617,13 +657,33 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 50,
-
     },
     comment_box: {
         borderBottomWidth: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: 5
+    },
+    //swipe style
+    rowBack: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+    },
+    backRightBtn: {
+        alignItems: 'center',
+        bottom: 0,
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        width: 75,
+        marginTop: 13
+    },
+    backRightBtnRight: {
+        backgroundColor: 'red',
+        right: 0,
     },
 });
 
