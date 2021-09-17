@@ -10,6 +10,7 @@ import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionSc
 import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSetting from '../screens/settings/SystemSetting';
+import SearchScreenForPlan from '../screens/collection/SearchScreenForPlan';
 
 const MainStack = createStackNavigator();
 
@@ -23,6 +24,7 @@ const AppNavigator = () => {
                 <>
                     <MainStack.Screen name="App" children={({navigation}) => <HomeNavigator navigation={navigation}/>}/>
                     <MainStack.Screen name="Search" component={SearchScreen} />
+                    <MainStack.Screen name="SearchForPlan" component={SearchScreenForPlan} />
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
                     <MainStack.Screen name="PlanCollection" component={MakePlanCollectionScreen} />
                     <MainStack.Screen name="FreeCollection" component={MakeFreeCollectionScreen}/>

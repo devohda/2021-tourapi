@@ -11,31 +11,33 @@ import {
     Pressable,
     FlatList,
     Animated,
-    TouchableHighlight
+    TouchableHighlight,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {Icon} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
-
 // import MapView, {Marker} from 'react-native-maps';
+
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import { tipsList } from '../../contexts/TipsListContextProvider';
 import TipsList from './TipsList';
+import DragAndDropList from './DragAndDropList';
 
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
+import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
 const windowWidth = Dimensions.get('window').width;
+const {width} = Dimensions.get('window');
 
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    // const {data} = route.params;
     const [userData, setUserData] = useIsUserData();
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
@@ -45,6 +47,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [tmpData, setTmpData] = tipsList();
     const [tmpPlaceData, setTmpPlaceData] = useState([]);
     const [visible, setVisible] = useState(false);
+    const [isEditPage, setIsEditPage] = useState(false);
 
     useEffect(() => {
         setTmpData([{
@@ -174,6 +177,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
       borderBottomColor: #C5C5C5;
       paddingBottom: 11px;
     `;
+
     const Keyword = ({item}) => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
@@ -207,47 +211,66 @@ const PlanCollectionScreen = ({route, navigation}) => {
         rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
     });
 
+
+    const SwipeList = props => (
+        <SwipeListView
+            data={props.item.places}
+            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index}/>}
+            keyExtractor={(item, idx) => {idx.toString()}}
+            key={(item, idx) => {idx.toString()}}
+            renderHiddenItem={(item, rowMap) => {
+                return (
+                <View style={{...styles.rowBack, backgroundColor: colors.red[1]}} key={item.index}>
+                    <TouchableOpacity
+                        style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
+                        onPress={() => deleteRow(rowMap, item.index)}
+                    >
+                        <View>
+                            <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            )}}
+            rightOpenValue={-75}
+            previewRowKey={'0'}
+            previewOpenDelay={3000}
+            disableRightSwipe={true}
+            disableLeftSwipe={isEditPage ? true : false}
+            closeOnRowOpen={true}
+            closeOnRowPress={true}
+            nestedScrollEnabled
+        />
+    )
+
+    const EditList = props => (
+        <DragAndDropList />
+    )
+
     const ShowDays = ({item, index}) => {
         const idx = index;
         return (
             <>
             <View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View>
-                        <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {item.day}</AppText>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <View>
+                            <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {item.day}</AppText>
+                        </View>
+                        <View style={{marginStart: 8}}>
+                            <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '400'}}>2021.09.21</AppText>
+                        </View>
                     </View>
-                    <View style={{marginStart: 8}}>
-                        <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '400'}}>2021.09.21</AppText>
+                    <View>
+                    <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {data : item})}>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
+                        </View>
+                    </TouchableOpacity>
                     </View>
                 </View>
             </View>
-            {/* <FlatList data={item.places} renderItem={({item, index}) => <ShowPlaces day={idx} item={item} index={index}/>}
-            keyExtractor={(item, idx) => {idx.toString();}}
-            nestedScrollEnabled/> */}
-            <SwipeListView
-                data={item.places}
-                renderItem={({item, index}) => <ShowPlaces day={idx} item={item} index={index}/>}
-                keyExtractor={(item, idx) => {idx.toString()}}
-                key={(item, idx) => {idx.toString()}}
-                renderHiddenItem={(item, rowMap) => {
-                    return (
-                    <View style={styles.rowBack} key={item.index}>
-                    <TouchableOpacity
-                        style={[styles.backRightBtn, styles.backRightBtnRight]}
-                        onPress={() => deleteRow(rowMap, item.index)}
-                    >
-                        <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                    </TouchableOpacity>
-                </View>
-                )}}
-                rightOpenValue={-75}
-                previewRowKey={'0'}
-                previewOpenDelay={3000}
-                disableRightSwipe={true}
-                closeOnRowOpen={true}
-                closeOnRowPress={true}
-                nestedScrollEnabled
-            />
+            {!isEditPage ? <SwipeList item={item} idx={idx}/> : <EditList />}
             <TouchableOpacity onPress={() => {
                 // if(isLimited) setIsLimited(false);
                 // else setIsLimited(true);
@@ -297,7 +320,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1}>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4}}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Place', {data: props.item})} disabled={isEditPage && true}>
                             <View style={{flexDirection: 'row', width: '90%'}}>
                                 {/* <Image source={{uri: item.place_img}} */}
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
@@ -384,10 +407,16 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     likePlace(item.place_pk);
                                 }
                             }}> */}
-                            <TouchableOpacity>
-                                <Jewel width={26} height={21}
-                                    style={{color: isPress[props.index] ? colors.red[3] : colors.red_gray[5]}}/>
-                            </TouchableOpacity>
+                            {
+                                !isEditPage ?
+                                <TouchableOpacity>
+                                    <Jewel width={26} height={21}
+                                        style={{color: isPress[props.index] ? colors.red[3] : colors.red_gray[5]}}/>
+                                </TouchableOpacity> :
+                                <TouchableOpacity>
+                                    <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
+                                </TouchableOpacity>
+                            }
                         </View>
                     </View>
                     {
@@ -439,35 +468,40 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </> :
                         <>
                         <TipsList data={props.item} idx={props.index} day={props.day}/>
-                        <View style={{
-                            height: 30,
-                            paddingVertical: 6,
-                            paddingLeft: 6,
-                            paddingRight: 5,
-                            marginBottom: 6,
-                            marginRight: 10,
-                            marginTop: 4,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginLeft: 36
-                        }}>
-                            <View style={{
-                                width: '90%',
-                                borderStyle: 'dotted',
-                                borderRadius: 1,
-                                borderWidth: 1,
-                                borderColor: colors.gray[4],
-                                zIndex: -1000
-                                }}></View>
-                            <View style={{marginStart: 6}}>
-                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>12PM</AppText>
-                            </View>
-                        </View>
                         </>
                     }
                 </View>
                 </TouchableHighlight>
+                {/* 받은 데이터를 이용해서 같은 성격의 데이터처럼 넣어야할것같음 */}
+                {/* {
+                    props.index === 0 &&
+                    <View style={{
+                        height: 30,
+                        paddingVertical: 6,
+                        paddingLeft: 6,
+                        paddingRight: 15,
+                        paddingBottom: 6,
+                        paddingTop: 4,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginLeft: 36,
+                        backgroundColor: colors.backgroundColor
+                    }}>
+                        <View style={{
+                            width: '90%',
+                            borderStyle: 'dotted',
+                            borderRadius: 1,
+                            borderWidth: 1,
+                            borderColor: colors.gray[4],
+                            zIndex: -1000
+                        }}></View>
+                        <View style={{marginStart: 6}}>
+                            <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>12PM</AppText>
+                        </View>
+                    </View>
+                } */}
+
             </>
         );
     };
@@ -476,56 +510,59 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {showMenu && (
-                <View style={{
-                    position: 'absolute',
-                    width: 80,
-                    height: 80,
-                    top: 50,
-                    right: 60,
-                    backgroundColor: '#fff',
-                    flex: 1,
-                    borderRadius: 10,
-                    zIndex: 100000000,
-
-                    shadowColor: '#000',
-                    shadowOffset: {
-                        width: 0,
-                        height: 2,
-                    },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    elevation: 5,
-
-                    overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // 수정 코드
-                        }}
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}><AppText>수정</AppText>
-                    </TouchableOpacity>
+            {
+                showMenu && (
                     <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
-                    }}></View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // 삭제 코드
-                        }}
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}><AppText>삭제</AppText></TouchableOpacity>
-                </View>
-            )}
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        top: 50,
+                        right: 60,
+                        backgroundColor: '#fff',
+                        flex: 1,
+                        borderRadius: 10,
+                        zIndex: 100000000,
+    
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+    
+                        overflow: 'visible'
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setIsEditPage(true);
+                                setShowMenu(state => !state);
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>수정</AppText>
+                        </TouchableOpacity>
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(state => !state);
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>삭제</AppText></TouchableOpacity>
+                    </View>
+                )
+            }
 
             <View flexDirection="row" style={{
                 height: 24,
@@ -540,12 +577,22 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
-                <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                        style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
-                        <MoreIcon style={{color: colors.mainColor}}/>
-                    </TouchableOpacity>
-                </View>
+                {
+                    !isEditPage ?
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                            style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                            <MoreIcon style={{color: colors.mainColor}}/>
+                        </TouchableOpacity>
+                    </View> :
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
+                            <View>
+                                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                }
             </View>
 
             <ScrollView>
@@ -640,12 +687,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         <AppText style={{color: colors.gray[4]}}>총 <AppText
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
-                                    <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
-                                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                            <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
-                                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
-                                        </View>
-                                    </TouchableOpacity>
                                 </View>
                                 <SafeAreaView>
                                     {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
@@ -861,24 +902,43 @@ const styles = StyleSheet.create({
 
     //swipe style
     rowBack: {
-        alignItems: 'center',
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingLeft: 15,
+        alignItems: 'center',
+        height: '100%'
     },
     backRightBtn: {
         alignItems: 'center',
-        bottom: 0,
         justifyContent: 'center',
         position: 'absolute',
-        top: 0,
         width: 75,
+        right: 0
     },
-    backRightBtnRight: {
-        backgroundColor: 'red',
-        right: 0,
+
+    //drag and sort style
+    container: {
+        flex: 1,
+        backgroundColor: '#f0f0f0',
     },
+    item: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    item_children: {
+        backgroundColor: '#ffffff',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    item_icon: {
+        marginLeft: 15,
+        resizeMode: 'contain',
+    },
+    item_text: {
+        marginRight: 55,
+        color: 'black'
+    }
 });
 
 export default PlanCollectionScreen;

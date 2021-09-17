@@ -1,21 +1,23 @@
 import React, {useState, useEffect} from "react";
 import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from "react-native";
-import ScreenContainer from "../components/ScreenContainer";
+import ScreenContainer from "../../components/ScreenContainer";
 import {useTheme} from '@react-navigation/native';
-import NavigationTop from "../components/NavigationTop";
-import SearchIcon from "../assets/images/search-icon.svg"
-import ScreenContainerView from "../components/ScreenContainerView";
-import SearchTabNavigator from "../navigation/SearchTabNavigator";
-import ScreenDivideLine from "../components/ScreenDivideLine";
-import Star from "../assets/images/search/star.svg";
-import AppText from "../components/AppText";
-import SearchKeywordContextProvider, {searchKeyword} from "../contexts/SearchkeywordContextProvider";
+import NavigationTop from "../../components/NavigationTop";
+import SearchIcon from "../../assets/images/search-icon.svg"
+import ScreenContainerView from "../../components/ScreenContainerView";
+import ScreenDivideLine from "../../components/ScreenDivideLine";
+import Star from "../../assets/images/search/star.svg";
+import AppText from "../../components/AppText";
+import SearchKeywordContextProvider, {searchKeyword} from "../../contexts/SearchkeywordContextProvider";
+import SearchPlaceForPlan from "./SearchPlaceForPlan";
 
-const SearchScreen = ({route, navigation}) => {
+const SearchScreenForPlan = ({route, navigation}) => {
+    const {data} = route.params;
     const {colors} = useTheme();
     const [searchText, setSearchText] = useState('');
     const [keyword, setKeyword] = useState('');
     const [k, setK] = searchKeyword();
+    console.log(data);
 
     const styles = StyleSheet.create({
         search_box: {
@@ -86,7 +88,7 @@ const SearchScreen = ({route, navigation}) => {
     const RecommendedPlace = (props) => {
         return (
             <View style={{marginRight: 8}}>
-                <Image source={require('../assets/images/mountain.jpeg')}
+                <Image source={require('../../assets/images/mountain.jpeg')}
                        style={{width: 141, height: 101, borderRadius: 10}}/>
                 <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -122,10 +124,10 @@ const SearchScreen = ({route, navigation}) => {
                     height: 162,
                     width: 162,
                 }}>
-                    <Image source={require('../assets/images/flower.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/mountain.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/autumn.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/sea.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../../assets/images/flower.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../../assets/images/mountain.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../../assets/images/autumn.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../../assets/images/sea.jpeg')} style={{width: 81, height: 81}}/>
                 </View>
                 <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
                     <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
@@ -161,7 +163,8 @@ const SearchScreen = ({route, navigation}) => {
                     {
                         keyword === '' ?
                         <RecommendedDefault /> :
-                        <SearchTabNavigator navigation={navigation} />
+                        // <SearchTabNavigator navigation={navigation} />
+                        <SearchPlaceForPlan navigation={navigation} />
                     }
                 </ScreenContainerView>
 
@@ -206,4 +209,4 @@ const SearchScreen = ({route, navigation}) => {
     )
 };
 
-export default SearchScreen;
+export default SearchScreenForPlan;
