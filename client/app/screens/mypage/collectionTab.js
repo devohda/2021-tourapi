@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import AppText from '../../components/AppText';
 import {Icon} from 'react-native-elements';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 const CollectionTab = ({navigation}) => {
 
-    const [userData, setUserData] = useIsUserData();
+    const [token, setToken] = useToken();
     const [collectionList, setCollectionList] = useState({});
     const [selectedDirType, setSelectedDirType] = useState(1);
     const [directoryType, setDirectoryType] = useState([
@@ -144,14 +144,12 @@ const CollectionTab = ({navigation}) => {
     const getCollectionsFromUsers = () => {
         try {
             fetch('http://34.146.140.88/collection/list', {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
-                body: JSON.stringify({
-                    userId: userData.user_pk
-                })
             }).then((res) => res.json())
                 .then(({data}) => {
                     setCollectionList(data);

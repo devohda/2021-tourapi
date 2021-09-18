@@ -8,7 +8,6 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    FlatList
 } from 'react-native';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -17,12 +16,13 @@ import {useTheme} from '@react-navigation/native';
 import CustomTextInput from '../../components/CustomTextInput';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import AppText from '../../components/AppText';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 export const navigationRef = React.createRef();
 
 const MakeFreeCollectionScreen = ({navigation}) => {
 
+    const [token, setToken] = useToken();
     const {colors} = useTheme();
     const styles = StyleSheet.create({
         plusComplete: {
@@ -104,7 +104,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
-    const [userData, setUserData] = useIsUserData();
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
@@ -120,7 +119,8 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
                     collectionData : {
@@ -129,7 +129,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         description: null,
                         type: 0,
                     },
-                    userId : userData.user_pk,
                     keywords: datas
                 })
             }).then((res) => res.json())

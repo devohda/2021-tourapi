@@ -19,25 +19,25 @@ import {Icon} from 'react-native-elements';
 // import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
-import NavigationTop from '../../components/NavigationTop';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
 const FreeCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const {data} = route.params;
-    const [userData, setUserData] = useIsUserData();
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
+
+    const [token, setToken] = useToken();
 
     useEffect(() => {
         getInitialData();
@@ -46,21 +46,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const getInitialData = () => {
         try {
             fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
-                body: JSON.stringify({
-                    userId: userData.user_pk,
-                })
             }).then((res) => res.json())
                 .then((response) => {
                     setCollectionData(response.data);
                     setPlaceLength(response.data.places.length);
                     setFalse();
-                    setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
-
+                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -71,10 +68,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const checkTrue = () => {
-        if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
-        return true;
-    };
+    // const checkTrue = () => {
+    //     if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+    //     return true;
+    // };
 
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
@@ -91,10 +88,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
-                    userId: userData.user_pk,
                     placeId: pk,
                 })
             }).then((res) => res.json())
@@ -116,10 +113,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
-                    userId: userData.user_pk,
                     placeId: pk,
                 })
             }).then((res) => res.json())
@@ -398,22 +395,22 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 color: colors.mainColor
                             }}>{data.collection_name}</AppText>
                         </View>
-                        {
-                            userData.user_pk !== data.user_pk &&
-                            <View style={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                marginTop: 20
-                            }}>
-                                <Image source={require('../../assets/images/here_click.png')}
-                                    style={{width: 26, height: 21, marginBottom: 2}}></Image>
-                                <AppText style={{
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    color: colors.red[3]
-                                }}>1,820</AppText>
-                            </View>
-                        }
+                        {/*{*/}
+                        {/*    userData.user_pk !== data.user_pk &&*/}
+                        {/*    <View style={{*/}
+                        {/*        justifyContent: 'center',*/}
+                        {/*        alignItems: 'center',*/}
+                        {/*        marginTop: 20*/}
+                        {/*    }}>*/}
+                        {/*        <Image source={require('../../assets/images/here_click.png')}*/}
+                        {/*            style={{width: 26, height: 21, marginBottom: 2}}></Image>*/}
+                        {/*        <AppText style={{*/}
+                        {/*            fontSize: 10,*/}
+                        {/*            fontWeight: '700',*/}
+                        {/*            color: colors.red[3]*/}
+                        {/*        }}>1,820</AppText>*/}
+                        {/*    </View>*/}
+                        {/*}*/}
                     </View>
                     <View style={{marginTop: '10%'}}>
                         <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}} flex={1}>
@@ -556,7 +553,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     placeholderTextColor={colors.gray[5]} />
                                 <Pressable style={{marginLeft: 5}}>
                                     <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
-                                    name={"pencil"} size={16}></Icon>
+                                        name={'pencil'} size={16}></Icon>
                                 </Pressable>
                             </View>
                         </View>

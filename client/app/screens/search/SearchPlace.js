@@ -35,7 +35,7 @@ const SearchPlace = ({navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -62,10 +62,10 @@ const SearchPlace = ({navigation}) => {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
-                    userId: userData.user_pk,
                     placeId: pk,
                 })
             }).then((res) => res.json())
@@ -88,10 +88,10 @@ const SearchPlace = ({navigation}) => {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
-                    userId: userData.user_pk,
                     placeId: pk,
                 })
             }).then((res) => res.json())

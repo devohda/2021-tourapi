@@ -4,13 +4,10 @@ import ScreenContainer from '../components/ScreenContainer';
 import MyPageNavigation from '../navigation/MypageNavigator';
 import {useTheme} from '@react-navigation/native';
 import AppText from '../components/AppText';
-import {useIsUserData} from '../contexts/UserDataContextProvider';
 import SettingsIcon from '../assets/images/settings-icon.svg';
 
 const MyPageScreen = ({navigation}) => {
     const {colors} = useTheme();
-    const [userData, setUserData] = useIsUserData();
-    console.log(userData);
 
     const styles = StyleSheet.create({
         myPageHashtag: {
@@ -93,7 +90,7 @@ const MyPageScreen = ({navigation}) => {
                                 color: colors.mainColor,
                             }}
                         >
-                            {userData.user_nickname}
+                            {/*{userData.user_nickname}*/}
                         </AppText>
                         <View
                             style={{

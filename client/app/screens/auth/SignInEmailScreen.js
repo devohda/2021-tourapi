@@ -5,7 +5,6 @@ import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import ScreenContainer from '../../components/ScreenContainer';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
@@ -46,7 +45,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            let url = 'http://localhost:3000/auth/loginJWT';
+            let url = 'http://34.146.140.88/auth/loginJWT';
             let options = {
                 method: 'POST',
                 mode: 'cors',
