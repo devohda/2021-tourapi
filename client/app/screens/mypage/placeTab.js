@@ -1,10 +1,10 @@
-import {useTheme} from "@react-navigation/native";
-import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
-import React, {useState} from "react";
-import AppText from "../../components/AppText";
-import {Icon} from "react-native-elements";
-import ScreenContainer from "../../components/ScreenContainer";
-import ScreenContainerView from "../../components/ScreenContainerView";
+import {useTheme} from '@react-navigation/native';
+import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
+import AppText from '../../components/AppText';
+import {Icon} from 'react-native-elements';
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
 
 const PlaceTab = () => {
     const {colors} = useTheme();
@@ -94,7 +94,7 @@ const PlaceTab = () => {
             textAlignVertical: 'center',
             marginVertical: 2
         },
-    })
+    });
 
     const [placeList, setPlaceList] = useState({});
 
@@ -104,7 +104,7 @@ const PlaceTab = () => {
     //
     // const getLikesFromUsers = () => {
     //     try {
-    //         fetch('http://34.146.140.88/place/like', {
+    //         fetch('http://localhost:3000/place/like', {
     //             method: 'GET',
     //             headers: {
     //                 'Accept': 'application/json',
@@ -129,7 +129,7 @@ const PlaceTab = () => {
             <View style={{alignItems: 'center'}}>
                 <View style={{marginEnd: 8}}>
                     <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                 style={{width: 163, height: 113, borderRadius: 10}}></Image></View>
+                        style={{width: 163, height: 113, borderRadius: 10}}></Image></View>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
                         {/* //TODO 리스트화 할필요 있음 */}
                         <AppText style={{
@@ -140,7 +140,7 @@ const PlaceTab = () => {
                         <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6,}}>|</AppText>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                             <Image source={require('../../assets/images/here_icon.png')}
-                                   style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
+                                style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
                             <AppText style={{color: colors.mainColor, fontSize: 10}}>{item.like_score}</AppText>
                         </View>
                     </View>
@@ -163,7 +163,7 @@ const PlaceTab = () => {
             </View>
         </View>
 
-    )
+    );
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -176,19 +176,19 @@ const PlaceTab = () => {
                     <View flexDirection="row">
                         <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
                         <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                              name={"chevron-down-outline"} size={16}></Icon>
+                            name={'chevron-down-outline'} size={16}></Icon>
                     </View>
 
                     <View flexDirection="row">
                         <View flexDirection="row">
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                  name={"funnel"} size={13}></Icon>
+                                name={'funnel'} size={13}></Icon>
                             <AppText style={{color: colors.mainColor}}>필터</AppText>
                         </View>
                         <View style={{marginHorizontal: 10}}><AppText style={{color: colors.gray[5]}}>|</AppText></View>
                         <View flexDirection="row">
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                  name={"pencil"} size={13}></Icon>
+                                name={'pencil'} size={13}></Icon>
                             <AppText style={{color: colors.mainColor}}>편집</AppText>
                         </View>
                     </View>
@@ -196,12 +196,12 @@ const PlaceTab = () => {
 
                 <SafeAreaView>
                     <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
-                              data={placeList} renderItem={PlaceContainer}
-                              keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
+                        data={placeList} renderItem={PlaceContainer}
+                        keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
                 </SafeAreaView>
             </ScreenContainerView>
         </ScreenContainer>
     );
-}
+};
 
 export default PlaceTab;

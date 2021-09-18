@@ -45,7 +45,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            let url = 'http://34.146.140.88/auth/loginJWT';
+            let url = 'http://localhost:3000/auth/loginJWT';
             let options = {
                 method: 'POST',
                 mode: 'cors',

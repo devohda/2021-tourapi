@@ -21,7 +21,7 @@ const SearchCollection = ({navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=collection`, {
+            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=collection`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

@@ -37,7 +37,7 @@ const CollectionTab = ({navigation}) => {
 
     useEffect(() => {
         getCollectionsFromUsers();
-    });
+    },[]);
 
     const {colors} = useTheme();
     const styles = StyleSheet.create({
@@ -143,7 +143,7 @@ const CollectionTab = ({navigation}) => {
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch('http://34.146.140.88/collection/list', {
+            fetch('http://localhost:3000/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -166,7 +166,7 @@ const CollectionTab = ({navigation}) => {
     const showDirectories = ({item}) => (
 
         <TouchableOpacity style={styles.directoryContainer} onPress={() => {
-            navigation.navigate('MakeFreeCollection', {data : item});
+            navigation.navigate('FreeCollection', {data : item});
         }}>
             <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                 <View style={{height: '68%'}}>
