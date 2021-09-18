@@ -3,36 +3,20 @@ const authService = require('../services/authService');
 
 exports.verifyToken = async (req, res, next) => {
     try {
-        const {tokens} = req.cookies;
-        const decodedAccessToken = jwt.verify(tokens.accessToken, process.env.JWT_SECRET);
-        if(decodedAccessToken){
-            const savedTokens = await authService.readUserTokenByUserPk(decodedAccessToken.user_pk);
-            if(savedTokens.accessToken === tokens.accessToken && savedTokens.refreshToken === tokens.refreshToken){
-                res.locals.user = decodedAccessToken.user;
-            }else{
-                return res.status(401).json({
-                    code: 401,
-                    message: '유효하지 않은 토큰'
-                });
-            }
-        }else{
-            const decodedRefreshToken = jwt.verify(tokens.refreshToken, process.env.JWT_SECRET);
-            if(decodedRefreshToken){
-                const savedTokens = await authService.readUserTokenByUserPk(decodedAccessToken.user_pk);
-                if(savedTokens.accessToken === tokens.accessToken && savedTokens.refreshToken === tokens.refreshToken){
-                    // refresh token 의 유효시간 = 200days
-                    const refreshToken = jwt.sign(decodedRefreshToken.user, process.env.JWT_SECRET, {expiresIn: 17280000000, issuer: 'here'});
+        const token = req.headers['x-access-token'];
+        if(!token){
+            return res.status(403).json({
+                code: 403,
+                message: '로그인하지 않은 유저'
+            });
+        }
 
-                    // access token 의 유효시간 = 30 minutes
-                    const accessToken = jwt.sign(decodedRefreshToken.user, process.env.JWT_SECRET, {expiresIn: 1800000, issuer: 'here'});
-
-
-                }else{
-                    return res.status(401).json({
-                        code: 401,
-                        message: '유효하지 않은 토큰'
-                    });
-                }
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        if(decodedToken){
+            const [access_token] = await authService.readUserTokenByUserPk(decodedToken.user_pk);
+            if(access_token === token){
+                res.locals.user = decodedToken.user;
+                return next();
             }else{
                 return res.status(401).json({
                     code: 401,
@@ -40,7 +24,6 @@ exports.verifyToken = async (req, res, next) => {
                 });
             }
         }
-        return next();
     } catch (err) {
 
         // 유효 기간 초과
@@ -50,6 +33,7 @@ exports.verifyToken = async (req, res, next) => {
                 message: '토큰 만료'
             });
         }
+
         return res.status(401).json({
             code: 401,
             message: '유효하지 않은 토큰'

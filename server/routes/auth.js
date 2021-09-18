@@ -163,10 +163,9 @@ router.post('/loginJWT', async (req, res, next) => {
         }
 
         // jwt 토큰 발급.
-        const tokens = await authService.createToken(user);
-        res.cookie('tokens', tokens);
+        const accessToken = await authService.createToken(user);
 
-        return res.send({code: 200, state: 'SUCCESS', tokens});
+        return res.send({code: 200, state: 'SUCCESS', accessToken});
     } catch (err) {
         return res.send({code: 501, state: 'SERVER ERROR'});
     }
