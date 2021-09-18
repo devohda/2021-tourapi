@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import {
   Image,
-  Platform,
   StatusBar,
-  Text,
   useWindowDimensions,
   View,
+  FlatList
 } from 'react-native';
 import {
   SafeAreaProvider,
@@ -26,6 +25,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+
+import AppText from '../../components/AppText';
+import ShowPlaces from './ShowPlaces';
+import { colors } from 'react-native-elements';
 
 function clamp(value, lowerBound, upperBound) {
   'worklet';
@@ -62,18 +65,7 @@ function objectMove(object, from, to) {
 
   return newObject;
 }
-
-function listToObject(list) {
-  const values = Object.values(list);
-  const object = {};
-
-  for (let i = 0; i < values.length; i++) {
-    object[values[i].id] = i;
-  }
-
-  return object;
-}
-
+const DAFT_PUNK = 'Daft Punk';
 const ALBUM_COVERS = {
   DISCOVERY:
     'https://upload.wikimedia.org/wikipedia/en/a/ae/Daft_Punk_-_Discovery.jpg',
@@ -84,8 +76,6 @@ const ALBUM_COVERS = {
   RANDOM_ACCESS_MEMORIES:
     'https://upload.wikimedia.org/wikipedia/en/a/a7/Random_Access_Memories.jpg',
 };
-
-const DAFT_PUNK = 'Daft Punk';
 
 const SONGS = shuffle([
   {
@@ -174,6 +164,19 @@ const SONGS = shuffle([
   },
 ]);
 
+
+function listToObject(list) {
+  const values = Object.values(list);
+  const object = {};
+
+  for (let i = 0; i < values.length; i++) {
+    object[values[i].tip] = i;
+    // object[values[i].id] = i;
+  }
+
+  return object;
+}
+
 const SONG_HEIGHT = 70;
 const SCROLL_HEIGHT_THRESHOLD = SONG_HEIGHT;
 
@@ -197,7 +200,7 @@ function Song({ artist, cover, title }) {
           marginLeft: 10,
         }}
       >
-        <Text
+        <AppText
           style={{
             fontSize: 16,
             fontWeight: '600',
@@ -205,7 +208,7 @@ function Song({ artist, cover, title }) {
           }}
         >
           {title}
-        </Text>
+        </AppText>
 
         <Text style={{ fontSize: 12, color: 'gray' }}>{artist}</Text>
       </View>
@@ -213,22 +216,33 @@ function Song({ artist, cover, title }) {
   );
 }
 
-function MovableSong({
-  id,
-  artist,
-  cover,
-  title,
+function ListAnimation({
+  day,
+  index,
   positions,
   scrollY,
-  songsCount,
+  tip,
+  data,
+  dataCount,
+  isEditPage,
+  isPress,
 }) {
+// function ListAnimation({
+//   id,
+//   artist,
+//   cover,
+//   title,
+//   positions,
+//   scrollY,
+//   songsCount,
+// }) {
   const dimensions = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [moving, setMoving] = useState(false);
-  const top = useSharedValue(positions.value[id] * SONG_HEIGHT);
+  const top = useSharedValue(positions.value[tip] * SONG_HEIGHT);
 
   useAnimatedReaction(
-    () => positions.value[id],
+    () => positions.value[tip],
     (currentPosition, previousPosition) => {
       if (currentPosition !== previousPosition) {
         if (!moving) {
@@ -254,7 +268,7 @@ function MovableSong({
         scrollY.value + dimensions.height - SCROLL_HEIGHT_THRESHOLD
       ) {
         // Scroll down
-        const contentHeight = songsCount * SONG_HEIGHT;
+        const contentHeight = dataCount * SONG_HEIGHT;
         const containerHeight =
           dimensions.height - insets.top - insets.bottom;
         const maxScroll = contentHeight - containerHeight;
@@ -270,26 +284,26 @@ function MovableSong({
       const newPosition = clamp(
         Math.floor(positionY / SONG_HEIGHT),
         0,
-        songsCount - 1
+        dataCount - 1
       );
 
-      if (newPosition !== positions.value[id]) {
+      if (newPosition !== positions.value[tip]) {
         positions.value = objectMove(
           positions.value,
-          positions.value[id],
+          positions.value[tip],
           newPosition
         );
       }
     },
     onFinish() {
-      top.value = positions.value[id] * SONG_HEIGHT;
+      top.value = positions.value[tip] * SONG_HEIGHT;
       runOnJS(setMoving)(false);
     },
   });
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      position: 'absolute',
+      // position: 'absolute',
       left: 0,
       right: 0,
       top: top.value,
@@ -307,18 +321,20 @@ function MovableSong({
   return (
     <Animated.View style={animatedStyle}>
         <PanGestureHandler onGestureEvent={gestureHandler}>
-          <Animated.View style={{ maxWidth: '80%' }}>
-            <Song artist={artist} cover={cover} title={title} />
+          <Animated.View>
+            <ShowPlaces day={day} item={data} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />
+            {/* <Song artist={artist} cover={cover} title={title} /> */}
           </Animated.View>
         </PanGestureHandler>
     </Animated.View>
   );
 }
 
-const DragAndDropList = () => {
-  const positions = useSharedValue(listToObject(SONGS));
+const DragAndDropList = props => {
   const scrollY = useSharedValue(0);
   const scrollViewRef = useAnimatedRef();
+  const data = props.data;
+  const positions = useSharedValue(listToObject(data));
 
   useAnimatedReaction(
     () => scrollY.value,
@@ -341,24 +357,38 @@ const DragAndDropList = () => {
             style={{
               flex: 1,
               position: 'relative',
-              backgroundColor: 'white',
-            }}
-            contentContainerStyle={{
-              height: SONGS.length * SONG_HEIGHT,
+              backgroundColor: colors.backgroundColor,
             }}
           >
-            {SONGS.map((song) => (
-              <MovableSong
-                key={song.id}
-                id={song.id}
-                artist={song.artist}
-                cover={song.cover}
-                title={song.title}
+            {/* {data.map((item, index) => (
+              <ListAnimation
+                key={item.id}
+                day={props.idx}
+                index={index}
                 positions={positions}
                 scrollY={scrollY}
-                songsCount={SONGS.length}
+                data={item}
+                dataCount={data.length}
+                isEditPage={props.isEditPage}
+                isPress={props.isPress}
               />
-            ))}
+            ))} */}
+            <FlatList data={data} renderItem={({item, index}) =>
+              <ListAnimation
+                  key={item.id}
+                  day={props.idx}
+                  index={index}
+                  positions={positions}
+                  scrollY={scrollY}
+                  tip={item.tip}
+                  data={item}
+                  dataCount={data.length}
+                  isEditPage={props.isEditPage}
+                  isPress={props.isPress}
+                />}
+            keyExtractor={(item, idx) => {idx.toString();}}
+            nestedScrollEnabled
+            key={(item, idx) => {idx.toString();}}/>
           </Animated.ScrollView>
         </SafeAreaView>
       </SafeAreaProvider>
