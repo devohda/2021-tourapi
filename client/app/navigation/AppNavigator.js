@@ -10,6 +10,7 @@ import PlaceScreen from '../screens/PlaceScreen';
 import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
+import {useToken} from '../contexts/TokenContextProvider';
 
 import * as SecureStore from 'expo-secure-store';
 const MainStack = createStackNavigator();
@@ -17,21 +18,29 @@ const MainStack = createStackNavigator();
 
 const AppNavigator = () => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn(false);
+    const [token, setToken] = useToken(null);
 
     const getTokenAndLogin = async () => {
-        const tokens = await SecureStore.getItemAsync('tokens');
-        if(tokens){
-            console.log(tokens);
+        const accessToken = await SecureStore.getItemAsync('accessToken');
+        if(accessToken){
+            // 토큰 불러와서 전역 context 에 저장하기.
+            setToken(accessToken);
 
             // 토큰으로 정보 조회해서 로그인 됐으면 main으로 이동 아니면 그대로.
             setIsSignedIn(true);
+            return;
         }
+
+        // TODO 건너뛰기 한 경우에도 저장된 정보 불러오기
+        //  건너뛰기 주석 풀면 구현은 되나, 권한 처리가 안 되어서 나중에 주석 풀기!
+        // const isSignedIn = await SecureStore.getItemAsync('isSignedIn');
+        // if(isSignedIn){
+        //     setIsSignedIn(true);
+        // }
     };
 
     useEffect(() => {
         // 자동 로그인 기능
-
-        // 저장된 토큰 꺼내기
         getTokenAndLogin().catch(err => console.log(err));
     }, []);
 

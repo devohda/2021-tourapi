@@ -10,25 +10,13 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
 
-// jwt 토큰 refresh token 저장을 위한 암호화된 async storage
-// import SecureStore from 'expo-secure-store';
-//
-// async function save(key, value) {
-//     await SecureStore.setItemAsync(key, value);
-// }
-//
-//
-// await SecureStore.setItemAsync('secure_token','sahdkfjaskdflas$%^&');
-// const token = await SecureStore.getItemAsync('secure_token');
-// console.log(token); // output: sahdkfjaskdflas$%^&
-
+import * as SecureStore from 'expo-secure-store';
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [userData, setUserData] = useIsUserData();
     const [showPassword, setShowPassword] = useState(true);
 
     const {colors} = useTheme();
@@ -55,6 +43,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             paddingVertical: 11
         },
     });
+
     const signIn = async () => {
         try {
             let url = 'http://localhost:3000/auth/loginJWT';
@@ -83,7 +72,9 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                 Alert.alert('', '비밀번호가 올바르지 않습니다.');
                 break;
             case 'SUCCESS' :
-                alert(response.token);
+                await SecureStore.setItemAsync('accessToken', response.accessToken);
+                // console.log(await SecureStore.getItemAsync('accessToken'));
+                setIsSignedIn(true);
                 break;
             }
         } catch (e) {

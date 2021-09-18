@@ -5,6 +5,8 @@ import AppText from '../../components/AppText';
 import { Icon } from 'react-native-elements';
 import { searchKeyword } from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
+import * as SecureStore from 'expo-secure-store';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 const SearchCollection = (props, {navigation}) => {
     const {colors} = useTheme();
@@ -13,17 +15,20 @@ const SearchCollection = (props, {navigation}) => {
     const [like, setLike] = useState(false);
     const [keyword, setKeyword] = searchKeyword();
 
+    const [token, setToken] = useToken();
+
     useEffect(() => {
         getResults();
     }, [keyword]);
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
+            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token' : token
                 },
             }).then((res) => res.json())
                 .then((response) => {

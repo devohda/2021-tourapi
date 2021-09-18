@@ -1,14 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, {useState, useContext} from 'react';
 
-const UserDataContext = React.createContext(null);
+const TokenContext = React.createContext(null);
 
-const UserDataContextProvider = ({children}) => {
-    return(
-        <UserDataContext.Provider value={useState(false)}>
+const TokenContextProvider = ({children}) => {
+    return (
+        <TokenContext.Provider value={useState(false)}>
             {children}
-        </UserDataContext.Provider>
-    )
-}
+        </TokenContext.Provider>
+    );
+};
 
-export const useIsUserData = () => useContext(UserDataContext)
-export default UserDataContextProvider;
+export const useToken = () => useContext(TokenContext);
+export default TokenContextProvider;
