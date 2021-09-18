@@ -11,11 +11,13 @@ exports.verifyToken = async (req, res, next) => {
             });
         }
 
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-        if(decodedToken){
-            const [access_token] = await authService.readUserTokenByUserPk(decodedToken.user_pk);
+        const isTokenVerified = jwt.verify(token, process.env.JWT_SECRET);
+        if(isTokenVerified){
+            const decodedToken = jwt.decode(token);
+            const [{access_token}] = await authService.readUserTokenByUserPk(decodedToken.user_pk);
+
             if(access_token === token){
-                res.locals.user = decodedToken.user;
+                res.locals.user = decodedToken;
                 return next();
             }else{
                 return res.status(401).json({

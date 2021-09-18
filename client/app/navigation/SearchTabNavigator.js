@@ -1,21 +1,17 @@
-import React, {useEffect, useState, createContext} from "react";
-import { StyleSheet, Image, View, TouchableOpacity, Dimensions, SafeAreaView, FlatList } from "react-native";
-import AppText from "../components/AppText";
-import Star from "../assets/images/search/star.svg";
-import Jewel from '../assets/images/jewel.svg'
+import React from 'react';
+import { Dimensions } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
-import SearchCollection from '../screens/search/SearchCollection'
-import SearchPlace from '../screens/search/SearchPlace';
-import SearchUser from '../screens/search/SearchUser';
 import {useTheme} from '@react-navigation/native';
-import { searchKeyword } from '../contexts/SearchkeywordContextProvider';
 const Tab = createMaterialTopTabNavigator();
-const totalWidth = Dimensions.get("screen").width;
+const totalWidth = Dimensions.get('screen').width;
 
-var placeListLength = 0;
+import SearchPlace from '../screens/search/SearchPlace';
+import SearchCollection from '../screens/search/SearchCollection';
+import SearchUser from '../screens/search/SearchUser';
 
-const SearchTabNavigator = (props, {route, navigation}) => {
+
+const SearchTabNavigator = ({navigation}) => {
     const {colors} = useTheme();
     return (
         <Tab.Navigator
@@ -49,12 +45,12 @@ const SearchTabNavigator = (props, {route, navigation}) => {
                         borderRadius: 6,
                         height: 2
                     },
-                })
+                });
             }}
         >
-            <Tab.Screen name={`공간`} component={SearchPlace} initialParams={{navigation: props.navigation}}/>
-            <Tab.Screen name={`보관함`} component={SearchCollection} initialParams={{navigation: props.navigation}}/>
-            <Tab.Screen name={`유저`} component={SearchUser} initialParams={{navigation: props.navigation}}/>
+            <Tab.Screen name={'공간'} children={() => <SearchPlace navigation={navigation}/>}/>
+            <Tab.Screen name={'보관함'} children={() => <SearchCollection navigation={navigation}/>}/>
+            <Tab.Screen name={'유저'} children={() => <SearchUser navigation={navigation}/>}/>
         </Tab.Navigator>
     );
 };

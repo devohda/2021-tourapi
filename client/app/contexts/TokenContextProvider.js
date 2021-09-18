@@ -4,7 +4,7 @@ const TokenContext = React.createContext(null);
 
 const TokenContextProvider = ({children}) => {
     return (
-        <TokenContext.Provider value={useState(false)}>
+        <TokenContext.Provider value={useState(null)}>
             {children}
         </TokenContext.Provider>
     );

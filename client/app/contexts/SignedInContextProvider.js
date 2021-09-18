@@ -7,8 +7,8 @@ const SignedInContextProvider = ({children}) => {
         <SignedInContext.Provider value={useState(false)}>
             {children}
         </SignedInContext.Provider>
-    )
-}
+    ); 
+};
 
-export const useIsSignedIn = () => useContext(SignedInContext)
+export const useIsSignedIn = () => useContext(SignedInContext);
 export default SignedInContextProvider;

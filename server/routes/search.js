@@ -10,6 +10,9 @@ const {selectUserList} = require('../services/userService');
 router.get('/', verifyToken, async (req, res, next) => {
 
     const {keyword, type} = req.query;
+    const {user} = res.locals;
+    console.log(user);
+    console.log(keyword, type);
     let data;
 
     try {
