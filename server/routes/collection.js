@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 const collectionService = require('../services/collectionService');
+const {verifyToken} = require('../middleware/jwt');
 
 // 보관함 생성
-router.post('/', async (req, res, next) => {
-    const {collectionData, userId, keywords} = req.body;
-    const result = await collectionService.createCollection(collectionData, userId, keywords);
+router.post('/', verifyToken, async (req, res, next) => {
+    const {collectionData, keywords} = req.body;
+    const {user} = res.locals;
+    const result = await collectionService.createCollection(collectionData, user.user_pk, keywords);
 
     if (result) {
         return res.send({
@@ -22,10 +24,9 @@ router.post('/', async (req, res, next) => {
 });
 
 // 자유보관함
-router.post('/list', async (req, res, next) => {
-    const {userId} = req.body;
-
-    const result = await collectionService.readCollectionListForPlaceInsert(userId);
+router.get('/list', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionListForPlaceInsert(user.user_pk);
 
     if (result) {
         return res.send({
@@ -42,10 +43,10 @@ router.post('/list', async (req, res, next) => {
 });
 
 // 보관함 가져오기
-router.post('/:collectionId', async (req, res, next) => {
+router.get('/:collectionId', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
-    const {userId} = req.body;
-    const result = await collectionService.readCollection(userId, collectionId);
+    const {user} = res.locals;
+    const result = await collectionService.readCollection(user.user_pk, collectionId);
 
     if (result) {
         return res.send({
@@ -63,11 +64,11 @@ router.post('/:collectionId', async (req, res, next) => {
 
 
 // 보관함에 장소 추가하기
-router.post('/:collectionId/place', async (req, res, next) => {
+router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
-    const {userId} = req.body;
+    const {user} = res.locals;
 
-    const result = await collectionService.createPlaceToCollection(collectionId, userId);
+    const result = await collectionService.createPlaceToCollection(collectionId, user.user_pk);
 
     if (result.affectedRows === 1) {
         return res.send({
