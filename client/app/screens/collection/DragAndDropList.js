@@ -189,6 +189,7 @@ function ListAnimation({
 
 const DragAndDropList = props => {
   const Data = props.data;
+  console.log(Data)
   const positions = useSharedValue(listToObject(Data));
   const scrollY = useSharedValue(0);
   const scrollViewRef = useAnimatedRef();

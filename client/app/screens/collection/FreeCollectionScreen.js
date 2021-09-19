@@ -10,7 +10,8 @@ import {
     TextInput,
     Pressable,
     FlatList,
-    TouchableHighlight
+    Animated,
+    TouchableHighlight,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -25,6 +26,8 @@ import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import { tipsList } from '../../contexts/TipsListContextProvider';
 import TipsList from './TipsList';
+import ShowPlaces from './ShowPlaces';
+import DragAndDropList from './DragAndDropList';
 
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
@@ -41,6 +44,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
+    const [tmpPlaceData, setTmpPlaceData] = useState([]);
+    const [visible, setVisible] = useState(false);
+    const [isEditPage, setIsEditPage] = useState(false);
 
     const [token, setToken] = useToken();
 
@@ -178,181 +184,115 @@ const FreeCollectionScreen = ({route, navigation}) => {
             return '기타';
         }
     };
-
-
-    const ShowPlaces = ({item, index}) => {
-        return (
-            <View style={{backgroundColor: colors.backgroundColor}}>
-                {item.place_pk !== collectionData.places[0].place_pk && <View style={{
-                    width: '100%',
-                    height: 1,
-                    backgroundColor: colors.red_gray[6],
-                    zIndex: -1000,
-                    marginVertical: 13
-                }}></View>}
-
-                <View>
-                    <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
-                            <View style={{flexDirection: 'row', width: '90%'}}>
-                                <Image source={{uri: item.place_img}}
-                                    style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                <View style={{
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    flexDirection: 'row',
-                                    width: '78%'
-                                }}>
-                                    <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold'
-                                            }}>{checkType(item.place_type)}</AppText>
-                                            <AppText style={{
-                                                marginHorizontal: 4, color: colors.gray[7],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold'
-                                            }}>|</AppText>
-                                            <Image source={require('../../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                    marginTop: '1%'
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                marginLeft: 2
-                                            }}>4.8</AppText>
-                                        </View>
-                                        <View style={{width: '100%'}}>
-                                            <AppText style={{
-                                                fontSize: 16,
-                                                fontWeight: 'bold',
-                                                color: colors.mainColor,
-                                                marginVertical: 5,
-                                            }}>{item.place_name}</AppText>
-                                        </View>
-                                        <AppText
-                                            style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText>
-                                    </View>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            {/* {item.like_flag === 0 ?  */}
-                            <TouchableOpacity onPress={() => {
-                                let newArr = [...isPress];
-                                if (newArr[index]) {
-                                    newArr[index] = false;
-                                    setIsPress(newArr);
-                                    deletePlace(item.place_pk);
-                                } else {
-                                    // for(let i=0;i<newArr.length;i++) {
-                                    //     if(i == index) continue;
-                                    //     else newArr[i] = false;
-                                    // }
-                                    newArr[index] = true;
-                                    setIsPress(newArr);
-                                    likePlace(item.place_pk);
-                                }
-                            }}>
-                                <Jewel width={26} height={21}
-                                    style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    {/* conditional 빼주기 */}
-                    {index < 2 && <TipsList data={item} idx={index}/>}
-                    {/* <View style={{
-                        backgroundColor: colors.defaultColor,
-                        height: 30,
-                        paddingVertical: 6,
-                        paddingLeft: 6,
-                        paddingRight: 5,
-                        marginBottom: 6,
-                        marginRight: 10,
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image source={require('../../assets/images/tipIcon.png')}
-                                style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                            <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                        </View>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image style={{width: 28, height: 28}}
-                                source={require('../../assets/images/default_profile_2.png')}></Image>
-                        </View>
-                    </View> */}
-                </View>
+    
+    const rowSwipeAnimatedValues = {};
+    Array(20)
+    .fill('')
+    .forEach((_, i) => {
+        rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
+    });
+    const SwipeList = props => (
+        <SwipeListView
+            data={collectionData.places}
+            renderItem={ShowPlaces}
+            keyExtractor={(item) => item.place_pk.toString()}
+            key={(item, idx) => {idx.toString()}}
+            renderHiddenItem={(item, rowMap) => {
+                return (
+                <View style={styles.rowBack} key={item.place_pk}>
+                <TouchableOpacity
+                    style={[styles.backRightBtn, styles.backRightBtnRight]}
+                    onPress={() => deleteRow(rowMap, item.place_pk)}
+                >
+                    <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                </TouchableOpacity>
             </View>
-        );
-    };
+            )}}
+            rightOpenValue={-75}
+            previewRowKey={'0'}
+            previewOpenDelay={3000}
+            disableRightSwipe={true}
+            disableLeftSwipe={isEditPage ? true : false}
+            closeOnRowOpen={true}
+            closeOnRowPress={true}
+            nestedScrollEnabled
+        />
+    )
 
+    const EditList = props => (
+        <DragAndDropList data={props.item} idx={props.idx} isEditPage={isEditPage} isPress={isPress} />
+    )
+    
+    const ShowCollections = ({item, index}) => {
+        const idx = index;
+        return (
+            <>
+                {/* <SwipeList item={item} idx={idx} key={idx}/>
+                 : <EditList item={item} idx={idx} key={idx}/> */}
+                {isEditPage ?
+                    <AppText>hi</AppText>
+                 : <EditList item={item} idx={idx} key={idx}/>
+                }                
+            </>
+        )
+    }
     const [showMenu, setShowMenu] = useState(false);
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {showMenu && (
-                <View style={{
-                    position: 'absolute',
-                    width: 140,
-                    height: 80,
-                    top: 50,
-                    right: 60,
-                    backgroundColor: '#fff',
-                    flex: 1,
-                    borderRadius: 10,
-                    zIndex: 100000000,
-
-                    shadowColor: '#000',
-                    shadowOffset: {
-                        width: 0,
-                        height: 2,
-                    },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    elevation: 5,
-
-                    overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // 수정 코드
-                        }}
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}><AppText>수정</AppText>
-                    </TouchableOpacity>
+            {
+                showMenu && (
                     <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
-                    }}></View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // 삭제 코드
-                        }}
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}><AppText>삭제</AppText></TouchableOpacity>
-                </View>
-            )}
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        top: 50,
+                        right: 60,
+                        backgroundColor: '#fff',
+                        flex: 1,
+                        borderRadius: 10,
+                        zIndex: 100000000,
+    
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+    
+                        overflow: 'visible'
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setIsEditPage(true);
+                                setShowMenu(state => !state);
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>수정</AppText>
+                        </TouchableOpacity>
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(state => !state);
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>삭제</AppText></TouchableOpacity>
+                    </View>
+                )
+            }
 
             <View flexDirection="row" style={{
                 height: 24,
@@ -367,12 +307,22 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
-                <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                        style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
-                        <MoreIcon style={{color: colors.mainColor}}/>
-                    </TouchableOpacity>
-                </View>
+                {
+                    !isEditPage ?
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                            style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                            <MoreIcon style={{color: colors.mainColor}}/>
+                        </TouchableOpacity>
+                    </View> :
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
+                            <View>
+                                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                }
             </View>
 
             <ScrollView>
@@ -461,6 +411,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         <AppText style={{color: colors.gray[4]}}>총 <AppText
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
+                                    <SafeAreaView>
+                                    <FlatList data={collectionData.places} renderItem={ShowCollections}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        nestedScrollEnabled/>
+                                    </SafeAreaView>
                                     <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -475,34 +430,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                    <SwipeListView
-                                        data={collectionData.places}
-                                        renderItem={ShowPlaces}
-                                        keyExtractor={(item) => item.place_pk.toString()}
-                                        key={(item, idx) => {idx.toString()}}
-                                        renderHiddenItem={(item, rowMap) => {
-                                            return (
-                                            <View style={styles.rowBack} key={item.place_pk}>
-                                            <TouchableOpacity
-                                                style={[styles.backRightBtn, styles.backRightBtnRight]}
-                                                onPress={() => deleteRow(rowMap, item.place_pk)}
-                                            >
-                                                <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                                            </TouchableOpacity>
-                                        </View>
-                                        )}}
-                                        rightOpenValue={-75}
-                                        previewRowKey={'0'}
-                                        previewOpenDelay={3000}
-                                        disableRightSwipe={true}
-                                        closeOnRowOpen={true}
-                                        closeOnRowPress={true}
-                                        nestedScrollEnabled
-                                    />
-                                    {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
-                                        keyExtractor={(item) => item.place_pk.toString()}
+                                {/* <FlatList data={collectionData.places} renderItem={ShowCollections}
+                                        keyExtractor={(item, index) => index.toString()}
                                         nestedScrollEnabled/> */}
-
                                 </SafeAreaView>
                                 <TouchableOpacity onPress={() => {
                                     // if(isLimited) setIsLimited(false);

@@ -22,13 +22,14 @@ import NavigationTop from "../../components/NavigationTop";
 import CustomTextInput from "../../components/CustomTextInput";
 import ScreenDivideLine from "../../components/ScreenDivideLine";
 import AppText from "../../components/AppText";
-import {useIsUserData} from "../../contexts/UserDataContextProvider";
+import {useToken} from '../../contexts/TokenContextProvider';
+
 import CalendarTexts from './CalendarTexts';
 
 export const navigationRef = React.createRef();
 
 const MakePlanCollectionScreen = ({navigation}) => {
-
+    const [token, setToken] = useToken();
     const {colors} = useTheme();
     const styles = StyleSheet.create({
         plusComplete: {
@@ -110,7 +111,6 @@ const MakePlanCollectionScreen = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
-    const [userData, setUserData] = useIsUserData();
     const [range, setRange] = useState({
         startDate: new Date(),
         endDate: new Date()
@@ -193,12 +193,12 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    setKeywordData(response.data)
-                    setFalse()
-                    console.log(keywordData)
+                    setKeywordData(response.data);
+                    setFalse();
+                    console.log(keywordData);
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {

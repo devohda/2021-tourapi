@@ -22,8 +22,9 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import { tipsList } from '../../contexts/TipsListContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
+
 import TipsList from './TipsList';
 import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
@@ -35,11 +36,9 @@ import MoreIcon from '../../assets/images/more-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
 const windowWidth = Dimensions.get('window').width;
-const {width} = Dimensions.get('window');
 
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const [userData, setUserData] = useIsUserData();
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
@@ -49,6 +48,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [tmpPlaceData, setTmpPlaceData] = useState([]);
     const [visible, setVisible] = useState(false);
     const [isEditPage, setIsEditPage] = useState(false);
+
+    const [token, setToken] = useToken();
 
     useEffect(() => {
         setTmpData([{
@@ -83,21 +84,18 @@ const PlanCollectionScreen = ({route, navigation}) => {
     // const getInitialData = () => {
     //     try {
     //         fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
-    //             method: 'POST',
+    //             method: 'GET',
     //             headers: {
     //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json'
+    //                 'Content-Type': 'application/json',
+    //                 'x-access-token': token
     //             },
-    //             body: JSON.stringify({
-    //                 userId: userData.user_pk,
-    //             })
     //         }).then((res) => res.json())
     //             .then((response) => {
     //                 setCollectionData(response.data);
     //                 setPlaceLength(response.data.places.length);
     //                 setFalse();
-    //                 setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
-
+    //                 // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
     //             })
     //             .catch((err) => {
     //                 console.error(err);
@@ -109,7 +107,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     // };
 
     // const checkTrue = () => {
-    //     if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+    //     // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
     //     return true;
     // };
 
@@ -128,10 +126,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
-                    userId: userData.user_pk,
                     placeId: pk,
                 })
             }).then((res) => res.json())
@@ -153,10 +151,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
-                    userId: userData.user_pk,
                     placeId: pk,
                 })
             }).then((res) => res.json())
@@ -536,7 +534,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                    <FlatList data={collectionData.places} renderItem={(item, index) => <ShowPlaces item={item} index={index}/>}
+                                    <FlatList data={item} renderItem={(item, index) => <ShowPlaces item={item} index={index}/>}
                                         keyExtractor={(item) => item.place_pk.toString()}
                                         nestedScrollEnabled/>
 

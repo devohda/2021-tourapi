@@ -205,12 +205,5 @@ const SearchPlace = ({navigation}) => {
     );
 };
 
-// const SearchPlace = () => {
-//     return (
-//         <View>
-//             <AppText>Hi</AppText>
-//         </View>
-//     );
-// };
 
 export default SearchPlace;
