@@ -1,20 +1,20 @@
 import React from 'react';
-import SignedInContextProvider from "./SignedInContextProvider";
-import UserDataContextProvider from './UserDataContextProvider';
+import SignedInContextProvider from './SignedInContextProvider';
+import TokenContextProvider from './TokenContextProvider';
 import SearchKeywordContextProvider from './SearchkeywordContextProvider';
 
 const AppContextProviders = props => {
     return (
         <>
             <SignedInContextProvider>
-                <UserDataContextProvider>
+                <TokenContextProvider>
                     <SearchKeywordContextProvider>
                         {props.children}
                     </SearchKeywordContextProvider>
-                </UserDataContextProvider>
+                </TokenContextProvider>
             </SignedInContextProvider>
         </>
-    )
-}
+    );
+};
 
 export default AppContextProviders;

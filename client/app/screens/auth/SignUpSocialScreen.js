@@ -3,28 +3,33 @@ import React, {useState} from 'react';
 import {StyleSheet, TouchableOpacity, View, Dimensions, Text} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
-import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
-import ScreenContainer from "../../components/ScreenContainer";
-import ScreenContainerView from "../../components/ScreenContainerView";
-import AppText from "../../components/AppText";
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import AppText from '../../components/AppText';
 
 import MainBoxIcon from '../../assets/images/login/main_box_icon.svg';
 import AppleLogo from '../../assets/images/login/apple.svg';
-import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg'
+import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg';
+
+import * as SecureStore from 'expo-secure-store';
 
 const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
-    const [email, setEmail] = useState(null)
-    const [password, setPassword] = useState(null)
-    const [isSignedIn, setIsSignedIn] = useIsSignedIn()
+    const [email, setEmail] = useState(null);
+    const [password, setPassword] = useState(null);
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
-    const { colors } = useTheme()
+    const {colors} = useTheme();
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <ScreenContainerView flex={1}>
                 <View style={{height: 24, marginTop: 20, justifyContent: 'center'}}>
-                    <TouchableOpacity onPress={() => setIsSignedIn(true)}>
+                    <TouchableOpacity onPress={async () => {
+                        // await SecureStore.setItemAsync('isSignedIn', 'true');
+                        setIsSignedIn(true);
+                    }}>
                         <AppText style={{
                             color: colors.mainColor,
                             fontSize: 16,
@@ -52,9 +57,10 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             }}
                             onPress={() => signIn(email, password, navigation, setIsSignedIn)}
                         >
-                            <View flexDirection="row" style={{alignItems : 'center'}}>
-                                <KakaotalkLogo />
-                                <AppText style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로 계속하기</AppText>
+                            <View flexDirection="row" style={{alignItems: 'center'}}>
+                                <KakaotalkLogo/>
+                                <AppText style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로
+                                    계속하기</AppText>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -83,7 +89,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
             </ScreenContainerView>
         </ScreenContainer>
     );
-}
+};
 
 const styles = StyleSheet.create({
     loginText: {

@@ -10,17 +10,17 @@ exports.readPlaceList = async (keyword) => {
     const result1 = await db.query(query);
 
     const result = result1.map(place => {
-        return {...place, star: 3}
-    })
+        return {...place, star: 3}; 
+    });
 
     return result;
-}
+};
 
 exports.readPlace = async (place_pk) => {
     const query = `SELECT place_pk, place_name, place_addr, place_type 
                    FROM places 
-                   WHERE place_pk=${place_pk}`
+                   WHERE place_pk=${place_pk}`;
 
     const result = await db.query(query);
     return result;
-}
+};

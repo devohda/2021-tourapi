@@ -1,21 +1,21 @@
-import React, {useState} from "react";
-import {StyleSheet, TextInput, TouchableOpacity, View, Text, Alert} from "react-native";
-import ScreenContainer from '../../../components/ScreenContainer'
-import styled from "styled-components/native";
-import CustomTextInput from "../../../components/CustomTextInput";
-import AppText from "../../../components/AppText";
-import {useTheme} from "@react-navigation/native";
+import React, {useState} from 'react';
+import {StyleSheet, TextInput, TouchableOpacity, View, Text, Alert} from 'react-native';
+import ScreenContainer from '../../../components/ScreenContainer';
+import styled from 'styled-components/native';
+import CustomTextInput from '../../../components/CustomTextInput';
+import AppText from '../../../components/AppText';
+import {useTheme} from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
   width: 100%;
   justify-content: flex-end;
   height: 8px;
-`
+`;
 
 const Form = styled(View)`
   margin-top: 63px;
-`
+`;
 
 const InputBox = styled(TextInput)`
   fontSize: 16px;
@@ -23,19 +23,19 @@ const InputBox = styled(TextInput)`
   borderBottomColor: #C5C5C5;
   marginBottom: 27px;
   paddingBottom: 11px;
-`
+`;
 
 const GetEmailTab = ({navigation}) => {
     const { colors } = useTheme();
 
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState('');
     const [isEmailDuplicated, setIsEmailDuplicated] = useState(undefined);
     const [color, setColor] = useState(colors.gray[5]);
     const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 
     const findSameEmail = async (email) => {
         try {
-            const result = await fetch('http://34.146.140.88/auth/sameEmail', {
+            const result = await fetch('http://localhost:3000/auth/sameEmail', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -48,20 +48,20 @@ const GetEmailTab = ({navigation}) => {
                     return response.data.isDuplicated === true;
                 })
                 .catch(error => console.log(error));
-            return result
+            return result;
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const checkIsValid = () => {
         
         if(isEmailDuplicated) {
             Alert.alert('', '이미 사용중인 아이디예요.');
         } else {
-            navigation.navigate('passwordTab', {email})
+            navigation.navigate('passwordTab', {email});
         }
-    }
+    };
 
     const styles = StyleSheet.create({
         progress: {
@@ -90,7 +90,7 @@ const GetEmailTab = ({navigation}) => {
             alignItems: 'center',
             justifyContent: 'center'
         }
-    })
+    });
 
     return (
         <>
@@ -126,7 +126,7 @@ const GetEmailTab = ({navigation}) => {
                             }
 
                             if(text === '') setColor(colors.gray[5]);
-                            if(text.match(emailRegExp)) setColor(colors.gray[5])
+                            if(text.match(emailRegExp)) setColor(colors.gray[5]);
                             setEmail(text);
                         }}
 
@@ -148,7 +148,7 @@ const GetEmailTab = ({navigation}) => {
                 </TouchableOpacity>
             </View>
         </>
-    )
-}
+    );
+};
 
 export default GetEmailTab;

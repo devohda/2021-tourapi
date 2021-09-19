@@ -21,7 +21,7 @@ exports.selectUserList = async (keyword) => {
                             ON ku.keyword_pk = k.keyword_pk 
                             WHERE ku.user_pk = ${user.user_pk}`;
             const [result2] = await conn.query(query2);
-            const keywords = result2.map(keyword => keyword.keyword_title)
+            const keywords = result2.map(keyword => keyword.keyword_title);
 
             // 각 유저 별 만든 보관함 개수
             const query3 = `SELECT COUNT(*) AS collection_cnt 
@@ -34,8 +34,8 @@ exports.selectUserList = async (keyword) => {
                 ...user,
                 keywords,
                 madeCollectionCnt
-            }
-        }))
+            };
+        })); 
 
     }catch (err){
         console.error(err);
@@ -43,4 +43,4 @@ exports.selectUserList = async (keyword) => {
         conn.release();
         return result;
     }
-}
+};

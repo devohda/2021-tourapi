@@ -7,12 +7,11 @@ import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import ListItem from './ListItem';
 
-const SystemSetting = ({navigation}) => {
+const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
-    const [userData, setUserData] = useIsUserData();
+
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
@@ -22,7 +21,7 @@ const SystemSetting = ({navigation}) => {
         {
             index: 1,
             title: '연결된 계정',
-            data: [{index: 1, name: userData.user_email}]
+            data: [{index: 1, name: '수정필요'}]
         },
         {
             index: 2,
@@ -110,4 +109,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SystemSetting;
+export default SystemSettingScreen;

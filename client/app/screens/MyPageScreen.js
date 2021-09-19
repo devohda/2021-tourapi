@@ -4,13 +4,10 @@ import ScreenContainer from '../components/ScreenContainer';
 import MyPageNavigation from '../navigation/MypageNavigator';
 import {useTheme} from '@react-navigation/native';
 import AppText from '../components/AppText';
-import {useIsUserData} from '../contexts/UserDataContextProvider';
 import SettingsIcon from '../assets/images/settings-icon.svg';
 
 const MyPageScreen = ({navigation}) => {
     const {colors} = useTheme();
-    const [userData, setUserData] = useIsUserData();
-    console.log(userData);
 
     const styles = StyleSheet.create({
         myPageHashtag: {
@@ -59,7 +56,7 @@ const MyPageScreen = ({navigation}) => {
                         alignItems: 'center',
                     }}
                 >
-                    {/* <Button title="시스템 설정" color={colors.mainColor} onPress={()=>navigation.navigate('SystemSetting')}></Button> */}
+                    {/* <Button title="시스템 설정" color={colors.mainColor} onPress={()=>navigation.navigate('SystemSettingScreen')}></Button> */}
                     <View
                         className="profile-img-container"
                         style={{justifyContent: 'center', alignItems: 'center'}}
@@ -93,7 +90,7 @@ const MyPageScreen = ({navigation}) => {
                                 color: colors.mainColor,
                             }}
                         >
-                            {userData.user_nickname}
+                            {/*{userData.user_nickname}*/}
                         </AppText>
                         <View
                             style={{

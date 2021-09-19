@@ -1,20 +1,20 @@
-import React, {useState} from "react";
-import {StyleSheet, TextInput, TouchableOpacity, View, Alert} from "react-native";
-import styled from "styled-components/native";
-import AppText from "../../../components/AppText";
+import React, {useState} from 'react';
+import {StyleSheet, TextInput, TouchableOpacity, View, Alert} from 'react-native';
+import styled from 'styled-components/native';
+import AppText from '../../../components/AppText';
 import { useTheme } from '@react-navigation/native';
-import CustomTextInput from "../../../components/CustomTextInput";
+import CustomTextInput from '../../../components/CustomTextInput';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
   width: 100%;
   justify-content: flex-end;
   height: 8px;
-`
+`;
 
 const Form = styled(View)`
   margin-top: 63px;
-`
+`;
 
 const InputBox = styled(TextInput)`
   fontSize: 16px;
@@ -22,11 +22,11 @@ const InputBox = styled(TextInput)`
   borderBottomColor: #C5C5C5;
   marginBottom: 27px;
   paddingBottom: 11px;
-`
+`;
 
 const signUp = async (user_email, user_password, user_nickname) => {
     try {
-        let url = 'http://34.146.140.88/auth/makeAccount';
+        let url = 'http://localhost:3000/auth/makeAccount';
         let options = {
             method: 'POST',
             mode: 'cors',
@@ -51,14 +51,14 @@ const signUp = async (user_email, user_password, user_nickname) => {
 
         return result;
     } catch (e) {
-        console.log(e.toString())
+        console.log(e.toString());
     }
-}
+};
 
 const GetNicknameTab = ({route, authNavigation}) => {
     const {email, password} = route.params;
-    const [isValid, setIsValid] = useState(false)
-    const [nickname, setNickname] = useState("");
+    const [isValid, setIsValid] = useState(false);
+    const [nickname, setNickname] = useState('');
     const [isNicknameDuplicated, setIsNicknameDuplicated] = useState(false);
     const { colors } = useTheme();
     const [color, setColor] = useState(colors.gray[5]);
@@ -66,7 +66,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
 
     const findSameNickname = async (nickname) => {
         try {
-            const result = await fetch('http://34.146.140.88/auth/sameNickname', {
+            const result = await fetch('http://localhost:3000/auth/sameNickname', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -79,17 +79,17 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     return response.data.isDuplicated === true;
                 })
                 .catch(error => console.log(error));
-            return result
+            return result;
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const checkIsValid = async () => {
         if(isNicknameDuplicated) {
-            Alert.alert('', '이미 사용 중인 닉네임이에요.')
+            Alert.alert('', '이미 사용 중인 닉네임이에요.');
         } else {
-            const result = await signUp(email, password, nickname)
+            const result = await signUp(email, password, nickname);
             if (result) {
                 authNavigation.navigate('SignInEmail');
             }
@@ -123,7 +123,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
             alignItems: 'center',
             justifyContent: 'center'
         }
-    })
+    });
 
     return (
         <>
@@ -157,10 +157,10 @@ const GetNicknameTab = ({route, authNavigation}) => {
                             }
 
                             if(patterns.test(text)) {
-                                setColor(colors.red[2])
+                                setColor(colors.red[2]);
                             }
 
-                            if(text === '') setColor(colors.gray[5])
+                            if(text === '') setColor(colors.gray[5]);
                             if(text.length <= 12 && !patterns.test(text)){
                                 setColor(colors.gray[5]);
                             } 
@@ -194,7 +194,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
                 </TouchableOpacity>
             </View>
         </>
-    )
-}
+    );
+};
 
 export default GetNicknameTab;

@@ -84,7 +84,7 @@ export default function MakeCollectionBtn({navigation}) {
                             margin: 10
                         }} onPress={() => {
                             refRBSheet.current.close();
-                            navigation.navigate('FreeCollection');
+                            navigation.navigate('MakeFreeCollection');
                             navigation.setOptions({tabBarVisible: false});
                         }}>
                             <AppText style={{
