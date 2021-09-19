@@ -158,7 +158,7 @@ const GetPasswordTab = ({route, navigation}) => {
                                 setPassword(text);
                             }}
                         />
-                        <Pressable style={{marginLeft: 5}} onPress={()=>{setShowPassword(!showPassword); console.log(showPassword)}}>
+                        <Pressable style={{marginLeft: 5}} onPress={()=>{setShowPassword(!showPassword)}}>
                                 {
                                     showPassword ?
                                     <Icon style={{marginTop: 3, marginRight: 5}} name={'eye'} type="ionicon"

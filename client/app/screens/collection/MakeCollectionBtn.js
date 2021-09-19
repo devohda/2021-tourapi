@@ -59,6 +59,10 @@ export default function MakeCollectionBtn({navigation}) {
                             height: 72,
                             borderRadius: 10,
                             margin: 10
+                        }} onPress={() => {
+                            refRBSheet.current.close();
+                            navigation.navigate('MakePlanCollection');
+                            navigation.setOptions({tabBarVisible: false});
                         }}>
                             <AppText style={{
                                 textAlign: 'center',

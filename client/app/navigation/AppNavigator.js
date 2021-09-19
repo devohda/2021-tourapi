@@ -7,10 +7,13 @@ import AuthenticationNavigator from './AuthenticationNavigator';
 import AuthenticationNavigator2 from './AuthenticationNavigator2';
 import SearchScreen from '../screens/SearchScreen';
 import PlaceScreen from '../screens/PlaceScreen';
+import MakePlanCollectionScreen from '../screens/collection/MakePlanCollectionScreen';
 import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionScreen';
+import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
 import {useToken} from '../contexts/TokenContextProvider';
+import SearchScreenForPlan from '../screens/collection/SearchScreenForPlan';
 
 import * as SecureStore from 'expo-secure-store';
 const MainStack = createStackNavigator();
@@ -53,11 +56,14 @@ const AppNavigator = () => {
                 <>
                     <MainStack.Screen name="App" children={({navigation}) => <HomeNavigator navigation={navigation}/>}/>
                     <MainStack.Screen name="Search" component={SearchScreen} />
+                    <MainStack.Screen name="SearchForPlan" component={SearchScreenForPlan} />
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
+                    <MainStack.Screen name="MakePlanCollection" component={MakePlanCollectionScreen} />
                     <MainStack.Screen name="MakeFreeCollection" component={MakeFreeCollectionScreen}/>
-                    <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />
                     <MainStack.Screen name="SystemSetting" component={SystemSettingScreen} />
                     <MainStack.Screen name="Authentication2" component={AuthenticationNavigator2}/>
+                    <MainStack.Screen name="PlanCollection" component={PlanCollectionScreen} />
+                    <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />
                 </>
             }
         </MainStack.Navigator>
