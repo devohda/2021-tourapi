@@ -4,11 +4,30 @@ const router = express.Router();
 const collectionService = require('../services/collectionService');
 const {verifyToken} = require('../middleware/jwt');
 
-// 보관함 생성
-router.post('/', verifyToken, async (req, res, next) => {
+// 자유 보관함 생성
+router.post('/free', verifyToken, async (req, res, next) => {
     const {collectionData, keywords} = req.body;
     const {user} = res.locals;
-    const result = await collectionService.createCollection(collectionData, user.user_pk, keywords);
+    const result = await collectionService.createFreeCollection(collectionData, user.user_pk, keywords);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS'
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
+
+// 일정 보관함 생성
+router.post('/plan', verifyToken, async (req, res, next) => {
+    const {collectionData, keywords} = req.body;
+    const {user} = res.locals;
+    const result = await collectionService.createPlanCollection(collectionData, user.user_pk, keywords);
 
     if (result) {
         return res.send({
@@ -88,5 +107,23 @@ router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
     }
 });
 
+// 보관함 삭제
+router.delete('/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+
+    const result = await collectionService.deleteCollection(collectionId);
+
+    if (result.affectedRows <= 1) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS'
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
 
 module.exports = router;
