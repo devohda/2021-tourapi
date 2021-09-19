@@ -5,74 +5,98 @@ import AppText from '../../components/AppText';
 
 import hereIcon from '../../assets/images/appicon.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import {useToken} from '../../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const ListItem = props => {
     const {colors} = useTheme();
     const [isEnabled, setIsEnabled] = useState(false);
     const [isLogout, setIsLogout] = useState(false);
+    const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
     };
 
     return(
-    <>
-    {
-        props.index === 1 || props.index === 2 ?
-            <View style={props.index === 1 ? {...styles.list_style, ...styles.list_style_version1} : {...styles.list_style, ...styles.list_style_version2}}>
-                {props.index === 1 && <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
-                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
-                {props.index === 2 && <Switch
-                        trackColor={{false: colors.gray[6], true: colors.mainColor}}
-                        thumbColor={colors.defaultColor}
-                        ios_backgroundColor={colors.gray[6]}
-                        onChange={toggleSwitch}
-                        value={isEnabled}
-                    />}
-            </View> :
-            <View style={{...styles.list_style}}>
-                {
-                    props.index === 4 ?
-                    <>
-                        <TouchableOpacity onPress={() => {props.data === '로그아웃' && setIsLogout(true)}}>
-                            <AppText style={{color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3], fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
-                        </TouchableOpacity>
-                        <Modal
-                            transparent={true}
-                            visible={isLogout}
-                            onRequestClose={() => {
-                            setIsLogout(!isLogout);
-                            }}
-                        >
-                            <View style={styles.centeredView}>
-                            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                                <AppText style={{...styles.modalText, color: colors.blue[1]}}>로그아웃 하시겠습니까?</AppText>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Pressable
-                                    style={{...styles.button, backgroundColor: colors.gray[4]}}
-                                    onPress={() => setIsLogout(!isLogout)}
+        <> 
+            {
+                props.index === 1 || props.index === 2 ?
+                    <View style={props.index === 1 ? {...styles.list_style, ...styles.list_style_version1} : {...styles.list_style, ...styles.list_style_version2}}>
+                        {props.index === 1 && <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
+                        <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
+                        {props.index === 2 && <Switch
+                            trackColor={{false: colors.gray[6], true: colors.mainColor}}
+                            thumbColor={colors.defaultColor}
+                            ios_backgroundColor={colors.gray[6]}
+                            onChange={toggleSwitch}
+                            value={isEnabled}
+                        />}
+                    </View> :
+                    <View style={{...styles.list_style}}>
+                        {
+                            props.index === 4 ?
+                                <>
+                                    <TouchableOpacity onPress={() => {props.data === '로그아웃' && setIsLogout(true);}}>
+                                        <AppText style={{color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3], fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
+                                    </TouchableOpacity>
+                                    <Modal
+                                        transparent={true}
+                                        visible={isLogout}
+                                        onRequestClose={() => {
+                                            setIsLogout(!isLogout);
+                                        }}
                                     >
-                                        <AppText style={styles.textStyle}>취소하기</AppText>
-                                    </Pressable>
-                                    <Pressable
-                                    style={{...styles.button, backgroundColor: colors.mainColor}}
-                                    onPress={() => {
-                                        setIsLogout(!isLogout);
-                                        //로그아웃 코드
-                                    }}
-                                    >
-                                        <AppText style={styles.textStyle}>로그아웃</AppText>
-                                    </Pressable>
-                                </View>
-                            </View>
-                            </View>
-                        </Modal>
-                    </> :
-                    <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
-                }
-            </View>
-    }
-    </>
-)};
+                                        <View style={styles.centeredView}>
+                                            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                                                <AppText style={{...styles.modalText, color: colors.blue[1]}}>로그아웃 하시겠습니까?</AppText>
+                                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                                    <Pressable
+                                                        style={{...styles.button, backgroundColor: colors.gray[4]}}
+                                                        onPress={() => setIsLogout(!isLogout)}
+                                                    >
+                                                        <AppText style={styles.textStyle}>취소하기</AppText>
+                                                    </Pressable>
+                                                    <Pressable
+                                                        style={{...styles.button, backgroundColor: colors.mainColor}}
+                                                        onPress={() => {
+                                                            fetch('http://localhost:3000/auth/logout', {
+                                                                method: 'DELETE',
+                                                                headers: {
+                                                                    'Accept': 'application/json',
+                                                                    'Content-Type': 'application/json',
+                                                                    'x-access-token': token
+                                                                },
+                                                            }).then((res) => res.json())
+                                                                .then((response) => {
+                                                                    console.log(response);
+                                                                    // if(response.code === 200){
+                                                                    setIsLogout(!isLogout);
+                                                                    // setToken(null);
+                                                                    setIsSignedIn(false);
+                                                                    SecureStore.deleteItemAsync('accessToken');
+                                                                    // }
+                                                                })
+                                                                .catch((err) => {
+                                                                    console.error(err);
+                                                                });
+                                                        }}
+                                                    >
+                                                        <AppText style={styles.textStyle}>로그아웃</AppText>
+                                                    </Pressable>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </Modal>
+                                </> :
+                                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
+                        }
+                    </View>
+            }
+        </>
+    );};
 
 const areEqual = (prevProps, nextProps) => {
     const { isSelected } = nextProps;
@@ -107,20 +131,20 @@ const styles = StyleSheet.create({
     //modal example
     centeredView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 22,
         backgroundColor: 'rgba(0,0,0,0.5)'
-      },
-      modalView: {
-        backgroundColor: "white",
+    },
+    modalView: {
+        backgroundColor: 'white',
         borderRadius: 10,
         padding: 20,
         justifyContent: 'center',
-        alignItems: "center",
+        alignItems: 'center',
         height: 150
-      },
-      button: {
+    },
+    button: {
         borderRadius: 10,
         marginHorizontal: 9.5,
         marginTop: 26,
@@ -128,21 +152,21 @@ const styles = StyleSheet.create({
         height: 38,
         justifyContent: 'center',
         alignItems: 'center'
-      },
-      textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center",
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
         fontSize: 14,
         lineHeight: 22.4,
         fontWeight: '500'
-      },
-      modalText: {
-        textAlign: "center",
+    },
+    modalText: {
+        textAlign: 'center',
         fontSize: 14,
         lineHeight: 22.4,
         fontWeight: '700'
-      }
-})
+    }
+});
 
 export default memo(ListItem, areEqual);

@@ -144,7 +144,8 @@ const CollectionTab = ({navigation}) => {
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch('http://34.146.140.88/collection/list', {
+            console.log(token);
+            fetch('http://localhost:3000/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

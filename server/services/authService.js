@@ -56,3 +56,9 @@ exports.readUserTokenByUserPk = async (user_pk) => {
     const tokens = await db.query(query);
     return tokens;
 };
+
+exports.deleteToken = async (user_pk) => {
+    const query = `DELETE FROM user_token WHERE user_pk = ${user_pk}`;
+    const result = await db.query(query);
+    return result;
+};

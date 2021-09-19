@@ -10,6 +10,7 @@ import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
 
 import * as SecureStore from 'expo-secure-store';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
 
@@ -17,6 +18,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
     const [password, setPassword] = useState(null);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [showPassword, setShowPassword] = useState(true);
+    const [token, setToken] = useToken();
 
     const {colors} = useTheme();
 
@@ -45,7 +47,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            let url = 'http://34.146.140.88/auth/loginJWT';
+            let url = 'http://localhost:3000/auth/loginJWT';
             let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -72,7 +74,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                 break;
             case 'SUCCESS' :
                 await SecureStore.setItemAsync('accessToken', response.accessToken);
-                // console.log(await SecureStore.getItemAsync('accessToken'));
+                setToken(response.accessToken);
                 setIsSignedIn(true);
                 break;
             }

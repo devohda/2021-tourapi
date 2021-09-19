@@ -108,4 +108,5 @@ dist
 
 packager-info.json
 .expo/
+.eslintrc.js
 
