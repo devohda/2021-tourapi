@@ -231,3 +231,9 @@ exports.readCollection = async (user_pk, collection_pk) => {
         return result;
     }
 };
+
+exports.deleteCollection = async (collection_pk) => {
+    const query = `DELETE FROM collections WHERE collection_pk = ${collection_pk}`
+    const result = db.query(query);
+    return result;
+}

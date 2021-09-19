@@ -107,5 +107,23 @@ router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
     }
 });
 
+// 보관함 삭제
+router.delete('/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+
+    const result = await collectionService.deleteCollection(collectionId);
+
+    if (result.affectedRows <= 1) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS'
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
 
 module.exports = router;
