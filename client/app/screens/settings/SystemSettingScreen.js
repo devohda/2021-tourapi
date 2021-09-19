@@ -43,9 +43,7 @@ const SystemSettingScreen = ({navigation}) => {
 
     const HeaderItem = ({title, index}) => (
         <View style={typeof title !== 'undefined' && {marginBottom: 16}}>
-            <AppText style={{...styles.header_text, color: colors.gray[4]}}>
-                {title}
-            </AppText>
+            <AppText style={{...styles.header_text, color: colors.gray[4]}}>{title}</AppText>
         </View>
     );
 
@@ -76,10 +74,8 @@ const SystemSettingScreen = ({navigation}) => {
             <ScreenContainerView>
                 <SectionList sections={systemMenu}
                     keyExtractor={(item, index) => item + index}
-                    renderItem={({item, section: {index}}) => <SettingListItem data={item.name}
-                        index={index}/>}
-                    renderSectionHeader={({section: {title, index}}) => <HeaderItem title={title}
-                        index={index}/>}
+                    renderItem={({item, section: {index}}) => <SettingListItem data={item.name} index={index}/>}
+                    renderSectionHeader={({section: {title, index}}) => <HeaderItem title={title} index={index}/>}
                     renderSectionFooter={({section: {index}}) => <FooterItem index={index}/>}
                     stickySectionHeadersEnabled={false}
                 />

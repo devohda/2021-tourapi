@@ -35,6 +35,7 @@ const CollectionTab = ({navigation}) => {
         }
     ]);
 
+    // TODO 빈배열 뺐을 때 무한 렌더링 되는 거 해결해야 함
     useEffect(() => {
         getCollectionsFromUsers();
     },[]);
@@ -143,7 +144,7 @@ const CollectionTab = ({navigation}) => {
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch('http://localhost:3000/collection/list', {
+            fetch('http://34.146.140.88/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
