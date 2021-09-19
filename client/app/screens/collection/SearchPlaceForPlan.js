@@ -1,12 +1,11 @@
-import React, {useState, useEffect, useContext} from "react";
-import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from "react-native";
+import React, {useState, useEffect, useContext} from 'react';
+import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from 'react-native';
 import {useTheme} from '@react-navigation/native';
-import Star from '../../assets/images/search/star.svg'
+import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
-import AppText from "../../components/AppText";
-import { searchKeyword } from "../../contexts/SearchkeywordContextProvider";
-import ShowEmpty from "../../components/ShowEmpty";
-import { useIsUserData } from "../../contexts/UserDataContextProvider";
+import AppText from '../../components/AppText';
+import { searchKeyword } from '../../contexts/SearchkeywordContextProvider';
+import ShowEmpty from '../../components/ShowEmpty';
 
 const SearchPlaceForPlan = (props, {navigation}) => {
     const {colors} = useTheme();
@@ -14,7 +13,6 @@ const SearchPlaceForPlan = (props, {navigation}) => {
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
     const [keyword, setKeyword] = searchKeyword();
-    const [userData, setUserData] = useIsUserData();
 
     const styles = StyleSheet.create({
         info_container : {
@@ -29,7 +27,7 @@ const SearchPlaceForPlan = (props, {navigation}) => {
             backgroundColor: colors.gray[4],
             marginHorizontal: 4
         }
-    })
+    });
 
     useEffect(() => {
         getResults();
@@ -47,10 +45,10 @@ const SearchPlaceForPlan = (props, {navigation}) => {
                 .then((response) => {
                     setPlaceList(response.data);
                     console.log(placeList);
-                    setFalse()
+                    setFalse();
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
 
         } catch (err) {
@@ -60,32 +58,32 @@ const SearchPlaceForPlan = (props, {navigation}) => {
 
     const checkType = (type) => {
         if(type === 12) {
-            return '관광지'
+            return '관광지';
         } else if(type === 14) {
-            return '문화시설'
+            return '문화시설';
         } else if(type === 15) {
-            return '축제/공연/행사'
+            return '축제/공연/행사';
         } else if(type === 28) {
-            return '레포츠'
+            return '레포츠';
         } else if(type === 32) {
-            return '숙박'
+            return '숙박';
         } else if(type === 38) {
-            return '쇼핑'
+            return '쇼핑';
         } else if(type === 39) {
-            return '음식'
+            return '음식';
         } else {
-            return '기타'
+            return '기타';
         }
-    }
+    };
 
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < placeList.length; i++) {
-            pressed.push(false)
+            pressed.push(false);
         }
-        setIsPress(pressed)
-    }
+        setIsPress(pressed);
+    };
 
     const PlaceContainer = ({item, index}) => ( 
         <TouchableOpacity onPress={()=>props.navigation.navigate('Place', {data : item})}>
@@ -129,21 +127,21 @@ const SearchPlaceForPlan = (props, {navigation}) => {
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
-    )
+    );
 
-        return (
-            <View style={{backgroundColor: colors.backgroundColor}}>
-                <ScrollView>
-                    {
-                        placeList.length === 0 ? 
+    return (
+        <View style={{backgroundColor: colors.backgroundColor}}>
+            <ScrollView>
+                {
+                    placeList.length === 0 ? 
                         <ShowEmpty /> :
                         <SafeAreaView>
                             <FlatList data={placeList} renderItem={PlaceContainer} keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
-                    }
-                </ScrollView>
-            </View>
-        )
-}
+                }
+            </ScrollView>
+        </View>
+    );
+};
 
 export default SearchPlaceForPlan;
