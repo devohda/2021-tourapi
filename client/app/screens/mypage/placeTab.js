@@ -104,7 +104,7 @@ const PlaceTab = () => {
     //
     // const getLikesFromUsers = () => {
     //     try {
-    //         fetch('http://localhost:3000/place/like', {
+    //         fetch('http://34.146.140.88/place/like', {
     //             method: 'GET',
     //             headers: {
     //                 'Accept': 'application/json',

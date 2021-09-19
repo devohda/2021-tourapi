@@ -60,7 +60,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -99,7 +99,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const likePlace = (pk) => {
         try {
-            fetch('http://localhost:3000/like/place', {
+            fetch('http://34.146.140.88/like/place', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -124,7 +124,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deletePlace = (pk) => {
         try {
-            fetch('http://localhost:3000/like/place', {
+            fetch('http://34.146.140.88/like/place', {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -479,18 +479,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         data={collectionData.places}
                                         renderItem={ShowPlaces}
                                         keyExtractor={(item) => item.place_pk.toString()}
-                                        key={(item, idx) => {idx.toString()}}
+                                        key={(item, idx) => {idx.toString();}}
                                         renderHiddenItem={(item, rowMap) => {
                                             return (
-                                            <View style={styles.rowBack} key={item.place_pk}>
-                                            <TouchableOpacity
-                                                style={[styles.backRightBtn, styles.backRightBtnRight]}
-                                                onPress={() => deleteRow(rowMap, item.place_pk)}
-                                            >
-                                                <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                                            </TouchableOpacity>
-                                        </View>
-                                        )}}
+                                                <View style={styles.rowBack} key={item.place_pk}>
+                                                    <TouchableOpacity
+                                                        style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                                        onPress={() => deleteRow(rowMap, item.place_pk)}
+                                                    >
+                                                        <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            );}}
                                         rightOpenValue={-75}
                                         previewRowKey={'0'}
                                         previewOpenDelay={3000}
