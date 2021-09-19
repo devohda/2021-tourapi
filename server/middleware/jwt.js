@@ -4,6 +4,7 @@ const authService = require('../services/authService');
 exports.verifyToken = async (req, res, next) => {
     try {
         const token = req.headers['x-access-token'];
+        console.log(token);
         if(!token){
             return res.status(403).json({
                 code: 403,
@@ -12,6 +13,7 @@ exports.verifyToken = async (req, res, next) => {
         }
 
         const isTokenVerified = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(isTokenVerified);
         if(isTokenVerified){
             const decodedToken = jwt.decode(token);
             const [{access_token}] = await authService.readUserTokenByUserPk(decodedToken.user_pk);

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -27,7 +27,6 @@ const AppNavigator = () => {
         if(accessToken){
             // 토큰 불러와서 전역 context 에 저장하기.
             setToken(accessToken);
-
             // 토큰으로 정보 조회해서 로그인 됐으면 main으로 이동 아니면 그대로.
             setIsSignedIn(true);
             return;
