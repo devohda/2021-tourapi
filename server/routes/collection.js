@@ -4,6 +4,7 @@ const router = express.Router();
 const collectionService = require('../services/collectionService');
 const {verifyToken} = require('../middleware/jwt');
 
+// CREATE
 // 자유 보관함 생성
 router.post('/free', verifyToken, async (req, res, next) => {
     const {collectionData, keywords} = req.body;
@@ -42,46 +43,6 @@ router.post('/plan', verifyToken, async (req, res, next) => {
     }
 });
 
-// 자유보관함
-router.get('/list', verifyToken, async (req, res, next) => {
-    const {user} = res.locals;
-    const result = await collectionService.readCollectionListForPlaceInsert(user.user_pk);
-
-    if (result) {
-        return res.send({
-            code: 200,
-            status: 'SUCCESS',
-            data: result
-        });
-    } else {
-        return res.send({
-            code: 500,
-            status: 'SERVER ERROR'
-        });
-    }
-});
-
-// 보관함 가져오기
-router.get('/:collectionId', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.params;
-    const {user} = res.locals;
-    const result = await collectionService.readCollection(user.user_pk, collectionId);
-
-    if (result) {
-        return res.send({
-            code: 200,
-            status: 'SUCCESS',
-            data : result
-        });
-    } else {
-        return res.send({
-            code: 500,
-            status: 'SERVER ERROR'
-        });
-    }
-});
-
-
 // 보관함에 장소 추가하기
 router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
@@ -107,6 +68,49 @@ router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
     }
 });
 
+// READ
+// 보관함 리스트 조회
+router.get('/list', verifyToken, async (req, res, next) => {
+    // 검색, 장소에서 보관함 추가할 때, 마이페이지 에서 사용
+    const {sort, keyword} = req.query;
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionList(user.user_pk, true, sort, keyword);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data: result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
+
+// 보관함 조회
+router.get('/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
+    const result = await collectionService.readCollection(user.user_pk, collectionId);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
+
+// DELETE
 // 보관함 삭제
 router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;

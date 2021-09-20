@@ -80,10 +80,10 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         // 보관함-장소 매핑에 시간 구획 라인 추가
         for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
             // pm 12
-            const query4 = `INSERT IGNORE INTO collection_plan_place_map (collection_pk, place_pk, cppm_plan_day)
+            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
                             VALUES (${collection_pk}, -1, ${day})`
             // pm 6
-            const query5 = `INSERT IGNORE INTO collection_plan_place_map (collection_pk, place_pk, cppm_plan_day)
+            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
                             VALUES (${collection_pk}, -2, ${day})`
 
             await conn.query(query4);
@@ -103,25 +103,53 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
 };
 
 // 보관함 리스트 조회(검색)
-exports.readCollectionList = async (keyword) => {
+exports.readCollectionList = async (user_pk, my, sort, keyword) => {
 
     // TODO
-    //  - 좋아요
-    //  - 추가된 장소의 사진 가져오기
+    //  - 마이페이지 : 보관함 이름, type, 키워드, 좋아요 개수, 장소 개수, 프로필 사진, 공개유무, sorting + 내꺼만
+    //  - 검색 : 만든 사람 닉네임, 키워드 검색 + 모든 사람
+    //  - 장소에서 불러오는 보관함 리스트 : 위와 같음 + 내꺼만
 
     const conn = await db.pool.getConnection();
     let result;
     try {
         await conn.beginTransaction();
 
-        const query1 = `SELECT collection_pk, collection_name, collection_type, user_nickname AS created_user_name
-                        FROM collections c
-                        INNER JOIN users u
-                        ON u.user_pk = c.user_pk 
-                        WHERE collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
+        let query1 = `SELECT c.collection_pk, collection_name, collection_type, collection_thumbnail, collection_private, user_nickname AS created_user_name, IFNULL(place_cnt, 0) AS place_cnt, IFNULL(like_cnt, 0) AS like_cnt
+                      FROM collections c
+                      INNER JOIN users u
+                      ON u.user_pk = c.user_pk
+                      LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
+                      ON cpm.collection_pk = c.collection_pk
+                      LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection GROUP BY collection_pk) lc 
+                      ON lc.collection_pk = c.collection_pk
+                      `
+
+        if(my || keyword){
+            query1 += ' WHERE';
+
+            if(keyword){
+                query1 += ` collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
+            }
+            if(my){
+                query1 += ` c.user_pk = ${user_pk}`;
+            }
+        }
+
+        switch (sort){
+            case 'RESENT':
+                query1 += ' ORDER BY c.collection_pk DESC';
+                break;
+            case 'OLD':
+                query1 += ' ORDER BY c.collection_pk ASC';
+                break;
+            default:
+                query1 += ' ORDER BY c.collection_pk DESC';
+        }
 
         const [result1] = await conn.query(query1);
 
+        // 키워드
         result = await Promise.all(result1.map(async collection => {
             const query2 = `SELECT keyword_title FROM keywords k
                             LEFT OUTER JOIN keywords_collections_map kcm
@@ -134,71 +162,6 @@ exports.readCollectionList = async (keyword) => {
             return {
                 ...collection,
                 keywords
-            };
-        }));
-
-        await conn.commit();
-    } catch (err) {
-        await conn.rollback();
-        console.error(err);
-    } finally {
-        conn.release();
-        return result;
-    }
-};
-
-// 본인 보관함 리스트 조회
-exports.readCollectionListForPlaceInsert = async (user_pk) => {
-
-    // TODO
-    //  - 권한 있는 유저 리스트(사진)
-    //  - 사진 최대 4개
-
-    // 보관함 정보
-    // - 좋아요 수
-    // - 포함된 장소 수
-    // - 키워드
-
-    const conn = await db.pool.getConnection();
-    let result;
-
-    try {
-        await conn.beginTransaction();
-
-        const query1 = `SELECT c.*, IFNULL(place_cnt, 0) AS place_cnt,
-                        CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
-                        FROM collections c
-                        LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
-                        ON cpm.collection_pk = c.collection_pk
-                        LEFT OUTER JOIN like_collection lc 
-                        ON lc.collection_pk = c.collection_pk
-                        AND lc.user_pk = c.user_pk
-                        WHERE c.user_pk = ${user_pk}`;
-
-        const [result1] = await conn.query(query1);
-
-        result = await Promise.all(result1.map(async collection => {
-            const query2 = `SELECT keyword_title FROM keywords k
-                            LEFT OUTER JOIN keywords_collections_map kcm
-                            ON kcm.keyword_pk = k.keyword_pk
-                            WHERE kcm.collection_pk = ${collection.collection_pk}`;
-
-            const query3 = `SELECT place_img FROM places p 
-                            INNER JOIN collection_place_map cpm
-                            ON cpm.place_pk = p.place_pk 
-                            AND cpm.collection_pk = ${collection.collection_pk}
-                            Limit 4`;
-
-            const [result2] = await conn.query(query2);
-            const [result3] = await conn.query(query3);
-
-            const keywords = result2.map(keyword => keyword.keyword_title);
-            const thumbnail_images = result3.map(image => image.place_img);
-
-            return {
-                ...collection,
-                keywords,
-                thumbnail_images
             };
         }));
 
@@ -225,6 +188,8 @@ exports.createPlaceToCollection = async (collection_pk, place_pk) => {
 
 // 보관함 상세 조회
 exports.readCollection = async (user_pk, collection_pk) => {
+    // TODO 보관함 type(자유, 일정) 에 따라 쿼리 다르게 타야 함.
+
     const conn = await db.pool.getConnection();
     let result;
 
