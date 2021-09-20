@@ -8,6 +8,8 @@ const client = require('twilio')(accountSid, authToken);
 
 const authService = require('../services/authService');
 
+const {verifyToken} = require('../middleware/jwt');
+
 /*
 * 비밀번호 찾기
 *
@@ -169,6 +171,14 @@ router.post('/loginJWT', async (req, res, next) => {
     } catch (err) {
         return res.send({code: 501, state: 'SERVER ERROR'});
     }
+});
+
+router.delete('/logout', verifyToken, async (req, res, next)=> {
+    const {user} = res.locals;
+    await authService.deleteToken(user.user_pk);
+
+    return res.send({code: 200, state: 'SUCCESS'});
+
 });
 
 module.exports = router;

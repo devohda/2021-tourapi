@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import { Layout, NativeDateService, RangeCalendar } from '@ui-kitten/components';
-import RBSheet from "react-native-raw-bottom-sheet";
+import RBSheet from 'react-native-raw-bottom-sheet';
 import moment from 'moment';
 import 'moment/locale/ko';
 
@@ -103,7 +103,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
 
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
-        console.log('완료')
+        console.log('완료');
     }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
@@ -117,37 +117,37 @@ const MakePlanCollectionScreen = ({navigation}) => {
     });
     const i18n = {
         dayNames: {
-          short: ['일', '월', '화', '수', '목', '금', '토'],
-          long: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+            short: ['일', '월', '화', '수', '목', '금', '토'],
+            long: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
         },
         monthNames: {
-          short: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-          long: [
-            '1월',
-            '2월',
-            '3월',
-            '4월',
-            '5월',
-            '6월',
-            '7월',
-            '8월',
-            '9월',
-            '10월',
-            '11월',
-            '12월',
-          ],
+            short: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            long: [
+                '1월',
+                '2월',
+                '3월',
+                '4월',
+                '5월',
+                '6월',
+                '7월',
+                '8월',
+                '9월',
+                '10월',
+                '11월',
+                '12월',
+            ],
         },
-      };
-    const formatDateService = new NativeDateService('ko', {i18n, format: `YY. MM. DD`});
+    };
+    const formatDateService = new NativeDateService('ko', {i18n, format: 'YY. MM. DD'});
 
     const Keyword = ({keyword, idx}) => {
         return (
             <View key={idx}
-                  style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                  }}
+                style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
 
             >
                 {/* <TouchableOpacity style={styles.selectType} onPress={pressFunc}> */}
@@ -168,15 +168,15 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         style={isPress[keyword.keyword_pk - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{keyword.keyword_title}</AppText>
                 </TouchableOpacity>
             </View>
-        )
-    }
+        );
+    };
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const DATA = {
         collection_name: collectionName,
         collection_private: (isEnabled === true) ? 1 : 0,
         collection_keywords: putKeywords,
         collection_type: 1,
-    }
+    };
 
     useEffect(() => {
         getKeywords();
@@ -221,20 +221,20 @@ const MakePlanCollectionScreen = ({navigation}) => {
             id: '3',
             key: '../assets/images/image3',
         }
-    ]
+    ];
 
     const showUsers = ({item}) => (
         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
             {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
         </View>
-    )
+    );
     
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < keywordData.length; i++) {
-            pressed.push(false)
+            pressed.push(false);
         }
-        setIsPress(pressed)
+        setIsPress(pressed);
     };
 
     const ShowCalendar = () => {
@@ -242,7 +242,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
             startDate: new Date(),
             endDate: new Date()
         });
-        const [textColor, setTextColor] = useState(colors.mainColor)
+        const [textColor, setTextColor] = useState(colors.mainColor);
 
         return (
             <TouchableOpacity onPress={()=>{
@@ -250,96 +250,96 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 setDate({
                     startDate: new Date(),
                     endDate: new Date
-                })
+                });
             }}><AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '400', lineHeight: 22.4}}>{moment(range.startDate).format('YY. MM. DD (dd)')} - {moment(range.endDate).format('YY. MM. DD (dd)')}</AppText>
-            <RBSheet
-            ref={refRBSheet}
-            closeOnDragDown={true}
-            closeOnPressMask={true}
-            height={600}
-            customStyles={{
-                wrapper: {
-                    backgroundColor: "rgba(0, 0, 0, 0.3)",
-                },
-                draggableIcon: {
-                    backgroundColor: colors.gray[4],
-                    width: 110
-                },
-                container: {
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
-                    backgroundColor: colors.yellow[7]
-                }
-            }}
-            >
-                <ScreenContainerView>
-                <View style={{
-                    marginTop: 24,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                }}>
-                    <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
-                    <AppText style={{color: colors.mainColor}}>{date.startDate ? moment(date.startDate).locale('ko').format('YY. MM. DD (dd)') : moment().format('YY. MM. DD (dd)')} - {date.endDate ? moment(date.endDate).locale('ko').format('YY. MM. DD (dd)') : moment().format('YY. MM. DD (dd)')}</AppText>
-                </View>
-                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <RangeCalendar
-                        range={date}
-                        onSelect={(nextRange) => {
-                            setDate(nextRange);
-                        }}
-                        dateService={formatDateService}
-                        style={{color: colors.mainColor, marginVertical: 20, borderColor: 'transparent'}}
-                        renderDay={(Date)=>{
-                            return(
-                                <View>
-                                    <AppText style={{color: Date.date >= date.startDate && Date.date <= date.endDate ? colors.backgroundColor : colors.mainColor,
-                                        fontSize: 12, lineHeight: 24, fontWeight: '500', justifyContent: 'center', textAlign: 'center', paddingTop: 10}}>
-                                    {Platform.OS === 'ios' ?
-                                    Date.date.toLocaleDateString().split('.')[2]
-                                    : Date.date.toLocaleDateString().split('/')[1]}
-                                    </AppText>
-                                </View>
-                            )}}
-                        />
-                </View>
-                <View flex={1} style={{marginBottom: 20}}>
-                    <TouchableOpacity
-                        style={{
-                            backgroundColor: (date.startDate && date.endDate && moment(date.startDate).format('YY. MM. DD (dd)') !== moment(date.endDate).format('YY. MM. DD (dd)')) ? colors.mainColor : colors.gray[5],
-                            height: 48,
-                            borderRadius: 10
-                        }}
-                        onPress={() => {
-                            refRBSheet.current.close();
-                            setRange(date)
-                        }}
-                    ><AppText
-                        style={{
-                            textAlign: 'center',
-                            padding: 14,
-                            fontSize: 16,
-                            color: colors.defaultColor,
-                            fontWeight: 'bold'
-                        }}
-                    >선택완료</AppText>
-                    </TouchableOpacity>
-                </View>
-                </ScreenContainerView>
-            </RBSheet>
+                <RBSheet
+                    ref={refRBSheet}
+                    closeOnDragDown={true}
+                    closeOnPressMask={true}
+                    height={600}
+                    customStyles={{
+                        wrapper: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        },
+                        draggableIcon: {
+                            backgroundColor: colors.gray[4],
+                            width: 110
+                        },
+                        container: {
+                            borderTopLeftRadius: 10,
+                            borderTopRightRadius: 10,
+                            backgroundColor: colors.yellow[7]
+                        }
+                    }}
+                >
+                    <ScreenContainerView>
+                        <View style={{
+                            marginTop: 24,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
+                            <AppText style={{color: colors.mainColor}}>{date.startDate ? moment(date.startDate).locale('ko').format('YY. MM. DD (dd)') : moment().format('YY. MM. DD (dd)')} - {date.endDate ? moment(date.endDate).locale('ko').format('YY. MM. DD (dd)') : moment().format('YY. MM. DD (dd)')}</AppText>
+                        </View>
+                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <RangeCalendar
+                                range={date}
+                                onSelect={(nextRange) => {
+                                    setDate(nextRange);
+                                }}
+                                dateService={formatDateService}
+                                style={{color: colors.mainColor, marginVertical: 20, borderColor: 'transparent'}}
+                                renderDay={(Date)=>{
+                                    return(
+                                        <View>
+                                            <AppText style={{color: Date.date >= date.startDate && Date.date <= date.endDate ? colors.backgroundColor : colors.mainColor,
+                                                fontSize: 12, lineHeight: 24, fontWeight: '500', justifyContent: 'center', textAlign: 'center', paddingTop: 10}}>
+                                                {Platform.OS === 'ios' ?
+                                                    Date.date.toLocaleDateString().split('.')[2]
+                                                    : Date.date.toLocaleDateString().split('/')[1]}
+                                            </AppText>
+                                        </View>
+                                    );}}
+                            />
+                        </View>
+                        <View flex={1} style={{marginBottom: 20}}>
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor: (date.startDate && date.endDate && moment(date.startDate).format('YY. MM. DD (dd)') !== moment(date.endDate).format('YY. MM. DD (dd)')) ? colors.mainColor : colors.gray[5],
+                                    height: 48,
+                                    borderRadius: 10
+                                }}
+                                onPress={() => {
+                                    refRBSheet.current.close();
+                                    setRange(date);
+                                }}
+                            ><AppText
+                                    style={{
+                                        textAlign: 'center',
+                                        padding: 14,
+                                        fontSize: 16,
+                                        color: colors.defaultColor,
+                                        fontWeight: 'bold'
+                                    }}
+                                >선택완료</AppText>
+                            </TouchableOpacity>
+                        </View>
+                    </ScreenContainerView>
+                </RBSheet>
             </TouchableOpacity>
-        )
-    }
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title="일정보관함 만들기"/>
-            <KeyboardAvoidingView flex={1} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
                             style={[collectionName ? {color: colors.mainColor, fontSize: 20, fontWeight: 'bold'} : {fontSize: 20}]}
-                            placeholder={"보관함 이름을 입력해주세요 (2~25자)"}
+                            placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>
                     </View>
@@ -359,7 +359,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
 
                             <View flexDirection="row">
                                 <Image source={require('../../assets/images/add_keyword.png')}
-                                       style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
+                                    style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                                 {
                                     keywordData.map((keyword, idx) => (
                                         <Keyword keyword={keyword} key={idx} />
@@ -404,7 +404,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
                         <ShowCalendar />
                     </View>
-                    <View flex={1} style={{marginBottom: 20, justifyContent: "flex-end"}}>
+                    <View flex={1} style={{marginBottom: 20, justifyContent: 'flex-end'}}>
                         <TouchableOpacity
                             testID="completed"
                             style={{
@@ -414,29 +414,29 @@ const MakePlanCollectionScreen = ({navigation}) => {
                             }}
                             onPress={() => {
                                 // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
-                                    // postCollections();
-                                    navigation.setOptions({tabBarVisible: true});
-                                    // navigation.goBack(null);
-                                    navigation.navigate('PlanCollection')
+                                // postCollections();
+                                navigation.setOptions({tabBarVisible: true});
+                                // navigation.goBack(null);
+                                navigation.navigate('PlanCollection');
                                 // }
                             }}
                             // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
                         ><AppText
-                            style={{
-                                textAlign: 'center',
-                                padding: 14,
-                                fontSize: 16,
-                                color: colors.defaultColor,
-                                fontWeight: 'bold'
-                            }}
-                        >보관함 만들기</AppText>
+                                style={{
+                                    textAlign: 'center',
+                                    padding: 14,
+                                    fontSize: 16,
+                                    color: colors.defaultColor,
+                                    fontWeight: 'bold'
+                                }}
+                            >보관함 만들기</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>
             </KeyboardAvoidingView>
         </ScreenContainer>
-    )
+    );
 
-}
+};
 
 export default MakePlanCollectionScreen;

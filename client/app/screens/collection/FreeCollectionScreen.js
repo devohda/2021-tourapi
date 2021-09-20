@@ -219,9 +219,16 @@ const FreeCollectionScreen = ({route, navigation}) => {
         />
     )
 
-    const EditList = props => (
+    // const EditList = props => (
+    //     <DragAndDropList data={props.item} idx={props.idx} isEditPage={isEditPage} isPress={isPress} />
+    // )
+    const EditList = props => {
+        console.log(props.item);
+        console.log('idx는');
+        console.log(props.idx);
+        return (
         <DragAndDropList data={props.item} idx={props.idx} isEditPage={isEditPage} isPress={isPress} />
-    )
+    )}
     
     const ShowCollections = ({item, index}) => {
         const idx = index;

@@ -5,8 +5,8 @@ const likeService = require('../services/likeService');
 const {verifyToken} = require('../middleware/jwt');
 
 // 장소 좋아요
-router.post('/place', verifyToken, async (req, res, next) => {
-    const {placeId} = req.body;
+router.post('/place/:placeId', verifyToken, async (req, res, next) => {
+    const {placeId} = req.params;
     const {user} = res.locals;
 
     try {
@@ -20,8 +20,8 @@ router.post('/place', verifyToken, async (req, res, next) => {
 });
 
 // 장소 좋아요 삭제
-router.delete('/place', verifyToken, async (req, res, next) => {
-    const {placeId} = req.body;
+router.delete('/place/:placeId', verifyToken, async (req, res, next) => {
+    const {placeId} = req.params;
     const {user} = res.locals;
 
     try {
@@ -34,8 +34,8 @@ router.delete('/place', verifyToken, async (req, res, next) => {
 });
 
 // 보관함 좋아요
-router.post('/collection', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.body;
+router.post('/collection/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
     const {user} = res.locals;
     try {
         await likeService.createLikeCollection(user.user_pk, collectionId);
@@ -47,8 +47,8 @@ router.post('/collection', verifyToken, async (req, res, next) => {
 });
 
 // 보관함 좋아요 삭제
-router.delete('/collection', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.body;
+router.delete('/collection/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
     const {user} = res.locals;
     try {
         await likeService.deleteLikeCollection(user.user_pk, collectionId);
