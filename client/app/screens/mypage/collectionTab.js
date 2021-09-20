@@ -144,7 +144,7 @@ const CollectionTab = ({navigation}) => {
     const getCollectionsFromUsers = () => {
         try {
             console.log(token);
-            fetch('http://localhost:3000/collection/list', {
+            fetch('http://34.146.140.88/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
