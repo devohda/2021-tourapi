@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import ScreenContainer from '../../components/ScreenContainer';
+import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View} from 'react-native';
+import {Icon} from 'react-native-elements';
+import { Button, IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
+
 import ScreenContainerView from '../../components/ScreenContainerView';
 import AppText from '../../components/AppText';
-import {Icon} from 'react-native-elements';
 import {useToken} from '../../contexts/TokenContextProvider';
 
 const CollectionTab = ({navigation}) => {
@@ -137,7 +138,7 @@ const CollectionTab = ({navigation}) => {
 
         keyword: {
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
         },
     });
 
@@ -196,7 +197,7 @@ const CollectionTab = ({navigation}) => {
                         fontWeight: '400',
                         color: colors.mainColor
                     }}>{item.collection_name}</AppText>
-                    <View style={{marginTop: 4}}>
+                    <View style={{marginTop: 4, flexDirection: 'row'}}>
                         {item.keywords.map((keyword, idx) => {
                             return (
                                 <AppText key={idx} style={{
@@ -252,6 +253,85 @@ const CollectionTab = ({navigation}) => {
         );
     };
 
+    const [showMenu, setShowMenu] = useState(false);
+    const [currentMenu, setCurrentMenu] = useState('최근 추가순');
+
+    const SelectBox = () => {
+        return (
+            <>
+            {
+                showMenu && <View style={{
+                position: 'absolute',
+                width: 100,
+                height: 80,
+                backgroundColor: '#fff',
+                flex: 1,
+                borderRadius: 10,
+                zIndex: 9900,
+
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+
+                overflow: 'visible'
+            }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('최근 추가순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>최근 추가순</AppText>
+                </TouchableOpacity>
+
+                <View style={{
+                    height: 1,
+                    borderColor: colors.gray[5],
+                    borderWidth: 0.4,
+                    borderRadius: 1,
+                }}></View>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>인기순</AppText>
+                </TouchableOpacity>
+
+                <View style={{
+                    height: 1,
+                    borderColor: colors.gray[5],
+                    borderWidth: 0.4,
+                    borderRadius: 1,
+                }}></View>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('리뷰순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>리뷰순</AppText>
+                </TouchableOpacity>
+            </View>
+            }
+        </>
+        )}
+
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
             <ScreenContainerView flex={1}>
@@ -264,12 +344,19 @@ const CollectionTab = ({navigation}) => {
                     </ScrollView>
                 </View>
 
-                <View flexDirection="row" style={{justifyContent: 'space-between', marginVertical: 14}}>
-                    <View flexDirection="row">
-                        <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
-                        <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                            name={'chevron-down-outline'} size={16}></Icon>
-                    </View>
+                <View flexDirection="row" style={{justifyContent: 'space-between', marginVertical: 14, position: 'relative', zIndex: 1}}>
+                    <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                        <View flexDirection="row" flex={1}>
+                            <TouchableOpacity onPress={()=>{
+                                setShowMenu(!showMenu);
+                                }} style={{flexDirection: 'row'}}>
+                                <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                    name={'chevron-down-outline'} size={16}></Icon>
+                            </TouchableOpacity>
+                            <SelectBox />
+                        </View>
+                    </TouchableWithoutFeedback>
                     <View flexDirection="row">
                         <View flexDirection="row">
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
@@ -287,6 +374,7 @@ const CollectionTab = ({navigation}) => {
                 </View>
                 <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
                     showsVerticalScrollIndicator={false}
+                    style={{zIndex: 0}}
                     data={collectionList} renderItem={showDirectories}
                     keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
                 />
