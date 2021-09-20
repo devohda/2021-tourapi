@@ -111,8 +111,10 @@ const SearchCollection = ({navigation}) => {
                 alignItems: 'center',
                 marginTop: 22,
                 width: '100%'
-            }, collectionList.length === 0 && {justifyContent: 'center'}}>
-                {
+            }
+            // ,collectionList.length === 0 && {justifyContent: 'center'}
+            }>
+                {/* {
                     collectionList.length === 0 ?
                         <ShowEmpty/> :
                         <SafeAreaView>
@@ -120,8 +122,12 @@ const SearchCollection = ({navigation}) => {
                                 data={collectionList} renderItem={CollectionContainer}
                                 keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
-                }
-
+                } */}
+                        <SafeAreaView>
+                            <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
+                                data={collectionList} renderItem={CollectionContainer}
+                                keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
+                        </SafeAreaView>
             </View>
         </View>
     );

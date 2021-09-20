@@ -159,7 +159,7 @@ const SearchScreen = ({route, navigation}) => {
                         </Pressable>
                     </View>
                     {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchTabNavigator/>
+                        searchKeyword === '' ? <RecommendedDefault /> : <SearchTabNavigator navigation={navigation} />
                     }
                 </ScreenContainerView>
 

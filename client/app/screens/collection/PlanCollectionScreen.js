@@ -34,7 +34,6 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
-import {useToken} from '../../contexts/TokenContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 

@@ -92,15 +92,19 @@ const SearchUser = () => {
     };
 
     return (
-        <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22}, userList.length === 0 && {justifyContent: 'center'}}>
-            {
+        <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22}
+        // , userList.length === 0 && {justifyContent: 'center'}
+        }>
+            {/* {
                 userList.length === 0 ?
                     <ShowEmpty /> :
                     <SafeAreaView>
                         <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={userList} renderItem={UserContainer} keyExtractor={(item) => item.user_pk.toString()} nestedScrollEnabled />
                     </SafeAreaView>
-            }
-
+            } */}
+                    <SafeAreaView>
+                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={userList} renderItem={UserContainer} keyExtractor={(item) => item.user_pk.toString()} nestedScrollEnabled />
+                    </SafeAreaView>
         </View>
     );
 };

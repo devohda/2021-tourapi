@@ -40,12 +40,13 @@ const SearchPlace = ({navigation}) => {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'x-access-token': token
+                    'x-access-token' : token
                 },
             }).then((res) => res.json())
                 .then((response) => {
                     setPlaceList(response.data);
-                    setFalse();
+                    // setFalse();
+                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -128,13 +129,13 @@ const SearchPlace = ({navigation}) => {
     };
 
     const [isPress, setIsPress] = useState([]);
-    const setFalse = () => {
-        var pressed = [];
-        for (let i = 0; i < placeList.length; i++) {
-            pressed.push(false);
-        }
-        setIsPress(pressed);
-    };
+    // const setFalse = () => {
+    //     var pressed = [];
+    //     for (let i = 0; i < placeList.length; i++) {
+    //         pressed.push(false);
+    //     }
+    //     setIsPress(pressed);
+    // };
 
     const PlaceContainer = ({item, index}) => (
         <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
@@ -192,14 +193,18 @@ const SearchPlace = ({navigation}) => {
     return (
         <View style={{backgroundColor: colors.backgroundColor}}>
             <ScrollView>
-                {
+                {/* {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
                         <SafeAreaView>
                             <FlatList data={placeList} renderItem={PlaceContainer}
                                 keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
-                }
+                } */}
+                                        <SafeAreaView>
+                            <FlatList data={placeList} renderItem={PlaceContainer}
+                                keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
+                        </SafeAreaView>
             </ScrollView>
         </View>
     );
