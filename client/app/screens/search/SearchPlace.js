@@ -193,18 +193,14 @@ const SearchPlace = ({navigation}) => {
     return (
         <View style={{backgroundColor: colors.backgroundColor}}>
             <ScrollView>
-                {/* {
+                {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
                         <SafeAreaView>
                             <FlatList data={placeList} renderItem={PlaceContainer}
                                 keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
-                } */}
-                                        <SafeAreaView>
-                            <FlatList data={placeList} renderItem={PlaceContainer}
-                                keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
-                        </SafeAreaView>
+                }
             </ScrollView>
         </View>
     );

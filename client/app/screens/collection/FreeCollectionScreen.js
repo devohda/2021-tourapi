@@ -12,6 +12,7 @@ import {
     FlatList,
     Animated,
     TouchableHighlight,
+    Modal
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -22,16 +23,14 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
-import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import { tipsList } from '../../contexts/TipsListContextProvider';
-import TipsList from './TipsList';
 import ShowPlaces from './ShowPlaces';
-import DragAndDropList from './DragAndDropList';
 
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import {useToken} from '../../contexts/TokenContextProvider';
+import DragAndDropListForFree from './DragAndDropListForFree';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -78,6 +77,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setCollectionData(response.data);
                     setPlaceLength(response.data.places.length);
                     setFalse();
+                    console.log(response.data)
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                 })
                 .catch((err) => {
@@ -90,7 +90,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+        //생성에서 바로 넘어오는 데이터 처리
+        if(typeof data === 'undefined') {
+            if (collectionData.collection_private === 0) return false;
+        } else if (data.collection_private === 0 ) return false;
         return true;
     };
 
@@ -153,36 +156,40 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const deleteCollection = () => {
+        console.log(collectionData)
+        try {
+            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const InputBox = styled(TextInput)`
       fontSize: 16px;
       borderBottomWidth: 1px;
       borderBottomColor: #C5C5C5;
       paddingBottom: 11px;
     `;
-    const Keyword = ({item}) => {
-        return (
-            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
-        );
-    };
 
-    const checkType = (type) => {
-        if (type === 12) {
-            return '관광지';
-        } else if (type === 14) {
-            return '문화시설';
-        } else if (type === 15) {
-            return '축제/공연/행사';
-        } else if (type === 28) {
-            return '레포츠';
-        } else if (type === 32) {
-            return '숙박';
-        } else if (type === 38) {
-            return '쇼핑';
-        } else if (type === 39) {
-            return '음식';
-        } else {
-            return '기타';
-        }
+    const Keyword = props => {
+        return (
+            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
+        );
     };
     
     const rowSwipeAnimatedValues = {};
@@ -191,10 +198,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
     .forEach((_, i) => {
         rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
     });
-    const SwipeList = props => (
+
+    const SwipeList = () => {
+        return (
         <SwipeListView
             data={collectionData.places}
-            renderItem={ShowPlaces}
+            renderItem={({item, index}) => <ShowPlaces item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />}
             keyExtractor={(item) => item.place_pk.toString()}
             key={(item, idx) => {idx.toString()}}
             renderHiddenItem={(item, rowMap) => {
@@ -217,38 +226,54 @@ const FreeCollectionScreen = ({route, navigation}) => {
             closeOnRowPress={true}
             nestedScrollEnabled
         />
-    )
-
-    // const EditList = props => (
-    //     <DragAndDropList data={props.item} idx={props.idx} isEditPage={isEditPage} isPress={isPress} />
-    // )
-    const EditList = props => {
-        console.log(props.item);
-        console.log('idx는');
-        console.log(props.idx);
-        return (
-        <DragAndDropList data={props.item} idx={props.idx} isEditPage={isEditPage} isPress={isPress} />
     )}
     
-    const ShowCollections = ({item, index}) => {
-        const idx = index;
-        return (
-            <>
-                {/* <SwipeList item={item} idx={idx} key={idx}/>
-                 : <EditList item={item} idx={idx} key={idx}/> */}
-                {isEditPage ?
-                    <AppText>hi</AppText>
-                 : <EditList item={item} idx={idx} key={idx}/>
-                }                
-            </>
-        )
-    }
     const [showMenu, setShowMenu] = useState(false);
+    const keywords = data.keywords;
+    const [deleteMenu, setDeleteMenu] = useState(false);
+
+    const deleteMode = () => {
+        setDeleteMenu(true);
+    }
+
+    const DeleteModal = () => (
+        <Modal
+        transparent={true}
+        visible={deleteMenu}
+        onRequestClose={() => {
+            setDeleteMenu(!deleteMenu);
+        }}
+    >
+        <View style={styles.centeredView}>
+            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 하시겠습니까?</AppText>
+                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                    <Pressable
+                        style={{...styles.button, backgroundColor: colors.gray[4]}}
+                        onPress={() => setDeleteMenu(!deleteMenu)}
+                    >
+                        <AppText style={styles.textStyle}>취소하기</AppText>
+                    </Pressable>
+                    <Pressable
+                        style={{...styles.button, backgroundColor: colors.mainColor}}
+                        onPress={() => {
+                            setDeleteMenu(!deleteMenu);
+                            deleteCollection();
+                        }}
+                    >
+                        <AppText style={styles.textStyle}>삭제하기</AppText>
+                    </Pressable>
+                </View>
+            </View>
+        </View>
+    </Modal>
+    )
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             {
                 showMenu && (
+                    <>
                     <View style={{
                         position: 'absolute',
                         width: 80,
@@ -289,15 +314,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             borderRadius: 1,
                         }}></View>
                         <TouchableOpacity
-                            onPress={() => {
+                            onPress={async () => {
                                 setShowMenu(state => !state);
+                                await deleteMode();
                             }}
                             style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}><AppText>삭제</AppText></TouchableOpacity>
+                        <DeleteModal />
                     </View>
+                </>
                 )
             }
 
@@ -350,6 +378,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 }]}>
                                 <AppText style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText>
                             </View>
+                            {
+                                    keywords.map((keyword, idx) => (
+                                        <Keyword keyword={keyword} key={idx} />
+                                    ))
+                            }
                         </View>
                         <View>
                             {checkTrue() &&
@@ -418,11 +451,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         <AppText style={{color: colors.gray[4]}}>총 <AppText
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
-                                    <SafeAreaView>
-                                    <FlatList data={collectionData.places} renderItem={ShowCollections}
-                                        keyExtractor={(item, index) => index.toString()}
-                                        nestedScrollEnabled/>
-                                    </SafeAreaView>
                                     <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -431,15 +459,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </TouchableOpacity>
                                 </View>
                                 <SafeAreaView>
-                                    {/* {
-                                    placeData.length > 5 ?
-                                } */}
-                                    {/* {collectionData.place.map((item, idx) =>(
-                                    <ShowPlaces item={item} idx={idx} key={idx}/>
-                                ))} */}
-                                {/* <FlatList data={collectionData.places} renderItem={ShowCollections}
-                                        keyExtractor={(item, index) => index.toString()}
-                                        nestedScrollEnabled/> */}
+                                    <SafeAreaView>
+                                        {
+                                            !isEditPage ?
+                                            <SwipeList /> :
+                                            <DragAndDropListForFree data={collectionData.places} isEditPage={isEditPage} isPress={isPress} />
+                                        }
+                                    </SafeAreaView>
                                 </SafeAreaView>
                                 <TouchableOpacity onPress={() => {
                                     // if(isLimited) setIsLimited(false);
@@ -620,6 +646,46 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         right: 0,
     },
+
+    //modal example
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    modalView: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 150
+    },
+    button: {
+        borderRadius: 10,
+        marginHorizontal: 9.5,
+        marginTop: 26,
+        width: 108,
+        height: 38,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 22.4,
+        fontWeight: '500'
+    },
+    modalText: {
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 22.4,
+        fontWeight: '700'
+    }
 });
 
 export default FreeCollectionScreen;

@@ -3,10 +3,12 @@ import { View, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-nati
 import { useTheme } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import {Modal, Card} from '@ui-kitten/components';
+import ScreenDivideLine from '../../components/ScreenDivideLine';
+import TipIcon from '../../assets/images/tipIcon.svg';
 
 import { tipsList } from '../../contexts/TipsListContextProvider';
 
-const ShowPlace = props => {
+const TipsList = props => {
     const { data, idx, day} = props;
     const {colors} = useTheme();
     const [visible, setVisible] = useState(false);
@@ -22,7 +24,7 @@ const ShowPlace = props => {
                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                     <Image source={require('../../assets/images/tipIcon.png')}
                         style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                    <AppText style={{color: colors.blue[1], fontSize: 14}}>{isFree ? tmpData[idx].tip : data.tip}</AppText>
+                    <AppText style={{color: colors.blue[1], fontSize: 14}}>{isFree && idx <= 1 ? tmpData[idx].tip : data.tip}</AppText>
                 </View>
                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                     <Image style={{width: 28, height: 28}}
@@ -30,6 +32,24 @@ const ShowPlace = props => {
                 </View>
             </View>
         </TouchableOpacity>
+        {/* <TouchableOpacity> */}
+            <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
+                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                    <TipIcon width={12} height={12} style={{marginEnd: 8, color: colors.gray[4]}}/>
+                    <TextInput style={{color: colors.blue[1], fontSize: 14}}
+                    placeholder={'한줄팁 추가하기'}
+                    ></TextInput>
+                </View>
+            </View>
+        {/* </TouchableOpacity> */}
+        {isFree &&
+            <View style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.red_gray[6],
+                zIndex: -1000,
+                marginVertical: 12
+            }}></View>}
         <Modal
         visible={visible}
         backdropStyle={styles.backdrop}
@@ -42,7 +62,7 @@ const ShowPlace = props => {
                     <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁 수정</AppText>
                 </View>
                 <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 24}}>
-                    <TextInput defaultValue={isFree ? tmpData[idx].tip : data.tip} onChangeText={(text)=>{
+                    <TextInput defaultValue={isFree && idx <= 1 ? tmpData[idx].tip : data.tip} onChangeText={(text)=>{
                             setChangedTip(text);
 
                         }}
@@ -113,12 +133,13 @@ const styles = StyleSheet.create({
         paddingLeft: 6,
         paddingRight: 5,
         marginBottom: 6,
-        marginRight: 10,
+        marginRight: 4,
         marginTop: 8,
+        marginLeft: 8,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     }
 });
 
-export default memo(ShowPlace, areEqual);
+export default memo(TipsList, areEqual);

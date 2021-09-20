@@ -71,13 +71,13 @@ function objectMove(object, from, to) {
 function listToObject(list) {
   const values = Object.values(list);
   const object = {};
-  // console.log(values)
-  for (let i = 0; i < values.length; i++) {
-    // object[values[i].id] = i;
-    object[values[i].tip] = i;
-  }
 
-  console.log(object)
+  // console.log(values)
+
+  for (let i = 0; i < values.length; i++) {
+    object[values[i].place_name] = i;
+  }
+  // console.log(object)
 
   return object;
 }
@@ -87,9 +87,7 @@ const CONTAINER_HEIGHT = 180;
 const SCROLL_HEIGHT_THRESHOLD = CONTAINER_HEIGHT;
 
 function ListAnimation({
-  day,
   index,
-  tip,
   data,
   positions,
   scrollY,
@@ -100,10 +98,10 @@ function ListAnimation({
   const dimensions = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [moving, setMoving] = useState(false);
-  const top = useSharedValue(positions.value[tip] * CONTAINER_HEIGHT);
+  const top = useSharedValue(positions.value[data.place_name] * CONTAINER_HEIGHT);
 
   useAnimatedReaction(
-    () => positions.value[tip],
+    () => positions.value[data.place_name],
     (currentPosition, previousPosition) => {
       if (currentPosition !== previousPosition) {
         if (!moving) {
@@ -148,16 +146,16 @@ function ListAnimation({
         songsCount - 1
       );
 
-      if (newPosition !== positions.value[tip]) {
+      if (newPosition !== positions.value[data.place_name]) {
         positions.value = objectMove(
           positions.value,
-          positions.value[tip],
+          positions.value[data.place_name],
           newPosition
         );
       }
     },
     onFinish() {
-      top.value = positions.value[tip] * CONTAINER_HEIGHT;
+      top.value = positions.value[data.place_name] * CONTAINER_HEIGHT;
       runOnJS(setMoving)(false);
     },
   });
@@ -182,14 +180,14 @@ function ListAnimation({
     <Animated.View style={animatedStyle}>
         <PanGestureHandler onGestureEvent={gestureHandler}>
           <Animated.View>
-            <ShowPlaces day={day} item={data} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />
+            <ShowPlaces item={data} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />
           </Animated.View>
         </PanGestureHandler>
     </Animated.View>
   );
 }
 
-const DragAndDropList = props => {
+const DragAndDropListForFree = props => {
   const Data = props.data;
   const positions = useSharedValue(listToObject(Data));
   const scrollY = useSharedValue(0);
@@ -223,51 +221,10 @@ const DragAndDropList = props => {
               height: Data.length * CONTAINER_HEIGHT,
             }}
           >
-              {/* <SwipeListView
-                  data={Data}
-                  renderItem={({item, index}) => 
-                  <ListAnimation
-                  key={item.id}
-                  day={props.idx}
-                  index={index}
-                  tip={item.tip}
-                  data={item}
-                  positions={positions}
-                  scrollY={scrollY}
-                  songsCount={Data.length}
-                  isEditPage={props.isEditPage}
-                  isPress={props.isPress}
-                />}
-                  keyExtractor={(item, idx) => {idx.toString()}}
-                  key={(item, idx) => {idx.toString()}}
-                  renderHiddenItem={(item, rowMap) => {
-                      return (
-                      <View style={{...styles.rowBack, backgroundColor: colors.red[1]}} key={item.id}>
-                          <TouchableOpacity
-                              style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
-                              onPress={() => deleteRow(rowMap, item.index)}
-                          >
-                              <View>
-                                  <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                              </View>
-                          </TouchableOpacity>
-                      </View>
-                  )}}
-                  rightOpenValue={-75}
-                  previewRowKey={'0'}
-                  previewOpenDelay={3000}
-                  disableRightSwipe={true}
-                  disableLeftSwipe={props.isEditPage ? true : false}
-                  closeOnRowOpen={true}
-                  closeOnRowPress={true}
-                  nestedScrollEnabled
-              /> */}
             {Data.map((data, index) => (
               <ListAnimation
-                key={data.id}
-                day={props.idx}
+                key={data.place_pk}
                 index={index}
-                tip={data.tip}
                 data={data}
                 positions={positions}
                 scrollY={scrollY}
@@ -307,4 +264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DragAndDropList;
+export default DragAndDropListForFree;
