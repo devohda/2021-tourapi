@@ -9,7 +9,7 @@ import TipIcon from '../../assets/images/tipIcon.svg';
 import { tipsList } from '../../contexts/TipsListContextProvider';
 
 const TipsList = props => {
-    const { data, idx, day} = props;
+    const { data, idx, day, length} = props;
     const {colors} = useTheme();
     const [visible, setVisible] = useState(false);
     const [changedTip, setChangedTip] = useState('');
@@ -19,30 +19,31 @@ const TipsList = props => {
     return(
         <>
         <View flex={1}>
-        <TouchableOpacity onPress={() => setVisible(true)}>
-            <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <Image source={require('../../assets/images/tipIcon.png')}
-                        style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                    <AppText style={{color: colors.blue[1], fontSize: 14}}>{isFree && idx <= 1 ? tmpData[idx].tip : data.tip}</AppText>
+            {
+                isFree && idx === 0 ?
+                <TouchableOpacity onPress={() => setVisible(true)}>
+                    <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Image source={require('../../assets/images/tipIcon.png')}
+                                style={{width: 12, height: 12, marginEnd: 8}}></Image>
+                            <AppText style={{color: colors.blue[1], fontSize: 14}}>{isFree && idx <= 1 ? tmpData[idx].tip : data.tip}</AppText>
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Image style={{width: 28, height: 28}}
+                                source={require('../../assets/images/default_profile_2.png')}></Image>
+                        </View>
+                    </View>
+                </TouchableOpacity> :
+                <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <TipIcon width={12} height={12} style={{marginEnd: 8, color: colors.gray[4]}}/>
+                        <TextInput style={{color: colors.blue[1], fontSize: 14}}
+                        placeholder={'한줄팁 추가하기'}
+                        ></TextInput>
+                    </View>
                 </View>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <Image style={{width: 28, height: 28}}
-                        source={require('../../assets/images/default_profile_2.png')}></Image>
-                </View>
-            </View>
-        </TouchableOpacity>
-        {/* <TouchableOpacity> */}
-            <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <TipIcon width={12} height={12} style={{marginEnd: 8, color: colors.gray[4]}}/>
-                    <TextInput style={{color: colors.blue[1], fontSize: 14}}
-                    placeholder={'한줄팁 추가하기'}
-                    ></TextInput>
-                </View>
-            </View>
-        {/* </TouchableOpacity> */}
-        {isFree &&
+            }
+        {idx < length-1 &&
             <View style={{
                 width: '100%',
                 height: 1,

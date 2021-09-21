@@ -83,7 +83,7 @@ function listToObject(list) {
 }
 
 //해당 height 가져오는 방법 구상
-const CONTAINER_HEIGHT = 180;
+const CONTAINER_HEIGHT = 160;
 const SCROLL_HEIGHT_THRESHOLD = CONTAINER_HEIGHT;
 
 function ListAnimation({
@@ -93,7 +93,8 @@ function ListAnimation({
   scrollY,
   songsCount,
   isEditPage,
-  isPress
+  isPress,
+  navigation
 }) {
   const dimensions = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -180,7 +181,7 @@ function ListAnimation({
     <Animated.View style={animatedStyle}>
         <PanGestureHandler onGestureEvent={gestureHandler}>
           <Animated.View>
-            <ShowPlaces item={data} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />
+            <ShowPlaces item={data} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={data.length} navigation={navigation}/>
           </Animated.View>
         </PanGestureHandler>
     </Animated.View>
@@ -231,6 +232,7 @@ const DragAndDropListForFree = props => {
                 songsCount={Data.length}
                 isEditPage={props.isEditPage}
                 isPress={props.isPress}
+                navigation={props.navigation}
               />
             ))}
           </Animated.ScrollView>

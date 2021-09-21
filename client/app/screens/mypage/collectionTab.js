@@ -56,7 +56,6 @@ const CollectionTab = ({navigation}) => {
             }).then((res) => res.json())
                 .then(({data}) => {
                     setCollectionList(data);
-                    console.log(data);
                 })
                 .catch((err) => {
                     console.error(err);

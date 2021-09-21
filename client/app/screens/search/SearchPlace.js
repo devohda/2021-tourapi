@@ -1,12 +1,15 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from 'react-native';
 import {useTheme} from '@react-navigation/native';
-import Star from '../../assets/images/search/star.svg';
-import Jewel from '../../assets/images/jewel.svg';
+import { useIsFocused } from '@react-navigation/native';
+
 import AppText from '../../components/AppText';
 import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
+
+import Star from '../../assets/images/search/star.svg';
+import Jewel from '../../assets/images/jewel.svg';
 
 const SearchPlace = ({navigation}) => {
     const {colors} = useTheme();
@@ -148,8 +151,13 @@ const SearchPlace = ({navigation}) => {
                 justifyContent: 'space-between'
             }}>
                 <View style={{flexDirection: 'row', width: '85%'}}>
-                    <Image source={require('../../assets/images/mountain.jpeg')}
-                        style={{borderRadius: 10, width: 72, height: 72}}/>
+                    {
+                        item.place_img ?
+                        <Image source={{uri: item.place_img}}
+                        style={{borderRadius: 10, width: 72, height: 72}}/> :
+                        <Image source={require('../../assets/images/here_default.png')}
+                        style={{borderRadius: 10, width: 72, height: 72}}/> 
+                    }
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
                             <AppText

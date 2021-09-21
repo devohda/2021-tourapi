@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from 'react-native';
+import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView, Alert} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
@@ -8,8 +8,9 @@ import { useSearchKeyword } from "../../contexts/SearchkeywordContextProvider";
 import ShowEmpty from "../../components/ShowEmpty";
 import {useToken} from '../../contexts/TokenContextProvider';
 
-const SearchPlaceForPlan = ({navigation}) => {
+const SearchPlaceForPlan = (props, {route, navigation}) => {
     const {colors} = useTheme();
+    const { pk, placeData, day} = props;
     const [placeList, setPlaceList] = useState([]);
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
@@ -17,21 +18,34 @@ const SearchPlaceForPlan = ({navigation}) => {
 
     const [token, setToken] = useToken();
 
+    const addPlace = (place_pk) => {
+        console.log(day.id)
+        try {
+            fetch(`http://34.146.140.88/collection/${pk}/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    planDay: day.id,
+                })
+            }).then((res) => {
+                res.json();
+            })
+                .then((responsedata) => {
+                    console.log(responsedata)
+                    Alert.alert('', '추가되었습니다.');
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
 
-    const styles = StyleSheet.create({
-        info_container : {
-            marginLeft: 8,
-            paddingVertical : 1.5,
-            justifyContent: 'space-between',
-            height: '100%'
-        },
-        score_line : {
-            width: 1,
-            height: '80%',
-            backgroundColor: colors.gray[4],
-            marginHorizontal: 4
+        } catch (err) {
+            console.error(err);
         }
-    });
+    };
 
     useEffect(() => {
         getResults();
@@ -93,11 +107,17 @@ const SearchPlaceForPlan = ({navigation}) => {
         <TouchableOpacity onPress={()=>props.navigation.navigate('Place', {data : item})}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', width: '85%'}}>
-                    <Image source={require('../../assets/images/mountain.jpeg')} style={{borderRadius: 10, width: 72, height: 72}}/>
+                    {
+                        item.place_img ?
+                        <Image source={{uri: item.place_img}}
+                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
+                        <Image source={require('../../assets/images/here_default.png')}
+                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                    }
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
                             <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
-                            <View style={styles.score_line}></View>
+                            <View style={{...styles.score_line, backgroundColor: colors.gray[4]}}></View>
                             <Star width={11} height={11} style={{marginTop: 2}} />
                             <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
                         </View>
@@ -118,7 +138,7 @@ const SearchPlaceForPlan = ({navigation}) => {
                         }
                         newArr[index] = true;
                         setIsPress(newArr);
-                        // likePlace(item.place_pk)
+                        addPlace(item.place_pk)
                     }
                 }}
                 style={{width: '15%'}}
@@ -147,5 +167,20 @@ const SearchPlaceForPlan = ({navigation}) => {
         </View>
     );
 };
+
+
+const styles = StyleSheet.create({
+    info_container : {
+        marginLeft: 8,
+        paddingVertical : 1.5,
+        justifyContent: 'space-between',
+        height: '100%'
+    },
+    score_line : {
+        width: 1,
+        height: '80%',
+        marginHorizontal: 4
+    }
+});
 
 export default SearchPlaceForPlan;

@@ -15,6 +15,7 @@ const SearchScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+    useEffect(() => {setSearchKeyword('')}, []);
 
     const styles = StyleSheet.create({
         search_box: {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Image, SectionList, StyleSheet, Switch} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import appJson from '../../../app.json';
@@ -8,10 +8,40 @@ import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import ListItem from './ListItem';
+import { useToken } from '../../contexts/TokenContextProvider';
 
 const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
 
+    const [token, setToken] = useToken();
+    const [userData, setUserData] = useState({});
+
+    useEffect(() => {
+        getUserData();
+    },[]);
+
+    // 보관함 데이터 가져오는 함수
+    const getUserData = () => {
+        try {
+            fetch('http://34.146.140.88/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
@@ -21,7 +51,7 @@ const SystemSettingScreen = ({navigation}) => {
         {
             index: 1,
             title: '연결된 계정',
-            data: [{index: 1, name: '수정필요'}]
+            data: [{index: 1, name: userData.user_nickname}]
         },
         {
             index: 2,

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, TextInput, Image, ScrollView, Pressable, StyleSheet} from 'react-native';
 import ScreenContainer from '../../components/ScreenContainer';
 import {useTheme} from '@react-navigation/native';
@@ -10,11 +10,14 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
 import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
+import SearchPlaceForPlan from './SearchPlaceForPlan';
 
-const SearchScreen = ({route, navigation}) => {
+const SearchScreenForPlan = ({route, navigation}) => {
     const {colors} = useTheme();
+    const { pk, placeData, day } = route.params;
     const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+    useEffect(() => {setSearchKeyword('')}, []);
 
     const styles = StyleSheet.create({
         search_box: {
@@ -159,7 +162,7 @@ const SearchScreen = ({route, navigation}) => {
                         </Pressable>
                     </View>
                     {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchTabNavigator/>
+                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForPlan pk={pk} placeData={placeData} day={day}/>
                     }
                 </ScreenContainerView>
 
@@ -185,23 +188,10 @@ const SearchScreen = ({route, navigation}) => {
                             <RecommendedPlace name="헬로피자" address="서울 마포구"/>
                         </ScrollView>
                     </View>
-                    <View style={{marginVertical: 12}}>
-                        <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
-                            <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 보관함</AppText>
-                        </View>
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                        </ScrollView>
-                    </View>
                 </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>
     );
 };
 
-export default SearchScreen;
+export default SearchScreenForPlan;
