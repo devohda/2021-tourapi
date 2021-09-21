@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, cloneElement} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -25,6 +25,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import { tipsList } from '../../contexts/TipsListContextProvider';
 import {useToken} from '../../contexts/TokenContextProvider';
+import { updatedList } from '../../contexts/UpdatedListContextProvider';
 
 import TipsList from './TipsList';
 import DragAndDropList from './DragAndDropList';
@@ -35,6 +36,9 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
+
+import moment from 'moment';
+import 'moment/locale/ko';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -47,9 +51,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
+    const [updatedData, setUpdatedData] = updatedList();
     const [tmpPlaceData, setTmpPlaceData] = useState([]);
     const [visible, setVisible] = useState(false);
     const [isEditPage, setIsEditPage] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [planDays, setPlanDays] = useState([]);
 
     const [token, setToken] = useToken();
 
@@ -80,48 +88,93 @@ const PlanCollectionScreen = ({route, navigation}) => {
             ]
         }
         ]);
-        // console.log(data)
-        // getInitialData();
+        getInitialCollectionData();
+        getInitialPlaceData();
+
+        if(typeof data.collection_private === 'boolean') {
+            setStartDate(moment(data.startDate).format('YYYY.MM.DD'));
+            setEndDate(moment(data.endDate).format('YYYY.MM.DD'));
+        }
     }, []);
 
-    // const getInitialData = () => {
-    //     try {
-    //         fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json',
-    //                 'x-access-token': token
-    //             },
-    //         }).then((res) => res.json())
-    //             .then((response) => {
-    //                 setCollectionData(response.data);
-    //                 setPlaceLength(response.data.places.length);
-    //                 setFalse();
-    //                 // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
-    //             })
-    //             .catch((err) => {
-    //                 console.error(err);
-    //             });
+    const getInitialCollectionData = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setCollectionData(response.data);
+                    setStartDate(response.data.collection_start_date.split('T')[0]);
+                    setEndDate(response.data.collection_end_date.split('T')[0]);
 
-    //     } catch (err) {
-    //         console.error(err);
-    //     }
-    // };
+                    var gap = moment(response.data.collection_end_date.split('T')[0]).diff(moment(response.data.collection_start_date.split('T')[0]), 'days');
+                    var newArr = [];
+                    for(var i=0;i<=gap;i++) {
+                        newArr.push({
+                            days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
+                        })
+                    }
+                    setPlanDays(newArr)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
 
-    // const checkTrue = () => {
-    //     // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
-    //     return true;
-    // };
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getInitialPlaceData = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}/places`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setPlaceData(response.data)
+                    var exceptLength = 0;
+                    for(let i = 0; i < response.data.length; i++) {
+                        if(response.data[i].place_pk === -1) exceptLength += 1;
+                    }
+                    setPlaceLength(response.data.length - exceptLength * 2);
+
+                    var pressed = [];
+                    for (let i = 0; i < placeLength; i++) {
+                        pressed.push(false);
+                    }
+                    setIsPress(pressed);
+                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const checkTrue = () => {
+        // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+        if(data.collection_private === true || data.collection_private === false) {
+            return true;
+        }
+        return false;
+    };
 
     const [isPress, setIsPress] = useState([]);
+
     const setFalse = () => {
-        var pressed = [];
-        for (let i = 0; i < placeLength; i++) {
-            pressed.push(false);
-        }
-        setIsPress(pressed);
-        console.log(collectionData)
     };
 
     const likePlace = (pk) => {
@@ -197,13 +250,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     }
 
-    const InputBox = styled(TextInput)`
-      fontSize: 16px;
-      borderBottomWidth: 1px;
-      borderBottomColor: #C5C5C5;
-      paddingBottom: 11px;
-    `;
-
     const Keyword = ({item}) => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
@@ -240,13 +286,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const SwipeList = props => (
         <SwipeListView
-            data={props.item.places}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />}
+            data={placeData}
+            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} />}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
             renderHiddenItem={(item, rowMap) => {
                 return (
-                    <View style={{...styles.rowBack, backgroundColor: colors.red[1]}} key={item.index}>
+                    <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
                         <TouchableOpacity
                             style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
                             onPress={() => deleteRow(rowMap, item.index)}
@@ -269,7 +315,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     );
 
     const EditList = props => (
-        <DragAndDropList data={props.item.places} idx={props.idx} isEditPage={isEditPage} isPress={isPress} />
+        <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
     );
 
     const ShowDays = ({item, index}) => {
@@ -280,10 +326,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                         <View style={{flexDirection: 'row'}}>
                             <View>
-                                <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {item.day}</AppText>
+                                <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '700'}}>Day {idx+1}</AppText>
                             </View>
                             <View style={{marginStart: 8}}>
-                                <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '400'}}>2021.09.21</AppText>
+                                <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '400'}}>{item.days}</AppText>
                             </View>
                         </View>
                         <View>
@@ -296,7 +342,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </View>
                     </View>
                 </View>
-                {!isEditPage ? <SwipeList item={item} idx={idx} key={idx}/> : <EditList item={item} idx={idx} key={idx}/>}
+                {!isEditPage ? <SwipeList idx={idx} key={idx}/> : <EditList idx={idx} key={idx}/>}
+
                 <TouchableOpacity onPress={() => {
                 // if(isLimited) setIsLimited(false);
                 // else setIsLimited(true);
@@ -372,6 +419,34 @@ const PlanCollectionScreen = ({route, navigation}) => {
     </Modal>
     )
 
+    const setDate = () => {
+
+        //data로 오는 거 처리
+        if(data.collection_private === true || data.collection_private === false) {
+            return `${startDate} - ${endDate}`;
+        }
+        else if(data.collection_private === 0 || data.collection_private === 1) {
+            if(Object.keys(collectionData).length === 0 && collectionData.constructor === Object) return '';
+            else {
+                //년도가 다를 경우
+                if(parseInt(startDate.split('-')[0]) !== parseInt(endDate.split('-')[0])) {
+                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('YYYY.MM.DD')}`;
+                }
+                //월이 다를 경우
+                if(parseInt(startDate.split('-')[1]) !== parseInt(endDate.split('-')[1])) {
+                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('MM.DD')}`;
+                }
+                //일이 다를 경우
+                if(parseInt(startDate.split('-')[2]) !== parseInt(endDate.split('-')[2])) {
+                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('DD')}`;
+                }
+                //시작일과 종료일이 같을 경우
+                else return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}`;
+            }
+        }
+
+    }
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             {
@@ -438,7 +513,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', left: 0}}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={() => {
+                        if(typeof data.collection_private === 'boolean') {
+                            navigation.pop(2);
+                        }
+                        else navigation.goBack()}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -446,12 +525,17 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     !isEditPage ?
                         <View style={{position: 'absolute', right: 0}}>
                             <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                                disabled={typeof data.collection_private === 'boolean'}
                                 style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
                                 <MoreIcon style={{color: colors.mainColor}}/>
                             </TouchableOpacity>
                         </View> :
                         <View style={{position: 'absolute', right: 0}}>
-                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
+                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
+                            onPress={() => {
+                                setIsEditPage(false);
+                                console.log(updatedData)
+                            }}>
                                 <View>
                                     <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
                                 </View>
@@ -480,9 +564,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            {/* {checkTrue() &&
+                            {checkTrue() &&
                             <Image source={require('../../assets/images/lock_forDir.png')}
-                                style={{width: 22, height: 22}}></Image>} */}
+                                style={{width: 22, height: 22}}></Image>}
                         </View>
                     </View>
                     <View style={{
@@ -492,13 +576,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }}>
                         <View style={{justifyContent: 'center', alignItems: 'flex-start'}}>
                             <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '500'}}>
-                                2021.09.21-29
+                                {setDate()}
                             </AppText>
                             <AppText style={{
                                 fontSize: 22,
                                 fontWeight: '700',
                                 color: colors.mainColor
-                            }}>보관함 제목</AppText>
+                            }}>{collectionData.collection_name}</AppText>
                             {/* <AppText style={{
                                 fontSize: 22,
                                 fontWeight: '700',
@@ -546,46 +630,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </View>
 
                 <ScreenContainerView>
-                    <View style={{marginTop: 16}}>
-                        <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <View>
-                                <AppText style={{color: colors.gray[4]}}>총 <AppText
-                                    style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
-                            </View>
-                        </View>
-                        <SafeAreaView>
-                            {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
-                                        keyExtractor={(item) => item.place_pk.toString()}
-                                        nestedScrollEnabled/> */}
-                            <FlatList data={tmpData} renderItem={ShowDays}
-                                keyExtractor={(item, index) => index.toString()}
-                                nestedScrollEnabled/>
-                        </SafeAreaView>
-                        <TouchableOpacity onPress={() => {
-                            // if(isLimited) setIsLimited(false);
-                            // else setIsLimited(true);
-                            // console.log(isLimited)
-                        }}>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <AppText style={{
-                                    fontSize: 14,
-                                    fontWeight: '400',
-                                    color: colors.gray[2]
-                                }}>전체보기</AppText>
-                                <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                    style={{
-                                        width: 15,
-                                        height: 15,
-                                        marginLeft: 10,
-                                        marginBottom: 5
-                                    }}></Image>
-                            </View>
-                        </TouchableOpacity>
-                    </View> 
                     {
                         placeLength !== 0 ?
                             <View style={{marginTop: 16}}>
@@ -594,41 +638,20 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                 </View>
                                 <SafeAreaView>
-                                    {/* {
-                                    placeData.length > 5 ?
-                                } */}
-                                    {/* {collectionData.place.map((item, idx) =>(
-                                    <ShowPlaces item={item} idx={idx} key={idx}/>
-                                ))} */}
-                                    <FlatList data={item} renderItem={(item, index) => <ShowPlaces item={item} index={index}/>}
-                                        keyExtractor={(item) => item.place_pk.toString()}
+                                            {/* {
+                                            placeData.length > 5 ?
+                                        } */}
+                                            {/* {collectionData.place.map((item, idx) =>(
+                                            <ShowPlaces item={item} idx={idx} key={idx}/>
+                                        ))} */}
+                                    {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
+                                                keyExtractor={(item) => item.place_pk.toString()}
+                                                nestedScrollEnabled/> */}
+                                    <FlatList data={planDays} renderItem={ShowDays}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        key={(item, index) => index.toString()}
                                         nestedScrollEnabled/>
-
                                 </SafeAreaView>
-                                <TouchableOpacity onPress={() => {
-                                    // if(isLimited) setIsLimited(false);
-                                    // else setIsLimited(true);
-                                    // console.log(isLimited)
-                                }}>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }}>
-                                        <AppText style={{
-                                            fontSize: 14,
-                                            fontWeight: '400',
-                                            color: colors.gray[2]
-                                        }}>전체보기</AppText>
-                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                            style={{
-                                                width: 15,
-                                                height: 15,
-                                                marginLeft: 10,
-                                                marginBottom: 5
-                                            }}></Image>
-                                    </View>
-                                </TouchableOpacity>
                             </View> :
                             <View style={{
                                 justifyContent: 'center',
@@ -766,6 +789,12 @@ const styles = StyleSheet.create({
     },
 
     //swipe style
+    rowBackTime: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: '50%'
+    },
     rowBack: {
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -245,23 +245,21 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     const [height, setHeight] = useState(150 + 90 * 5);
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
+    const [token, setToken] = useToken();
 
     const postPlace = () => {
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         try {
-            fetch(`http://34.146.140.88/collection/${collectionId}/place`, {
+            fetch(`http://34.146.140.88/collection/${collectionId}/place/${placeData.place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
-                body: JSON.stringify({
-                    userId: placeData.place_pk,
-                })
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response);
                     Alert.alert('', '보관함에 공간이 저장되었습니다.');
                 })
                 .catch((err) => {

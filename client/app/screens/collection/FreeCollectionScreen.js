@@ -51,7 +51,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
 
     useEffect(() => {
-        getInitialData();
+        getInitialCollectionData();
+        getInitialPlaceData();
         setTmpData([
             {
                 id: 1,
@@ -64,7 +65,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         ]);
     }, []);
 
-    const getInitialData = () => {
+    const getInitialCollectionData = () => {
         try {
             fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
                 method: 'GET',
@@ -76,7 +77,33 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then((response) => {
                     setCollectionData(response.data);
-                    setPlaceLength(response.data.places.length);
+                    // setPlaceLength(response.data.places.length);
+                    // setFalse();
+                    // console.log(response.data)
+                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getInitialPlaceData = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}/places`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setPlaceData(response.data)
+                    setPlaceLength(response.data.length);
                     setFalse();
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                 })
@@ -96,6 +123,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         } else {
             if (data.collection_private === false) return false;
         }
+        if (collectionData.collection_private === 0) return false;
         return true;
     };
 
@@ -181,13 +209,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     }
 
-    const InputBox = styled(TextInput)`
-      fontSize: 16px;
-      borderBottomWidth: 1px;
-      borderBottomColor: #C5C5C5;
-      paddingBottom: 11px;
-    `;
-
     const Keyword = props => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
@@ -204,8 +225,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const SwipeList = () => {
         return (
         <SwipeListView
-            data={collectionData.places}
-            renderItem={({item, index}) => <ShowPlaces item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />}
+            data={placeData}
+            renderItem={({item, index}) => <ShowPlaces item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation}/>}
             keyExtractor={(item) => item.place_pk.toString()}
             key={(item, idx) => {idx.toString()}}
             renderHiddenItem={(item, rowMap) => {
@@ -464,7 +485,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         {
                                             !isEditPage ?
                                             <SwipeList /> :
-                                            <DragAndDropListForFree data={collectionData.places} isEditPage={isEditPage} isPress={isPress} />
+                                            <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>
