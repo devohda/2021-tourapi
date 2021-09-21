@@ -177,4 +177,28 @@ router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     }
 });
 
+// 보관함에 장소 삭제
+router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
+    const {collectionId, placeId} = req.params;
+    const {planDay} = req.body;
+
+    const result = await collectionService.deletePlaceToCollection(collectionId, placeId, planDay);
+
+    if (result.affectedRows === 1) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS'
+        });
+    } else if (result.affectedRows === 0) {
+        return res.send({
+            code: 202,
+            status: 'NOT EXISTED'
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 module.exports = router;
