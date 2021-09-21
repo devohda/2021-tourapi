@@ -14,7 +14,7 @@ import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
-const ShowPlaces = props => {
+const ShowPlacesForFree = props => {
     const { colors } = useTheme();
     const { day, index, isEditPage, isPress, item, length, originalData} = props;
     console.log(item)
@@ -52,29 +52,32 @@ const ShowPlaces = props => {
 
     return (
         <>
-            { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
+            {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.red_gray[6],
+                zIndex: -1000,
+                marginVertical: 13
+            }}></View>} */}
+            {/* pk로 바꾸기 */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
             <View flex={1}>
                 <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                    <TouchableOpacity onPress={() => props.navigation.navigate('Place', {data: item})} disabled={isEditPage && true}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Place', {data: props.item})} disabled={props.isEditPage && true}>
                         <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
+                            {/* <Image source={{uri: item.place_img}} */}
                             {
                                 !isFree &&
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                            {index + 1}    
+                                            {props.item.id}    
                                         </AppText>
                                     </View>
                                 </View>
                             }
-                            {
-                                item.place_img ?
-                                <Image source={{uri: item.place_img}}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                                <Image source={require('../../assets/images/here_default.png')}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
-                            }
+                            <Image source={require('../../assets/images/flower.jpeg')}
+                                style={{width: 72, height: 72, borderRadius: 15}}></Image>
                             <View style={{
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
@@ -88,7 +91,7 @@ const ShowPlaces = props => {
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
-                                        }}>{checkType(item.place_type)}</AppText>
+                                        }}>{isFree && checkType(props.item.place_type)}</AppText>
                                         <AppText style={{
                                             marginHorizontal: 4, color: colors.gray[7],
                                             textAlign: 'center',
@@ -111,15 +114,23 @@ const ShowPlaces = props => {
                                         }}>4.8</AppText>
                                     </View>
                                     <View style={{width: '100%'}}>
-                                        <AppText style={{
+                                        {/* <AppText style={{
                                             fontSize: 16,
                                             fontWeight: 'bold',
                                             color: colors.mainColor,
                                             marginVertical: 5,
-                                        }}>{item.place_name}</AppText>
+                                        }}>{item.place_name}</AppText> */}
+                                                                                    <AppText style={{
+                                            fontSize: 16,
+                                            fontWeight: 'bold',
+                                            color: colors.mainColor,
+                                            marginVertical: 5,
+                                        }}>{isFree? props.item.place_name : '제목'}</AppText>
                                     </View>
-                                    <AppText
-                                        style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText>
+                                    {/* <AppText
+                                        style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText> */}
+                                                                                <AppText
+                                        style={{fontSize: 12, color: colors.gray[4]}}>{isFree? props.item.place_addr : '서울시 구로구 연동로'}</AppText>
                                 </View>
                             </View>
                         </View>
@@ -143,10 +154,10 @@ const ShowPlaces = props => {
                             }
                         }}> */}
                         {
-                            !isEditPage ?
+                            !props.isEditPage ?
                             <TouchableOpacity>
                                 <Jewel width={26} height={21}
-                                    style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
+                                    style={{color: isPress[props.index] ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity> :
                             <TouchableOpacity>
                                 <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
@@ -157,7 +168,7 @@ const ShowPlaces = props => {
                 {
                     isFree ?
                     <>
-                    <TipsList data={item} idx={index} day={day} length={length}/>
+                    <TipsList data={props.item} idx={props.index} day={props.day}/>
                     </> :
                     <>
                         {/* <View style={{
@@ -182,54 +193,43 @@ const ShowPlaces = props => {
                         </View>
                     </View> */}
 
-                    <TipsList data={item} idx={index} day={day} length={length}/>
+                    <TipsList data={props.item} idx={props.index} day={props.day}/>
                     </>
                 }
             </View>
-            </TouchableHighlight> :
-            item.cpm_plan_day === day &&
-            <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
-                <View flex={1}>
+            </TouchableHighlight>
+            {/* 받은 데이터를 이용해서 같은 성격의 데이터처럼 넣어야할것같음 */}
+            {/* {
+                props.index === 0 &&
+                <View style={{
+                    height: 30,
+                    paddingVertical: 6,
+                    paddingLeft: 6,
+                    paddingRight: 15,
+                    paddingBottom: 6,
+                    paddingTop: 4,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginLeft: 36,
+                    backgroundColor: colors.backgroundColor
+                }}>
                     <View style={{
-                        height: 30,
-                        paddingVertical: 6,
-                        paddingLeft: 6,
-                        paddingRight: 15,
-                        paddingBottom: 6,
-                        paddingTop: 4,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginLeft: 36,
-                        backgroundColor: colors.backgroundColor
-                    }}>
-                            <View style={{
-                                width: !isEditPage ? '90%' : '80%',
-                                borderStyle: 'dotted',
-                                borderRadius: 1,
-                                borderWidth: 1,
-                                borderColor: colors.gray[4],
-                                zIndex: -1000,
-                                
-                            }}></View>
-                            <View style={{marginStart: 6}}>
-                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>
-                                    {item.place_pk === -1 ? '12PM' : '18PM'}
-                                </AppText>
-                        </View>
-                        {
-                            isEditPage &&
-                            <TouchableOpacity style={{marginStart: 12}}>
-                                <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
-                            </TouchableOpacity>
-                        }
+                        width: '90%',
+                        borderStyle: 'dotted',
+                        borderRadius: 1,
+                        borderWidth: 1,
+                        borderColor: colors.gray[4],
+                        zIndex: -1000
+                    }}></View>
+                    <View style={{marginStart: 6}}>
+                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>12PM</AppText>
                     </View>
                 </View>
-            </TouchableHighlight>
-            }
+            } */}
 
         </>
     );
 };
 
-export default ShowPlaces;
+export default ShowPlacesForFree;

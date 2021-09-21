@@ -179,6 +179,31 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const setFalse = () => {
     };
 
+    const deletePlace = (place_pk, day) => {
+        try {
+            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    planDay: day,
+                })
+            }).then((res) => res.json())
+                .then((response) => {
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const likePlace = (pk) => {
         try {
             fetch('http://34.146.140.88/like/place', {
@@ -204,7 +229,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const deletePlace = (pk) => {
+    const deleteLikedPlace = (pk) => {
         try {
             fetch('http://34.146.140.88/like/place', {
                 method: 'DELETE',
@@ -297,7 +322,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
                         <TouchableOpacity
                             style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
-                            onPress={() => deleteRow(rowMap, item.index)}
+                            onPress={() => {
+                                deletePlace(item.item.place_pk, props.idx)
+                            }}
                         >
                             <View>
                                 <AppText style={{color: colors.defaultColor}}>삭제</AppText>
