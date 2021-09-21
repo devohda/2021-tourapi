@@ -300,3 +300,17 @@ exports.deleteCollection = async (collection_pk) => {
     const result = db.query(query);
     return result;
 };
+
+// 보관함에 장소 삭제
+exports.deletePlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+    let query = `DELETE FROM collection_place_map 
+                 WHERE collection_pk = ${collection_pk} 
+                 AND place_pk = ${place_pk}`
+
+    // 일정 보관함인 경우
+    if(cpm_plan_day){
+        query += ` AND cpm_plan_day = ${cpm_plan_day}`
+    }
+    const result = db.query(query);
+    return result;
+}
