@@ -11,23 +11,22 @@ router.get('/', verifyToken, async (req, res, next) => {
 
     const {keyword, type} = req.query;
     const {user} = res.locals;
-    console.log(user);
-    console.log(keyword, type);
+
     let data;
 
     try {
         switch (type) {
-        case 'place':
-            data = await readPlaceList(keyword);
-            break;
-        case 'collection':
-            data = await readCollectionList(null, false, null, keyword);
-            break;
-        case 'user':
-            data = await readUserList(keyword);
-            break;
-        default:
-            break;
+            case 'place':
+                data = await readPlaceList(user.user_pk, keyword);
+                break;
+            case 'collection':
+                data = await readCollectionList(null, false, null, keyword);
+                break;
+            case 'user':
+                data = await readUserList(keyword);
+                break;
+            default:
+                break;
         }
     } catch (err) {
         return res.send({code: 500, status: 'SERVER ERROR'});
