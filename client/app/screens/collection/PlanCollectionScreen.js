@@ -122,7 +122,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const likePlace = (pk) => {
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch('http://localhost:3000/like/place', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -147,7 +147,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deletePlace = (pk) => {
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch('http://localhost:3000/like/place', {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

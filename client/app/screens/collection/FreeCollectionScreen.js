@@ -65,7 +65,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -108,7 +108,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const likePlace = (pk) => {
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch('http://localhost:3000/like/place', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -133,7 +133,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deletePlace = (pk) => {
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch('http://localhost:3000/like/place', {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

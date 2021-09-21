@@ -35,7 +35,7 @@ const SearchPlace = ({navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -59,7 +59,7 @@ const SearchPlace = ({navigation}) => {
 
     const likePlace = (pk) => {
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch('http://localhost:3000/like/place', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -85,7 +85,7 @@ const SearchPlace = ({navigation}) => {
     const deletePlace = (pk) => {
         console.log(pk);
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch('http://localhost:3000/like/place', {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

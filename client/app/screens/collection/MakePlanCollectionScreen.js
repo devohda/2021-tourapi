@@ -185,7 +185,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://34.146.140.88/keyword/list', {
+            fetch('http://localhost:3000/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

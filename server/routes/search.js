@@ -21,7 +21,7 @@ router.get('/', verifyToken, async (req, res, next) => {
             data = await readPlaceList(keyword);
             break;
         case 'collection':
-            data = await readCollectionList(keyword, null);
+            data = await readCollectionList(null, false, null, keyword);
             break;
         case 'user':
             data = await selectUserList(keyword);

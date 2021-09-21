@@ -38,8 +38,8 @@ exports.readUserByEmail = async (email) => {
 };
 
 exports.createToken = async function (user) {
-    // access token 의 유효시간 = 30 minutes
-    const accessToken = jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 1800000, issuer: 'here'});
+    // access token 의 유효시간 = 1000일
+    const accessToken = jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 86400000, issuer: 'here'});
 
     // db 에 토큰 저장
     const query = `INSERT INTO user_token (user_pk, access_token) VALUES (${user.user_pk}, ${mysql.escape(accessToken)})`;
