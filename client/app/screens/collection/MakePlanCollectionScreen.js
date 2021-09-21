@@ -185,7 +185,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://localhost:3000/keyword/list', {
+            fetch('http://34.146.140.88/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -206,28 +206,61 @@ const MakePlanCollectionScreen = ({navigation}) => {
         }
     }, []);
 
-    //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
-    //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
-    const users = [
-        {
-            id: '1',
-            image: '../assets/images/image1',
-        },
-        {
-            id: '2',
-            key: '../assets/images/image2',
-        },
-        {
-            id: '3',
-            key: '../assets/images/image3',
+    const postCollections = () => {
+        var datas = []; var showDatas = [];
+        for (let i = 0; i < keywordData.length; i++) {
+            if (isPress[i] === true) {
+                datas.push(keywordData[i].keyword_pk);
+                showDatas.push(keywordData[i].keyword_title);
+            }
         }
-    ];
+        const startDate = moment(range.startDate).format('YYYY-MM-DD');
+        const endDate = moment(range.endDate).format('YYYY-MM-DD');
 
-    const showUsers = ({item}) => (
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
-        </View>
-    );
+        try {
+            fetch('http://34.146.140.88/collection/plan', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    collectionData : {
+                        name: collectionName,
+                        isPrivate: isEnabled,
+                        startDate: startDate,
+                        endDate: endDate
+                    },
+                    keywords: datas
+                })
+            }).then((res) => {
+                res.json()
+            })
+                .then((responsedata) => {
+                    const item = {
+                        'collection_name': collectionName,
+                        'collection_private': isEnabled,
+                        'collection_type': 1,
+                        'keywords': showDatas,
+                        'places': [],
+                        'startDate': startDate,
+                        'endDate': endDate
+                    }
+                    Alert.alert('', '일정보관함이 생성되었습니다');
+                    navigation.navigate('PlanCollection', {
+                        data: item
+                    });
+                })
+                .catch((err) => {
+                    console.error(err);
+                    Alert.alert('', '일정보관함 생성에 실패했습니다');
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
     
     const setFalse = () => {
         var pressed = [];
@@ -414,10 +447,10 @@ const MakePlanCollectionScreen = ({navigation}) => {
                             }}
                             onPress={() => {
                                 // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
-                                // postCollections();
-                                navigation.setOptions({tabBarVisible: true});
+                                postCollections();
+                                // navigation.setOptions({tabBarVisible: true});
                                 // navigation.goBack(null);
-                                navigation.navigate('PlanCollection');
+                                // navigation.navigate('PlanCollection');
                                 // }
                             }}
                             // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}

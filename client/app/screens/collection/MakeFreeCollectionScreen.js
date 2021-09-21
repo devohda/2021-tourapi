@@ -125,15 +125,12 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 body: JSON.stringify({
                     collectionData : {
                         name: collectionName,
-                        private: isEnabled,
+                        isPrivate: isEnabled,
                         description: null,
                     },
                     keywords: datas
                 })
             }).then((res) => {
-                console.log('여기!!')
-
-                console.log(res.json())
                 res.json()
             })
                 .then((responsedata) => {
@@ -204,7 +201,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://localhost:3000/keyword/list', {
+            fetch('http://34.146.140.88/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -214,7 +211,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 .then((response) => {
                     setKeywordData(response.data);
                     setFalse();
-                    console.log(keywordData);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -224,12 +220,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             console.error(err);
         }
     }, []);
-
-    const showUsers = ({item}) => (
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
-        </View>
-    );
     
     const setFalse = () => {
         var pressed = [];

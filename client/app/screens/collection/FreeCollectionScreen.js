@@ -12,7 +12,8 @@ import {
     FlatList,
     Animated,
     TouchableHighlight,
-    Modal
+    Modal,
+    Alert
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -65,7 +66,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -77,7 +78,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setCollectionData(response.data);
                     setPlaceLength(response.data.places.length);
                     setFalse();
-                    console.log(response.data)
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                 })
                 .catch((err) => {
@@ -93,7 +93,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
         //생성에서 바로 넘어오는 데이터 처리
         if(typeof data === 'undefined') {
             if (collectionData.collection_private === 0) return false;
-        } else if (data.collection_private === 0 ) return false;
+        } else {
+            if (data.collection_private === false) return false;
+        }
         return true;
     };
 
@@ -108,7 +110,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const likePlace = (pk) => {
         try {
-            fetch('http://localhost:3000/like/place', {
+            fetch('http://34.146.140.88/like/place', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -120,7 +122,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response)
+                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -133,7 +135,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deletePlace = (pk) => {
         try {
-            fetch('http://localhost:3000/like/place', {
+            fetch('http://34.146.140.88/like/place', {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -145,7 +147,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response)
+                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -157,7 +159,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const deleteCollection = () => {
-        console.log(collectionData)
         try {
             fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
@@ -168,7 +169,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response);
+                    Alert.alert('', '삭제되었습니다.');
+                    navigation.goBack();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -246,7 +248,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     >
         <View style={styles.centeredView}>
             <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 하시겠습니까?</AppText>
+                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                     <Pressable
                         style={{...styles.button, backgroundColor: colors.gray[4]}}
@@ -315,7 +317,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         }}></View>
                         <TouchableOpacity
                             onPress={async () => {
-                                setShowMenu(state => !state);
                                 await deleteMode();
                             }}
                             style={{
