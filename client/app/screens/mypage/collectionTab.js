@@ -70,70 +70,70 @@ const CollectionTab = ({navigation}) => {
     const showDirectories = ({item}) => {
         return (
 
-        <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
-            item.collection_type === 1 ?
-            navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
-        }}>
-            <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
-                <View style={{height: '68%'}}>
-                    <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
-                        <View style={[styles.dirType, {
-                            borderColor: colors.backgroundColor,
-                            backgroundColor: colors.backgroundColor
-                        }]}>
-                            <AppText
-                            style={item.collection_type === 1 ? {...styles.dirPlanText, color: colors.red[3]} : {...styles.dirFreeText, color: colors.mainColor}}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
-                        </View>
-                        {item.collection_private === 1 &&
+            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
+                item.collection_type === 1 ?
+                    navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
+            }}>
+                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
+                    <View style={{height: '68%'}}> 
+                        <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <View style={[styles.dirType, {
+                                borderColor: colors.backgroundColor,
+                                backgroundColor: colors.backgroundColor
+                            }]}>
+                                <AppText
+                                    style={item.collection_type === 1 ? {...styles.dirPlanText, color: colors.red[3]} : {...styles.dirFreeText, color: colors.mainColor}}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
+                            </View>
+                            {item.collection_private === 1 &&
                         <View style={{marginRight: 9, marginTop: 8}}>
                             <Image style={{width: 20, height: 20}}
                                 source={require('../../assets/images/lock_outline.png')}></Image>
                         </View>
-                        }
-                    </View>
-                    <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/mountain.jpeg')}/>
-                </View>
-                <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
-                    <AppText style={{
-                        fontSize: 14,
-                        fontWeight: '400',
-                        color: colors.mainColor
-                    }}>{item.collection_name}</AppText>
-                    <View style={{marginTop: 4, flexDirection: 'row'}}>
-                        {item.keywords.map((keyword, idx) => {
-                            return (
-                                <AppText key={idx} style={{
-                                    color: colors.gray[4],
-                                    fontSize: 10,
-                                    marginRight: 6.21
-                                }}># {keyword}</AppText>);
-                        })}
-                    </View>
-                    <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
-                        <View style={{flexDirection: 'row'}}>
-                            <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
+                            }
                         </View>
-                        <View style={{flexDirection: 'row'}}>
-                            <View style={{marginRight: 8, flexDirection: 'row'}}>
-                                <Image source={require('../../assets/images/here_icon.png')}
-                                    style={{width: 8, height: 8, margin: 2}}></Image>
-                                <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                        <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/mountain.jpeg')}/>
+                    </View>
+                    <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                        <AppText style={{
+                            fontSize: 14,
+                            fontWeight: '400',
+                            color: colors.mainColor
+                        }}>{item.collection_name}</AppText>
+                        <View style={{marginTop: 4, flexDirection: 'row'}}>
+                            {item.keywords.map((keyword, idx) => {
+                                return (
+                                    <AppText key={idx} style={{
+                                        color: colors.gray[4],
+                                        fontSize: 10,
+                                        marginRight: 6.21
+                                    }}># {keyword}</AppText>);
+                            })}
+                        </View>
+                        <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                            <View style={{flexDirection: 'row'}}>
+                                <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
-                                <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                    style={{margin: 1}}></Icon>
-                                <AppText style={{
-                                    fontSize: 8,
-                                    color: colors.hashTagColor,
-                                    fontWeight: 'bold'
-                                }}>{item.place_cnt}</AppText>
+                                <View style={{marginRight: 8, flexDirection: 'row'}}>
+                                    <Image source={require('../../assets/images/here_icon.png')}
+                                        style={{width: 8, height: 8, margin: 2}}></Image>
+                                    <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                                </View>
+                                <View style={{flexDirection: 'row'}}>
+                                    <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
+                                        style={{margin: 1}}></Icon>
+                                    <AppText style={{
+                                        fontSize: 8,
+                                        color: colors.hashTagColor,
+                                        fontWeight: 'bold'
+                                    }}>{item.place_cnt}</AppText>
+                                </View>
                             </View>
                         </View>
                     </View>
                 </View>
-            </View>
-        </TouchableOpacity>
-    )};
+            </TouchableOpacity>
+        );};
 
     const Keyword = ({type, idx}) => {
         return (
@@ -144,8 +144,8 @@ const CollectionTab = ({navigation}) => {
                             backgroundColor: colors.mainColor,
                             shadowColor: colors.red[7]} :
                         {...styles.selectType, borderColor: colors.defaultColor,
-                        backgroundColor: colors.defaultColor,
-                        shadowColor: colors.red[7]}}
+                            backgroundColor: colors.defaultColor,
+                            shadowColor: colors.red[7]}}
                     onPress={() => {
                         // 클릭하면 색 바꾸기
                         setDirectoryType(dirType => dirType.map(
@@ -174,78 +174,78 @@ const CollectionTab = ({navigation}) => {
     const SelectBox = () => {
         return (
             <>
-            {
-                showMenu && <View style={{
-                position: 'absolute',
-                width: 100,
-                height: 80,
-                backgroundColor: '#fff',
-                flex: 1,
-                borderRadius: 10,
-                zIndex: 9900,
-
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-
-                overflow: 'visible'
-            }}>
-                <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('최근 추가순');
-                    }}
-                    style={{
+                {
+                    showMenu && <View style={{
+                        position: 'absolute',
+                        width: 100,
+                        height: 80,
+                        backgroundColor: '#fff',
                         flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}><AppText>최근 추가순</AppText>
-                </TouchableOpacity>
+                        borderRadius: 10,
+                        zIndex: 9900,
 
-                <View style={{
-                    height: 1,
-                    borderColor: colors.gray[5],
-                    borderWidth: 0.4,
-                    borderRadius: 1,
-                }}></View>
-                <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('인기순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}><AppText>인기순</AppText>
-                </TouchableOpacity>
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
 
-                <View style={{
-                    height: 1,
-                    borderColor: colors.gray[5],
-                    borderWidth: 0.4,
-                    borderRadius: 1,
-                }}></View>
-                <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('리뷰순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}><AppText>리뷰순</AppText>
-                </TouchableOpacity>
-            </View>
-            }
-        </>
-        )}
+                        overflow: 'visible'
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('최근 추가순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>최근 추가순</AppText>
+                        </TouchableOpacity>
+
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('인기순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>인기순</AppText>
+                        </TouchableOpacity>
+
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('리뷰순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>리뷰순</AppText>
+                        </TouchableOpacity>
+                    </View>
+                }
+            </>
+        );};
 
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
@@ -264,7 +264,7 @@ const CollectionTab = ({navigation}) => {
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
                                 setShowMenu(!showMenu);
-                                }} style={{flexDirection: 'row'}}>
+                            }} style={{flexDirection: 'row'}}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
                                     name={'chevron-down-outline'} size={16}></Icon>
