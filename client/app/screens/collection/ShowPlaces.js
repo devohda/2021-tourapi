@@ -16,9 +16,11 @@ import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
 const ShowPlaces = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length} = props;
+    const { day, index, isEditPage, isPress, item, length, originalData} = props;
+    console.log(item)
     const isFree = (typeof day === 'undefined');
-    
+    // console.log(day + 1)
+
     const checkType = (type) => {
         if(type === 12) {
             return '관광지';
@@ -39,9 +41,20 @@ const ShowPlaces = props => {
         }
     };
 
+    const checkDay = (day) => {
+        if(day === -1) return 0;
+        else return day
+    }
+
+    const setNumber = () => {
+        console.log(originalData)
+        console.log(Object.values(originalData)[0])
+        return 0
+    }
+
     return (
         <>
-            { item.place_pk > 0 ?
+            { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
             <View flex={1}>
                 <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
@@ -52,7 +65,7 @@ const ShowPlaces = props => {
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                            {index + 1}    
+                                            {setNumber()}    
                                         </AppText>
                                     </View>
                                 </View>
@@ -176,6 +189,7 @@ const ShowPlaces = props => {
                 }
             </View>
             </TouchableHighlight> :
+            item.cpm_plan_day === day &&
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1}>
                     <View style={{

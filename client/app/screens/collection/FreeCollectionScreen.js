@@ -300,7 +300,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     <View style={{
                         position: 'absolute',
                         width: 80,
-                        height: 80,
+                        // height: 80,
+                        height: 40,
                         top: 50,
                         right: 60,
                         backgroundColor: '#fff',
@@ -319,7 +320,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     
                         overflow: 'visible'
                     }}>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => {
                                 setIsEditPage(true);
                                 setShowMenu(state => !state);
@@ -329,7 +330,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}><AppText>수정</AppText>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
@@ -360,7 +361,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', left: 0}}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={() => {
+                        if(typeof data.collection_private === 'boolean') {
+                            navigation.pop(2);
+                        }
+                        else navigation.goBack()}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>

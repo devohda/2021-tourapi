@@ -1,33 +1,45 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Platform, View, Image, StyleSheet, Button, TouchableOpacity} from 'react-native';
+import {useTheme} from '@react-navigation/native';
+
+import AppText from '../components/AppText';
 import ScreenContainer from '../components/ScreenContainer';
 import MyPageNavigation from '../navigation/MypageNavigator';
-import {useTheme} from '@react-navigation/native';
-import AppText from '../components/AppText';
+import { useToken } from '../contexts/TokenContextProvider';
+
 import SettingsIcon from '../assets/images/settings-icon.svg';
 
 const MyPageScreen = ({navigation}) => {
     const {colors} = useTheme();
+    const [token, setToken] = useToken();
+    const [userData, setUserData] = useState({});
 
-    const styles = StyleSheet.create({
-        myPageHashtag: {
-            borderWidth: 1,
-            borderRadius: 12,
-            paddingVertical: 2,
-            paddingHorizontal: 5,
-            marginRight: 10,
-            shadowColor: colors.red[8],
-            shadowOffset: {width: 0, height: 1},
-            shadowOpacity: 0.1,
-            elevation: 1,
-        },
+    useEffect(() => {
+        getUserData();
+    },[]);
 
-        myPageHashtagText: {
-            color: colors.gray[2],
-            fontSize: 12,
-            textAlign: 'center',
-        },
-    });
+    // 보관함 데이터 가져오는 함수
+    const getUserData = () => {
+        try {
+            fetch('http://34.146.140.88/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -89,7 +101,7 @@ const MyPageScreen = ({navigation}) => {
                                 color: colors.mainColor,
                             }}
                         >
-                            {/*{userData.user_nickname}*/}
+                            {userData.user_nickname}
                         </AppText>
                         <View
                             style={{
@@ -103,10 +115,11 @@ const MyPageScreen = ({navigation}) => {
                                     {
                                         borderColor: colors.defaultColor,
                                         backgroundColor: colors.defaultColor,
+                                        shadowColor: colors.red[8]
                                     },
                                 ]}
                             >
-                                <AppText style={styles.myPageHashtagText}>#조용한</AppText>
+                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[2]}}>#조용한</AppText>
                             </View>
                             <View
                                 style={[
@@ -114,10 +127,11 @@ const MyPageScreen = ({navigation}) => {
                                     {
                                         borderColor: colors.defaultColor,
                                         backgroundColor: colors.defaultColor,
+                                        shadowColor: colors.red[8]
                                     },
                                 ]}
                             >
-                                <AppText style={styles.myPageHashtagText}>#따뜻한</AppText>
+                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[2]}}>#따뜻한</AppText>
                             </View>
                         </View>
                     </View>
@@ -127,5 +141,24 @@ const MyPageScreen = ({navigation}) => {
         </ScreenContainer>
     );
 };
+
+
+const styles = StyleSheet.create({
+    myPageHashtag: {
+        borderWidth: 1,
+        borderRadius: 12,
+        paddingVertical: 2,
+        paddingHorizontal: 5,
+        marginRight: 10,
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.1,
+        elevation: 1,
+    },
+
+    myPageHashtagText: {
+        fontSize: 12,
+        textAlign: 'center',
+    },
+});
 
 export default MyPageScreen;

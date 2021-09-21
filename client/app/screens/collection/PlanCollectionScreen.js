@@ -14,7 +14,7 @@ import {
     Modal,
     Alert
 } from 'react-native';
-import {useTheme} from '@react-navigation/native';
+import {useIsFocused, useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {Icon} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -58,6 +58,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [planDays, setPlanDays] = useState([]);
+    const isFocused = useIsFocused();
 
     const [token, setToken] = useToken();
 
@@ -95,7 +96,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             setStartDate(moment(data.startDate).format('YYYY.MM.DD'));
             setEndDate(moment(data.endDate).format('YYYY.MM.DD'));
         }
-    }, []);
+    }, [isFocused]);
 
     const getInitialCollectionData = () => {
         try {
@@ -116,6 +117,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     var newArr = [];
                     for(var i=0;i<=gap;i++) {
                         newArr.push({
+                            id: i,
                             days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
                         })
                     }
@@ -287,7 +289,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const SwipeList = props => (
         <SwipeListView
             data={placeData}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} />}
+            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength}/>}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
             renderHiddenItem={(item, rowMap) => {
@@ -333,7 +335,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {data : item})}>
+                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk,placeData: placeData, day : item})}>
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                     <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                     <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -454,7 +456,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     <View style={{
                         position: 'absolute',
                         width: 80,
-                        height: 80,
+                        // height: 80,
+                        height: 40,
                         top: 50,
                         right: 60,
                         backgroundColor: '#fff',
@@ -473,7 +476,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     
                         overflow: 'visible'
                     }}>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => {
                                 setIsEditPage(true);
                                 setShowMenu(state => !state);
@@ -483,7 +486,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}><AppText>수정</AppText>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
