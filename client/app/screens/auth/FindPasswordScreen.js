@@ -11,7 +11,7 @@ const FindPasswordScreen = () => {
     const [phoneNumber, setPhoneNumber] = useState(null);
     const sendSMS = () => {
         try {
-            fetch('http://34.146.140.88/auth/authPhone', {
+            fetch('http://localhost:3000/auth/authPhone', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

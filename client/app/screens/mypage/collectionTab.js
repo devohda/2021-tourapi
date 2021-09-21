@@ -11,7 +11,6 @@ const CollectionTab = ({navigation}) => {
 
     const [token, setToken] = useToken();
     const [collectionList, setCollectionList] = useState({});
-    const [selectedDirType, setSelectedDirType] = useState(1);
     const [directoryType, setDirectoryType] = useState([
         {
             name: '전체',
@@ -145,7 +144,7 @@ const CollectionTab = ({navigation}) => {
     const getCollectionsFromUsers = () => {
         try {
             console.log(token);
-            fetch('http://34.146.140.88/collection/list', {
+            fetch('http://localhost:3000/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -187,8 +186,7 @@ const CollectionTab = ({navigation}) => {
                         </View>
                         }
                     </View>
-                    <Image style={styles.defaultImage}
-                        source={item.thumbnail_images.length !== 0 ? {uri: item.thumbnail_images[0]} : require('../../assets/images/mountain.jpeg')}/>
+                    <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/mountain.jpeg')}/>
                 </View>
                 <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                     <AppText style={{
@@ -207,12 +205,11 @@ const CollectionTab = ({navigation}) => {
                         })}
                     </View>
                     <View flexDirection="row" style={{position: 'absolute', bottom: 10}}>
-                        <AppText style={{fontSize: 8, width: '60%'}}>by minsun</AppText>
+                        <AppText style={{fontSize: 8, width: '60%'}}>by {item.created_user_name}</AppText>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Image source={require('../../assets/images/here_icon.png')}
                                 style={{width: 8, height: 8, margin: 2}}></Image>
-                            <AppText
-                                style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>1.2k</AppText>
+                            <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
                         </View>
                         <View style={{marginRight: 8, flexDirection: 'row'}}>
                             <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
