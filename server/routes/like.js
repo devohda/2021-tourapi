@@ -19,6 +19,25 @@ router.post('/place/:placeId', verifyToken, async (req, res, next) => {
 
 });
 
+// 장소 좋아요 조회
+router.get('/placeList', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await likeService.readLikePlace(user.user_pk);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
 // 장소 좋아요 삭제
 router.delete('/place/:placeId', verifyToken, async (req, res, next) => {
     const {placeId} = req.params;
@@ -45,6 +64,25 @@ router.post('/collection/:collectionId', verifyToken, async (req, res, next) => 
 
     return res.send({code: 200, status: 'SUCCESS'});
 });
+
+// 보관함 좋아요 조회
+router.get('/collectionList', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await likeService.readLikeCollection(user.user_pk);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 
 // 보관함 좋아요 삭제
 router.delete('/collection/:collectionId', verifyToken, async (req, res, next) => {
