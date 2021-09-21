@@ -135,6 +135,28 @@ router.get('/:collectionId/comments',async (req, res, next) => {
 
 })
 
+// UPDATE
+// 보관함 장소 리스트 수정
+router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
+    const {placeList} = req.body;
+
+    const result = await collectionService.updateCollectionPlaceList(user.user_pk, collectionId, placeList);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
 // DELETE
 // 보관함 삭제
 router.delete('/:collectionId', verifyToken, async (req, res, next) => {

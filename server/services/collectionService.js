@@ -1,5 +1,6 @@
 const db = require('../database/database');
 const mysql = require('mysql2');
+const {files} = require("yarn/lib/cli");
 
 // 자유 보관함 생성
 exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
@@ -196,6 +197,7 @@ exports.readCollection = async (user_pk, collection_pk) => {
     //  자유 보관함 : 제작자 여부, 키워드, 공개여부, 좋아요 여부, 보관함 이름, type, 공간 리스트( 이름, type, 사진, 사용자 별점, 전체 별점, 사용자의 좋아요 여부, 한줄평)
     //  일정 보관함 : 제작자 여부, 키워드, 공개여부, 좋아요 여부, 보관함 이름, type, 공간 리스트( 이름, type, 사진, 사용자 별점, 전체 별점, 사용자의 좋아요 여부, 한줄평)
     // 자유 보관함 : 공간 리스트( 사용자 별점, 전체 별점, 한줄평)
+    // 만약, 공동 관리자 생기면 제작자 여부 대신 권한 여부 따져야 함.
 
     const conn = await db.pool.getConnection();
     let result;
@@ -261,6 +263,36 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
 // 보관함 댓글 리스트
 exports.readCollectionCommentList = async (collection_pk) => {};
+
+// 보관함 장소 리스트 수정
+exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) => {
+
+    const conn = await db.pool.getConnection();
+    let result;
+
+    try {
+        await conn.beginTransaction();
+
+        const query1 = `DELETE FROM collection_place_map 
+                        WHERE collection_pk = ${collection_pk}`
+        const [result1] = await conn.query(query1);
+
+        for (const place of placeList) {
+            const query2 = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
+                            VALUES (${collection_pk}, ${place.placeId}, ${place.planDay})`
+            await conn.query(query2)
+        }
+
+        result = true;
+        await conn.commit();
+    }catch (err){
+        result = false;
+        await conn.rollback();
+    }finally {
+        conn.release();
+        return result;
+    }
+};
 
 // 보관함 삭제
 exports.deleteCollection = async (collection_pk) => {

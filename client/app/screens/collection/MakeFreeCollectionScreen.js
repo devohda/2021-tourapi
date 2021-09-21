@@ -57,7 +57,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             justifyContent: 'center'
         },
         selectTypeTextClicked: {
-            color : colors.defaultColor,
+            color: colors.defaultColor,
             fontSize: 14,
             textAlign: 'center',
             textAlignVertical: 'center',
@@ -106,7 +106,8 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
-        var datas = []; var showDatas = [];
+        var datas = [];
+        var showDatas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
                 datas.push(keywordData[i].keyword_pk);
@@ -123,7 +124,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                     'x-access-token': token
                 },
                 body: JSON.stringify({
-                    collectionData : {
+                    collectionData: {
                         name: collectionName,
                         isPrivate: isEnabled,
                         description: null,
@@ -131,7 +132,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                     keywords: datas
                 })
             }).then((res) => {
-                res.json()
+                res.json();
             })
                 .then((responsedata) => {
                     const item = {
@@ -140,7 +141,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         'collection_type': 0,
                         'keywords': showDatas,
                         'places': []
-                    }
+                    };
                     Alert.alert('', '자유보관함이 생성되었습니다');
                     navigation.navigate('FreeCollection', {
                         data: item
@@ -220,7 +221,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             console.error(err);
         }
     }, []);
-    
+
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < keywordData.length; i++) {
@@ -236,18 +237,24 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName ? {color: colors.mainColor, fontSize: 20, fontWeight: 'bold'} : {fontSize: 20}]}
+                            style={[collectionName ? {
+                                color: colors.mainColor,
+                                fontSize: 20,
+                                fontWeight: 'bold'
+                            } : {fontSize: 20}]}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>
                     </View>
                 </ScreenContainerView>
-                <ScreenDivideLine />
+                <ScreenDivideLine/>
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</AppText>
-                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대
+                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함
+                                키워드</AppText>
+                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>*
+                                최대
                                 3개</AppText>
                         </View>
                         <View style={{
@@ -260,7 +267,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                                     style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <Keyword keyword={keyword} key={idx} />
+                                        <Keyword keyword={keyword} key={idx}/>
                                     ))
                                 }
                                 {/* <FlatList data={keywordData} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/> */}
