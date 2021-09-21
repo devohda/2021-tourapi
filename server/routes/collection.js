@@ -44,11 +44,11 @@ router.post('/plan', verifyToken, async (req, res, next) => {
 });
 
 // 보관함에 장소 추가하기
-router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.params;
-    const {user} = res.locals;
+router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
+    const {collectionId, placeId} = req.params;
+    const {planDay} = req.body;
 
-    const result = await collectionService.createPlaceToCollection(collectionId, user.user_pk);
+    const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay);
 
     if (result.affectedRows === 1) {
         return res.send({
