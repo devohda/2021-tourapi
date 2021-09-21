@@ -5,7 +5,7 @@ const {verifyToken} = require('../middleware/jwt');
 
 const {readPlaceList} = require('../services/placeService');
 const {readCollectionList} = require('../services/collectionService');
-const {selectUserList} = require('../services/userService');
+const {readUserList} = require('../services/userService');
 
 router.get('/', verifyToken, async (req, res, next) => {
 
@@ -24,7 +24,7 @@ router.get('/', verifyToken, async (req, res, next) => {
             data = await readCollectionList(null, false, null, keyword);
             break;
         case 'user':
-            data = await selectUserList(keyword);
+            data = await readUserList(keyword);
             break;
         default:
             break;
