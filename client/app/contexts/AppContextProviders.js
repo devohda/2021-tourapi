@@ -6,6 +6,7 @@ import TipsListContextProvider from './TipsListContextProvider';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
 import { default as theme } from './theme.json';
+import { default as mapping } from './mapping.json';
 
 const AppContextProviders = props => {
     return (
@@ -14,7 +15,7 @@ const AppContextProviders = props => {
                 <TokenContextProvider>
                     <SearchKeywordContextProvider>
                         <TipsListContextProvider>
-                            <ApplicationProvider {...eva} theme={{...theme}}>
+                            <ApplicationProvider {...eva} theme={{...theme}} customMapping={mapping}>
                                 {props.children}
                             </ApplicationProvider>
                         </TipsListContextProvider>

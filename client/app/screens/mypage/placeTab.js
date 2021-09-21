@@ -1,5 +1,5 @@
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
+import {Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, View, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import React, {useState} from 'react';
 import AppText from '../../components/AppText';
 import {Icon} from 'react-native-elements';
@@ -165,6 +165,85 @@ const PlaceTab = () => {
 
     );
 
+    const [showMenu, setShowMenu] = useState(false);
+    const [currentMenu, setCurrentMenu] = useState('최근 추가순');
+
+    const SelectBox = () => {
+        return (
+            <>
+            {
+                showMenu && <View style={{
+                position: 'absolute',
+                width: 100,
+                height: 80,
+                backgroundColor: '#fff',
+                flex: 1,
+                borderRadius: 10,
+                zIndex: 9900,
+
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+
+                overflow: 'visible'
+            }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('최근 추가순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>최근 추가순</AppText>
+                </TouchableOpacity>
+
+                <View style={{
+                    height: 1,
+                    borderColor: colors.gray[5],
+                    borderWidth: 0.4,
+                    borderRadius: 1,
+                }}></View>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>인기순</AppText>
+                </TouchableOpacity>
+
+                <View style={{
+                    height: 1,
+                    borderColor: colors.gray[5],
+                    borderWidth: 0.4,
+                    borderRadius: 1,
+                }}></View>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('리뷰순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>리뷰순</AppText>
+                </TouchableOpacity>
+            </View>
+            }
+        </>
+        )}
+
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
             <ScreenContainerView flex={1}>
@@ -173,11 +252,18 @@ const PlaceTab = () => {
                     justifyContent: 'space-between',
                     marginTop : 4
                 }}>
-                    <View flexDirection="row">
-                        <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
-                        <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                            name={'chevron-down-outline'} size={16}></Icon>
-                    </View>
+                    <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                        <View flexDirection="row" flex={1}>
+                            <TouchableOpacity onPress={()=>{
+                                setShowMenu(!showMenu);
+                                }} style={{flexDirection: 'row'}}>
+                                <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                    name={'chevron-down-outline'} size={16}></Icon>
+                            </TouchableOpacity>
+                            <SelectBox />
+                        </View>
+                    </TouchableWithoutFeedback>
 
                     <View flexDirection="row">
                         <View flexDirection="row">
