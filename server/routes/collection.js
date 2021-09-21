@@ -110,6 +110,31 @@ router.get('/:collectionId', verifyToken, async (req, res, next) => {
     }
 });
 
+// 보관함 장소 리스트 조회
+router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionPlaceList(user.user_pk, collectionId);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
+// 보관함 댓글 리스트 조회
+router.get('/:collectionId/comments',async (req, res, next) => {
+
+})
+
 // DELETE
 // 보관함 삭제
 router.delete('/:collectionId', verifyToken, async (req, res, next) => {
