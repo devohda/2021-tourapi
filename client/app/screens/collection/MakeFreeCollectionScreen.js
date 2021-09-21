@@ -106,10 +106,11 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
-        var datas = [];
+        var datas = []; var showDatas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
-                datas.push(keywordData[i].keyword_title);
+                datas.push(keywordData[i].keyword_pk);
+                showDatas.push(keywordData[i].keyword_title);
             }
         }
 
@@ -124,16 +125,26 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 body: JSON.stringify({
                     collectionData : {
                         name: collectionName,
-                        private: isEnabled,
+                        isPrivate: isEnabled,
                         description: null,
-                        type: 0,
                     },
                     keywords: datas
                 })
-            }).then((res) => res.json())
+            }).then((res) => {
+                res.json()
+            })
                 .then((responsedata) => {
-                    console.log(responsedata);
+                    const item = {
+                        'collection_name': collectionName,
+                        'collection_private': isEnabled,
+                        'collection_type': 0,
+                        'keywords': showDatas,
+                        'places': []
+                    }
                     Alert.alert('', '자유보관함이 생성되었습니다');
+                    navigation.navigate('FreeCollection', {
+                        data: item
+                    });
                 })
                 .catch((err) => {
                     console.error(err);
@@ -200,7 +211,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 .then((response) => {
                     setKeywordData(response.data);
                     setFalse();
-                    console.log(keywordData);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -210,29 +220,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             console.error(err);
         }
     }, []);
-
-    //TODO 추가한 키워드들 화면 안쪽으로 쌓일 수 있도록 css 수정
-    //TODO 임의로 사진 넣어준거고 실제로는 유저의 프로필 사진?? 넣어야함
-    const users = [
-        {
-            id: '1',
-            image: '../assets/images/image1',
-        },
-        {
-            id: '2',
-            key: '../assets/images/image2',
-        },
-        {
-            id: '3',
-            key: '../assets/images/image3',
-        }
-    ];
-
-    const showUsers = ({item}) => (
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            {/* <TouchableOpacity style={styles.selectType}><Image style={styles.selectTypeText} source={item.key}></Image></TouchableOpacity> */}
-        </View>
-    );
     
     const setFalse = () => {
         var pressed = [];
@@ -280,16 +267,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                             </View>
                         </View>
                     </View>
-                    {/* <View style={{marginTop: 37, left: 24}}>
-                        <AppText style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</AppText>
-                        <View style={{flexDirection: 'row', marginTop: 16}}>
-                            <SafeAreaView>
-                                <FlatList data={users} renderItem={showUsers} keyExtractor={(item) => item.id}
-                                          contentContainerStyle={{paddingBottom: 20}} horizontal={true}
-                                          nestedScrollEnabled/>
-                            </SafeAreaView>
-                        </View>
-                    </View> */}
                     {/* marginBottom은 일단 퍼블리싱때문에 */}
                     <View style={{
                         marginTop: 24,

@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import ScreenContainer from '../../components/ScreenContainer';
+import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View} from 'react-native';
+import {Icon} from 'react-native-elements';
+import { Button, IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
+
 import ScreenContainerView from '../../components/ScreenContainerView';
 import AppText from '../../components/AppText';
-import {Icon} from 'react-native-elements';
 import {useToken} from '../../contexts/TokenContextProvider';
+import { useIsFocused } from '@react-navigation/native';
 
 const CollectionTab = ({navigation}) => {
 
     const [token, setToken] = useToken();
+    const isFocused = useIsFocused();
     const [collectionList, setCollectionList] = useState({});
     const [directoryType, setDirectoryType] = useState([
         {
@@ -37,113 +40,12 @@ const CollectionTab = ({navigation}) => {
     // TODO 빈배열 뺐을 때 무한 렌더링 되는 거 해결해야 함
     useEffect(() => {
         getCollectionsFromUsers();
-    },[]);
+    },[isFocused]);
 
     const {colors} = useTheme();
-    const styles = StyleSheet.create({
-        directoryContainer: {
-            width: '49%',
-            height: 249,
-            borderRadius: 10,
-            backgroundColor: '#fff',
-            marginBottom: 11,
-            shadowColor: colors.red_gray[6],
-            shadowOffset: {
-                width: 0,
-                height: 0,
-            },
-            shadowOpacity: 1,
-            shadowRadius: 6,
-            elevation: 5,
-        },
-        likesContainer: {
-            width: Dimensions.get('screen').width / 2.25,
-            marginTop: 16,
-        },
-        dirType: {
-            borderWidth: 1,
-            paddingVertical: 1,
-            paddingHorizontal: 8,
-            borderRadius: 14,
-            elevation: 1,
-            width: 43,
-            height: 22,
-            marginLeft: 9,
-            marginTop: 8,
-            flexDirection: 'row',
-            zIndex: 10000,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        dirFreeText: {
-            color: colors.mainColor,
-            fontSize: 12,
-            fontWeight: 'bold',
-        },
-        dirPlanText: {
-            color: colors.red[3],
-            fontSize: 12,
-            fontWeight: 'bold'
-        },
-        defaultImage: {
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-        },
-        selectType: {
-            borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[7],
-            borderWidth: 1,
-            paddingVertical: 1,
-            paddingHorizontal: 8.5,
-            borderRadius: 12,
-            marginRight: 10,
-            shadowOffset: {width: 0, height: 2},
-            shadowOpacity: 0.1,
-            elevation: 1,
-            height: 28,
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        selectTypeClicked: {
-            borderColor: colors.mainColor, backgroundColor: colors.mainColor, shadowColor: colors.red[7],
-            borderWidth: 1,
-            paddingVertical: 1,
-            paddingHorizontal: 8.5,
-            borderRadius: 12,
-            marginRight: 10,
-            shadowOffset: {width: 0, height: 2},
-            shadowOpacity: 0.1,
-            elevation: 1,
-            height: 28,
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        selectTypeTextClicked: {
-            color: colors.defaultColor,
-            fontSize: 14,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            fontWeight: 'bold',
-            marginVertical: 2
-        },
-        selectTypeText: {
-            color: colors.subColor,
-            fontSize: 14,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            marginVertical: 2
-        },
-
-        keyword: {
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-    });
-
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            console.log(token);
             fetch('http://34.146.140.88/collection/list', {
                 method: 'GET',
                 headers: {
@@ -154,6 +56,7 @@ const CollectionTab = ({navigation}) => {
             }).then((res) => res.json())
                 .then(({data}) => {
                     setCollectionList(data);
+                    console.log(data)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -164,10 +67,12 @@ const CollectionTab = ({navigation}) => {
         }
     };
 
-    const showDirectories = ({item}) => (
+    const showDirectories = ({item}) => {
+        return (
 
-        <TouchableOpacity style={styles.directoryContainer} onPress={() => {
-            navigation.navigate('FreeCollection', {data : item});
+        <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
+            item.collection_type === 1 ?
+            navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
         }}>
             <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                 <View style={{height: '68%'}}>
@@ -177,7 +82,7 @@ const CollectionTab = ({navigation}) => {
                             backgroundColor: colors.backgroundColor
                         }]}>
                             <AppText
-                                style={item.collection_type == 1 ? styles.dirPlanText : styles.dirFreeText}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
+                            style={item.collection_type === 1 ? {...styles.dirPlanText, color: colors.red[3]} : {...styles.dirFreeText, color: colors.mainColor}}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
                         </View>
                         {item.collection_private === 1 &&
                         <View style={{marginRight: 9, marginTop: 8}}>
@@ -194,7 +99,7 @@ const CollectionTab = ({navigation}) => {
                         fontWeight: '400',
                         color: colors.mainColor
                     }}>{item.collection_name}</AppText>
-                    <View style={{marginTop: 4}}>
+                    <View style={{marginTop: 4, flexDirection: 'row'}}>
                         {item.keywords.map((keyword, idx) => {
                             return (
                                 <AppText key={idx} style={{
@@ -204,33 +109,43 @@ const CollectionTab = ({navigation}) => {
                                 }}># {keyword}</AppText>);
                         })}
                     </View>
-                    <View flexDirection="row" style={{position: 'absolute', bottom: 10}}>
-                        <AppText style={{fontSize: 8, width: '60%'}}>by {item.created_user_name}</AppText>
-                        <View style={{marginRight: 8, flexDirection: 'row'}}>
-                            <Image source={require('../../assets/images/here_icon.png')}
-                                style={{width: 8, height: 8, margin: 2}}></Image>
-                            <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                    <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                        <View style={{flexDirection: 'row'}}>
+                            <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
                         </View>
-                        <View style={{marginRight: 8, flexDirection: 'row'}}>
-                            <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                style={{margin: 2}}></Icon>
-                            <AppText style={{
-                                fontSize: 8,
-                                color: colors.hashTagColor,
-                                fontWeight: 'bold'
-                            }}>{item.place_cnt}</AppText>
+                        <View style={{flexDirection: 'row'}}>
+                            <View style={{marginRight: 8, flexDirection: 'row'}}>
+                                <Image source={require('../../assets/images/here_icon.png')}
+                                    style={{width: 8, height: 8, margin: 2}}></Image>
+                                <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
+                                    style={{margin: 1}}></Icon>
+                                <AppText style={{
+                                    fontSize: 8,
+                                    color: colors.hashTagColor,
+                                    fontWeight: 'bold'
+                                }}>{item.place_cnt}</AppText>
+                            </View>
                         </View>
                     </View>
                 </View>
             </View>
         </TouchableOpacity>
-    );
+    )};
 
     const Keyword = ({type, idx}) => {
         return (
             <View style={styles.keyword}>
                 <TouchableOpacity
-                    style={type.isClicked ? styles.selectTypeClicked : styles.selectType}
+                    style={type.isClicked ?
+                        {...styles.selectTypeClicked, borderColor: colors.mainColor,
+                            backgroundColor: colors.mainColor,
+                            shadowColor: colors.red[7]} :
+                        {...styles.selectType, borderColor: colors.defaultColor,
+                        backgroundColor: colors.defaultColor,
+                        shadowColor: colors.red[7]}}
                     onPress={() => {
                         // 클릭하면 색 바꾸기
                         setDirectoryType(dirType => dirType.map(
@@ -240,14 +155,97 @@ const CollectionTab = ({navigation}) => {
                                     isClicked: false
                                 })
                         );
+                        // directoryType.map((val, i) =>
+                        //     (i === idx && i === 1) &&
+                        //     getCollectionsFromUsers()
+                        // )
                     }}
                 >
                     <AppText
-                        style={type.isClicked ? styles.selectTypeTextClicked : styles.selectTypeText}>{type.name}</AppText>
+                        style={type.isClicked ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.subColor}}>{type.name}</AppText>
                 </TouchableOpacity>
             </View>
         );
     };
+
+    const [showMenu, setShowMenu] = useState(false);
+    const [currentMenu, setCurrentMenu] = useState('최근 추가순');
+
+    const SelectBox = () => {
+        return (
+            <>
+            {
+                showMenu && <View style={{
+                position: 'absolute',
+                width: 100,
+                height: 80,
+                backgroundColor: '#fff',
+                flex: 1,
+                borderRadius: 10,
+                zIndex: 9900,
+
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+
+                overflow: 'visible'
+            }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('최근 추가순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>최근 추가순</AppText>
+                </TouchableOpacity>
+
+                <View style={{
+                    height: 1,
+                    borderColor: colors.gray[5],
+                    borderWidth: 0.4,
+                    borderRadius: 1,
+                }}></View>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>인기순</AppText>
+                </TouchableOpacity>
+
+                <View style={{
+                    height: 1,
+                    borderColor: colors.gray[5],
+                    borderWidth: 0.4,
+                    borderRadius: 1,
+                }}></View>
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('리뷰순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}><AppText>리뷰순</AppText>
+                </TouchableOpacity>
+            </View>
+            }
+        </>
+        )}
 
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
@@ -261,12 +259,19 @@ const CollectionTab = ({navigation}) => {
                     </ScrollView>
                 </View>
 
-                <View flexDirection="row" style={{justifyContent: 'space-between', marginVertical: 14}}>
-                    <View flexDirection="row">
-                        <AppText style={{color: colors.mainColor}}>최근 추가순</AppText>
-                        <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                            name={'chevron-down-outline'} size={16}></Icon>
-                    </View>
+                <View flexDirection="row" style={{justifyContent: 'space-between', marginVertical: 14, position: 'relative', zIndex: 1}}>
+                    <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                        <View flexDirection="row" flex={1}>
+                            <TouchableOpacity onPress={()=>{
+                                setShowMenu(!showMenu);
+                                }} style={{flexDirection: 'row'}}>
+                                <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                    name={'chevron-down-outline'} size={16}></Icon>
+                            </TouchableOpacity>
+                            <SelectBox />
+                        </View>
+                    </TouchableWithoutFeedback>
                     <View flexDirection="row">
                         <View flexDirection="row">
                             <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
@@ -284,6 +289,7 @@ const CollectionTab = ({navigation}) => {
                 </View>
                 <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
                     showsVerticalScrollIndicator={false}
+                    style={{zIndex: 0}}
                     data={collectionList} renderItem={showDirectories}
                     keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
                 />
@@ -291,5 +297,98 @@ const CollectionTab = ({navigation}) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    directoryContainer: {
+        width: '49%',
+        height: 249,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        marginBottom: 11,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        shadowOpacity: 1,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+    likesContainer: {
+        width: Dimensions.get('screen').width / 2.25,
+        marginTop: 16,
+    },
+    dirType: {
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8,
+        borderRadius: 14,
+        elevation: 1,
+        width: 43,
+        height: 22,
+        marginLeft: 9,
+        marginTop: 8,
+        flexDirection: 'row',
+        zIndex: 10000,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dirFreeText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    dirPlanText: {
+        fontSize: 12,
+        fontWeight: 'bold'
+    },
+    defaultImage: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
+    selectType: {
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8.5,
+        borderRadius: 12,
+        marginRight: 10,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        elevation: 1,
+        height: 28,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    selectTypeClicked: {
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8.5,
+        borderRadius: 12,
+        marginRight: 10,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        elevation: 1,
+        height: 28,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    selectTypeTextClicked: {
+        fontSize: 14,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontWeight: 'bold',
+        marginVertical: 2
+    },
+    selectTypeText: {
+        fontSize: 14,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        marginVertical: 2
+    },
+
+    keyword: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+});
 
 export default CollectionTab;

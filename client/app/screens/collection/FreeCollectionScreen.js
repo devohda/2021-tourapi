@@ -10,7 +10,10 @@ import {
     TextInput,
     Pressable,
     FlatList,
-    TouchableHighlight
+    Animated,
+    TouchableHighlight,
+    Modal,
+    Alert
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -21,14 +24,14 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
-import Jewel from '../../assets/images/jewel.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import { tipsList } from '../../contexts/TipsListContextProvider';
-import TipsList from './TipsList';
+import ShowPlaces from './ShowPlaces';
 
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import {useToken} from '../../contexts/TokenContextProvider';
+import DragAndDropListForFree from './DragAndDropListForFree';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -41,6 +44,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
+    const [tmpPlaceData, setTmpPlaceData] = useState([]);
+    const [visible, setVisible] = useState(false);
+    const [isEditPage, setIsEditPage] = useState(false);
 
     const [token, setToken] = useToken();
 
@@ -84,7 +90,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+        //생성에서 바로 넘어오는 데이터 처리
+        if(typeof data === 'undefined') {
+            if (collectionData.collection_private === 0) return false;
+        } else {
+            if (data.collection_private === false) return false;
+        }
         return true;
     };
 
@@ -111,7 +122,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response)
+                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -136,7 +147,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response)
+                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -147,212 +158,177 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const deleteCollection = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    Alert.alert('', '삭제되었습니다.');
+                    navigation.goBack();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const InputBox = styled(TextInput)`
       fontSize: 16px;
       borderBottomWidth: 1px;
       borderBottomColor: #C5C5C5;
       paddingBottom: 11px;
     `;
-    const Keyword = ({item}) => {
+
+    const Keyword = props => {
         return (
-            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
+            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
         );
     };
+    
+    const rowSwipeAnimatedValues = {};
+    Array(20)
+    .fill('')
+    .forEach((_, i) => {
+        rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
+    });
 
-    const checkType = (type) => {
-        if (type === 12) {
-            return '관광지';
-        } else if (type === 14) {
-            return '문화시설';
-        } else if (type === 15) {
-            return '축제/공연/행사';
-        } else if (type === 28) {
-            return '레포츠';
-        } else if (type === 32) {
-            return '숙박';
-        } else if (type === 38) {
-            return '쇼핑';
-        } else if (type === 39) {
-            return '음식';
-        } else {
-            return '기타';
-        }
-    };
-
-
-    const ShowPlaces = ({item, index}) => {
+    const SwipeList = () => {
         return (
-            <View style={{backgroundColor: colors.backgroundColor}}>
-                {item.place_pk !== collectionData.places[0].place_pk && <View style={{
-                    width: '100%',
-                    height: 1,
-                    backgroundColor: colors.red_gray[6],
-                    zIndex: -1000,
-                    marginVertical: 13
-                }}></View>}
+        <SwipeListView
+            data={collectionData.places}
+            renderItem={({item, index}) => <ShowPlaces item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} />}
+            keyExtractor={(item) => item.place_pk.toString()}
+            key={(item, idx) => {idx.toString()}}
+            renderHiddenItem={(item, rowMap) => {
+                return (
+                <View style={styles.rowBack} key={item.place_pk}>
+                <TouchableOpacity
+                    style={[styles.backRightBtn, styles.backRightBtnRight]}
+                    onPress={() => deleteRow(rowMap, item.place_pk)}
+                >
+                    <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                </TouchableOpacity>
+            </View>
+            )}}
+            rightOpenValue={-75}
+            previewRowKey={'0'}
+            previewOpenDelay={3000}
+            disableRightSwipe={true}
+            disableLeftSwipe={isEditPage ? true : false}
+            closeOnRowOpen={true}
+            closeOnRowPress={true}
+            nestedScrollEnabled
+        />
+    )}
+    
+    const [showMenu, setShowMenu] = useState(false);
+    const keywords = data.keywords;
+    const [deleteMenu, setDeleteMenu] = useState(false);
 
-                <View>
-                    <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
-                            <View style={{flexDirection: 'row', width: '90%'}}>
-                                <Image source={{uri: item.place_img}}
-                                    style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                <View style={{
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    flexDirection: 'row',
-                                    width: '78%'
-                                }}>
-                                    <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold'
-                                            }}>{checkType(item.place_type)}</AppText>
-                                            <AppText style={{
-                                                marginHorizontal: 4, color: colors.gray[7],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold'
-                                            }}>|</AppText>
-                                            <Image source={require('../../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                    marginTop: '1%'
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                marginLeft: 2
-                                            }}>4.8</AppText>
-                                        </View>
-                                        <View style={{width: '100%'}}>
-                                            <AppText style={{
-                                                fontSize: 16,
-                                                fontWeight: 'bold',
-                                                color: colors.mainColor,
-                                                marginVertical: 5,
-                                            }}>{item.place_name}</AppText>
-                                        </View>
-                                        <AppText
-                                            style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText>
-                                    </View>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            {/* {item.like_flag === 0 ?  */}
-                            <TouchableOpacity onPress={() => {
-                                let newArr = [...isPress];
-                                if (newArr[index]) {
-                                    newArr[index] = false;
-                                    setIsPress(newArr);
-                                    deletePlace(item.place_pk);
-                                } else {
-                                    // for(let i=0;i<newArr.length;i++) {
-                                    //     if(i == index) continue;
-                                    //     else newArr[i] = false;
-                                    // }
-                                    newArr[index] = true;
-                                    setIsPress(newArr);
-                                    likePlace(item.place_pk);
-                                }
-                            }}>
-                                <Jewel width={26} height={21}
-                                    style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    {/* conditional 빼주기 */}
-                    {index < 2 && <TipsList data={item} idx={index}/>}
-                    {/* <View style={{
-                        backgroundColor: colors.defaultColor,
-                        height: 30,
-                        paddingVertical: 6,
-                        paddingLeft: 6,
-                        paddingRight: 5,
-                        marginBottom: 6,
-                        marginRight: 10,
-                        marginTop: 8,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image source={require('../../assets/images/tipIcon.png')}
-                                style={{width: 12, height: 12, marginEnd: 8}}></Image>
-                            <AppText style={{color: colors.blue[1], fontSize: 14}}>근처에 xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                        </View>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image style={{width: 28, height: 28}}
-                                source={require('../../assets/images/default_profile_2.png')}></Image>
-                        </View>
-                    </View> */}
+    const deleteMode = () => {
+        setDeleteMenu(true);
+    }
+
+    const DeleteModal = () => (
+        <Modal
+        transparent={true}
+        visible={deleteMenu}
+        onRequestClose={() => {
+            setDeleteMenu(!deleteMenu);
+        }}
+    >
+        <View style={styles.centeredView}>
+            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                    <Pressable
+                        style={{...styles.button, backgroundColor: colors.gray[4]}}
+                        onPress={() => setDeleteMenu(!deleteMenu)}
+                    >
+                        <AppText style={styles.textStyle}>취소하기</AppText>
+                    </Pressable>
+                    <Pressable
+                        style={{...styles.button, backgroundColor: colors.mainColor}}
+                        onPress={() => {
+                            setDeleteMenu(!deleteMenu);
+                            deleteCollection();
+                        }}
+                    >
+                        <AppText style={styles.textStyle}>삭제하기</AppText>
+                    </Pressable>
                 </View>
             </View>
-        );
-    };
-
-    const [showMenu, setShowMenu] = useState(false);
+        </View>
+    </Modal>
+    )
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {showMenu && (
-                <View style={{
-                    position: 'absolute',
-                    width: 140,
-                    height: 80,
-                    top: 50,
-                    right: 60,
-                    backgroundColor: '#fff',
-                    flex: 1,
-                    borderRadius: 10,
-                    zIndex: 100000000,
-
-                    shadowColor: '#000',
-                    shadowOffset: {
-                        width: 0,
-                        height: 2,
-                    },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    elevation: 5,
-
-                    overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // 수정 코드
-                        }}
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}><AppText>수정</AppText>
-                    </TouchableOpacity>
+            {
+                showMenu && (
+                    <>
                     <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
-                    }}></View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // 삭제 코드
-                        }}
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}><AppText>삭제</AppText></TouchableOpacity>
-                </View>
-            )}
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        top: 50,
+                        right: 60,
+                        backgroundColor: '#fff',
+                        flex: 1,
+                        borderRadius: 10,
+                        zIndex: 100000000,
+    
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+    
+                        overflow: 'visible'
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setIsEditPage(true);
+                                setShowMenu(state => !state);
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>수정</AppText>
+                        </TouchableOpacity>
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={async () => {
+                                await deleteMode();
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>삭제</AppText></TouchableOpacity>
+                        <DeleteModal />
+                    </View>
+                </>
+                )
+            }
 
             <View flexDirection="row" style={{
                 height: 24,
@@ -367,12 +343,22 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
-                <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                        style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
-                        <MoreIcon style={{color: colors.mainColor}}/>
-                    </TouchableOpacity>
-                </View>
+                {
+                    !isEditPage ?
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                            style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                            <MoreIcon style={{color: colors.mainColor}}/>
+                        </TouchableOpacity>
+                    </View> :
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
+                            <View>
+                                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                }
             </View>
 
             <ScrollView>
@@ -393,6 +379,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 }]}>
                                 <AppText style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText>
                             </View>
+                            {
+                                    keywords.map((keyword, idx) => (
+                                        <Keyword keyword={keyword} key={idx} />
+                                    ))
+                            }
                         </View>
                         <View>
                             {checkTrue() &&
@@ -469,40 +460,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </TouchableOpacity>
                                 </View>
                                 <SafeAreaView>
-                                    {/* {
-                                    placeData.length > 5 ?
-                                } */}
-                                    {/* {collectionData.place.map((item, idx) =>(
-                                    <ShowPlaces item={item} idx={idx} key={idx}/>
-                                ))} */}
-                                    <SwipeListView
-                                        data={collectionData.places}
-                                        renderItem={ShowPlaces}
-                                        keyExtractor={(item) => item.place_pk.toString()}
-                                        key={(item, idx) => {idx.toString();}}
-                                        renderHiddenItem={(item, rowMap) => {
-                                            return (
-                                                <View style={styles.rowBack} key={item.place_pk}>
-                                                    <TouchableOpacity
-                                                        style={[styles.backRightBtn, styles.backRightBtnRight]}
-                                                        onPress={() => deleteRow(rowMap, item.place_pk)}
-                                                    >
-                                                        <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            );}}
-                                        rightOpenValue={-75}
-                                        previewRowKey={'0'}
-                                        previewOpenDelay={3000}
-                                        disableRightSwipe={true}
-                                        closeOnRowOpen={true}
-                                        closeOnRowPress={true}
-                                        nestedScrollEnabled
-                                    />
-                                    {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
-                                        keyExtractor={(item) => item.place_pk.toString()}
-                                        nestedScrollEnabled/> */}
-
+                                    <SafeAreaView>
+                                        {
+                                            !isEditPage ?
+                                            <SwipeList /> :
+                                            <DragAndDropListForFree data={collectionData.places} isEditPage={isEditPage} isPress={isPress} />
+                                        }
+                                    </SafeAreaView>
                                 </SafeAreaView>
                                 <TouchableOpacity onPress={() => {
                                     // if(isLimited) setIsLimited(false);
@@ -683,6 +647,46 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         right: 0,
     },
+
+    //modal example
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    modalView: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 150
+    },
+    button: {
+        borderRadius: 10,
+        marginHorizontal: 9.5,
+        marginTop: 26,
+        width: 108,
+        height: 38,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 22.4,
+        fontWeight: '500'
+    },
+    modalText: {
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 22.4,
+        fontWeight: '700'
+    }
 });
 
 export default FreeCollectionScreen;

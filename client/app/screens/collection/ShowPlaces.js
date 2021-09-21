@@ -17,6 +17,27 @@ import SlideMenu from '../../assets/images/menu_for_edit.svg';
 const ShowPlaces = props => {
     const { colors } = useTheme();
     const isPress = props.isPress;
+    const isFree = (typeof props.day === 'undefined');
+    
+    const checkType = (type) => {
+        if(type === 12) {
+            return '관광지';
+        } else if(type === 14) {
+            return '문화시설';
+        } else if(type === 15) {
+            return '축제/공연/행사';
+        } else if(type === 28) {
+            return '레포츠';
+        } else if(type === 32) {
+            return '숙박';
+        } else if(type === 38) {
+            return '쇼핑';
+        } else if(type === 39) {
+            return '음식';
+        } else {
+            return '기타';
+        }
+    };
 
     return (
         <>
@@ -30,17 +51,20 @@ const ShowPlaces = props => {
             {/* pk로 바꾸기 */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
             <View flex={1}>
-                <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4}}>
+                <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
                     <TouchableOpacity onPress={() => navigation.navigate('Place', {data: props.item})} disabled={props.isEditPage && true}>
-                        <View style={{flexDirection: 'row', width: '90%'}}>
+                        <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
                             {/* <Image source={{uri: item.place_img}} */}
-                            <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
-                                    <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                        {props.item.id}    
-                                    </AppText>
+                            {
+                                !isFree &&
+                                <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
+                                    <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
+                                        <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
+                                            {props.item.id}    
+                                        </AppText>
+                                    </View>
                                 </View>
-                            </View>
+                            }
                             <Image source={require('../../assets/images/flower.jpeg')}
                                 style={{width: 72, height: 72, borderRadius: 15}}></Image>
                             <View style={{
@@ -51,12 +75,12 @@ const ShowPlaces = props => {
                             }}>
                                 <View style={{marginLeft: 8, marginTop: '2%'}}>
                                     <View style={{flexDirection: 'row'}}>
-                                        {/* <AppText style={{
+                                        <AppText style={{
                                             color: colors.gray[3],
                                             textAlign: 'center',
                                             fontSize: 10,
                                             fontWeight: 'bold'
-                                        }}>{checkType(item.place_type)}</AppText> */}
+                                        }}>{isFree && checkType(props.item.place_type)}</AppText>
                                         <AppText style={{
                                             marginHorizontal: 4, color: colors.gray[7],
                                             textAlign: 'center',
@@ -90,12 +114,12 @@ const ShowPlaces = props => {
                                             fontWeight: 'bold',
                                             color: colors.mainColor,
                                             marginVertical: 5,
-                                        }}>제목</AppText>
+                                        }}>{isFree? props.item.place_name : '제목'}</AppText>
                                     </View>
                                     {/* <AppText
                                         style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText> */}
                                                                                 <AppText
-                                        style={{fontSize: 12, color: colors.gray[4]}}>서울시 구로구 연동로</AppText>
+                                        style={{fontSize: 12, color: colors.gray[4]}}>{isFree? props.item.place_addr : '서울시 구로구 연동로'}</AppText>
                                 </View>
                             </View>
                         </View>
@@ -131,9 +155,12 @@ const ShowPlaces = props => {
                     </View>
                 </View>
                 {
-                    props.item.id === 2 ?
+                    isFree ?
                     <>
-                    <View style={{
+                    <TipsList data={props.item} idx={props.index} day={props.day}/>
+                    </> :
+                    <>
+                        {/* <View style={{
                         backgroundColor: colors.defaultColor,
                         height: 30,
                         paddingVertical: 6,
@@ -153,31 +180,8 @@ const ShowPlaces = props => {
                         <View>
                             <BackIcon width={10} height={14} style={{color: colors.mainColor, transform: [{rotate: '180deg'}], width: 4, height: 8}}/>
                         </View>
-                    </View>
+                    </View> */}
 
-                    <TipsList data={props.item} idx={props.index} day={props.day}/>
-
-                    <TouchableOpacity onPress={() => {
-                                // if(isLimited) setIsLimited(false);
-                                // else setIsLimited(true);
-                                // console.log(isLimited)
-                            }}>
-                                <View style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}>
-                                    <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                        style={{
-                                            width: 15,
-                                            height: 15,
-                                            marginLeft: 10,
-                                            marginBottom: 5
-                                        }}></Image>
-                                </View>
-                    </TouchableOpacity>
-                    </> :
-                    <>
                     <TipsList data={props.item} idx={props.index} day={props.day}/>
                     </>
                 }
