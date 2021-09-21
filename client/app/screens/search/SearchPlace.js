@@ -40,12 +40,13 @@ const SearchPlace = ({navigation}) => {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'x-access-token': token
+                    'x-access-token' : token
                 },
             }).then((res) => res.json())
                 .then((response) => {
                     setPlaceList(response.data);
-                    setFalse();
+                    // setFalse();
+                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -128,13 +129,13 @@ const SearchPlace = ({navigation}) => {
     };
 
     const [isPress, setIsPress] = useState([]);
-    const setFalse = () => {
-        var pressed = [];
-        for (let i = 0; i < placeList.length; i++) {
-            pressed.push(false);
-        }
-        setIsPress(pressed);
-    };
+    // const setFalse = () => {
+    //     var pressed = [];
+    //     for (let i = 0; i < placeList.length; i++) {
+    //         pressed.push(false);
+    //     }
+    //     setIsPress(pressed);
+    // };
 
     const PlaceContainer = ({item, index}) => (
         <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
@@ -205,12 +206,5 @@ const SearchPlace = ({navigation}) => {
     );
 };
 
-// const SearchPlace = () => {
-//     return (
-//         <View>
-//             <AppText>Hi</AppText>
-//         </View>
-//     );
-// };
 
 export default SearchPlace;

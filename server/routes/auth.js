@@ -169,6 +169,7 @@ router.post('/loginJWT', async (req, res, next) => {
 
         return res.send({code: 200, state: 'SUCCESS', accessToken});
     } catch (err) {
+        console.log(err)
         return res.send({code: 501, state: 'SERVER ERROR'});
     }
 });

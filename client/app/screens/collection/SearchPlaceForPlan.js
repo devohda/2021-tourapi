@@ -3,16 +3,20 @@ import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList,
 import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
-import AppText from '../../components/AppText';
-import { searchKeyword } from '../../contexts/SearchkeywordContextProvider';
-import ShowEmpty from '../../components/ShowEmpty';
+import AppText from "../../components/AppText";
+import { useSearchKeyword } from "../../contexts/SearchkeywordContextProvider";
+import ShowEmpty from "../../components/ShowEmpty";
+import {useToken} from '../../contexts/TokenContextProvider';
 
-const SearchPlaceForPlan = (props, {navigation}) => {
+const SearchPlaceForPlan = ({navigation}) => {
     const {colors} = useTheme();
     const [placeList, setPlaceList] = useState([]);
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
-    const [keyword, setKeyword] = searchKeyword();
+    const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+
+    const [token, setToken] = useToken();
+
 
     const styles = StyleSheet.create({
         info_container : {
@@ -31,20 +35,20 @@ const SearchPlaceForPlan = (props, {navigation}) => {
 
     useEffect(() => {
         getResults();
-    }, [keyword]);
+    }, [searchKeyword]);
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(keyword)}&type=${searchType}`, {
+            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
             }).then((res) => res.json())
                 .then((response) => {
                     setPlaceList(response.data);
-                    console.log(placeList);
                     setFalse();
                 })
                 .catch((err) => {

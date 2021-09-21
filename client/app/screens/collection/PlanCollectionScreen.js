@@ -11,7 +11,8 @@ import {
     Pressable,
     FlatList,
     Animated,
-    TouchableHighlight,
+    Modal,
+    Alert
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -23,6 +24,8 @@ import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import { tipsList } from '../../contexts/TipsListContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
+
 import TipsList from './TipsList';
 import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
@@ -32,13 +35,12 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
-import {useToken} from '../../contexts/TokenContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
-const {width} = Dimensions.get('window');
 
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
+    const {data} = route.params;
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
@@ -78,27 +80,25 @@ const PlanCollectionScreen = ({route, navigation}) => {
             ]
         }
         ]);
+        // console.log(data)
         // getInitialData();
     }, []);
 
     // const getInitialData = () => {
     //     try {
     //         fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
-    //             method: 'POST',
+    //             method: 'GET',
     //             headers: {
     //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json'
+    //                 'Content-Type': 'application/json',
+    //                 'x-access-token': token
     //             },
-    //             body: JSON.stringify({
-    //                 userId: userData.user_pk,
-    //             })
     //         }).then((res) => res.json())
     //             .then((response) => {
     //                 setCollectionData(response.data);
     //                 setPlaceLength(response.data.places.length);
     //                 setFalse();
-    //                 setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
-
+    //                 // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
     //             })
     //             .catch((err) => {
     //                 console.error(err);
@@ -110,7 +110,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     // };
 
     // const checkTrue = () => {
-    //     if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
+    //     // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
     //     return true;
     // };
 
@@ -121,6 +121,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             pressed.push(false);
         }
         setIsPress(pressed);
+        console.log(collectionData)
     };
 
     const likePlace = (pk) => {
@@ -130,7 +131,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'x-access-token' : token
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
                     placeId: pk,
@@ -155,7 +156,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'x-access-token' : token
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
                     placeId: pk,
@@ -172,6 +173,29 @@ const PlanCollectionScreen = ({route, navigation}) => {
             console.error(err);
         }
     };
+
+    const deleteCollection = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    Alert.alert('', '삭제되었습니다.');
+                    navigation.goBack();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     const InputBox = styled(TextInput)`
       fontSize: 16px;
@@ -309,6 +333,44 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const [showMenu, setShowMenu] = useState(false);
+    const [deleteMenu, setDeleteMenu] = useState(false);
+
+    const deleteMode = () => {
+        setDeleteMenu(true);
+    }
+
+    const DeleteModal = () => (
+        <Modal
+        transparent={true}
+        visible={deleteMenu}
+        onRequestClose={() => {
+            setDeleteMenu(!deleteMenu);
+        }}
+    >
+        <View style={styles.centeredView}>
+            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                    <Pressable
+                        style={{...styles.button, backgroundColor: colors.gray[4]}}
+                        onPress={() => setDeleteMenu(!deleteMenu)}
+                    >
+                        <AppText style={styles.textStyle}>취소하기</AppText>
+                    </Pressable>
+                    <Pressable
+                        style={{...styles.button, backgroundColor: colors.mainColor}}
+                        onPress={() => {
+                            setDeleteMenu(!deleteMenu);
+                            deleteCollection();
+                        }}
+                    >
+                        <AppText style={styles.textStyle}>삭제하기</AppText>
+                    </Pressable>
+                </View>
+            </View>
+        </View>
+    </Modal>
+    )
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -354,14 +416,15 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             borderRadius: 1,
                         }}></View>
                         <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(state => !state);
+                            onPress={async () => {
+                                await deleteMode();
                             }}
                             style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}><AppText>삭제</AppText></TouchableOpacity>
+                        <DeleteModal />
                     </View>
                 )
             }
@@ -537,7 +600,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     {/* {collectionData.place.map((item, idx) =>(
                                     <ShowPlaces item={item} idx={idx} key={idx}/>
                                 ))} */}
-                                    <FlatList data={collectionData.places} renderItem={(item, index) => <ShowPlaces item={item} index={index}/>}
+                                    <FlatList data={item} renderItem={(item, index) => <ShowPlaces item={item} index={index}/>}
                                         keyExtractor={(item) => item.place_pk.toString()}
                                         nestedScrollEnabled/>
 
@@ -740,6 +803,46 @@ const styles = StyleSheet.create({
     item_text: {
         marginRight: 55,
         color: 'black'
+    },
+
+    //modal example
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    modalView: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 150
+    },
+    button: {
+        borderRadius: 10,
+        marginHorizontal: 9.5,
+        marginTop: 26,
+        width: 108,
+        height: 38,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 22.4,
+        fontWeight: '500'
+    },
+    modalText: {
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 22.4,
+        fontWeight: '700'
     }
 });
 

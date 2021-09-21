@@ -56,7 +56,7 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
         // 좋아요
         const likePlace = () => {
             try {
-                fetch('http://34.146.140.88/like/place', {
+                fetch('http://localhost:3000/like/place', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -80,7 +80,7 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
         };
         const deletePlace = () => {
             try {
-                fetch('http://34.146.140.88/like/place', {
+                fetch('http://localhost:3000/like/place', {
                     method: 'DELETE',
                     headers: {
                         'Accept': 'application/json',
@@ -241,7 +241,8 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
 
 const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
-    const [height, setHeight] = useState(150 + 90 * collectionList.length);
+    // const [height, setHeight] = useState(150 + 90 * collectionList.length);
+    const [height, setHeight] = useState(150 + 90 * 5);
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
 
@@ -249,7 +250,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         try {
-            fetch(`http://34.146.140.88/collection/${collectionId}/place`, {
+            fetch(`http://localhost:3000/collection/${collectionId}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -275,8 +276,11 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     const ShowFreeDir = ({item, idx}) => {
         const [borderColor, setBorderColor] = useState(colors.defaultColor);
 
+        //TODO 5개까지만 보여지도록 하였으나 scrollview 다시 한번 해보기
         return (
             <>
+            {
+                idx <= 4 &&
                 <View key={idx} style={{alignItems: 'center', justifyContent: 'center', marginTop: 12}}>
                     <View style={{
                         width: '100%',
@@ -362,50 +366,12 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                                         width: 236
                                     }}>{item.collection_name}</AppText>
                                 </View>
-                                <View style={{marginRight: '15%'}}>
-                                    <View style={{flexDirection: 'row', position: 'relative', alignItems: 'center'}}
-                                        flex={1}>
-                                        {/* 여기에는 받은 유저 프로필만 넣고, +2 부분에는 전체 인원수-3명으로 퉁 치기 */}
-                                        <View style={{zIndex: 0, flex: 1, position: 'absolute'}}><Image
-                                            style={{width: 24, height: 24}}
-                                            source={require('../assets/images/default_profile_1.png')}></Image></View>
-                                        <View style={{
-                                            zIndex: 1,
-                                            flex: 1,
-                                            position: 'absolute',
-                                            marginLeft: 10
-                                        }}><Image style={{width: 24, height: 24}}
-                                                source={require('../assets/images/default_profile_2.png')}></Image></View>
-                                        <View style={{
-                                            zIndex: 2,
-                                            flex: 1,
-                                            position: 'absolute',
-                                            marginLeft: 20
-                                        }}><Image style={{width: 24, height: 24}}
-                                                source={require('../assets/images/default_profile_3.png')}></Image></View>
-                                        <View style={{
-                                            zIndex: 3,
-                                            flex: 1,
-                                            position: 'absolute',
-                                            marginLeft: 24.5,
-                                            backgroundColor: 'rgba(0, 0, 0, 0.37);',
-                                            width: 15,
-                                            height: 15,
-                                            borderRadius: 50,
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}><AppText style={{
-                                                color: colors.defaultColor,
-                                                fontSize: 10,
-                                                textAlign: 'center'
-                                            }}>+2</AppText></View>
-                                    </View>
-
-                                </View>
                             </View>
                         </TouchableOpacity>
                     </View>
                 </View>
+            }
+
                 {idx === collectionList.length - 1 &&
                 <View style={{marginTop: 22, borderRadius: 10}}>
                     <TouchableOpacity
@@ -444,7 +410,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                 ref={refRBSheet}
                 closeOnDragDown={true}
                 closeOnPressMask={true}
-                height={collectionList.length > 6 ? maxHeight : height}
+                height={height}
                 customStyles={{
                     wrapper: {
                         backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -469,12 +435,12 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                             style={{width: 32, height: 32}}></Image>
                     </View>
 
-                    <SafeAreaView>
+                    {/* <SafeAreaView> */}
                         {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
                         {/* <FlatList data={collectionList} renderItem={showFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
-                    </SafeAreaView>
+                    {/* </SafeAreaView> */}
                 </View>
             </RBSheet>
         </>
@@ -537,7 +503,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://34.146.140.88/place/${data.place_pk}`, {
+            fetch(`http://localhost:3000/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -564,7 +530,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCollectionList = () => {
         try {
-            fetch('http://34.146.140.88/collection/list', {
+            fetch('http://localhost:3000/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
