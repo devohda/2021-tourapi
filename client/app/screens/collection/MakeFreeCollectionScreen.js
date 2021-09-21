@@ -115,7 +115,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
         }
 
         try {
-            fetch('http://34.146.140.88/collection/free', {
+            fetch('http://34.146.140.88/collection', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

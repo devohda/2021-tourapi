@@ -176,10 +176,13 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
 };
 
 // 보관함에 장소 추가
-exports.createPlaceToCollection = async (collection_pk, place_pk) => {
+exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
 
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk) 
-                   VALUES (${collection_pk}, ${place_pk})`;
+    // 자유 보관함의 경우 날짜 없으므로 -1 저장
+    if(!cpm_plan_day) cpm_plan_day = -1;
+
+    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
+                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
 
     const result = await db.query(query);
 
@@ -189,6 +192,10 @@ exports.createPlaceToCollection = async (collection_pk, place_pk) => {
 // 보관함 상세 조회
 exports.readCollection = async (user_pk, collection_pk) => {
     // TODO 보관함 type(자유, 일정) 에 따라 쿼리 다르게 타야 함.
+    // TODO 댓글, 한줄평 구현되면 추가해야 함.
+    //  자유 보관함 : 제작자 여부, 키워드, 공개여부, 좋아요 여부, 보관함 이름, type, 공간 리스트( 이름, type, 사진, 사용자 별점, 전체 별점, 사용자의 좋아요 여부, 한줄평)
+    //  일정 보관함 : 제작자 여부, 키워드, 공개여부, 좋아요 여부, 보관함 이름, type, 공간 리스트( 이름, type, 사진, 사용자 별점, 전체 별점, 사용자의 좋아요 여부, 한줄평)
+    // 자유 보관함 : 공간 리스트( 사용자 별점, 전체 별점, 한줄평)
 
     const conn = await db.pool.getConnection();
     let result;
@@ -197,8 +204,11 @@ exports.readCollection = async (user_pk, collection_pk) => {
         await conn.beginTransaction();
 
         // 보관함 정보 & 보관함 좋아요 상태
-        const query1 = `SELECT c.*, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+        const query1 = `SELECT c.*, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, user_nickname AS created_user_name,
+                               CASE WHEN c.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator
                         FROM collections c
+                        INNER JOIN users u
+                        ON u.user_pk = c.user_pk
                         LEFT OUTER JOIN like_collection lc
                         ON lc.collection_pk = c.collection_pk
                         AND lc.user_pk = ${user_pk}
@@ -213,23 +223,9 @@ exports.readCollection = async (user_pk, collection_pk) => {
         const [result2] = await conn.query(query2);
         const keywords = result2.map(keyword => keyword.keyword_title);
 
-        // 장소 정보 & 장소 좋아요 상태
-        const query3 = `SELECT cpm.place_pk, place_name, place_addr, place_img, place_type, 
-                               CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
-                        FROM collection_place_map cpm
-                        INNER JOIN places p
-                        ON p.place_pk = cpm.place_pk
-                        LEFT OUTER JOIN like_place lp
-                        ON lp.place_pk = cpm.place_pk
-                        AND lp.user_pk = ${user_pk}
-                        WHERE collection_pk = ${collection_pk}`;
-
-        const [result3] = await conn.query(query3);
-
         result = {
             ...result1,
-            keywords,
-            places: result3
+            keywords
         };
 
         await conn.commit();
@@ -241,6 +237,30 @@ exports.readCollection = async (user_pk, collection_pk) => {
         return result;
     }
 };
+
+// 보관함 장소 리스트
+exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
+
+    // 장소 정보 & 장소 좋아요 상태
+
+    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, 
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+                   FROM collection_place_map cpm
+                   LEFT OUTER JOIN places p
+                   ON p.place_pk = cpm.place_pk
+                   LEFT OUTER JOIN like_place lp
+                   ON lp.place_pk = cpm.place_pk
+                   AND lp.user_pk = ${user_pk}
+                   WHERE collection_pk = ${collection_pk}
+                   ORDER BY cpm_plan_day ASC, cpm_map_pk ASC`;
+
+    const result = await db.query(query);
+    return result;
+
+};
+
+// 보관함 댓글 리스트
+exports.readCollectionCommentList = async (collection_pk) => {};
 
 // 보관함 삭제
 exports.deleteCollection = async (collection_pk) => {

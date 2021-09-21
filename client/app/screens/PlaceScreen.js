@@ -56,7 +56,7 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
         // 좋아요
         const likePlace = () => {
             try {
-                fetch('http://localhost:3000/like/place', {
+                fetch('http://34.146.140.88/like/place', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -80,7 +80,7 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
         };
         const deletePlace = () => {
             try {
-                fetch('http://localhost:3000/like/place', {
+                fetch('http://34.146.140.88/like/place', {
                     method: 'DELETE',
                     headers: {
                         'Accept': 'application/json',
@@ -250,7 +250,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         try {
-            fetch(`http://localhost:3000/collection/${collectionId}/place`, {
+            fetch(`http://34.146.140.88/collection/${collectionId}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -503,7 +503,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://localhost:3000/place/${data.place_pk}`, {
+            fetch(`http://34.146.140.88/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -530,7 +530,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCollectionList = () => {
         try {
-            fetch('http://localhost:3000/collection/list', {
+            fetch('http://34.146.140.88/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

@@ -44,11 +44,11 @@ router.post('/plan', verifyToken, async (req, res, next) => {
 });
 
 // 보관함에 장소 추가하기
-router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.params;
-    const {user} = res.locals;
+router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
+    const {collectionId, placeId} = req.params;
+    const {planDay} = req.body;
 
-    const result = await collectionService.createPlaceToCollection(collectionId, user.user_pk);
+    const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay);
 
     if (result.affectedRows === 1) {
         return res.send({
@@ -109,6 +109,31 @@ router.get('/:collectionId', verifyToken, async (req, res, next) => {
         });
     }
 });
+
+// 보관함 장소 리스트 조회
+router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionPlaceList(user.user_pk, collectionId);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
+// 보관함 댓글 리스트 조회
+router.get('/:collectionId/comments',async (req, res, next) => {
+
+})
 
 // DELETE
 // 보관함 삭제
