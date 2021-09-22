@@ -305,7 +305,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                                 navigation.goBack(null);
                                 // }
                             }}
-                            // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
+                            disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
                         ><AppText
                                 style={{
                                     textAlign: 'center',

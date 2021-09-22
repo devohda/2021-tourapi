@@ -187,14 +187,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const checkPrivate = () => {
         //생성에서 바로 넘어오는 데이터 처리
-        if(data.collection_private === true || data.collection_private === false) {
+        if(typeof data.collection_private === 'boolean') {
             return false;
         } else {
             if (collectionData.is_creator) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     const [isPress, setIsPress] = useState([]);
@@ -314,7 +314,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             previewRowKey={'0'}
             previewOpenDelay={3000}
             disableRightSwipe={true}
-            disableLeftSwipe={isEditPage || checkPrivate()? true : false}
+            disableLeftSwipe={checkPrivate()? false : true}
             closeOnRowOpen={true}
             closeOnRowPress={true}
             nestedScrollEnabled
@@ -558,7 +558,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         <AppText style={{color: colors.gray[4]}}>총 <AppText
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
-                                    <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
+                                    <TouchableOpacity onPress={()=>{
+                                        navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
+                                    }} style={{display: !collectionData.is_creator && 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -606,7 +608,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     <AppText style={{color: colors.gray[4]}}>총 <AppText
                                         style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                 </View>
-                                <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
+                                <TouchableOpacity onPress={()=>{
+                                    if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
+                                    else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
+                                }} style={{display: !checkPrivate() && 'none'}}>
                                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                         <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                         <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

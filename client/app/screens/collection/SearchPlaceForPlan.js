@@ -15,6 +15,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+    console.log(props)
 
     const [token, setToken] = useToken();
 
