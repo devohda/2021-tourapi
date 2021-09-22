@@ -87,7 +87,7 @@ const TipsList = props => {
                             if(isFree) newArr[idx].tip = changedTip;
                             else newArr[day].places[idx].tip = changedTip;
                             setTmpData(newArr);
-                            console.log(tmpData)
+                            // console.log(tmpData)
                             setVisible(false);
                         }}>
                             <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5}}>

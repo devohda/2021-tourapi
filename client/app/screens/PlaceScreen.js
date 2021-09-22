@@ -283,7 +283,7 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data[0])
+                    // console.log(response.data[0])
                     setPlaceData(response.data[0]);
                 })
                 .catch((err) => {
@@ -395,7 +395,7 @@ const PlaceScreen = ({route, navigation}) => {
                         }
                     }).then((res) => res.json())
                         .then((response) => {
-                            console.log(response)
+                            // console.log(response)
                             getInitialData()
                         })
                         .catch((err) => {
@@ -472,28 +472,28 @@ const PlaceScreen = ({route, navigation}) => {
             <>
                 {/*장소 사진*/}
                 <View style={{flexDirection: 'row'}}>
-                    <Image style={{width: '50%', height: 200}}
-                        source={require('../assets/images/mountain.jpeg')}
+                    <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
+                        source={require('../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <Image style={{width: '50%', height: 100}}
-                                source={require('../assets/images/mountain.jpeg')}
+                            <Image style={{width: '50%', height: 100, margin: 2}}
+                                source={require('../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
-                            <Image style={{width: '50%', height: 100}}
-                                source={require('../assets/images/mountain.jpeg')}
+                            <Image style={{width: '50%', height: 100, margin: 2}}
+                                source={require('../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <Image style={{width: '50%', height: 100}}
-                                source={require('../assets/images/mountain.jpeg')}
+                            <Image style={{width: '50%', height: 100, margin: 2}}
+                                source={require('../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
-                            <Image style={{width: '50%', height: 100}}
-                                source={require('../assets/images/mountain.jpeg')}
+                            <Image style={{width: '50%', height: 100, margin: 2}}
+                                source={require('../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>

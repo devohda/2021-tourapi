@@ -195,7 +195,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 .then((response) => {
                     setKeywordData(response.data);
                     setFalse();
-                    console.log(keywordData);
+                    // console.log(keywordData);
                 })
                 .catch((err) => {
                     console.error(err);

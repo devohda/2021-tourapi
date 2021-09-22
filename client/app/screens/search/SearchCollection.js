@@ -79,7 +79,7 @@ const SearchCollection = (props, {navigation}) => {
                         </View>
                             }
                         </View>
-                        <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/mountain.jpeg')}/>
+                        <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                         <AppText style={{

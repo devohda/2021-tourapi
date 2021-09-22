@@ -19,7 +19,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     const [token, setToken] = useToken();
 
     const addPlace = (place_pk) => {
-        console.log(day.id)
+        // console.log(day.id)
         try {
             fetch(`http://34.146.140.88/collection/${pk}/place/${place_pk}`, {
                 method: 'POST',
@@ -35,7 +35,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                 res.json();
             })
                 .then((responsedata) => {
-                    console.log(responsedata)
+                    // console.log(responsedata)
                     Alert.alert('', '추가되었습니다.');
                 })
                 .catch((err) => {

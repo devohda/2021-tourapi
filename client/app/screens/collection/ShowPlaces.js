@@ -24,7 +24,6 @@ const ShowPlaces = props => {
     const [placeIndex, setPlaceIndex] = useState(0);
 
     const checkType = (type) => {
-        console.log(item)
         if(type === 12) {
             return '관광지';
         } else if(type === 14) {
