@@ -600,6 +600,19 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                 </TouchableOpacity>
                             </View> :
+                            <View style={{marginTop: 16}}>
+                            <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
+                                <View>
+                                    <AppText style={{color: colors.gray[4]}}>총 <AppText
+                                        style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
+                                </View>
+                                <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
+                                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                        <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
+                                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
                             <View style={{
                                 justifyContent: 'center',
                                 alignItems: 'center',
@@ -616,6 +629,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
                                     담겨있지 않아요!</AppText>
                             </View>
+                        </View>
                     }
 
                 </ScreenContainerView>
@@ -648,7 +662,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         </View>
                         <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
                             <View style={{marginRight: 8}}>
-                                <Image source={require('../../assets/images/mountain.jpeg')}
+                                <Image source={require('../../assets/images/here_default.png')}
                                     style={{width: 40, height: 40, borderRadius: 40, resizeMode: 'stretch'}}/>
                             </View>
                             <View>

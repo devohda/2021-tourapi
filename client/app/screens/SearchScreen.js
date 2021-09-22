@@ -86,7 +86,7 @@ const SearchScreen = ({route, navigation}) => {
     const RecommendedPlace = ({name, address}) => {
         return (
             <View style={{marginRight: 8}}>
-                <Image source={require('../assets/images/mountain.jpeg')}
+                <Image source={require('../assets/images/here_default.png')}
                     style={{width: 141, height: 101, borderRadius: 10}}/>
                 <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -122,10 +122,7 @@ const SearchScreen = ({route, navigation}) => {
                     height: 162,
                     width: 162,
                 }}>
-                    <Image source={require('../assets/images/flower.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/mountain.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/autumn.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/sea.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../assets/images/here_default.png')} style={{width: 162, height: 162}}/>
                 </View>
                 <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
                     <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
