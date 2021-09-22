@@ -516,14 +516,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 }}>
                                     <Jewel width={26} height={21}
                                         style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                                    {/* <Image source={require('../../assets/images/here_click.png')}
-                                        style={{width: 26, height: 21, marginBottom: 2}}></Image> */}
-                                    {/* <AppText style={{
+                                    <AppText style={{
                                         fontSize: 10,
                                         fontWeight: '700',
                                         color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
                                         marginTop: 2
-                                    }}>{data.like_cnt}</AppText> */}
+                                    }}>{collectionData.like_cnt}</AppText>
                                 </View>}
                             </TouchableOpacity>
                         }
