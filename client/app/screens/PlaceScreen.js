@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert } from 'react-native';
+import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert, FlatList } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
@@ -15,223 +15,6 @@ import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import ScreenDivideLine from '../components/ScreenDivideLine';
 import {useToken} from '../contexts/TokenContextProvider';
-
-const PlaceInfo = ({placeData, collectionList, colors, styles, data, getInitialData}) => {
-    const [token, setToken] = useToken();
-    const [isLiked, setIsLiked] = useState(false);
-    const refRBSheet = useRef();
-
-    const checkType = (type) => {
-        if (type === 12) {
-            return '관광지';
-        } else if (type === 14) {
-            return '문화시설';
-        } else if (type === 15) {
-            return '축제/공연/행사';
-        } else if (type === 28) {
-            return '레포츠';
-        } else if (type === 32) {
-            return '숙박';
-        } else if (type === 38) {
-            return '쇼핑';
-        } else if (type === 39) {
-            return '음식';
-        } else {
-            return '기타';
-        }
-    };
-
-
-    const PlaceInfo = (props) => {
-        return (
-            <View flexDirection="row" style={{marginVertical: 2}}>
-                <Icon type="ionicon" name={props.icon} size={14} color={colors.mainColor}></Icon>
-                <View style={{marginLeft: 5}}>
-                    {props.children}
-                </View>
-            </View>
-        );
-    };
-    const IconTab = () => {
-        const LikePlace = (pk) => {
-            //공간 좋아요
-            try {
-                fetch(`http://34.146.140.88/like/place/${pk}`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'x-access-token': token
-                    }
-                }).then((res) => res.json())
-                    .then((response) => {
-                        getInitialData()
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
-    
-            } catch (err) {
-                console.error(err);
-            }
-        };
-    
-        const DeleteLikedPlace = (pk) => {
-            //공간 좋아요 삭제
-            try {
-                fetch(`http://34.146.140.88/like/place/${pk}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'x-access-token': token
-                    }
-                }).then((res) => res.json())
-                    .then((response) => {
-                        getInitialData()
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
-    
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        // 공유
-        const onShare = async () => {
-            try {
-                const result = await Share.share({
-                    message:
-                    placeData.place_name,
-                });
-                if (result.action === Share.sharedAction) {
-                    if (result.activityType) {
-                        // shared with activity type of result.activityType
-                    } else {
-                        // shared
-                    }
-                } else if (result.action === Share.dismissedAction) {
-                    // dismissed
-                }
-            } catch (error) {
-                Alert.alert('', error.message);
-            }
-        };
-
-        return (
-            <View style={styles.iconTabContainer}>
-                <TouchableOpacity onPress={() => {
-                    if (data.like_flag) {
-                        DeleteLikedPlace(placeData.place_pk);
-                    } else {
-                        LikePlace(placeData.place_pk);
-                    }
-                }}>
-                    <Jewel width={26} height={21}
-                        style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                    {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
-                </TouchableOpacity>
-                <View style={{
-                    borderWidth: 0.5,
-                    transform: [{rotate: '90deg'}],
-                    width: 42,
-                    borderColor: colors.red_gray[5],
-                    marginHorizontal: 30
-                }}/>
-                <TouchableOpacity onPress={() => {
-                    refRBSheet.current.open();
-                }}>
-                    <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
-                        collectionList={collectionList}/>
-                </TouchableOpacity>
-                <View style={{
-                    borderWidth: 0.5,
-                    transform: [{rotate: '90deg'}],
-                    width: 42,
-                    borderColor: colors.red_gray[5],
-                    marginHorizontal: 30
-                }}/>
-                <TouchableOpacity onPress={onShare}>
-                    <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={28}/>
-                </TouchableOpacity>
-            </View>
-        );
-    };
-
-    return (
-        <>
-            {/*장소 사진*/}
-            <View style={{flexDirection: 'row'}}>
-                <Image style={{width: '50%', height: 200}}
-                    source={require('../assets/images/mountain.jpeg')}
-                    resizeMode="cover"
-                />
-                <View style={{width: '50%', height: 200}}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                        <Image style={{width: '50%', height: 100}}
-                            source={require('../assets/images/mountain.jpeg')}
-                            resizeMode="cover"
-                        />
-                        <Image style={{width: '50%', height: 100}}
-                            source={require('../assets/images/mountain.jpeg')}
-                            resizeMode="cover"
-                        />
-                    </View>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                        <Image style={{width: '50%', height: 100}}
-                            source={require('../assets/images/mountain.jpeg')}
-                            resizeMode="cover"
-                        />
-                        <Image style={{width: '50%', height: 100}}
-                            source={require('../assets/images/mountain.jpeg')}
-                            resizeMode="cover"
-                        />
-                    </View>
-                </View>
-            </View>
-
-            {/*장소 데이터*/}
-            <ScreenContainerView>
-                <View style={{marginVertical: 18}}>
-                    <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
-                        <AppText style={styles.placeName}>{placeData.place_name}</AppText>
-                        <View style={{
-                            ...styles.categoryBorder,
-                            borderColor: colors.red_gray[6],
-                            backgroundColor: colors.red_gray[6],
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}>
-                            <AppText style={styles.categoryText}>{checkType(placeData.place_type)}</AppText>
-                        </View>
-                    </View>
-
-                    <PlaceInfo icon={'location'}>
-                        <AppText style={styles.location}>{placeData.place_addr}</AppText>
-                        <AppText style={{
-                            color: colors.gray[4],
-                            fontSize: 14,
-                            lineHeight: 22.4
-                        }}>{placeData.place_addr}</AppText>
-                    </PlaceInfo>
-                    <PlaceInfo icon={'globe-outline'}>
-                        <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
-                    </PlaceInfo>
-                    <PlaceInfo icon={'time-outline'}>
-                        <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
-                    </PlaceInfo>
-                    <PlaceInfo icon={'call'}>
-                        <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
-                    </PlaceInfo>
-                </View>
-
-                <IconTab />
-            </ScreenContainerView>
-        </>
-    );
-};
 
 const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
@@ -266,14 +49,10 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     };
 
     const ShowFreeDir = ({item, idx}) => {
-        const [borderColor, setBorderColor] = useState(colors.defaultColor);
 
-        //TODO 5개까지만 보여지도록 하였으나 scrollview 다시 한번 해보기
         return (
-            <>
-            {
-                idx <= 4 &&
-                <View key={idx} style={{alignItems: 'center', justifyContent: 'center', marginTop: 12}}>
+            <View style={{marginTop: 12, marginHorizontal: 20}}>
+                <View style={{alignItems: 'center', justifyContent: 'center'}}>
                     <View style={{
                         width: '100%',
                         backgroundColor: colors.defaultColor,
@@ -335,7 +114,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                                     <View style={{paddingRight: 8, flexDirection: 'row'}}>
                                         <Icon type="ionicon" name={'location'} size={10} color={colors.mainColor}
                                             style={{marginVertical: 2, marginRight: 2}}></Icon>
-                                        <AppText style={{fontSize: 12, color: colors.mainColor}}>9</AppText>
+                                        <AppText style={{fontSize: 12, color: colors.mainColor}}>{item.place_cnt}</AppText>
                                     </View>
                                     {item.collection_private == 1 &&
                                     <Image style={{width: 10, height: 10, marginLeft: 2}}
@@ -362,10 +141,9 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         </TouchableOpacity>
                     </View>
                 </View>
-            }
 
                 {idx === collectionList.length - 1 &&
-                <View style={{marginTop: 22, borderRadius: 10}}>
+                <View style={{marginVertical: 22, borderRadius: 10}}>
                     <TouchableOpacity
                         style={{
                             height: 48,
@@ -389,7 +167,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         >보관함에 추가하기</AppText>
                     </TouchableOpacity>
                 </View>}
-            </>
+            </View>
         );
     };
 
@@ -414,26 +192,28 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     container: {
                         borderTopLeftRadius: 10,
                         borderTopRightRadius: 10,
-                        backgroundColor: colors.yellow[7]
+                        backgroundColor: colors.yellow[7],
                     }
                 }}
             >
                 <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                         <AppText
-                            style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에
-                            추가하기</AppText>
+                            style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
                         <Image source={require('../assets/images/folder.png')}
                             style={{width: 32, height: 32}}></Image>
                     </View>
+                </View>
 
-                    {/* <SafeAreaView> */}
+                    <SafeAreaView flex={1}>
+                        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
                         {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
-                        {/* <FlatList data={collectionList} renderItem={showFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
-                    {/* </SafeAreaView> */}
-                </View>
+                        {/* <FlatList style={{flex: 1}} flex={1} data={collectionList} renderItem={ShowFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
+                        </ScrollView>
+                    </SafeAreaView>
+                {/* </ScrollView> */}
             </RBSheet>
         </>
     );
@@ -503,6 +283,7 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
+                    console.log(response.data[0])
                     setPlaceData(response.data[0]);
                 })
                 .catch((err) => {
@@ -542,11 +323,230 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
+    const PlaceInfo = ({placeData, collectionList, styles, data}) => {
+        const [token, setToken] = useToken();
+        const [isLiked, setIsLiked] = useState(false);
+        const refRBSheet = useRef();
+    
+        const checkType = (type) => {
+            if (type === 12) {
+                return '관광지';
+            } else if (type === 14) {
+                return '문화시설';
+            } else if (type === 15) {
+                return '축제/공연/행사';
+            } else if (type === 28) {
+                return '레포츠';
+            } else if (type === 32) {
+                return '숙박';
+            } else if (type === 38) {
+                return '쇼핑';
+            } else if (type === 39) {
+                return '음식';
+            } else {
+                return '기타';
+            }
+        };
+    
+    
+        const PlaceInfo = (props) => {
+            return (
+                <View flexDirection="row" style={{marginVertical: 2}}>
+                    <Icon type="ionicon" name={props.icon} size={14} color={colors.mainColor}></Icon>
+                    <View style={{marginLeft: 5}}>
+                        {props.children}
+                    </View>
+                </View>
+            );
+        };
+        const IconTab = () => {
+            const LikePlace = (pk) => {
+                //공간 좋아요
+                try {
+                    fetch(`http://34.146.140.88/like/place/${pk}`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'x-access-token': token
+                        }
+                    }).then((res) => res.json())
+                        .then((response) => {
+                            getInitialData()
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+        
+                } catch (err) {
+                    console.error(err);
+                }
+            };
+        
+            const DeleteLikedPlace = (pk) => {
+                //공간 좋아요 삭제
+                try {
+                    fetch(`http://34.146.140.88/like/place/${pk}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'x-access-token': token
+                        }
+                    }).then((res) => res.json())
+                        .then((response) => {
+                            console.log(response)
+                            getInitialData()
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+        
+                } catch (err) {
+                    console.error(err);
+                }
+            };
+    
+            // 공유
+            const onShare = async () => {
+                try {
+                    const result = await Share.share({
+                        message:
+                        placeData.place_name,
+                    });
+                    if (result.action === Share.sharedAction) {
+                        if (result.activityType) {
+                            // shared with activity type of result.activityType
+                        } else {
+                            // shared
+                        }
+                    } else if (result.action === Share.dismissedAction) {
+                        // dismissed
+                    }
+                } catch (error) {
+                    Alert.alert('', error.message);
+                }
+            };
+    
+            return (
+                <View style={styles.iconTabContainer}>
+                    <TouchableOpacity onPress={() => {
+                        if (placeData.like_flag) {
+                            DeleteLikedPlace(placeData.place_pk);
+                        } else {
+                            LikePlace(placeData.place_pk);
+                        }
+                    }}>
+                        <Jewel width={26} height={21}
+                            style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                        {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
+                    </TouchableOpacity>
+                    <View style={{
+                        borderWidth: 0.5,
+                        transform: [{rotate: '90deg'}],
+                        width: 42,
+                        borderColor: colors.red_gray[5],
+                        marginHorizontal: 30
+                    }}/>
+                    <TouchableOpacity onPress={() => {
+                        refRBSheet.current.open();
+                    }}>
+                        <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
+                            collectionList={collectionList}/>
+                    </TouchableOpacity>
+                    <View style={{
+                        borderWidth: 0.5,
+                        transform: [{rotate: '90deg'}],
+                        width: 42,
+                        borderColor: colors.red_gray[5],
+                        marginHorizontal: 30
+                    }}/>
+                    <TouchableOpacity onPress={onShare}>
+                        <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={28}/>
+                    </TouchableOpacity>
+                </View>
+            );
+        };
+    
+        return (
+            <>
+                {/*장소 사진*/}
+                <View style={{flexDirection: 'row'}}>
+                    <Image style={{width: '50%', height: 200}}
+                        source={require('../assets/images/mountain.jpeg')}
+                        resizeMode="cover"
+                    />
+                    <View style={{width: '50%', height: 200}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <Image style={{width: '50%', height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                            <Image style={{width: '50%', height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <Image style={{width: '50%', height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                            <Image style={{width: '50%', height: 100}}
+                                source={require('../assets/images/mountain.jpeg')}
+                                resizeMode="cover"
+                            />
+                        </View>
+                    </View>
+                </View>
+    
+                {/*장소 데이터*/}
+                <ScreenContainerView>
+                    <View style={{marginVertical: 18}}>
+                        <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
+                            <AppText style={styles.placeName}>{placeData.place_name}</AppText>
+                            <View style={{
+                                ...styles.categoryBorder,
+                                borderColor: colors.red_gray[6],
+                                backgroundColor: colors.red_gray[6],
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <AppText style={styles.categoryText}>{checkType(placeData.place_type)}</AppText>
+                            </View>
+                        </View>
+    
+                        <PlaceInfo icon={'location'}>
+                            <AppText style={styles.location}>{placeData.place_addr}</AppText>
+                            <AppText style={{
+                                color: colors.gray[4],
+                                fontSize: 14,
+                                lineHeight: 22.4
+                            }}>{placeData.place_addr}</AppText>
+                        </PlaceInfo>
+                        <PlaceInfo icon={'globe-outline'}>
+                            <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
+                        </PlaceInfo>
+                        <PlaceInfo icon={'time-outline'}>
+                            <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
+                        </PlaceInfo>
+                        <PlaceInfo icon={'call'}>
+                            <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
+                        </PlaceInfo>
+                    </View>
+    
+                    <IconTab />
+                </ScreenContainerView>
+            </>
+        );
+    };
+    
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
             <ScrollView showsVerticalScrollIndicator={false}>
-                <PlaceInfo placeData={placeData} collectionList={collectionList} colors={colors} styles={styles} data={data} getInitialData={getInitialData}/>
+                <PlaceInfo placeData={placeData} collectionList={collectionList} colors={colors} styles={styles} data={data}/>
                 <ScreenDivideLine/>
                 <ScreenContainerView>
                     <View style={{alignItems: 'center'}}>

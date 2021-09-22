@@ -67,7 +67,6 @@ const PlaceTab = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data)
                     setCollectionList(response.data)
                 })
                 .catch((err) => {
@@ -160,7 +159,7 @@ const PlaceTab = ({navigation}) => {
                         <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
                     }
                 </View>
-                <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                <View flex={1} style={{marginLeft: 5}}>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
                         <AppText style={{
                             color: colors.mainColor,
@@ -174,15 +173,15 @@ const PlaceTab = ({navigation}) => {
                             <AppText style={{color: colors.mainColor, fontSize: 10}}>4.8</AppText>
                         </View>
                     </View>
-                    <View style={{width: '75%'}}>
+                    <View style={{width: '100%'}}>
                         <AppText style={{
                             color: colors.mainColor,
                             fontSize: 16,
                             fontWeight: 'bold',
-                            lineHeight: 28.8
+                            lineHeight: 24.8
                         }}>{item.place_name}</AppText>
                     </View>
-                    <View style={{width: '75%'}}>
+                    <View style={{width: '100%'}}>
                         <AppText style={{
                             color: colors.gray[4],
                             fontSize: 12,
@@ -226,14 +225,14 @@ const PlaceTab = ({navigation}) => {
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
                         <View style={{marginTop: 4, flexDirection: 'row'}}>
-                            {/* {item.keywords.map((keyword, idx) => {
+                            {item.keywords.map((keyword, idx) => {
                                 return (
                                     <AppText key={idx} style={{
                                         color: colors.gray[4],
                                         fontSize: 10,
                                         marginRight: 6.21
                                     }}># {keyword}</AppText>);
-                            })} */}
+                            })}
                         </View>
                         <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
