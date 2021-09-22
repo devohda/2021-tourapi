@@ -203,15 +203,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkPrivate = () => {
-        //생성에서 바로 넘어오는 데이터 처리
         if(data.collection_private === true || data.collection_private === false) {
             return false;
         } else {
             if (collectionData.is_creator) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     const [isPress, setIsPress] = useState([]);
@@ -376,7 +375,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             previewRowKey={'0'}
             previewOpenDelay={3000}
             disableRightSwipe={true}
-            disableLeftSwipe={isEditPage || checkPrivate()? true : false}
+            disableLeftSwipe={checkPrivate() ? false : true}
             closeOnRowOpen={true}
             closeOnRowPress={true}
             nestedScrollEnabled
@@ -402,7 +401,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk,placeData: placeData, day : item})}>
+                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : item})}
+                                style={{display: !collectionData.is_creator && 'none'}}
+                            >
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                     <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                     <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -646,7 +647,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontSize: 22,
                                 fontWeight: '700',
                                 color: colors.mainColor
-                            }}>{collectionData.collection_name}</AppText>
+                            }}>{data.collection_name}</AppText>
                         </View>
                         {
                            userData.user_nickname !== data.created_user_name &&
@@ -663,13 +664,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     marginVertical: 5
                                 }}>
                                     <Jewel width={26} height={21}
-                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                        style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                                     <AppText style={{
                                         fontSize: 10,
                                         fontWeight: '700',
-                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
+                                        color: data.like_cnt ? colors.red[3] : colors.red_gray[3],
                                         marginTop: 2
-                                    }}>{collectionData.like_cnt}</AppText>
+                                    }}>{data.like_cnt}</AppText>
                                 </View>}
                             </TouchableOpacity>
                         }
@@ -728,7 +729,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                             <AppText style={{color: colors.gray[4]}}>총 <AppText
                                                 style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                         </View>
-                                        <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
+                                        <TouchableOpacity onPress={()=>{
+                                                if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
+                                                else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
+                                            }} style={{display: !checkPrivate() && 'none'}}>
                                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

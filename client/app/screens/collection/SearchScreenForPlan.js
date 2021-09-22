@@ -15,6 +15,7 @@ import SearchPlaceForPlan from './SearchPlaceForPlan';
 const SearchScreenForPlan = ({route, navigation}) => {
     const {colors} = useTheme();
     const { pk, placeData, day } = route.params;
+    console.log(route.params)
     const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     useEffect(() => {setSearchKeyword('')}, []);
@@ -159,7 +160,7 @@ const SearchScreenForPlan = ({route, navigation}) => {
                         </Pressable>
                     </View>
                     {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForPlan pk={pk} placeData={placeData} day={day}/>
+                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForPlan pk={pk} placeData={placeData} day={day} navigation={navigation} />
                     }
                 </ScreenContainerView>
 
