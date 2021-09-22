@@ -16,7 +16,7 @@ import ScreenContainerView from '../components/ScreenContainerView';
 import ScreenDivideLine from '../components/ScreenDivideLine';
 import {useToken} from '../contexts/TokenContextProvider';
 
-const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
+const PlaceInfo = ({placeData, collectionList, colors, styles, data, getInitialData}) => {
     const [token, setToken] = useToken();
     const [isLiked, setIsLiked] = useState(false);
     const refRBSheet = useRef();
@@ -53,51 +53,47 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
         );
     };
     const IconTab = () => {
-        // 좋아요
-        const likePlace = () => {
+        const LikePlace = (pk) => {
+            //공간 좋아요
             try {
-                fetch('http://34.146.140.88/like/place', {
+                fetch(`http://34.146.140.88/like/place/${pk}`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                         'x-access-token': token
-                    },
-                    body: JSON.stringify({
-                        placeId: placeData.place_pk,
-                    })
+                    }
                 }).then((res) => res.json())
                     .then((response) => {
-                        console.log(response);
+                        getInitialData()
                     })
                     .catch((err) => {
                         console.error(err);
                     });
-
+    
             } catch (err) {
                 console.error(err);
             }
         };
-        const deletePlace = () => {
+    
+        const DeleteLikedPlace = (pk) => {
+            //공간 좋아요 삭제
             try {
-                fetch('http://34.146.140.88/like/place', {
+                fetch(`http://34.146.140.88/like/place/${pk}`, {
                     method: 'DELETE',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                         'x-access-token': token
-                    },
-                    body: JSON.stringify({
-                        placeId: placeData.place_pk,
-                    })
+                    }
                 }).then((res) => res.json())
                     .then((response) => {
-                        console.log(response);
+                        getInitialData()
                     })
                     .catch((err) => {
                         console.error(err);
                     });
-
+    
             } catch (err) {
                 console.error(err);
             }
@@ -127,16 +123,14 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
         return (
             <View style={styles.iconTabContainer}>
                 <TouchableOpacity onPress={() => {
-                    if (isLiked) {
-                        setIsLiked(false);
-                        deletePlace();
+                    if (data.like_flag) {
+                        DeleteLikedPlace(placeData.place_pk);
                     } else {
-                        setIsLiked(true);
-                        likePlace();
+                        LikePlace(placeData.place_pk);
                     }
                 }}>
                     <Jewel width={26} height={21}
-                        style={isLiked ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                        style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                     {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
                 </TouchableOpacity>
                 <View style={{
@@ -233,7 +227,7 @@ const PlaceInfo = ({placeData, collectionList, colors, styles}) => {
                     </PlaceInfo>
                 </View>
 
-                <IconTab/>
+                <IconTab />
             </ScreenContainerView>
         </>
     );
@@ -552,7 +546,7 @@ const PlaceScreen = ({route, navigation}) => {
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
             <ScrollView showsVerticalScrollIndicator={false}>
-                <PlaceInfo placeData={placeData} collectionList={collectionList} colors={colors} styles={styles}/>
+                <PlaceInfo placeData={placeData} collectionList={collectionList} colors={colors} styles={styles} data={data} getInitialData={getInitialData}/>
                 <ScreenDivideLine/>
                 <ScreenContainerView>
                     <View style={{alignItems: 'center'}}>

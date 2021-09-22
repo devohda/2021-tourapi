@@ -66,9 +66,8 @@ const CollectionTab = ({navigation}) => {
         }
     };
 
-    const showDirectories = ({item}) => {
+    const CollectionContainer = ({item}) => {
         return (
-
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
@@ -250,13 +249,13 @@ const CollectionTab = ({navigation}) => {
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
             <ScreenContainerView flex={1}>
                 {/* 키워드 선택 */}
-                <View flexDirection="row" style={{alignItems: 'center', justifyContent: 'center', marginVertical: 4}}>
+                {/* <View flexDirection="row" style={{alignItems: 'center', justifyContent: 'center', marginVertical: 4}}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         {directoryType.map(
                             (type, idx) => <Keyword type={type} key={idx} idx={idx}/>
                         )}
                     </ScrollView>
-                </View>
+                </View> */}
 
                 <View flexDirection="row" style={{justifyContent: 'space-between', marginVertical: 14, position: 'relative', zIndex: 1}}>
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
@@ -289,7 +288,7 @@ const CollectionTab = ({navigation}) => {
                 <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
                     showsVerticalScrollIndicator={false}
                     style={{zIndex: 0}}
-                    data={collectionList} renderItem={showDirectories}
+                    data={collectionList} renderItem={CollectionContainer}
                     keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
                 />
             </ScreenContainerView>

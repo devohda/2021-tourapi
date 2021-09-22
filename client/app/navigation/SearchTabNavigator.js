@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Dimensions } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
@@ -10,9 +10,40 @@ import SearchPlace from '../screens/search/SearchPlace';
 import SearchCollection from '../screens/search/SearchCollection';
 import SearchUser from '../screens/search/SearchUser';
 
+import { useToken } from '../contexts/TokenContextProvider';
+
 
 const SearchTabNavigator = ({navigation}) => {
     const {colors} = useTheme();
+    const [token, setToken] = useToken();
+    const [userData, setUserData] = useState({});
+
+    useEffect(() => {
+        getUserData();
+    },[]);
+
+    const getUserData = () => {
+        try {
+            fetch('http://34.146.140.88/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <Tab.Navigator
             sceneContainerStyle={{
@@ -49,7 +80,7 @@ const SearchTabNavigator = ({navigation}) => {
             }}
         >
             <Tab.Screen name={'공간'} children={() => <SearchPlace navigation={navigation}/>}/>
-            <Tab.Screen name={'보관함'} children={() => <SearchCollection navigation={navigation}/>}/>
+            <Tab.Screen name={'보관함'} children={() => <SearchCollection navigation={navigation} user={userData.user_nickname}/>}/>
             <Tab.Screen name={'유저'} children={() => <SearchUser navigation={navigation}/>}/>
         </Tab.Navigator>
     );

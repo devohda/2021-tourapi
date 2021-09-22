@@ -49,7 +49,6 @@ const SearchPlace = ({navigation}) => {
                 .then((response) => {
                     setPlaceList(response.data);
                     // setFalse();
-                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -60,21 +59,19 @@ const SearchPlace = ({navigation}) => {
         }
     };
 
-    const likePlace = (pk) => {
+    const LikePlace = (pk) => {
+        //공간 좋아요
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch(`http://34.146.140.88/like/place/${pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
-                },
-                body: JSON.stringify({
-                    placeId: pk,
-                })
+                }
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response);
+                    getResults();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -85,22 +82,19 @@ const SearchPlace = ({navigation}) => {
         }
     };
 
-    const deletePlace = (pk) => {
-        console.log(pk);
+    const DeleteLikedPlace = (pk) => {
+        //공간 좋아요 삭제
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch(`http://34.146.140.88/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
-                },
-                body: JSON.stringify({
-                    placeId: pk,
-                })
+                }
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response);
+                    getResults()
                 })
                 .catch((err) => {
                     console.error(err);
@@ -140,7 +134,8 @@ const SearchPlace = ({navigation}) => {
     //     setIsPress(pressed);
     // };
 
-    const PlaceContainer = ({item, index}) => (
+    const PlaceContainer = ({item, index}) => {
+        return (
         <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
             <View style={{
                 marginBottom: 8,
@@ -177,26 +172,31 @@ const SearchPlace = ({navigation}) => {
                     </View>
                 </View>
                 <TouchableOpacity onPress={() => {
-                    let newArr = [...isPress];
-                    if (newArr[index]) {
-                        newArr[index] = false;
-                        setIsPress(newArr);
-                        deletePlace(item.place_pk);
+                    // let newArr = [...isPress];
+                    // if (newArr[index]) {
+                    //     newArr[index] = false;
+                    //     setIsPress(newArr);
+                    //     deletePlace(item.place_pk);
+                    // } else {
+                    //     for (let i = 0; i < newArr.length; i++) {
+                    //         if (i == index) continue;
+                    //         else newArr[i] = false;
+                    //     }
+                    //     newArr[index] = true;
+                    //     setIsPress(newArr);
+                    //     likePlace(item.place_pk);
+                    // }
+                    if (item.like_flag) {
+                        DeleteLikedPlace(item.place_pk);
                     } else {
-                        for (let i = 0; i < newArr.length; i++) {
-                            if (i == index) continue;
-                            else newArr[i] = false;
-                        }
-                        newArr[index] = true;
-                        setIsPress(newArr);
-                        likePlace(item.place_pk);
+                        LikePlace(item.place_pk);
                     }
                 }}>
-                    <Jewel width={26} height={21} style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
+                    <Jewel width={26} height={21} style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
-    );
+    )};
 
     return (
         <View style={{backgroundColor: colors.backgroundColor}}>

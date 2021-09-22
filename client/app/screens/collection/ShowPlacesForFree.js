@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     TouchableOpacity,
     View,
@@ -13,13 +13,16 @@ import TipsList from './TipsList';
 import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
+import { setUpdated } from '../../contexts/SetUpdateContextProviders';
+import { useToken } from '../../contexts/TokenContextProvider';
 
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, originalData} = props;
-    console.log(item)
+    const { day, index, isEditPage, isPress, item, length, navigation, originalData, pk} = props;
     const isFree = (typeof day === 'undefined');
-    // console.log(day + 1)
+    const [update, setUpdate] = setUpdated();
+    const [token, setToken] = useToken();
+    const [isLiked, setIsLiked] = useState(item.like_flag);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -41,14 +44,75 @@ const ShowPlacesForFree = props => {
         }
     };
 
-    const checkDay = (day) => {
-        if(day === -1) return 0;
-        else return day
-    }
+    const getInitialPlaceData = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${pk}/places`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setIsLiked(response.data[index].like_flag)
+                    // console.log(response.data)
+                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
 
-    const setNumber = () => {
-        return 0
-    }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const LikePlace = (pk) => {
+        //공간 좋아요
+        try {
+            fetch(`http://34.146.140.88/like/place/${pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then((response) => {
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const DeleteLikedPlace = (pk) => {
+        //공간 좋아요 삭제
+        try {
+            fetch(`http://34.146.140.88/like/place/${pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then((response) => {
+                    getInitialPlaceData()
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <>
@@ -76,8 +140,13 @@ const ShowPlacesForFree = props => {
                                     </View>
                                 </View>
                             }
-                            <Image source={require('../../assets/images/flower.jpeg')}
-                                style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                            {
+                                item.place_img ?
+                                <Image source={{uri: item.place_img}}
+                                style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                <Image source={require('../../assets/images/here_default.png')}
+                                style={{borderRadius: 10, width: 72, height: 72}}/> 
+                            }
                             <View style={{
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
@@ -129,7 +198,7 @@ const ShowPlacesForFree = props => {
                                     </View>
                                     {/* <AppText
                                         style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText> */}
-                                                                                <AppText
+                                        <AppText
                                         style={{fontSize: 12, color: colors.gray[4]}}>{isFree? props.item.place_addr : '서울시 구로구 연동로'}</AppText>
                                 </View>
                             </View>
@@ -155,9 +224,19 @@ const ShowPlacesForFree = props => {
                         }}> */}
                         {
                             !props.isEditPage ?
-                            <TouchableOpacity>
+                            // <TouchableOpacity onPress={() => {
+                            //     console.log(item.place_pk)
+                            //     console.log(item)
+                            // }}>
+                            <TouchableOpacity onPress={() => {
+                                if (isLiked) {
+                                    DeleteLikedPlace(item.place_pk);
+                                } else {
+                                    LikePlace(item.place_pk);
+                                }
+                            }}>
                                 <Jewel width={26} height={21}
-                                    style={{color: isPress[props.index] ? colors.red[3] : colors.red_gray[5]}}/>
+                                    style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity> :
                             <TouchableOpacity>
                                 <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
@@ -168,7 +247,7 @@ const ShowPlacesForFree = props => {
                 {
                     isFree ?
                     <>
-                    <TipsList data={props.item} idx={props.index} day={props.day}/>
+                    <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
                     </> :
                     <>
                         {/* <View style={{
@@ -193,7 +272,7 @@ const ShowPlacesForFree = props => {
                         </View>
                     </View> */}
 
-                    <TipsList data={props.item} idx={props.index} day={props.day}/>
+                    <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
                     </>
                 }
             </View>
