@@ -113,13 +113,15 @@ const PlanCollectionScreen = ({route, navigation}) => {
             ]
         }
         ]);
-        getInitialCollectionData();
-        getInitialPlaceData();
+
         getUserData();
 
         if(typeof data.collection_private === 'boolean') {
             setStartDate(moment(data.startDate).format('YYYY.MM.DD'));
             setEndDate(moment(data.endDate).format('YYYY.MM.DD'));
+        } else {
+            getInitialCollectionData();
+            getInitialPlaceData();
         }
     }, [isFocused]);
 
@@ -203,7 +205,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkPrivate = () => {
-        if(data.collection_private === true || data.collection_private === false) {
+        // if(data.collection_private === true || data.collection_private === false) {
+        if(typeof data.collection_private === 'boolean') {
+
             return false;
         } else {
             if (collectionData.is_creator) {
@@ -211,6 +215,15 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }
         }
         return false;
+    }
+
+    const checkCreated = () => {
+        if(data.collection_private === true || data.collection_private === false) {
+            return false;
+        } else {
+            if(collectionData.is_creator) return false;
+        }
+        return true;
     }
 
     const [isPress, setIsPress] = useState([]);
@@ -664,13 +677,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     marginVertical: 5
                                 }}>
                                     <Jewel width={26} height={21}
-                                        style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                                     <AppText style={{
                                         fontSize: 10,
                                         fontWeight: '700',
-                                        color: data.like_cnt ? colors.red[3] : colors.red_gray[3],
+                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
                                         marginTop: 2
-                                    }}>{data.like_cnt}</AppText>
+                                    }}>{collectionData.like_cnt}</AppText>
                                 </View>}
                             </TouchableOpacity>
                         }
@@ -732,7 +745,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         <TouchableOpacity onPress={()=>{
                                                 if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
                                                 else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                            }} style={{display: !checkPrivate() && 'none'}}>
+                                            }} style={{display: checkCreated() && 'none'}}>
                                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
