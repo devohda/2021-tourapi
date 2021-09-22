@@ -197,6 +197,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
         return false;
     }
 
+    const checkCreated = () => {
+        if(data.collection_private === true || data.collection_private === false) {
+            return false;
+        } else {
+            if(collectionData.is_creator) return false;
+        }
+        return true;
+    }
+
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
         var pressed = [];
@@ -611,7 +620,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 <TouchableOpacity onPress={()=>{
                                     if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
                                     else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                }} style={{display: !checkPrivate() && 'none'}}>
+                                }} style={{display: checkCreated() && 'none'}}>
                                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                         <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                         <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
