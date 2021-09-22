@@ -20,7 +20,6 @@ const SystemSettingScreen = ({navigation}) => {
         getUserData();
     },[]);
 
-    // 보관함 데이터 가져오는 함수
     const getUserData = () => {
         try {
             fetch('http://34.146.140.88/user', {

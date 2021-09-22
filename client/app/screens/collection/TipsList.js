@@ -20,7 +20,7 @@ const TipsList = props => {
         <>
         <View flex={1}>
             {
-                isFree && idx === 0 ?
+                isFree && idx === 0 && !props.private ?
                 <TouchableOpacity onPress={() => setVisible(true)}>
                     <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
@@ -34,7 +34,8 @@ const TipsList = props => {
                         </View>
                     </View>
                 </TouchableOpacity> :
-                <View style={isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}}>
+                
+                <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor} : {...styles.planContainer, backgroundColor: colors.defaultColor}, !props.private && {display: 'none'}]}>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <TipIcon width={12} height={12} style={{marginEnd: 8, color: colors.gray[4]}}/>
                         <TextInput style={{color: colors.blue[1], fontSize: 14}}
@@ -43,14 +44,14 @@ const TipsList = props => {
                     </View>
                 </View>
             }
-        {idx < length-1 &&
+        {/* {idx < length-1 &&
             <View style={{
                 width: '100%',
                 height: 1,
                 backgroundColor: colors.red_gray[6],
                 zIndex: -1000,
                 marginVertical: 12
-            }}></View>}
+            }}></View>} */}
         <Modal
         visible={visible}
         backdropStyle={styles.backdrop}

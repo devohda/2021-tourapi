@@ -58,9 +58,33 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [planDays, setPlanDays] = useState([]);
+
     const isFocused = useIsFocused();
 
     const [token, setToken] = useToken();
+    const [userData, setUserData] = useState({});
+
+    const getUserData = () => {
+        try {
+            fetch('http://34.146.140.88/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     useEffect(() => {
         setTmpData([{
@@ -91,6 +115,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         ]);
         getInitialCollectionData();
         getInitialPlaceData();
+        getUserData();
 
         if(typeof data.collection_private === 'boolean') {
             setStartDate(moment(data.startDate).format('YYYY.MM.DD'));
@@ -146,9 +171,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     setPlaceData(response.data)
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
-                        if(response.data[i].place_pk === -1) exceptLength += 1;
+                        if(response.data[i].place_pk === -1 || response.data[i].place_pk === -2) exceptLength += 1;
                     }
-                    setPlaceLength(response.data.length - exceptLength * 2);
+                    setPlaceLength(response.data.length - exceptLength);
 
                     var pressed = [];
                     for (let i = 0; i < placeLength; i++) {
@@ -168,11 +193,26 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const checkTrue = () => {
         // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
-        if(data.collection_private === true || data.collection_private === false) {
-            return true;
+        if(typeof data.collection_private === 'boolean') {
+            if(data.collection_private === true) return true;
+            else return false;
+        } else {
+            if(collectionData.collection_private === 1) return true;
         }
         return false;
     };
+
+    const checkPrivate = () => {
+        //생성에서 바로 넘어오는 데이터 처리
+        if(data.collection_private === true || data.collection_private === false) {
+            return false;
+        } else {
+            if (collectionData.is_creator) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     const [isPress, setIsPress] = useState([]);
 
@@ -180,6 +220,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const deletePlace = (place_pk, day) => {
+        //공간 삭제
         try {
             fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
@@ -204,21 +245,20 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     }
 
-    const likePlace = (pk) => {
+    const LikeCollection = () => {
+        //보관함 좋아요
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    placeId: pk,
-                })
             }).then((res) => res.json())
                 .then((response) => {
                     // console.log(response)
+                    getInitialCollectionData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -229,21 +269,20 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const deleteLikedPlace = (pk) => {
+    const DeleteLikedCollection = () => {
+        //보관함 좋아요 삭제
         try {
-            fetch('http://34.146.140.88/like/place', {
+            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    placeId: pk,
-                })
             }).then((res) => res.json())
                 .then((response) => {
                     // console.log(response)
+                    getInitialCollectionData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -311,10 +350,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
         });
 
 
-    const SwipeList = props => (
+    const SwipeList = props => {
+        return (
         <SwipeListView
             data={placeData}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength}/>}
+            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
             renderHiddenItem={(item, rowMap) => {
@@ -336,12 +376,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
             previewRowKey={'0'}
             previewOpenDelay={3000}
             disableRightSwipe={true}
-            disableLeftSwipe={isEditPage ? true : false}
+            disableLeftSwipe={isEditPage || checkPrivate()? true : false}
             closeOnRowOpen={true}
             closeOnRowPress={true}
             nestedScrollEnabled
         />
-    );
+    )};
 
     const EditList = props => (
         <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
@@ -397,13 +437,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             }}></Image>
                     </View>
                 </TouchableOpacity>
-                <View style={{
-                    width: '100%',
-                    height: 1,
-                    backgroundColor: colors.red_gray[6],
-                    zIndex: -1000,
-                    marginVertical: 13
-                }}></View>
             </>
         );
     };
@@ -551,6 +584,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
+                {checkPrivate() && <>
                 {
                     !isEditPage ?
                         <View style={{position: 'absolute', right: 0}}>
@@ -571,7 +605,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                }
+                }</>}
             </View>
 
             <ScrollView>
@@ -613,28 +647,32 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontWeight: '700',
                                 color: colors.mainColor
                             }}>{collectionData.collection_name}</AppText>
-                            {/* <AppText style={{
-                                fontSize: 22,
-                                fontWeight: '700',
-                                color: colors.mainColor
-                            }}>{data.collection_name}</AppText> */}
                         </View>
-                        {/* {
-                            userData.user_pk !== data.user_pk &&
-                        <View style={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                marginTop: 10
+                        {
+                           userData.user_nickname !== data.created_user_name &&
+                           <TouchableOpacity onPress={() => {
+                                if (collectionData.like_flag) {
+                                    DeleteLikedCollection();
+                                } else {
+                                    LikeCollection();
+                                }
                             }}>
-                                <Image source={require('../../assets/images/here_click.png')}
-                                    style={{width: 26, height: 21, marginBottom: 2}}></Image>
-                                <AppText style={{
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    color: colors.red[3]
-                                }}>1,820</AppText>
-                            </View>
-                        } */}
+                                {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    marginVertical: 5
+                                }}>
+                                    <Jewel width={26} height={21}
+                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                    {/* <AppText style={{
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
+                                        marginTop: 2
+                                    }}>{data.like_cnt}</AppText> */}
+                                </View>}
+                            </TouchableOpacity>
+                        }
                     </View>
                 </ScreenContainerView>
 

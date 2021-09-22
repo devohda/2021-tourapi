@@ -27,13 +27,14 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import { tipsList } from '../../contexts/TipsListContextProvider';
-import ShowPlaces from './ShowPlaces';
 
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
+import Jewel from '../../assets/images/jewel.svg';
 import {useToken} from '../../contexts/TokenContextProvider';
 import DragAndDropListForFree from './DragAndDropListForFree';
 import ShowPlacesForFree from './ShowPlacesForFree';
+import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -50,8 +51,33 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [visible, setVisible] = useState(false);
     const [isEditPage, setIsEditPage] = useState(false);
     const isFocused = useIsFocused();
+    const [isLiked, setIsLiked] = useState(false);
 
     const [token, setToken] = useToken();
+    const [userData, setUserData] = useState({});
+    const [update, setUpdate] = setUpdated();
+
+    const getUserData = () => {
+        try {
+            fetch('http://34.146.140.88/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     useEffect(() => {
         getInitialCollectionData();
@@ -66,7 +92,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 tip: '두번째 팁'
             }
         ]);
-    }, [isFocused]);
+        getUserData();
+        // setUpdate(false)
+    }, [isFocused, setUpdate]);
 
     const getInitialCollectionData = () => {
         try {
@@ -134,7 +162,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response)
+                    // console.log(response)
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -157,6 +185,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
         return true;
     };
 
+    const checkPrivate = () => {
+        //생성에서 바로 넘어오는 데이터 처리
+        if(data.collection_private === true || data.collection_private === false) {
+            return false;
+        } else {
+            if (collectionData.is_creator) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
         var pressed = [];
@@ -164,56 +204,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             pressed.push(false);
         }
         setIsPress(pressed);
-    };
-
-    const likePlace = (pk) => {
-        try {
-            fetch('http://34.146.140.88/like/place', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-                body: JSON.stringify({
-                    placeId: pk,
-                })
-            }).then((res) => res.json())
-                .then((response) => {
-                    console.log(response)
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const deleteLikedPlace = (pk) => {
-        try {
-            fetch('http://34.146.140.88/like/place', {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-                body: JSON.stringify({
-                    placeId: pk,
-                })
-            }).then((res) => res.json())
-                .then((response) => {
-                    console.log(response)
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
     };
 
     const deleteCollection = () => {
@@ -239,6 +229,54 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     }
 
+    const LikeCollection = () => {
+        //보관함 좋아요
+        try {
+            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    // console.log(response)
+                    getInitialCollectionData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const DeleteLikedCollection = () => {
+        //보관함 좋아요 삭제
+        try {
+            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    // console.log(response)
+                    getInitialCollectionData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const Keyword = props => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
@@ -252,22 +290,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
         rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
     });
 
-    // const deleteRow = (rowMap, rowKey) => {
-    //     closeRow(rowMap, rowKey);
-    //     const [section] = rowKey.split('.');
-    //     const newData = [...placeData];
-    //     const prevIndex = placeData[section].data.findIndex(
-    //         item => item.key === rowKey
-    //     );
-    //     newData[section].data.splice(prevIndex, 1);
-    //     setListData(newData);
-    // };
-
     const SwipeList = () => {
         return (
         <SwipeListView
             data={placeData}
-            renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation}/>}
+            renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
             keyExtractor={(item) => item.place_pk.toString()}
             key={(item, idx) => {idx.toString()}}
             renderHiddenItem={(item, rowMap) => {
@@ -287,7 +314,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             previewRowKey={'0'}
             previewOpenDelay={3000}
             disableRightSwipe={true}
-            disableLeftSwipe={isEditPage ? true : false}
+            disableLeftSwipe={isEditPage || checkPrivate()? true : false}
             closeOnRowOpen={true}
             closeOnRowPress={true}
             nestedScrollEnabled
@@ -412,6 +439,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
+                {checkPrivate() && <>
                 {
                     !isEditPage ?
                     <View style={{position: 'absolute', right: 0}}>
@@ -427,7 +455,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             </View>
                         </TouchableOpacity>
                     </View>
-                }
+                }</>}
             </View>
 
             <ScrollView>
@@ -472,22 +500,33 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 color: colors.mainColor
                             }}>{data.collection_name}</AppText>
                         </View>
-                        {/*{*/}
-                        {/*    userData.user_pk !== data.user_pk &&*/}
-                        {/*    <View style={{*/}
-                        {/*        justifyContent: 'center',*/}
-                        {/*        alignItems: 'center',*/}
-                        {/*        marginTop: 20*/}
-                        {/*    }}>*/}
-                        {/*        <Image source={require('../../assets/images/here_click.png')}*/}
-                        {/*            style={{width: 26, height: 21, marginBottom: 2}}></Image>*/}
-                        {/*        <AppText style={{*/}
-                        {/*            fontSize: 10,*/}
-                        {/*            fontWeight: '700',*/}
-                        {/*            color: colors.red[3]*/}
-                        {/*        }}>1,820</AppText>*/}
-                        {/*    </View>*/}
-                        {/*}*/}
+                        {
+                           userData.user_nickname !== data.created_user_name &&
+                           <TouchableOpacity onPress={() => {
+                            if (collectionData.like_flag) {
+                                DeleteLikedCollection();
+                            } else {
+                                LikeCollection();
+                            }
+                        }}>
+                                {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    marginVertical: 5
+                                }}>
+                                    <Jewel width={26} height={21}
+                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                    {/* <Image source={require('../../assets/images/here_click.png')}
+                                        style={{width: 26, height: 21, marginBottom: 2}}></Image> */}
+                                    {/* <AppText style={{
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
+                                        marginTop: 2
+                                    }}>{data.like_cnt}</AppText> */}
+                                </View>}
+                            </TouchableOpacity>
+                        }
                     </View>
                 </ScreenContainerView>
 

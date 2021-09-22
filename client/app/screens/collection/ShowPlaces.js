@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     TouchableOpacity,
     View,
@@ -9,6 +9,7 @@ import { useTheme } from '@react-navigation/native';
 
 import AppText from '../../components/AppText';
 import TipsList from './TipsList';
+import { useToken } from '../../contexts/TokenContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
@@ -16,12 +17,14 @@ import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
 const ShowPlaces = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, originalData} = props;
-    console.log(item)
+    const { day, index, isEditPage, isPress, item, length, navigation, pk} = props;
     const isFree = (typeof day === 'undefined');
-    // console.log(day + 1)
+    const [token, setToken] = useToken();
+    const [isLiked, setIsLiked] = useState(item.like_flag);
+    const [placeIndex, setPlaceIndex] = useState(0);
 
     const checkType = (type) => {
+        console.log(item)
         if(type === 12) {
             return '관광지';
         } else if(type === 14) {
@@ -46,9 +49,83 @@ const ShowPlaces = props => {
         else return day
     }
 
+    const checkIndex = () => {
+        return placeIndex+1
+    }
+
     const setNumber = () => {
         return 0
-    }
+    };
+
+    const getInitialPlaceData = () => {
+        try {
+            fetch(`http://34.146.140.88/collection/${pk}/places`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setIsLiked(response.data[index].like_flag)
+                    // console.log(response.data)
+                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const LikePlace = (pk) => {
+        //공간 좋아요
+        try {
+            fetch(`http://34.146.140.88/like/place/${pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then((response) => {
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const DeleteLikedPlace = (pk) => {
+        //공간 좋아요 삭제
+        try {
+            fetch(`http://34.146.140.88/like/place/${pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then((response) => {
+                    getInitialPlaceData()
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <>
@@ -56,14 +133,14 @@ const ShowPlaces = props => {
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
             <View flex={1}>
                 <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                    <TouchableOpacity onPress={() => props.navigation.navigate('Place', {data: item})} disabled={isEditPage && true}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})} disabled={isEditPage && true}>
                         <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
                             {
                                 !isFree &&
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                            {index + 1}    
+                                            {index+1}    
                                         </AppText>
                                     </View>
                                 </View>
@@ -144,9 +221,15 @@ const ShowPlaces = props => {
                         }}> */}
                         {
                             !isEditPage ?
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                if (isLiked) {
+                                    DeleteLikedPlace(item.place_pk);
+                                } else {
+                                    LikePlace(item.place_pk);
+                                }
+                            }}>
                                 <Jewel width={26} height={21}
-                                    style={{color: isPress[index] ? colors.red[3] : colors.red_gray[5]}}/>
+                                    style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity> :
                             <TouchableOpacity>
                                 <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
@@ -157,7 +240,7 @@ const ShowPlaces = props => {
                 {
                     isFree ?
                     <>
-                    <TipsList data={item} idx={index} day={day} length={length}/>
+                    <TipsList data={item} idx={index} day={day} length={length} key={index} private={props.private}/>
                     </> :
                     <>
                         {/* <View style={{
@@ -182,7 +265,7 @@ const ShowPlaces = props => {
                         </View>
                     </View> */}
 
-                    <TipsList data={item} idx={index} day={day} length={length}/>
+                    <TipsList data={item} idx={index} day={day} length={length} key={index} private={props.private}/>
                     </>
                 }
             </View>
