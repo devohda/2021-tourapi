@@ -11,10 +11,11 @@ router.post('/free', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
     const result = await collectionService.createFreeCollection(collectionData, user.user_pk, keywords);
 
-    if (result) {
+    if (result.collection_pk) {
         return res.send({
             code: 200,
-            status: 'SUCCESS'
+            status: 'SUCCESS',
+            collectionId : result.collection_pk
         });
     } else {
         return res.send({
@@ -30,10 +31,11 @@ router.post('/plan', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
     const result = await collectionService.createPlanCollection(collectionData, user.user_pk, keywords);
 
-    if (result) {
+    if (result.collection_pk) {
         return res.send({
             code: 200,
-            status: 'SUCCESS'
+            status: 'SUCCESS',
+            collectionId : result.collection_pk
         });
     } else {
         return res.send({

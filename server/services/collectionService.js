@@ -29,7 +29,7 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
         const result3 = await conn.query(query3, [insertKeywordsSet]);
 
-        result = true;
+        result = {collection_pk};
 
         await conn.commit();
     } catch (err) {
@@ -91,7 +91,7 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
             await conn.query(query5);
         }
 
-        result = true;
+        result = {collection_pk};
 
         await conn.commit();
     } catch (err) {
