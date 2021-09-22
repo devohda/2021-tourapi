@@ -4,11 +4,11 @@ const SearchKeywordContext = React.createContext(null);
 
 const SearchKeywordContextProvider = ({children}) => {
     return(
-        <SearchKeywordContext.Provider value={useState(false)}>
+        <SearchKeywordContext.Provider value={useState('')}>
             {children}
         </SearchKeywordContext.Provider>
-    )
-}
+    );
+};
 
-export const searchKeyword = () => useContext(SearchKeywordContext)
+export const useSearchKeyword = () => useContext(SearchKeywordContext);
 export default SearchKeywordContextProvider;

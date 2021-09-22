@@ -1,21 +1,21 @@
-import React, {useState} from "react";
-import {StyleSheet, TextInput, TouchableOpacity, View, Text} from "react-native";
-import ScreenContainer from '../../../components/ScreenContainer'
-import styled from "styled-components/native";
-import CustomTextInput from "../../../components/CustomTextInput";
-import AppText from "../../../components/AppText";
-import {useTheme} from "@react-navigation/native";
+import React, {useState} from 'react';
+import {StyleSheet, TextInput, TouchableOpacity, View, Text, Alert} from 'react-native';
+import ScreenContainer from '../../../components/ScreenContainer';
+import styled from 'styled-components/native';
+import CustomTextInput from '../../../components/CustomTextInput';
+import AppText from '../../../components/AppText';
+import {useTheme} from '@react-navigation/native';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
   width: 100%;
   justify-content: flex-end;
   height: 8px;
-`
+`;
 
 const Form = styled(View)`
   margin-top: 63px;
-`
+`;
 
 const InputBox = styled(TextInput)`
   fontSize: 16px;
@@ -23,12 +23,12 @@ const InputBox = styled(TextInput)`
   borderBottomColor: #C5C5C5;
   marginBottom: 27px;
   paddingBottom: 11px;
-`
+`;
 
 const GetEmailTab = ({navigation}) => {
     const { colors } = useTheme();
 
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState('');
     const [isEmailDuplicated, setIsEmailDuplicated] = useState(undefined);
     const [color, setColor] = useState(colors.gray[5]);
     const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
@@ -48,15 +48,20 @@ const GetEmailTab = ({navigation}) => {
                     return response.data.isDuplicated === true;
                 })
                 .catch(error => console.log(error));
-            return result
+            return result;
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
-    const checkIsValid = async () => {
-        navigation.navigate('passwordTab', {email})
-    }
+    const checkIsValid = () => {
+        
+        if(isEmailDuplicated) {
+            Alert.alert('', '이미 사용중인 아이디예요.');
+        } else {
+            navigation.navigate('passwordTab', {email});
+        }
+    };
 
     const styles = StyleSheet.create({
         progress: {
@@ -79,13 +84,13 @@ const GetEmailTab = ({navigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: !email.match(emailRegExp) || isEmailDuplicated ? colors.gray[6] : colors.mainColor,
+            backgroundColor: !email.match(emailRegExp) ? colors.gray[6] : colors.mainColor,
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
             justifyContent: 'center'
         }
-    })
+    });
 
     return (
         <>
@@ -120,12 +125,8 @@ const GetEmailTab = ({navigation}) => {
                                 setColor(colors.red[2]);
                             }
 
-                            if(!isEmailDuplicated) {
-                                setColor(colors.red[2]);
-                            }
-
                             if(text === '') setColor(colors.gray[5]);
-                            if(text.match(emailRegExp) && isEmailDuplicated) setColor(colors.gray[5])
+                            if(text.match(emailRegExp)) setColor(colors.gray[5]);
                             setEmail(text);
                         }}
 
@@ -135,24 +136,19 @@ const GetEmailTab = ({navigation}) => {
                     }}>
                         이메일 형식이 올바르지 않아요.
                     </AppText>
-                    <AppText style={{color: colors.red[2],
-                        display: isEmailDuplicated ? 'flex' : 'none'
-                    }}>
-                        이미 사용중인 아이디예요.
-                    </AppText>
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
-                    disabled={!email.match(emailRegExp) || isEmailDuplicated ? true : false}
+                    disabled={!email.match(emailRegExp) ? true : false}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>
             </View>
         </>
-    )
-}
+    );
+};
 
 export default GetEmailTab;

@@ -1,14 +1,14 @@
-import React, {useState} from "react";
-import ScreenContainer from '../../components/ScreenContainer'
-import {View, TextInput, Button} from "react-native";
+import React, {useState} from 'react';
+import ScreenContainer from '../../components/ScreenContainer';
+import {View, TextInput, Button} from 'react-native';
 import * as SMS from 'expo-sms';
-import AppText from "../../components/AppText";
-import PhoneInput from "react-native-phone-number-input";
+import AppText from '../../components/AppText';
+import PhoneInput from 'react-native-phone-number-input';
 
 
 const FindPasswordScreen = () => {
-    const [email, setEmail] = useState(null)
-    const [phoneNumber, setPhoneNumber] = useState(null)
+    const [email, setEmail] = useState(null);
+    const [phoneNumber, setPhoneNumber] = useState(null);
     const sendSMS = () => {
         try {
             fetch('http://34.146.140.88/auth/authPhone', {
@@ -24,7 +24,7 @@ const FindPasswordScreen = () => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
     return (
         <ScreenContainer>
             <View>
@@ -42,11 +42,11 @@ const FindPasswordScreen = () => {
                     }}
                 />
                 <Button title="sms 전송" onPress={() => {
-                    sendSMS()
+                    sendSMS();
                 }}/>
             </View>
         </ScreenContainer>
-    )
-}
+    );
+};
 
 export default FindPasswordScreen;

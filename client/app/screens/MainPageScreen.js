@@ -1,22 +1,18 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
     View,
     Image,
-    SafeAreaView,
     ScrollView,
     ImageBackground, Platform,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
-import {useIsUserData} from '../contexts/UserDataContextProvider';
 import AppText from '../components/AppText';
-import BackIcon from '../assets/images/back-icon.svg';
 import ScreenContainer from '../components/ScreenContainer';
 
 export default function MainPageScreen({navigation}) {
-    const [userData, setUserData] = useIsUserData();
     const {colors} = useTheme();
 
     return (

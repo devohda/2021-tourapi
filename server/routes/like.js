@@ -2,56 +2,99 @@ const express = require('express');
 const router = express.Router();
 
 const likeService = require('../services/likeService');
+const {verifyToken} = require('../middleware/jwt');
 
 // 장소 좋아요
-router.post('/place', async (req, res, next) => {
-    const {userId, placeId} = req.body;
+router.post('/place/:placeId', verifyToken, async (req, res, next) => {
+    const {placeId} = req.params;
+    const {user} = res.locals;
 
     try {
-        await likeService.createLikePlace(userId, placeId);
+        await likeService.createLikePlace(user.user_pk, placeId);
     } catch (err) {
-        return res.send({code: 500, status: "SERVER ERROR"})
+        return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: "SUCCESS"})
+    return res.send({code: 200, status: 'SUCCESS'});
 
+});
+
+// 장소 좋아요 조회
+router.get('/placeList', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await likeService.readLikePlace(user.user_pk);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 })
 
 // 장소 좋아요 삭제
-router.delete('/place', async (req, res, next) => {
-    const {userId, placeId} = req.body;
+router.delete('/place/:placeId', verifyToken, async (req, res, next) => {
+    const {placeId} = req.params;
+    const {user} = res.locals;
 
     try {
-        await likeService.deleteLikePlace(userId, placeId);
+        await likeService.deleteLikePlace(user.user_pk, placeId);
     } catch (err) {
-        return res.send({code: 500, status: "SERVER ERROR"})
+        return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: "SUCCESS"})
-})
+    return res.send({code: 200, status: 'SUCCESS'});
+});
 
 // 보관함 좋아요
-router.post('/collection', async (req, res, next) => {
-    const {userId, collectionId} = req.body;
+router.post('/collection/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
     try {
-        await likeService.createLikeCollection(userId, collectionId);
+        await likeService.createLikeCollection(user.user_pk, collectionId);
     } catch (err) {
-        return res.send({code: 500, status: "SERVER ERROR"})
+        return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: "SUCCESS"})
+    return res.send({code: 200, status: 'SUCCESS'});
+});
+
+// 보관함 좋아요 조회
+router.get('/collectionList', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await likeService.readLikeCollection(user.user_pk);
+
+    if (result) {
+        return res.send({
+            code: 200,
+            status: 'SUCCESS',
+            data : result
+        });
+    } else {
+        return res.send({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 })
 
 // 보관함 좋아요 삭제
-router.delete('/collection', async (req, res, next) => {
-    const {userId, collectionId} = req.body;
+router.delete('/collection/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
     try {
-        await likeService.deleteLikeCollection(userId, collectionId);
+        await likeService.deleteLikeCollection(user.user_pk, collectionId);
     } catch (err) {
-        return res.send({code: 500, status: "SERVER ERROR"})
+        return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: "SUCCESS"})
-})
+    return res.send({code: 200, status: 'SUCCESS'});
+});
 
 module.exports = router;

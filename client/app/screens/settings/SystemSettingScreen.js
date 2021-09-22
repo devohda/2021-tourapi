@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Image, SectionList, StyleSheet, Switch} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import appJson from '../../../app.json';
@@ -7,12 +7,40 @@ import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import {useIsUserData} from '../../contexts/UserDataContextProvider';
 import ListItem from './ListItem';
+import { useToken } from '../../contexts/TokenContextProvider';
 
-const SystemSetting = ({navigation}) => {
+const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
-    const [userData, setUserData] = useIsUserData();
+
+    const [token, setToken] = useToken();
+    const [userData, setUserData] = useState({});
+
+    useEffect(() => {
+        getUserData();
+    },[]);
+
+    const getUserData = () => {
+        try {
+            fetch('http://34.146.140.88/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then((response) => {
+                    setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
@@ -22,7 +50,7 @@ const SystemSetting = ({navigation}) => {
         {
             index: 1,
             title: '연결된 계정',
-            data: [{index: 1, name: userData.user_email}]
+            data: [{index: 1, name: userData.user_nickname}]
         },
         {
             index: 2,
@@ -44,9 +72,7 @@ const SystemSetting = ({navigation}) => {
 
     const HeaderItem = ({title, index}) => (
         <View style={typeof title !== 'undefined' && {marginBottom: 16}}>
-            <AppText style={{...styles.header_text, color: colors.gray[4]}}>
-                {title}
-            </AppText>
+            <AppText style={{...styles.header_text, color: colors.gray[4]}}>{title}</AppText>
         </View>
     );
 
@@ -77,10 +103,8 @@ const SystemSetting = ({navigation}) => {
             <ScreenContainerView>
                 <SectionList sections={systemMenu}
                     keyExtractor={(item, index) => item + index}
-                    renderItem={({item, section: {index}}) => <SettingListItem data={item.name}
-                        index={index}/>}
-                    renderSectionHeader={({section: {title, index}}) => <HeaderItem title={title}
-                        index={index}/>}
+                    renderItem={({item, section: {index}}) => <SettingListItem data={item.name} index={index}/>}
+                    renderSectionHeader={({section: {title, index}}) => <HeaderItem title={title} index={index}/>}
                     renderSectionFooter={({section: {index}}) => <FooterItem index={index}/>}
                     stickySectionHeadersEnabled={false}
                 />
@@ -110,4 +134,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SystemSetting;
+export default SystemSettingScreen;

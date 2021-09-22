@@ -1,21 +1,20 @@
-import React, {useState} from "react";
-import {StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Image} from "react-native";
-import ScreenContainer from '../../../components/ScreenContainer'
-import styled from "styled-components/native";
-import AppText from "../../../components/AppText";
+import React, {useState} from 'react';
+import {StyleSheet, TextInput, TouchableOpacity, View, Alert} from 'react-native';
+import styled from 'styled-components/native';
+import AppText from '../../../components/AppText';
 import { useTheme } from '@react-navigation/native';
-import CustomTextInput from "../../../components/CustomTextInput";
+import CustomTextInput from '../../../components/CustomTextInput';
 
 const ProgressBar = styled(View)`
   flexDirection: row;
   width: 100%;
   justify-content: flex-end;
   height: 8px;
-`
+`;
 
 const Form = styled(View)`
   margin-top: 63px;
-`
+`;
 
 const InputBox = styled(TextInput)`
   fontSize: 16px;
@@ -23,7 +22,7 @@ const InputBox = styled(TextInput)`
   borderBottomColor: #C5C5C5;
   marginBottom: 27px;
   paddingBottom: 11px;
-`
+`;
 
 const signUp = async (user_email, user_password, user_nickname) => {
     try {
@@ -52,14 +51,14 @@ const signUp = async (user_email, user_password, user_nickname) => {
 
         return result;
     } catch (e) {
-        console.log(e.toString())
+        console.log(e.toString());
     }
-}
+};
 
 const GetNicknameTab = ({route, authNavigation}) => {
     const {email, password} = route.params;
-    const [isValid, setIsValid] = useState(false)
-    const [nickname, setNickname] = useState("");
+    const [isValid, setIsValid] = useState(false);
+    const [nickname, setNickname] = useState('');
     const [isNicknameDuplicated, setIsNicknameDuplicated] = useState(false);
     const { colors } = useTheme();
     const [color, setColor] = useState(colors.gray[5]);
@@ -80,23 +79,20 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     return response.data.isDuplicated === true;
                 })
                 .catch(error => console.log(error));
-            return result
+            return result;
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const checkIsValid = async () => {
-        const nicknameRegExp = /^([A-Z]|[a-z]|[0-9]|[가-힣]){2,12}$/g;
-        if (!nickname.match(nicknameRegExp)) {
-            alert('Error');
-            setIsValid(false)
-            return 0;
-        }
-
-        const result = await signUp(email, password, nickname)
-        if (result) {
-            authNavigation.navigate('SignInEmail');
+        if(isNicknameDuplicated) {
+            Alert.alert('', '이미 사용 중인 닉네임이에요.');
+        } else {
+            const result = await signUp(email, password, nickname);
+            if (result) {
+                authNavigation.navigate('SignInEmail');
+            }
         }
     };
 
@@ -121,13 +117,13 @@ const GetNicknameTab = ({route, authNavigation}) => {
             lineHeight: 44,
         },
         continue_btn: {
-            backgroundColor: nickname && nickname.length <= 12 && !patterns.test(nickname) && !isNicknameDuplicated ? colors.mainColor : colors.gray[6],
+            backgroundColor: nickname && nickname.length <= 12 && !patterns.test(nickname) ? colors.mainColor : colors.gray[6],
             height: 48,
             borderRadius: 10,
             alignItems: 'center',
             justifyContent: 'center'
         }
-    })
+    });
 
     return (
         <>
@@ -161,18 +157,12 @@ const GetNicknameTab = ({route, authNavigation}) => {
                             }
 
                             if(patterns.test(text)) {
-                                setColor(colors.red[2])
-                            }
-
-                            if(isNicknameDuplicated) {
                                 setColor(colors.red[2]);
                             }
 
-                            if(text === '') setColor(colors.gray[5])
+                            if(text === '') setColor(colors.gray[5]);
                             if(text.length <= 12 && !patterns.test(text)){
-                                if(!isNicknameDuplicated) {
-                                    setColor(colors.gray[5]);
-                                }
+                                setColor(colors.gray[5]);
                             } 
                             setNickname(text);
                         }}
@@ -187,24 +177,24 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     }}>
                         특수문자는 사용할 수 없어요.
                     </AppText>
-                    <AppText style={{color: colors.red[2],
+                    {/* <AppText style={{color: colors.red[2],
                         display: isNicknameDuplicated ? 'flex' : 'none'
                     }}>
                         이미 사용 중인 닉네임이에요.
-                    </AppText>
+                    </AppText> */}
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
-                    disabled={nickname && nickname.length <= 12 && !patterns.test(nickname) && !isNicknameDuplicated ? false : true}
+                    disabled={nickname && nickname.length <= 12 && !patterns.test(nickname) ? false : true}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>시작하기</AppText>
                 </TouchableOpacity>
             </View>
         </>
-    )
-}
+    );
+};
 
 export default GetNicknameTab;

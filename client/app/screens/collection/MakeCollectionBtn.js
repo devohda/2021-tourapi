@@ -13,11 +13,11 @@ export default function MakeCollectionBtn({navigation}) {
 
     return (
         <>
-            <TouchableOpacity style={{height: 50, top : 6, justifyContent: 'center'}}onPress={() => {
+            <TouchableOpacity style={{height: 50, marginHorizontal: '15%', justifyContent: 'center', alignItems: 'center', marginBottom: 3}} onPress={() => {
                 refRBSheet.current.open();
                 setClicked(true);
             }}>
-                <Icon type="ionicon" name={'add-circle-outline'} size={32} color={colors.mainColor}></Icon>
+                <Icon type="ionicon" name={'add-circle-outline'} size={38} color={colors.mainColor}></Icon>
             </TouchableOpacity>
             <RBSheet
                 ref={refRBSheet}
@@ -59,6 +59,10 @@ export default function MakeCollectionBtn({navigation}) {
                             height: 72,
                             borderRadius: 10,
                             margin: 10
+                        }} onPress={() => {
+                            refRBSheet.current.close();
+                            navigation.navigate('MakePlanCollection');
+                            navigation.setOptions({tabBarVisible: false});
                         }}>
                             <AppText style={{
                                 textAlign: 'center',
@@ -84,7 +88,7 @@ export default function MakeCollectionBtn({navigation}) {
                             margin: 10
                         }} onPress={() => {
                             refRBSheet.current.close();
-                            navigation.navigate('FreeCollection');
+                            navigation.navigate('MakeFreeCollection');
                             navigation.setOptions({tabBarVisible: false});
                         }}>
                             <AppText style={{

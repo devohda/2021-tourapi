@@ -1,21 +1,21 @@
-import React, {useState, useEffect} from "react";
-import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from "react-native";
-import ScreenContainer from "../components/ScreenContainer";
+import React, {useState, useEffect} from 'react';
+import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from 'react-native';
+import ScreenContainer from '../components/ScreenContainer';
 import {useTheme} from '@react-navigation/native';
-import NavigationTop from "../components/NavigationTop";
-import SearchIcon from "../assets/images/search-icon.svg"
-import ScreenContainerView from "../components/ScreenContainerView";
-import SearchTabNavigator from "../navigation/SearchTabNavigator";
-import ScreenDivideLine from "../components/ScreenDivideLine";
-import Star from "../assets/images/search/star.svg";
-import AppText from "../components/AppText";
-import SearchKeywordContextProvider, {searchKeyword} from "../contexts/SearchkeywordContextProvider";
+import NavigationTop from '../components/NavigationTop';
+import SearchIcon from '../assets/images/search-icon.svg';
+import ScreenContainerView from '../components/ScreenContainerView';
+import SearchTabNavigator from '../navigation/SearchTabNavigator';
+import ScreenDivideLine from '../components/ScreenDivideLine';
+import Star from '../assets/images/search/star.svg';
+import AppText from '../components/AppText';
+import {useSearchKeyword} from '../contexts/SearchkeywordContextProvider';
 
-const SearchScreen = ({navigation}) => {
+const SearchScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const [searchText, setSearchText] = useState('');
-    const [keyword, setKeyword] = useState('');
-    const [k, setK] = searchKeyword();
+    const [k, setK] = useState('');
+    const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+    useEffect(() => {setSearchKeyword('')}, []);
 
     const styles = StyleSheet.create({
         search_box: {
@@ -62,7 +62,7 @@ const SearchScreen = ({navigation}) => {
         },
     });
 
-    const RecommendedDefault = (props) => {
+    const RecommendedDefault = () => {
         return (
             <View style={{marginTop: 16}}>
                 <AppText style={{fontSize: 12, fontWeight: '500', color: colors.gray[5]}}>추천 검색어</AppText>
@@ -80,14 +80,14 @@ const SearchScreen = ({navigation}) => {
                     </View>
                 </View>
             </View>
-        )
-    }
+        );
+    };
 
-    const RecommendedPlace = (props) => {
+    const RecommendedPlace = ({name, address}) => {
         return (
             <View style={{marginRight: 8}}>
-                <Image source={require('../assets/images/mountain.jpeg')}
-                       style={{width: 141, height: 101, borderRadius: 10}}/>
+                <Image source={require('../assets/images/here_default.png')}
+                    style={{width: 141, height: 101, borderRadius: 10}}/>
                 <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
                         <AppText style={{fontSize: 10, color: colors.mainColor}}>음식점</AppText>
@@ -95,14 +95,14 @@ const SearchScreen = ({navigation}) => {
                         <Star width={14} height={14}/>
                         <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</AppText>
                     </View>
-                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{props.name}</AppText>
-                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{props.address}</AppText>
+                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{name}</AppText>
+                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{address}</AppText>
                 </View>
             </View>
-        )
-    }
+        );
+    };
 
-    const RecommendedCollection = (props) => {
+    const RecommendedCollection = () => {
         return (
             <View style={{
                 width: 162,
@@ -118,14 +118,11 @@ const SearchScreen = ({navigation}) => {
                 overflow: 'hidden'
             }}>
                 <View flexDirection="row" style={{
-                    flexWrap: "wrap",
+                    flexWrap: 'wrap',
                     height: 162,
                     width: 162,
                 }}>
-                    <Image source={require('../assets/images/flower.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/mountain.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/autumn.jpeg')} style={{width: 81, height: 81}}/>
-                    <Image source={require('../assets/images/sea.jpeg')} style={{width: 81, height: 81}}/>
+                    <Image source={require('../assets/images/here_default.png')} style={{width: 162, height: 162}}/>
                 </View>
                 <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
                     <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
@@ -138,8 +135,8 @@ const SearchScreen = ({navigation}) => {
                     </AppText>
                 </View>
             </View>
-        )
-    }
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -148,25 +145,24 @@ const SearchScreen = ({navigation}) => {
                 <ScreenContainerView>
                     <View flexDirection="row" style={styles.search_box}>
                         <TextInput flex={1} style={{fontSize: 16}}
-                                   autoCapitalize="none"
-                                   autoCorrect={false}
-                                   placeholder="원하는 공간을 검색해보세요"
-                                   placeholderTextColor={colors.gray[5]}
-                                   onChangeText={(text) => {setSearchText(text)}}
-                                   onSubmitEditing={()=> {setKeyword(''); setKeyword(searchText); setK(searchText)}}/>
-                        <Pressable style={{marginLeft: 5}} onPress={() => {setKeyword(''); setKeyword(searchText); setK(searchText)}}>
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="원하는 공간을 검색해보세요"
+                            placeholderTextColor={colors.gray[5]}
+                            onChangeText={(text) => setK(text)}
+                            onSubmitEditing={()=> setSearchKeyword(k)}
+                        />
+                        <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
                             <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
                         </Pressable>
                     </View>
                     {
-                        keyword === '' ?
-                        <RecommendedDefault /> :
-                        <SearchTabNavigator navigation={navigation} />
+                        searchKeyword === '' ? <RecommendedDefault /> : <SearchTabNavigator navigation={navigation} />
                     }
                 </ScreenContainerView>
 
                 <ScreenDivideLine/>
-                
+
                 <ScreenContainerView>
                     <View style={{marginVertical: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
@@ -203,7 +199,7 @@ const SearchScreen = ({navigation}) => {
                 </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>
-    )
+    );
 };
 
 export default SearchScreen;

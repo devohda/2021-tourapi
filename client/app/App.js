@@ -1,11 +1,11 @@
-import React from 'react';
-import {DefaultTheme, NavigationContainer} from "@react-navigation/native";
+import React, {useEffect, useState} from 'react';
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import { StatusBar, Platform } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font';
 
-import AppNavigator from "./navigation/AppNavigator";
-import AppContextProviders from "./contexts/AppContextProviders";
+import AppNavigator from './navigation/AppNavigator';
+import AppContextProviders from './contexts/AppContextProviders';
 
 const ColorTheme = {
     ...DefaultTheme,
@@ -41,7 +41,8 @@ const ColorTheme = {
             5 : '#BABFC8',
             6 : '#C9CFD9',
             7 : '#BDC2CA',
-            8 : '#929292'
+            8 : '#929292',
+            9 : '#C4C4C4'
         },
         red_gray : {
             1 : '#BFAFAF',
@@ -65,7 +66,9 @@ const ColorTheme = {
     }
 };
 
+
 export default function App() {
+
     let [fontsLoaded] = useFonts({
         'Pretendard-Thin': require('./assets/fonts/Pretendard-Thin.otf'),
         'Pretendard-ExtraLight': require('./assets/fonts/Pretendard-ExtraLight.otf'),

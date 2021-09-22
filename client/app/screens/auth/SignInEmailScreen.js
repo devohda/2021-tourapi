@@ -1,24 +1,26 @@
 //전역 선언 방법 찾아보기
 import React, {useContext, useState} from 'react';
-import {Button, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {Button, StyleSheet, TextInput, TouchableOpacity, View, Alert, Pressable} from 'react-native';
 import {useTheme} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import NavigationTop from '../../components/NavigationTop';
+import AppText from '../../components/AppText';
 
-import {useIsSignedIn} from "../../contexts/SignedInContextProvider";
-import ScreenContainer from "../../components/ScreenContainer";
-import {useIsUserData} from "../../contexts/UserDataContextProvider";
-import ScreenContainerView from "../../components/ScreenContainerView";
-import NavigationTop from "../../components/NavigationTop";
-import AppText from "../../components/AppText";
-import { Icon } from 'react-native-elements';
+import * as SecureStore from 'expo-secure-store';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 const SignInEmailScreen = ({appNavigation, navigation}) => {
 
-    const [email, setEmail] = useState(null)
-    const [password, setPassword] = useState(null)
-    const [isSignedIn, setIsSignedIn] = useIsSignedIn()
-    const [userData, setUserData] = useIsUserData()
+    const [email, setEmail] = useState(null);
+    const [password, setPassword] = useState(null);
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [showPassword, setShowPassword] = useState(true);
+    const [token, setToken] = useToken();
 
-    const { colors } = useTheme();
+    const {colors} = useTheme();
 
     const styles = StyleSheet.create({
         button: {
@@ -34,11 +36,18 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             padding: 14,
             fontSize: 16,
             fontWeight: 'bold'
-        }
+        },
+        password_box: {
+            borderBottomWidth: 1,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: 11
+        },
     });
+
     const signIn = async () => {
         try {
-            let url = 'http://34.146.140.88/auth/loginEmail';
+            let url = 'http://34.146.140.88/auth/loginJWT';
             let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -52,26 +61,28 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     }
                 })
             };
-            const {state, userData: user} = await fetch(url, options)
+            const response = await fetch(url, options)
                 .then(res => res.json())
                 .catch(error => console.log(error));
 
-            switch (state) {
-                case 'NOT EXIST' :
-                    alert('가입되지 않은 정보입니다.')
-                    break;
-                case 'NOT MATCHED' :
-                    alert('비밀번호를 다시 확인해주세요.')
-                    break;
-                case 'SUCCESS' :
-                    setUserData(user);
-                    setIsSignedIn(true);
-                    break;
+            console.log(response);
+            switch (response.state) {
+            case 'NOT EXIST' :
+                Alert.alert('', '가입되지 않은 이메일입니다.');
+                break;
+            case 'NOT MATCHED' :
+                Alert.alert('', '비밀번호가 올바르지 않습니다.');
+                break;
+            case 'SUCCESS' :
+                await SecureStore.setItemAsync('accessToken', response.accessToken);
+                setToken(response.accessToken);
+                setIsSignedIn(true);
+                break;
             }
         } catch (e) {
-            console.log(e.toString())
+            console.log(e.toString());
         }
-    }
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -79,7 +90,9 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             <ScreenContainerView>
                 <View style={{marginTop: 60}}>
                     <View>
-                        <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의 <AppText style={{fontSize: 28, color: colors.mainColor,fontWeight: "bold"}}>공간 보관함</AppText>을</AppText>
+                        <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의 <AppText
+                            style={{fontSize: 28, color: colors.mainColor, fontWeight: 'bold'}}>공간
+                            보관함</AppText>을</AppText>
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</AppText>
                     </View>
                     <TextInput style={{
@@ -87,27 +100,35 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         fontSize: 16,
                         borderBottomWidth: 1,
                         borderBottomColor: colors.gray[5],
-                        marginBottom: 27,
+                        marginBottom: 16,
                         paddingBottom: 11
                     }}
-                               placeholder="이메일 주소를 입력해주세요"
-                               onChangeText={(text) => setEmail(text)}
-                               autoCapitalize="none"
+                    placeholder="이메일 주소를 입력해주세요"
+                    onChangeText={(text) => setEmail(text)}
+                    autoCapitalize="none"
                     />
-                    <View style={{flexDirection: 'row'}}>
-                    <TextInput flex={1}
-                    style={{
-                        fontSize: 16,
-                        borderBottomWidth: 1,
-                        borderBottomColor: colors.gray[5],
-                        marginBottom: 38,
-                        paddingBottom: 11,
-                        flex: 1
-                    }} placeholder="비밀번호를 입력해주세요" secureTextEntry={true}
-                               onChangeText={(text) => setPassword(text)}
-                               autoCapitalize="none"
-                    />
-                    {/* <Icon type="ionicon" name={"eye"} size={20} color={colors.gray[5]}></Icon> */}
+                    <View style={{marginBottom: 27}}>
+                        <View flexDirection="row" style={{...styles.password_box, borderColor: colors.gray[5]}}>
+                            <TextInput flex={1} style={{fontSize: 16}}
+                                autoCorrect={false}
+                                placeholder="비밀번호를 입력해주세요" secureTextEntry={showPassword}
+                                onChangeText={(text) => setPassword(text)}
+                                autoCapitalize="none"
+                                placeholderTextColor={colors.gray[5]}/>
+                            <Pressable style={{marginLeft: 5}} onPress={() => {
+                                setShowPassword(!showPassword);
+                                console.log(showPassword);
+                            }}>
+                                {
+                                    showPassword ?
+                                        <Icon style={{marginTop: 3, marginRight: 5}} name={'eye'} type="ionicon"
+                                            size={18} color={colors.gray[9]}></Icon>
+                                        :
+                                        <Icon style={{marginTop: 3, marginRight: 5}} name={'eye-off'} type="ionicon"
+                                            size={18} color={colors.gray[9]}></Icon>
+                                }
+                            </Pressable>
+                        </View>
                     </View>
                     <TouchableOpacity
                         style={{
@@ -115,7 +136,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                             height: 52,
                             borderRadius: 10,
                             alignItems: 'center',
-                            justifyContent: "center"
+                            justifyContent: 'center'
                         }}
                         disabled={email && password ? false : true}
                         onPress={() => signIn()}
@@ -135,6 +156,6 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             </ScreenContainerView>
         </ScreenContainer>
     );
-}
+};
 
 export default SignInEmailScreen;
