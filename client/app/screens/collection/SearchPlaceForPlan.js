@@ -161,7 +161,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                     placeList.length === 0 ? 
                         <ShowEmpty /> :
                         <SafeAreaView>
-                            <FlatList data={placeList} renderItem={PlaceContainer} keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
+                            <FlatList data={placeList} renderItem={PlaceContainer} keyExtractor={(item, index) => item.place_pk.toString()} key={(item, index) => item.place_pk.toString()}nestedScrollEnabled/>
                         </SafeAreaView>
                 }
             </ScrollView>
