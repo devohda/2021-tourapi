@@ -364,35 +364,42 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const SwipeList = props => {
         return (
-        <SwipeListView
-            data={placeData}
+        // <SwipeListView
+        //     data={placeData}
+        //     renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+        //     keyExtractor={(item, idx) => {idx.toString();}}
+        //     key={(item, idx) => {idx.toString();}}
+        //     renderHiddenItem={(item, rowMap) => {
+        //         return (
+        //             <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
+        //                 <TouchableOpacity
+        //                     style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
+        //                     onPress={() => {
+        //                         deletePlace(item.item.place_pk, props.idx)
+        //                     }}
+        //                 >
+        //                     <View>
+        //                         <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+        //                     </View>
+        //                 </TouchableOpacity>
+        //             </View>
+        //         );}}
+        //     rightOpenValue={-75}
+        //     previewRowKey={'0'}
+        //     previewOpenDelay={3000}
+        //     disableRightSwipe={true}
+        //     disableLeftSwipe={checkPrivate() ? false : true}
+        //     closeOnRowOpen={true}
+        //     closeOnRowPress={true}
+        //     nestedScrollEnabled
+        // />
+        <SafeAreaView>
+        <FlatList data={placeData}
             renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
-            renderHiddenItem={(item, rowMap) => {
-                return (
-                    <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
-                        <TouchableOpacity
-                            style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
-                            onPress={() => {
-                                deletePlace(item.item.place_pk, props.idx)
-                            }}
-                        >
-                            <View>
-                                <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                );}}
-            rightOpenValue={-75}
-            previewRowKey={'0'}
-            previewOpenDelay={3000}
-            disableRightSwipe={true}
-            disableLeftSwipe={checkPrivate() ? false : true}
-            closeOnRowOpen={true}
-            closeOnRowPress={true}
-            nestedScrollEnabled
-        />
+        nestedScrollEnabled/>
+        </SafeAreaView>
     )};
 
     const EditList = props => (
@@ -415,7 +422,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </View>
                         <View>
                             <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : item})}
-                                style={{display: !collectionData.is_creator && 'none'}}
+                                style={!collectionData.is_creator && {display: 'none'}}
                             >
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                     <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -745,7 +752,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         <TouchableOpacity onPress={()=>{
                                                 if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
                                                 else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                            }} style={{display: checkCreated() && 'none'}}>
+                                            }} style={checkCreated() && {display: 'none'}}>
                                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

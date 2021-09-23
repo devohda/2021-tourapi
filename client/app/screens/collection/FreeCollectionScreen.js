@@ -80,8 +80,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     useEffect(() => {
-        getInitialCollectionData();
-        getInitialPlaceData();
+        if(typeof data.collection_private !== 'boolean') {
+            getInitialCollectionData();
+            getInitialPlaceData();
+        }
+
         setTmpData([
             {
                 id: 1,
@@ -291,43 +294,42 @@ const FreeCollectionScreen = ({route, navigation}) => {
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
         );
     };
-    
-    const rowSwipeAnimatedValues = {};
-    Array(20)
-    .fill('')
-    .forEach((_, i) => {
-        rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
-    });
 
     const SwipeList = () => {
         return (
-        <SwipeListView
-            data={placeData}
+        // <SwipeListView
+        //     data={placeData}
+        //     keyExtractor={(item) => item.place_pk.toString()}
+        //     key={(item, idx) => {idx.toString()}}
+        //     renderHiddenItem={(item, rowMap) => {
+        //         return (
+        //         <View style={styles.rowBack} key={item.place_pk}>
+        //         <TouchableOpacity
+        //             style={[styles.backRightBtn, styles.backRightBtnRight]}
+        //             onPress={() => {
+        //                 deletePlace(item.item.place_pk)
+        //             }}
+        //         >
+        //             <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+        //         </TouchableOpacity>
+        //     </View>
+        //     )}}
+        //     rightOpenValue={-75}
+        //     previewRowKey={'0'}
+        //     previewOpenDelay={3000}
+        //     disableRightSwipe={true}
+        //     disableLeftSwipe={checkPrivate()? false : true}
+        //     closeOnRowOpen={true}
+        //     closeOnRowPress={true}
+        //     nestedScrollEnabled
+        // />
+        <SafeAreaView>
+        <FlatList data={placeData}
             renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-            keyExtractor={(item) => item.place_pk.toString()}
-            key={(item, idx) => {idx.toString()}}
-            renderHiddenItem={(item, rowMap) => {
-                return (
-                <View style={styles.rowBack} key={item.place_pk}>
-                <TouchableOpacity
-                    style={[styles.backRightBtn, styles.backRightBtnRight]}
-                    onPress={() => {
-                        deletePlace(item.item.place_pk)
-                    }}
-                >
-                    <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-                </TouchableOpacity>
-            </View>
-            )}}
-            rightOpenValue={-75}
-            previewRowKey={'0'}
-            previewOpenDelay={3000}
-            disableRightSwipe={true}
-            disableLeftSwipe={checkPrivate()? false : true}
-            closeOnRowOpen={true}
-            closeOnRowPress={true}
-            nestedScrollEnabled
-        />
+            keyExtractor={(item, idx) => {idx.toString();}}
+            key={(item, idx) => {idx.toString();}}
+        nestedScrollEnabled/>
+        </SafeAreaView>
     )}
     
     const [showMenu, setShowMenu] = useState(false);
@@ -569,7 +571,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                     <TouchableOpacity onPress={()=>{
                                         navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                    }} style={{display: !collectionData.is_creator && 'none'}}>
+                                    }} style={!collectionData.is_creator && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -620,7 +622,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 <TouchableOpacity onPress={()=>{
                                     if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
                                     else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                }} style={{display: checkCreated() && 'none'}}>
+                                }} style={ checkCreated() && {display:'none'}}>
                                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                         <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                         <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
