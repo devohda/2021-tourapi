@@ -32,7 +32,7 @@ import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import {useToken} from '../../contexts/TokenContextProvider';
-import DragAndDropListForFree from './DragAndDropListForFree';
+// import DragAndDropListForFree from './DragAndDropListForFree';
 import ShowPlacesForFree from './ShowPlacesForFree';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 
@@ -583,7 +583,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         {
                                             !isEditPage ?
                                             <SwipeList /> :
-                                            <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
+                                            <SwipeList />
+                                            // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>

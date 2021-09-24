@@ -28,7 +28,7 @@ import {useToken} from '../../contexts/TokenContextProvider';
 import { updatedList } from '../../contexts/UpdatedListContextProvider';
 
 import TipsList from './TipsList';
-import DragAndDropList from './DragAndDropList';
+// import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
 
 import Jewel from '../../assets/images/jewel.svg';
@@ -403,7 +403,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
     )};
 
     const EditList = props => (
-        <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
+        <View></View>
+        // <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
     );
 
     const ShowDays = ({item, index}) => {
