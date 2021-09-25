@@ -29,7 +29,9 @@ const MyPageScreen = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
+                    console.log(response);
                     setUserData(response.data);
+                    console.log(response.data);
                 })
                 .catch((err) => {
                     console.error(err);

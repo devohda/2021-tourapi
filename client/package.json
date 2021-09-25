@@ -26,7 +26,7 @@
     "@types/styled-components": "^5.1.11",
     "@types/styled-components-react-native": "^5.1.1",
     "@ui-kitten/components": "^5.1.1",
-    "expo": "~41.0.1",
+    "expo": "~42.0.4",
     "expo-app-loading": "^1.1.2",
     "expo-blur": "^9.0.3",
     "expo-font": "~9.1.0",
