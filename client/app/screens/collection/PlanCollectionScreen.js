@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import {useIsFocused, useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import {Icon} from 'react-native-elements';
+import {Icon, ListItem, Button} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 // import MapView, {Marker} from 'react-native-maps';
 
@@ -364,42 +364,54 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const SwipeList = props => {
         return (
-        // <SwipeListView
-        //     data={placeData}
-        //     renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-        //     keyExtractor={(item, idx) => {idx.toString();}}
-        //     key={(item, idx) => {idx.toString();}}
-        //     renderHiddenItem={(item, rowMap) => {
-        //         return (
-        //             <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
-        //                 <TouchableOpacity
-        //                     style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
-        //                     onPress={() => {
-        //                         deletePlace(item.item.place_pk, props.idx)
-        //                     }}
-        //                 >
-        //                     <View>
-        //                         <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-        //                     </View>
-        //                 </TouchableOpacity>
-        //             </View>
-        //         );}}
-        //     rightOpenValue={-75}
-        //     previewRowKey={'0'}
-        //     previewOpenDelay={3000}
-        //     disableRightSwipe={true}
-        //     disableLeftSwipe={checkPrivate() ? false : true}
-        //     closeOnRowOpen={true}
-        //     closeOnRowPress={true}
-        //     nestedScrollEnabled
-        // />
-        <SafeAreaView>
-        <FlatList data={placeData}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+            <>
+        <SwipeListView
+            data={placeData}
+            renderItem={({item, index}) => 
+            <>
+            <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>
+            </>}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
-        nestedScrollEnabled/>
-        </SafeAreaView>
+            renderHiddenItem={(item, rowMap) => {
+                return (
+                    <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
+                        <TouchableOpacity
+                            style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
+                            onPress={() => {
+                                deletePlace(item.item.place_pk, props.idx)
+                            }}
+                        >
+                            <View>
+                                <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                );}}
+            rightOpenValue={-75}
+            previewRowKey={'0'}
+            previewOpenDelay={3000}
+            disableRightSwipe={true}
+            disableLeftSwipe={checkPrivate() ? false : true}
+            closeOnRowOpen={true}
+            closeOnRowPress={true}
+            nestedScrollEnabled
+        />
+{/* {        placeData.map((item, index) => (
+        <TipsList data={item} idx={index} day={props.idx} length={placeLength} key={index} private={collectionData.is_creator}/>
+
+            ))} */}
+        </>
+        // <SafeAreaView>
+        //     <FlatList data={placeData}
+        //       renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+        //       keyExtractor={(item, idx) => {idx.toString();}}
+        //       key={(item, idx) => {idx.toString();}}
+        //   nestedScrollEnabled/>
+        // </SafeAreaView>
+//         placeData.map((item, index) => (
+// <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>
+//         ))
     )};
 
     const EditList = props => (
