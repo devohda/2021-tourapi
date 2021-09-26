@@ -102,7 +102,8 @@ const MyPageScreen = ({navigation}) => {
                                 color: colors.mainColor,
                             }}
                         >
-                            {userData.user_nickname}
+                            hi
+                            {/* {userData.user_nickname} */}
                         </AppText>
                         <View
                             style={{

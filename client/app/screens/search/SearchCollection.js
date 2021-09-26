@@ -3,10 +3,10 @@ import {Image, Text, View, ScrollView, FlatList, SafeAreaView, Dimensions, Touch
 import {useIsFocused, useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import {Icon} from 'react-native-elements';
-import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
-import ScreenContainerView from '../../components/ScreenContainerView';
+import { searchCollectionResult } from '../../contexts/search/SearchCollectionContextProvider';
 
 const SearchCollection = (props, {navigation}) => {
     const {colors} = useTheme();
@@ -14,12 +14,13 @@ const SearchCollection = (props, {navigation}) => {
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     const { user } = props;
-
+    const [searchLength, setSearchLength] = searchCollectionResult();
     const [token, setToken] = useToken();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getResults();
-    }, [searchKeyword]);
+    }, [searchKeyword, isFocused]);
 
     const getResults = () => {
         try {
@@ -32,7 +33,7 @@ const SearchCollection = (props, {navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(res)
+                    setSearchLength(response.data.length);
                     checkPrivate(response.data);
 
                 })

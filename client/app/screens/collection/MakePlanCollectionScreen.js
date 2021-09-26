@@ -238,12 +238,12 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 res.json()
             })
                 .then((responsedata) => {
+                    console.log(responsedata)
                     const item = {
                         'collection_name': collectionName,
                         'collection_private': isEnabled,
                         'collection_type': 1,
                         'keywords': showDatas,
-                        'places': [],
                         'startDate': startDate,
                         'endDate': endDate
                     }
@@ -441,7 +441,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <TouchableOpacity
                             testID="completed"
                             style={{
-                                backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : colors.gray[5],
+                                backgroundColor: DATA.collection_name.length >= 2 ? colors.mainColor : colors.gray[5],
                                 height: 48,
                                 borderRadius: 10
                             }}
@@ -453,7 +453,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 // navigation.navigate('PlanCollection');
                                 // }
                             }}
-                            // disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
+                            disabled={DATA.collection_name.length < 2 ? true : false}
                         ><AppText
                                 style={{
                                     textAlign: 'center',

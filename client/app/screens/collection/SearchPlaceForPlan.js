@@ -4,7 +4,7 @@ import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import AppText from "../../components/AppText";
-import { useSearchKeyword } from "../../contexts/SearchkeywordContextProvider";
+import { useSearchKeyword } from "../../contexts/search/SearchkeywordContextProvider";
 import ShowEmpty from "../../components/ShowEmpty";
 import {useToken} from '../../contexts/TokenContextProvider';
 
@@ -133,20 +133,25 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                         setIsPress(newArr);
                         // deletePlace(item.place_pk)
                     } else {
-                        for(let i=0;i<newArr.length;i++) {
-                            if(i == index) continue;
-                            else newArr[i] = false;
-                        }
+                        // for(let i=0;i<newArr.length;i++) {
+                        //     if(i == index) continue;
+                        //     else newArr[i] = false;
+                        // }
                         newArr[index] = true;
                         setIsPress(newArr);
                         addPlace(item.place_pk)
                     }
                 }}
                 style={{width: '15%'}}
+                disabled={isPress[index] && true}
                 >
-                    <View style={{height: 28, backgroundColor: colors.mainColor, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={[{height: 28, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}, isPress[index] ? {backgroundColor: colors.gray[6]} : {backgroundColor: colors.mainColor}]}>
                         <View style={{paddingVertical: 4.5, paddingHorizontal: 4.5}}>
-                            <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가하기</AppText>
+                            {
+                                isPress[index] ?
+                                <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가완료</AppText> :
+                                <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가하기</AppText>
+                            }
                         </View>
                     </View>
                 </TouchableOpacity>

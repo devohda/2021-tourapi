@@ -239,7 +239,7 @@ const ShowPlaces = props => {
                 {
                     isFree ?
                     <>
-                    <TipsList data={item} idx={index} day={day} length={length} key={index} private={props.private}/>
+                    {/* <TipsList data={item} idx={index} day={day} length={length} key={index} private={props.private}/> */}
                     </> :
                     <>
                         {/* <View style={{
@@ -264,7 +264,7 @@ const ShowPlaces = props => {
                         </View>
                     </View> */}
 
-                    <TipsList data={item} idx={index} day={day} length={length} key={index} private={props.private}/>
+                    {/* <TipsList data={item} idx={index} day={day} length={length} key={index} private={props.private}/> */}
                     </>
                 }
             </View>
