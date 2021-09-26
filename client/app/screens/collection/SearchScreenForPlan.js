@@ -9,7 +9,7 @@ import SearchTabNavigator from '../../navigation/SearchTabNavigator';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
 import SearchPlaceForPlan from './SearchPlaceForPlan';
 
 const SearchScreenForPlan = ({route, navigation}) => {

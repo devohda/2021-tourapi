@@ -1,12 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from 'react-native';
-import {useTheme} from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { useIsFocused } from '@react-navigation/native';
 
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
+import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
-import {useToken} from '../../contexts/TokenContextProvider';
+import { useToken } from '../../contexts/TokenContextProvider';
+import { searchPlaceResult } from '../../contexts/search/SearchPlaceContextProvider';
 
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
@@ -16,6 +17,8 @@ const SearchPlace = ({navigation}) => {
     const [placeList, setPlaceList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+    const [searchLength, setSearchLength] = searchPlaceResult();
+    const isFocused = useIsFocused();
 
     const [token, setToken] = useToken();
 
@@ -34,7 +37,9 @@ const SearchPlace = ({navigation}) => {
         }
     });
 
-    useEffect(() => {getResults();}, [searchKeyword]);
+    useEffect(() => {
+        getResults();
+    }, [searchKeyword, isFocused]);
 
     const getResults = () => {
         try {
@@ -47,6 +52,7 @@ const SearchPlace = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
+                    setSearchLength(response.data.length);
                     setPlaceList(response.data);
                     // setFalse();
                 })

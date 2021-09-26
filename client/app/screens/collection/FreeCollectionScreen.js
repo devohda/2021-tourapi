@@ -97,7 +97,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         ]);
         getUserData();
         // setUpdate(false)
-    }, [isFocused, setUpdate]);
+    }, [isFocused]);
 
     const getInitialCollectionData = () => {
         try {
@@ -310,7 +310,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         //                 deletePlace(item.item.place_pk)
         //             }}
         //         >
-        //             <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+        //             <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
         //         </TouchableOpacity>
         //     </View>
         //     )}}
@@ -323,13 +323,42 @@ const FreeCollectionScreen = ({route, navigation}) => {
         //     closeOnRowPress={true}
         //     nestedScrollEnabled
         // />
-        <SafeAreaView>
-        <FlatList data={placeData}
-            renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-            keyExtractor={(item, idx) => {idx.toString();}}
-            key={(item, idx) => {idx.toString();}}
-        nestedScrollEnabled/>
-        </SafeAreaView>
+        <SwipeListView
+        data={placeData}
+        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+        keyExtractor={(item, idx) => {idx.toString();}}
+        key={(item, idx) => {idx.toString();}}
+            renderHiddenItem={(item, rowMap) => {
+                return (
+                <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
+                    <TouchableOpacity
+                        style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
+                        onPress={() => {
+                            deletePlace(item.item.place_pk, props.idx)
+                        }}
+                    >
+                        {/* <View style={{justifyContent: 'center', alignItems: 'center'}}> */}
+                            <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
+                        {/* </View> */}
+                    </TouchableOpacity>
+            </View>
+            )}}
+        rightOpenValue={-75}
+        previewRowKey={'0'}
+        previewOpenDelay={3000}
+        disableRightSwipe={true}
+        disableLeftSwipe={checkPrivate() ? false : true}
+        closeOnRowOpen={true}
+        closeOnRowPress={true}
+        nestedScrollEnabled
+    />
+        // <SafeAreaView>
+        // <FlatList data={placeData}
+        //     renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+        //     keyExtractor={(item, idx) => {idx.toString();}}
+        //     key={(item, idx) => {idx.toString();}}
+        // nestedScrollEnabled/>
+        // </SafeAreaView>
     )}
     
     const [showMenu, setShowMenu] = useState(false);
@@ -410,7 +439,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }}><AppText>수정</AppText>
+                            }}><AppText>수정하기</AppText>
                         </TouchableOpacity> */}
                         <View style={{
                             height: 1,
@@ -426,7 +455,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }}><AppText>삭제</AppText></TouchableOpacity>
+                            }}><AppText>삭제하기</AppText></TouchableOpacity>
                         <DeleteModal />
                     </View>
                 </>
@@ -510,6 +539,24 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 fontWeight: '700',
                                 color: colors.mainColor
                             }}>{data.collection_name}</AppText>
+                            {
+                                typeof data.collection_private === 'boolean' ?
+                                <AppText style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    color: colors.gray[2],
+                                    lineHeight: 19.2,
+                                    marginTop: 12
+                                }}>by. {userData.user_nickname}</AppText> :
+                                <AppText style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    color: colors.gray[2],
+                                    lineHeight: 19.2,
+                                    marginTop: 12
+                                }}>by. {collectionData.created_user_name}</AppText>
+                                
+                            }
                         </View>
                         {
                            userData.user_nickname !== data.created_user_name &&
@@ -530,7 +577,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     <AppText style={{
                                         fontSize: 10,
                                         fontWeight: '700',
-                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
+                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
                                         marginTop: 2
                                     }}>{collectionData.like_cnt}</AppText>
                                 </View>}
@@ -588,31 +635,31 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>
-                                <TouchableOpacity onPress={() => {
-                                    // if(isLimited) setIsLimited(false);
-                                    // else setIsLimited(true);
-                                    // console.log(isLimited)
-                                }}>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        marginTop: 26,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
+                                    <TouchableOpacity onPress={() => {
+                                        // if(isLimited) setIsLimited(false);
+                                        // else setIsLimited(true);
+                                        // console.log(isLimited)
                                     }}>
-                                        <AppText style={{
-                                            fontSize: 14,
-                                            fontWeight: '400',
-                                            color: colors.gray[2]
-                                        }}>전체보기</AppText>
-                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                            style={{
-                                                width: 15,
-                                                height: 15,
-                                                marginLeft: 10,
-                                                marginBottom: 5
-                                            }}></Image>
-                                    </View>
-                                </TouchableOpacity>
+                                        <View style={{
+                                            flexDirection: 'row',
+                                            marginTop: 26,
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }}>
+                                            <AppText style={{
+                                                fontSize: 14,
+                                                fontWeight: '400',
+                                                color: colors.gray[2]
+                                            }}>전체보기</AppText>
+                                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                style={{
+                                                    width: 15,
+                                                    height: 15,
+                                                    marginLeft: 10,
+                                                    marginBottom: 5
+                                                }}></Image>
+                                        </View>
+                                    </TouchableOpacity>
                             </View> :
                             <View style={{marginTop: 16}}>
                             <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -778,7 +825,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         width: 75,
-        marginTop: 13
+        marginTop: 13,
+        height: '100%'
     },
     backRightBtnRight: {
         backgroundColor: 'red',

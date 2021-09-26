@@ -34,7 +34,8 @@ export default function MainPageScreen({navigation}) {
                 </View>
                 <View style={{position: 'absolute', right: 0}}>
                     <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-                        <Icon type="ionicon"
+                        <Icon
+                            type="ionicon"
                             name={'md-search'}
                             color={colors.mainColor}
                             size={28}>
@@ -63,7 +64,8 @@ export default function MainPageScreen({navigation}) {
                                     lineHeight: 36,
                                     fontWeight: 'bold'
                                 }}>보관함</AppText>
-                                <TouchableOpacity style={{top: 44.5, left: 16}}><Icon type="ionicon"
+                                <TouchableOpacity style={{top: 44.5, left: 16}}><Icon
+                                    type="ionicon"
                                     name={'chevron-forward-outline'}
                                     color={colors.mainColor}
                                     size={26}></Icon></TouchableOpacity>

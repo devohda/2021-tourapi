@@ -11,12 +11,18 @@ import SearchCollection from '../screens/search/SearchCollection';
 import SearchUser from '../screens/search/SearchUser';
 
 import { useToken } from '../contexts/TokenContextProvider';
+import { searchPlaceResult } from '../contexts/search/SearchPlaceContextProvider';
+import { searchCollectionResult } from '../contexts/search/SearchCollectionContextProvider';
+import { searchUserResult } from '../contexts/search/SearchUserContextProvider';
 
 
 const SearchTabNavigator = ({navigation}) => {
     const {colors} = useTheme();
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [searchPlace, setSearchPlace] = searchPlaceResult();
+    const [searchCollection, setSearchCollection] = searchCollectionResult();
+    const [searchUser, setSearchUser] = searchUserResult();
 
     useEffect(() => {
         getUserData();
@@ -79,9 +85,9 @@ const SearchTabNavigator = ({navigation}) => {
                 });
             }}
         >
-            <Tab.Screen name={'공간'} children={() => <SearchPlace navigation={navigation}/>}/>
-            <Tab.Screen name={'보관함'} children={() => <SearchCollection navigation={navigation} user={userData.user_nickname}/>}/>
-            <Tab.Screen name={'유저'} children={() => <SearchUser navigation={navigation}/>}/>
+            <Tab.Screen name={`공간 ${searchPlace}`} children={() => <SearchPlace navigation={navigation}/>}/>
+            <Tab.Screen name={`보관함 ${searchCollection}`} children={() => <SearchCollection navigation={navigation} user={userData.user_nickname}/>}/>
+            <Tab.Screen name={`유저 ${searchUser}`} children={() => <SearchUser navigation={navigation}/>}/>
         </Tab.Navigator>
     );
 };

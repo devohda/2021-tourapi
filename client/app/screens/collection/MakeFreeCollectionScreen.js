@@ -140,7 +140,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         'collection_private': isEnabled,
                         'collection_type': 0,
                         'keywords': showDatas,
-                        'places': []
                     };
                     Alert.alert('', '자유보관함이 생성되었습니다');
                     navigation.navigate('FreeCollection', {
@@ -294,7 +293,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <TouchableOpacity
                             testID="completed"
                             style={{
-                                backgroundColor: ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) ? colors.mainColor : colors.gray[5],
+                                backgroundColor: DATA.collection_name.length >= 2 ? colors.mainColor : colors.gray[5],
                                 height: 48,
                                 borderRadius: 10
                             }}
@@ -305,7 +304,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                                 navigation.goBack(null);
                                 // }
                             }}
-                            disabled={DATA.collection_name.length < 2 && (isPress.filter((value) => value === true).length == 0 || isPress.filter((value) => value === true).length > 3) ? true : false}
+                            disabled={DATA.collection_name.length < 2 ? true : false}
                         ><AppText
                                 style={{
                                     textAlign: 'center',

@@ -228,8 +228,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const [isPress, setIsPress] = useState([]);
 
-    const setFalse = () => {
-    };
+    // const setFalse = () => {
+    // };
 
     const deletePlace = (place_pk, day) => {
         //공간 삭제
@@ -354,36 +354,24 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const rowSwipeAnimatedValues = {};
-    Array(20)
-        .fill('')
-        .forEach((_, i) => {
-            rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
-        });
-
-
     const SwipeList = props => {
         return (
-            <>
         <SwipeListView
             data={placeData}
-            renderItem={({item, index}) => 
-            <>
-            <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>
-            </>}
-            keyExtractor={(item, idx) => {idx.toString();}}
-            key={(item, idx) => {idx.toString();}}
+            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+            keyExtractor={(item, idx) => item.place_pk.toString()}
+            key={(item, idx) => item.place_pk.toString()}
             renderHiddenItem={(item, rowMap) => {
                 return (
-                    <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
+                    <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
                         <TouchableOpacity
-                            style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
+                            style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
                             onPress={() => {
                                 deletePlace(item.item.place_pk, props.idx)
                             }}
                         >
-                            <View>
-                                <AppText style={{color: colors.defaultColor}}>삭제</AppText>
+                            <View style={{justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+                                <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -397,11 +385,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
             closeOnRowPress={true}
             nestedScrollEnabled
         />
-{/* {        placeData.map((item, index) => (
+/* {        placeData.map((item, index) => (
         <TipsList data={item} idx={index} day={props.idx} length={placeLength} key={index} private={collectionData.is_creator}/>
 
-            ))} */}
-        </>
+            ))} */
         // <SafeAreaView>
         //     <FlatList data={placeData}
         //       renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
@@ -579,7 +566,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }}><AppText>수정</AppText>
+                            }}><AppText>수정하기</AppText>
                         </TouchableOpacity> */}
                         <View style={{
                             height: 1,
@@ -595,7 +582,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }}><AppText>삭제</AppText></TouchableOpacity>
+                            }}><AppText>삭제하기</AppText></TouchableOpacity>
                         <DeleteModal />
                     </View>
                 )
@@ -681,6 +668,24 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontWeight: '700',
                                 color: colors.mainColor
                             }}>{data.collection_name}</AppText>
+                            {
+                                typeof data.collection_private === 'boolean' ?
+                                <AppText style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    color: colors.gray[2],
+                                    lineHeight: 19.2,
+                                    marginTop: 12
+                                }}>by. {userData.user_nickname}</AppText> :
+                                <AppText style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    color: colors.gray[2],
+                                    lineHeight: 19.2,
+                                    marginTop: 12
+                                }}>by. {collectionData.created_user_name}</AppText>
+                                
+                            }
                         </View>
                         {
                            userData.user_nickname !== data.created_user_name &&
@@ -701,7 +706,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     <AppText style={{
                                         fontSize: 10,
                                         fontWeight: '700',
-                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
+                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
                                         marginTop: 2
                                     }}>{collectionData.like_cnt}</AppText>
                                 </View>}
