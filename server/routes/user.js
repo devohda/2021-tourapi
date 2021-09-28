@@ -7,7 +7,7 @@ const userService = require('../services/userService');
 router.get('/', verifyToken, (req, res, next) => {
     const {user_email, user_img, user_nickname} = res.locals.user;
     const userData = {user_email, user_img, user_nickname}
-    return res.send({code: 200, status: 'SUCCESS', data: userData});
+    return res.send({code: 200, status: 'OK', data: userData});
 })
 
 router.get('/list', async (req, res) => {
@@ -18,7 +18,7 @@ router.get('/list', async (req, res) => {
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS', data: result});
+    return res.send({code: 200, status: 'OK', data: result});
 });
 
 module.exports = router;

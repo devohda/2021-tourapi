@@ -66,7 +66,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://localhost:3000/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -127,7 +127,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialCollectionData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -146,9 +146,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         newArr.push({
                             id: i,
                             days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
-                        })
+                        });
                     }
-                    setPlanDays(newArr)
+                    setPlanDays(newArr);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -161,7 +161,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}/places`, {
+            fetch(`http://localhost:3000/collection/${data.collection_pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -170,7 +170,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    setPlaceData(response.data)
+                    setPlaceData(response.data);
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
                         if(response.data[i].place_pk === -1 || response.data[i].place_pk === -2) exceptLength += 1;
@@ -215,7 +215,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }
         }
         return false;
-    }
+    };
 
     const checkCreated = () => {
         if(data.collection_private === true || data.collection_private === false) {
@@ -224,7 +224,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             if(collectionData.is_creator) return false;
         }
         return true;
-    }
+    };
 
     const [isPress, setIsPress] = useState([]);
 
@@ -234,7 +234,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const deletePlace = (place_pk, day) => {
         //공간 삭제
         try {
-            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://localhost:3000/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -255,12 +255,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const LikeCollection = () => {
         //보관함 좋아요
         try {
-            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://localhost:3000/like/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -284,7 +284,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const DeleteLikedCollection = () => {
         //보관함 좋아요 삭제
         try {
-            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://localhost:3000/like/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -307,7 +307,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deleteCollection = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -326,7 +326,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const Keyword = ({item}) => {
         return (
@@ -356,36 +356,36 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const SwipeList = props => {
         return (
-        <SwipeListView
-            data={placeData}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-            keyExtractor={(item, idx) => item.place_pk.toString()}
-            key={(item, idx) => item.place_pk.toString()}
-            renderHiddenItem={(item, rowMap) => {
-                return (
-                    <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
-                        <TouchableOpacity
-                            style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
-                            onPress={() => {
-                                deletePlace(item.item.place_pk, props.idx)
-                            }}
-                        >
-                            <View style={{justifyContent: 'center', alignItems: 'center', height: '100%'}}>
-                                <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                );}}
-            rightOpenValue={-75}
-            previewRowKey={'0'}
-            previewOpenDelay={3000}
-            disableRightSwipe={true}
-            disableLeftSwipe={checkPrivate() ? false : true}
-            closeOnRowOpen={true}
-            closeOnRowPress={true}
-            nestedScrollEnabled
-        />
-/* {        placeData.map((item, index) => (
+            <SwipeListView
+                data={placeData}
+                renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+                keyExtractor={(item, idx) => item.place_pk.toString()}
+                key={(item, idx) => item.place_pk.toString()}
+                renderHiddenItem={(item, rowMap) => {
+                    return (
+                        <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
+                            <TouchableOpacity
+                                style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
+                                onPress={() => {
+                                    deletePlace(item.item.place_pk, props.idx);
+                                }}
+                            >
+                                <View style={{justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+                                    <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    );}}
+                rightOpenValue={-75}
+                previewRowKey={'0'}
+                previewOpenDelay={3000}
+                disableRightSwipe={true}
+                disableLeftSwipe={checkPrivate() ? false : true}
+                closeOnRowOpen={true}
+                closeOnRowPress={true}
+                nestedScrollEnabled
+            />
+        /* {        placeData.map((item, index) => (
         <TipsList data={item} idx={index} day={props.idx} length={placeLength} key={index} private={collectionData.is_creator}/>
 
             ))} */
@@ -396,10 +396,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
         //       key={(item, idx) => {idx.toString();}}
         //   nestedScrollEnabled/>
         // </SafeAreaView>
-//         placeData.map((item, index) => (
-// <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>
-//         ))
-    )};
+        //         placeData.map((item, index) => (
+        // <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>
+        //         ))
+        );};
 
     const EditList = props => (
         <View></View>
@@ -467,40 +467,40 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deleteMode = () => {
         setDeleteMenu(true);
-    }
+    };
 
     const DeleteModal = () => (
         <Modal
-        transparent={true}
-        visible={deleteMenu}
-        onRequestClose={() => {
-            setDeleteMenu(!deleteMenu);
-        }}
-    >
-        <View style={styles.centeredView}>
-            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <Pressable
-                        style={{...styles.button, backgroundColor: colors.gray[4]}}
-                        onPress={() => setDeleteMenu(!deleteMenu)}
-                    >
-                        <AppText style={styles.textStyle}>취소하기</AppText>
-                    </Pressable>
-                    <Pressable
-                        style={{...styles.button, backgroundColor: colors.mainColor}}
-                        onPress={() => {
-                            setDeleteMenu(!deleteMenu);
-                            deleteCollection();
-                        }}
-                    >
-                        <AppText style={styles.textStyle}>삭제하기</AppText>
-                    </Pressable>
+            transparent={true}
+            visible={deleteMenu}
+            onRequestClose={() => {
+                setDeleteMenu(!deleteMenu);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.gray[4]}}
+                            onPress={() => setDeleteMenu(!deleteMenu)}
+                        >
+                            <AppText style={styles.textStyle}>취소하기</AppText>
+                        </Pressable>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            onPress={() => {
+                                setDeleteMenu(!deleteMenu);
+                                deleteCollection();
+                            }}
+                        >
+                            <AppText style={styles.textStyle}>삭제하기</AppText>
+                        </Pressable>
+                    </View>
                 </View>
             </View>
-        </View>
-    </Modal>
-    )
+        </Modal>
+    );
 
     const setDate = () => {
 
@@ -528,7 +528,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }
         }
 
-    }
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -601,32 +601,32 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         if(typeof data.collection_private === 'boolean') {
                             navigation.pop(2);
                         }
-                        else navigation.goBack()}}>
+                        else navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
                 {checkPrivate() && <>
-                {
-                    !isEditPage ?
-                        <View style={{position: 'absolute', right: 0}}>
-                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                disabled={typeof data.collection_private === 'boolean'}
-                                style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
-                                <MoreIcon style={{color: colors.mainColor}}/>
-                            </TouchableOpacity>
-                        </View> :
-                        <View style={{position: 'absolute', right: 0}}>
-                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
-                            onPress={() => {
-                                setIsEditPage(false);
-                                console.log(updatedData)
-                            }}>
-                                <View>
-                                    <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                }</>}
+                    {
+                        !isEditPage ?
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                                    disabled={typeof data.collection_private === 'boolean'}
+                                    style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                                    <MoreIcon style={{color: colors.mainColor}}/>
+                                </TouchableOpacity>
+                            </View> :
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
+                                    onPress={() => {
+                                        setIsEditPage(false);
+                                        console.log(updatedData);
+                                    }}>
+                                    <View>
+                                        <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                    }</>}
             </View>
 
             <ScrollView>
@@ -670,47 +670,47 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             }}>{data.collection_name}</AppText>
                             {
                                 typeof data.collection_private === 'boolean' ?
-                                <AppText style={{
-                                    fontSize: 12,
-                                    fontWeight: '400',
-                                    color: colors.gray[2],
-                                    lineHeight: 19.2,
-                                    marginTop: 12
-                                }}>by. {userData.user_nickname}</AppText> :
-                                <AppText style={{
-                                    fontSize: 12,
-                                    fontWeight: '400',
-                                    color: colors.gray[2],
-                                    lineHeight: 19.2,
-                                    marginTop: 12
-                                }}>by. {collectionData.created_user_name}</AppText>
+                                    <AppText style={{
+                                        fontSize: 12,
+                                        fontWeight: '400',
+                                        color: colors.gray[2],
+                                        lineHeight: 19.2,
+                                        marginTop: 12
+                                    }}>by. {userData.user_nickname}</AppText> :
+                                    <AppText style={{
+                                        fontSize: 12,
+                                        fontWeight: '400',
+                                        color: colors.gray[2],
+                                        lineHeight: 19.2,
+                                        marginTop: 12
+                                    }}>by. {collectionData.created_user_name}</AppText>
                                 
                             }
                         </View>
                         {
-                           userData.user_nickname !== data.created_user_name &&
+                            userData.user_nickname !== data.created_user_name &&
                            <TouchableOpacity onPress={() => {
-                                if (collectionData.like_flag) {
-                                    DeleteLikedCollection();
-                                } else {
-                                    LikeCollection();
-                                }
-                            }}>
-                                {!(data.collection_private === false || data.collection_private === true) && <View style={{
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginVertical: 5
-                                }}>
-                                    <Jewel width={26} height={21}
-                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                                    <AppText style={{
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
-                                        marginTop: 2
-                                    }}>{collectionData.like_cnt}</AppText>
-                                </View>}
-                            </TouchableOpacity>
+                               if (collectionData.like_flag) {
+                                   DeleteLikedCollection();
+                               } else {
+                                   LikeCollection();
+                               }
+                           }}>
+                               {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                                   justifyContent: 'center',
+                                   alignItems: 'center',
+                                   marginVertical: 5
+                               }}>
+                                   <Jewel width={26} height={21}
+                                       style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                   <AppText style={{
+                                       fontSize: 10,
+                                       fontWeight: '700',
+                                       color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
+                                       marginTop: 2
+                                   }}>{collectionData.like_cnt}</AppText>
+                               </View>}
+                           </TouchableOpacity>
                         }
                     </View>
                 </ScreenContainerView>
@@ -745,10 +745,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                 </View>
                                 <SafeAreaView>
-                                            {/* {
+                                    {/* {
                                             placeData.length > 5 ?
                                         } */}
-                                            {/* {collectionData.place.map((item, idx) =>(
+                                    {/* {collectionData.place.map((item, idx) =>(
                                             <ShowPlaces item={item} idx={idx} key={idx}/>
                                         ))} */}
                                     {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
@@ -768,9 +768,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                                 style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                         </View>
                                         <TouchableOpacity onPress={()=>{
-                                                if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
-                                                else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                            }} style={checkCreated() && {display: 'none'}}>
+                                            if(typeof data.collection_private === 'boolean') navigation.navigate('Search');
+                                            else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
+                                        }} style={checkCreated() && {display: 'none'}}>
                                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -784,16 +784,16 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     marginTop: 40,
                                     marginBottom: 52
                                 }}>
-                                <Image source={require('../../assets/images/empty_forDir.png')} style={{
-                                    width: 150,
-                                    height: 120,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginBottom: 12
-                                }}></Image>
-                                <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
+                                    <Image source={require('../../assets/images/empty_forDir.png')} style={{
+                                        width: 150,
+                                        height: 120,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        marginBottom: 12
+                                    }}></Image>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
                                     담겨있지 않아요!</AppText>
-                            </View>
+                                </View>
                             </>
                     }
 

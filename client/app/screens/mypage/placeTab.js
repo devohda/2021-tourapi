@@ -32,11 +32,11 @@ const PlaceTab = ({navigation}) => {
     useEffect(() => {
         getLikedPlace();
         getLikedCollection();
-    }, [isFocused])
+    }, [isFocused]);
     
     const getLikedPlace = () => {
         try {
-            fetch('http://34.146.140.88/like/placeList', {
+            fetch('http://localhost:3000/like/placeList', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -45,20 +45,20 @@ const PlaceTab = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    setPlaceList(response.data)
+                    setPlaceList(response.data);
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
     
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const getLikedCollection = () => {
         try {
-            fetch('http://34.146.140.88/like/collectionList', {
+            fetch('http://localhost:3000/like/collectionList', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -67,16 +67,16 @@ const PlaceTab = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    setCollectionList(response.data)
+                    setCollectionList(response.data);
                 })
                 .catch((err) => {
-                    console.error(err)
+                    console.error(err);
                 });
     
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const checkType = (type) => {
         if (type === 12) {
@@ -121,7 +121,7 @@ const PlaceTab = ({navigation}) => {
                         directoryType.map((val, i) =>
                             (i === idx) &&
                             setCurrentRendering(i)
-                        )
+                        );
                     }}
                 >
                     <AppText
@@ -134,29 +134,29 @@ const PlaceTab = ({navigation}) => {
     const SetRendering = () => {
         if(currentRendering === 0) return (
             <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
-            showsVerticalScrollIndicator={false}
-            data={placeList} renderItem={PlaceContainer}
-            keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
-        )
+                showsVerticalScrollIndicator={false}
+                data={placeList} renderItem={PlaceContainer}
+                keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
+        );
         else return (
             <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-            showsVerticalScrollIndicator={false}
-            style={{zIndex: 0}}
-            data={collectionList} renderItem={CollectionContainer}
-            keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled />
-        )
-    }
+                showsVerticalScrollIndicator={false}
+                style={{zIndex: 0}}
+                data={collectionList} renderItem={CollectionContainer}
+                keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled />
+        );
+    };
 
     const PlaceContainer = ({item}) => (
         <TouchableOpacity style={{...styles.placeContainer, shadowColor: colors.red_gray[6], backgroundColor: colors.backgroundColor}} onPress={() => {
-                navigation.navigate('Place', {data : item})
+            navigation.navigate('Place', {data : item});
         }}>
             <View flex={1} style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
                 <View style={{height: '50%'}}> 
                     {
                         item.place_img ?
-                        <Image style={styles.defaultPlaceImage} source={{uri: item.place_img}}/> :
-                        <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
+                            <Image style={styles.defaultPlaceImage} source={{uri: item.place_img}}/> :
+                            <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
                     }
                 </View>
                 <View flex={1} style={{marginLeft: 5}}>
@@ -266,78 +266,78 @@ const PlaceTab = ({navigation}) => {
     const SelectBox = () => {
         return (
             <>
-            {
-                showMenu && <View style={{
-                position: 'absolute',
-                width: 100,
-                height: 80,
-                backgroundColor: '#fff',
-                flex: 1,
-                borderRadius: 10,
-                zIndex: 9900,
-
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-
-                overflow: 'visible'
-            }}>
-                <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('최근 추가순');
-                    }}
-                    style={{
+                {
+                    showMenu && <View style={{
+                        position: 'absolute',
+                        width: 100,
+                        height: 80,
+                        backgroundColor: '#fff',
                         flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}><AppText>최근 추가순</AppText>
-                </TouchableOpacity>
+                        borderRadius: 10,
+                        zIndex: 9900,
 
-                <View style={{
-                    height: 1,
-                    borderColor: colors.gray[5],
-                    borderWidth: 0.4,
-                    borderRadius: 1,
-                }}></View>
-                <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('인기순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}><AppText>인기순</AppText>
-                </TouchableOpacity>
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
 
-                <View style={{
-                    height: 1,
-                    borderColor: colors.gray[5],
-                    borderWidth: 0.4,
-                    borderRadius: 1,
-                }}></View>
-                <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('리뷰순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}><AppText>리뷰순</AppText>
-                </TouchableOpacity>
-            </View>
-            }
-        </>
-        )}
+                        overflow: 'visible'
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('최근 추가순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>최근 추가순</AppText>
+                        </TouchableOpacity>
+
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('인기순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>인기순</AppText>
+                        </TouchableOpacity>
+
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                        }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('리뷰순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}><AppText>리뷰순</AppText>
+                        </TouchableOpacity>
+                    </View>
+                }
+            </>
+        );};
 
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>

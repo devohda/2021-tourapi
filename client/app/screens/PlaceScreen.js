@@ -28,7 +28,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         try {
-            fetch(`http://34.146.140.88/collection/${collectionId}/place/${placeData.place_pk}`, {
+            fetch(`http://localhost:3000/collection/${collectionId}/place/${placeData.place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -205,14 +205,14 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     </View>
                 </View>
 
-                    <SafeAreaView flex={1}>
-                        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
+                <SafeAreaView flex={1}>
+                    <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
                         {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
                         {/* <FlatList style={{flex: 1}} flex={1} data={collectionList} renderItem={ShowFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
-                        </ScrollView>
-                    </SafeAreaView>
+                    </ScrollView>
+                </SafeAreaView>
                 {/* </ScrollView> */}
             </RBSheet>
         </>
@@ -275,7 +275,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://34.146.140.88/place/${data.place_pk}`, {
+            fetch(`http://localhost:3000/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -283,7 +283,7 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data[0])
+                    console.log(response.data[0]);
                     setPlaceData(response.data[0]);
                 })
                 .catch((err) => {
@@ -303,7 +303,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCollectionList = () => {
         try {
-            fetch('http://34.146.140.88/collection/list', {
+            fetch('http://localhost:3000/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -363,7 +363,7 @@ const PlaceScreen = ({route, navigation}) => {
             const LikePlace = (pk) => {
                 //공간 좋아요
                 try {
-                    fetch(`http://34.146.140.88/like/place/${pk}`, {
+                    fetch(`http://localhost:3000/like/place/${pk}`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -372,7 +372,7 @@ const PlaceScreen = ({route, navigation}) => {
                         }
                     }).then((res) => res.json())
                         .then((response) => {
-                            getInitialData()
+                            getInitialData();
                         })
                         .catch((err) => {
                             console.error(err);
@@ -386,7 +386,7 @@ const PlaceScreen = ({route, navigation}) => {
             const DeleteLikedPlace = (pk) => {
                 //공간 좋아요 삭제
                 try {
-                    fetch(`http://34.146.140.88/like/place/${pk}`, {
+                    fetch(`http://localhost:3000/like/place/${pk}`, {
                         method: 'DELETE',
                         headers: {
                             'Accept': 'application/json',
@@ -396,7 +396,7 @@ const PlaceScreen = ({route, navigation}) => {
                     }).then((res) => res.json())
                         .then((response) => {
                             // console.log(response)
-                            getInitialData()
+                            getInitialData();
                         })
                         .catch((err) => {
                             console.error(err);

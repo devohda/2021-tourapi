@@ -32,7 +32,7 @@ router.get('/', verifyToken, async (req, res, next) => {
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS', data});
+    return res.send({code: 200, status: 'OK', data});
 });
 
 module.exports = router;

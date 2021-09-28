@@ -47,7 +47,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            let url = 'http://34.146.140.88/auth/loginJWT';
+            let url = 'http://localhost:3000/auth/loginJWT';
             let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -73,7 +73,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
             case 'NOT MATCHED' :
                 Alert.alert('', '비밀번호가 올바르지 않습니다.');
                 break;
-            case 'SUCCESS' :
+            case 'OK' :
                 await SecureStore.setItemAsync('accessToken', response.accessToken);
                 setToken(response.accessToken);
                 setIsSignedIn(true);

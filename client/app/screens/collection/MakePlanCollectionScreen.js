@@ -18,10 +18,10 @@ import 'moment/locale/ko';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import NavigationTop from "../../components/NavigationTop";
-import CustomTextInput from "../../components/CustomTextInput";
-import ScreenDivideLine from "../../components/ScreenDivideLine";
-import AppText from "../../components/AppText";
+import NavigationTop from '../../components/NavigationTop';
+import CustomTextInput from '../../components/CustomTextInput';
+import ScreenDivideLine from '../../components/ScreenDivideLine';
+import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
 
 import CalendarTexts from './CalendarTexts';
@@ -185,7 +185,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://34.146.140.88/keyword/list', {
+            fetch('http://localhost:3000/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -218,7 +218,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
         const endDate = moment(range.endDate).format('YYYY-MM-DD');
 
         try {
-            fetch('http://34.146.140.88/collection/plan', {
+            fetch('http://localhost:3000/collection/plan', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -235,10 +235,10 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     keywords: datas
                 })
             }).then((res) => {
-                res.json()
+                res.json();
             })
                 .then((responsedata) => {
-                    console.log(responsedata)
+                    console.log(responsedata);
                     const item = {
                         'collection_name': collectionName,
                         'collection_private': isEnabled,
@@ -246,7 +246,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         'keywords': showDatas,
                         'startDate': startDate,
                         'endDate': endDate
-                    }
+                    };
                     Alert.alert('', '일정보관함이 생성되었습니다');
                     navigation.navigate('PlanCollection', {
                         data: item

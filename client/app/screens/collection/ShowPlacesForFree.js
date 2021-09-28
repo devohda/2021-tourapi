@@ -46,7 +46,7 @@ const ShowPlacesForFree = props => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${pk}/places`, {
+            fetch(`http://localhost:3000/collection/${pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -55,7 +55,7 @@ const ShowPlacesForFree = props => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    setIsLiked(response.data[index].like_flag)
+                    setIsLiked(response.data[index].like_flag);
                     // console.log(response.data)
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                 })
@@ -71,7 +71,7 @@ const ShowPlacesForFree = props => {
     const LikePlace = (pk) => {
         //공간 좋아요
         try {
-            fetch(`http://34.146.140.88/like/place/${pk}`, {
+            fetch(`http://localhost:3000/like/place/${pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -94,7 +94,7 @@ const ShowPlacesForFree = props => {
     const DeleteLikedPlace = (pk) => {
         //공간 좋아요 삭제
         try {
-            fetch(`http://34.146.140.88/like/place/${pk}`, {
+            fetch(`http://localhost:3000/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -103,7 +103,7 @@ const ShowPlacesForFree = props => {
                 }
             }).then((res) => res.json())
                 .then((response) => {
-                    getInitialPlaceData()
+                    getInitialPlaceData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -125,13 +125,13 @@ const ShowPlacesForFree = props => {
             }}></View>} */}
             {/* pk로 바꾸기 */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
-            <View flex={1}>
-                <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Place', {data: props.item})} disabled={props.isEditPage && true}>
-                        <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
-                            {/* <Image source={{uri: item.place_img}} */}
-                            {
-                                !isFree &&
+                <View flex={1}>
+                    <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Place', {data: props.item})} disabled={props.isEditPage && true}>
+                            <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
+                                {/* <Image source={{uri: item.place_img}} */}
+                                {
+                                    !isFree &&
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
@@ -139,74 +139,74 @@ const ShowPlacesForFree = props => {
                                         </AppText>
                                     </View>
                                 </View>
-                            }
-                            {
-                                item.place_img ?
-                                <Image source={{uri: item.place_img}}
-                                style={{borderRadius: 10, width: 72, height: 72}}/> :
-                                <Image source={require('../../assets/images/here_default.png')}
-                                style={{borderRadius: 10, width: 72, height: 72}}/> 
-                            }
-                            <View style={{
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                flexDirection: 'row',
-                                width: '67%'
-                            }}>
-                                <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                    <View style={{flexDirection: 'row'}}>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>{isFree && checkType(props.item.place_type)}</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 4, color: colors.gray[7],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>|</AppText>
-                                        <Image source={require('../../assets/images/review_star.png')}
-                                            style={{
-                                                width: 10,
-                                                height: 10,
-                                                alignSelf: 'center',
-                                                marginTop: '1%'
-                                            }}></Image>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold',
-                                            marginLeft: 2
-                                        }}>4.8</AppText>
-                                    </View>
-                                    <View style={{width: '100%'}}>
-                                        {/* <AppText style={{
+                                }
+                                {
+                                    item.place_img ?
+                                        <Image source={{uri: item.place_img}}
+                                            style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        <Image source={require('../../assets/images/here_default.png')}
+                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
+                                }
+                                <View style={{
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    flexDirection: 'row',
+                                    width: '67%'
+                                }}>
+                                    <View style={{marginLeft: 8, marginTop: '2%'}}>
+                                        <View style={{flexDirection: 'row'}}>
+                                            <AppText style={{
+                                                color: colors.gray[3],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: 'bold'
+                                            }}>{isFree && checkType(props.item.place_type)}</AppText>
+                                            <AppText style={{
+                                                marginHorizontal: 4, color: colors.gray[7],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: 'bold'
+                                            }}>|</AppText>
+                                            <Image source={require('../../assets/images/review_star.png')}
+                                                style={{
+                                                    width: 10,
+                                                    height: 10,
+                                                    alignSelf: 'center',
+                                                    marginTop: '1%'
+                                                }}></Image>
+                                            <AppText style={{
+                                                color: colors.gray[3],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: 'bold',
+                                                marginLeft: 2
+                                            }}>4.8</AppText>
+                                        </View>
+                                        <View style={{width: '100%'}}>
+                                            {/* <AppText style={{
                                             fontSize: 16,
                                             fontWeight: 'bold',
                                             color: colors.mainColor,
                                             marginVertical: 5,
                                         }}>{item.place_name}</AppText> */}
-                                                                                    <AppText style={{
-                                            fontSize: 16,
-                                            fontWeight: 'bold',
-                                            color: colors.mainColor,
-                                            marginVertical: 5,
-                                        }}>{isFree? props.item.place_name : '제목'}</AppText>
-                                    </View>
-                                    {/* <AppText
+                                            <AppText style={{
+                                                fontSize: 16,
+                                                fontWeight: 'bold',
+                                                color: colors.mainColor,
+                                                marginVertical: 5,
+                                            }}>{isFree? props.item.place_name : '제목'}</AppText>
+                                        </View>
+                                        {/* <AppText
                                         style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText> */}
                                         <AppText
-                                        style={{fontSize: 12, color: colors.gray[4]}}>{isFree? props.item.place_addr : '서울시 구로구 연동로'}</AppText>
+                                            style={{fontSize: 12, color: colors.gray[4]}}>{isFree? props.item.place_addr : '서울시 구로구 연동로'}</AppText>
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    </TouchableOpacity>
-                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                        {/* {item.like_flag === 0 ?  */}
-                        {/* <TouchableOpacity onPress={() => {
+                        </TouchableOpacity>
+                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            {/* {item.like_flag === 0 ?  */}
+                            {/* <TouchableOpacity onPress={() => {
                             let newArr = [...isPress];
                             if (newArr[index]) {
                                 newArr[index] = false;
@@ -222,35 +222,35 @@ const ShowPlacesForFree = props => {
                                 likePlace(item.place_pk);
                             }
                         }}> */}
-                        {
-                            !props.isEditPage ?
-                            // <TouchableOpacity onPress={() => {
-                            //     console.log(item.place_pk)
-                            //     console.log(item)
-                            // }}>
-                            <TouchableOpacity onPress={() => {
-                                if (isLiked) {
-                                    DeleteLikedPlace(item.place_pk);
-                                } else {
-                                    LikePlace(item.place_pk);
-                                }
-                            }}>
-                                <Jewel width={26} height={21}
-                                    style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
-                            </TouchableOpacity> :
-                            <TouchableOpacity>
-                                <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
-                            </TouchableOpacity>
-                        }
+                            {
+                                !props.isEditPage ?
+                                // <TouchableOpacity onPress={() => {
+                                //     console.log(item.place_pk)
+                                //     console.log(item)
+                                // }}>
+                                    <TouchableOpacity onPress={() => {
+                                        if (isLiked) {
+                                            DeleteLikedPlace(item.place_pk);
+                                        } else {
+                                            LikePlace(item.place_pk);
+                                        }
+                                    }}>
+                                        <Jewel width={26} height={21}
+                                            style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
+                                    </TouchableOpacity> :
+                                    <TouchableOpacity>
+                                        <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
+                                    </TouchableOpacity>
+                            }
+                        </View>
                     </View>
-                </View>
-                {
-                    isFree ?
-                    <>
-                    <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
-                    </> :
-                    <>
-                        {/* <View style={{
+                    {
+                        isFree ?
+                            <>
+                                <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
+                            </> :
+                            <>
+                                {/* <View style={{
                         backgroundColor: colors.defaultColor,
                         height: 30,
                         paddingVertical: 6,
@@ -272,10 +272,10 @@ const ShowPlacesForFree = props => {
                         </View>
                     </View> */}
 
-                    <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
-                    </>
-                }
-            </View>
+                                <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
+                            </>
+                    }
+                </View>
             </TouchableHighlight>
             {/* 받은 데이터를 이용해서 같은 성격의 데이터처럼 넣어야할것같음 */}
             {/* {

@@ -3,9 +3,9 @@ import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList,
 import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
-import AppText from "../../components/AppText";
-import { useSearchKeyword } from "../../contexts/search/SearchkeywordContextProvider";
-import ShowEmpty from "../../components/ShowEmpty";
+import AppText from '../../components/AppText';
+import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
+import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
 
 const SearchPlaceForPlan = (props, {route, navigation}) => {
@@ -15,14 +15,14 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    console.log(props)
+    console.log(props);
 
     const [token, setToken] = useToken();
 
     const addPlace = (place_pk) => {
         // console.log(day.id)
         try {
-            fetch(`http://34.146.140.88/collection/${pk}/place/${place_pk}`, {
+            fetch(`http://localhost:3000/collection/${pk}/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -54,7 +54,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -110,10 +110,10 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                 <View style={{flexDirection: 'row', width: '85%'}}>
                     {
                         item.place_img ?
-                        <Image source={{uri: item.place_img}}
-                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                        <Image source={require('../../assets/images/here_default.png')}
-                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                            <Image source={{uri: item.place_img}}
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
+                            <Image source={require('../../assets/images/here_default.png')}
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                     }
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -139,7 +139,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                         // }
                         newArr[index] = true;
                         setIsPress(newArr);
-                        addPlace(item.place_pk)
+                        addPlace(item.place_pk);
                     }
                 }}
                 style={{width: '15%'}}
@@ -149,8 +149,8 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                         <View style={{paddingVertical: 4.5, paddingHorizontal: 4.5}}>
                             {
                                 isPress[index] ?
-                                <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가완료</AppText> :
-                                <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가하기</AppText>
+                                    <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가완료</AppText> :
+                                    <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가하기</AppText>
                             }
                         </View>
                     </View>

@@ -13,7 +13,7 @@ router.get('/list', async (req, res) => {
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS', data: result});
+    return res.send({code: 200, status: 'OK', data: result});
 });
 
 module.exports = router;

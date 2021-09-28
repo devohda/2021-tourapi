@@ -14,7 +14,7 @@ router.post('/free', verifyToken, async (req, res, next) => {
     if (result.collection_pk) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             collectionId : result.collection_pk
         });
     } else {
@@ -34,7 +34,7 @@ router.post('/plan', verifyToken, async (req, res, next) => {
     if (result.collection_pk) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             collectionId : result.collection_pk
         });
     } else {
@@ -55,7 +55,7 @@ router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next)
     if (result.affectedRows === 1) {
         return res.send({
             code: 200,
-            status: 'SUCCESS'
+            status: 'OK'
         });
     } else if (result.affectedRows === 0) {
         return res.send({
@@ -81,7 +81,7 @@ router.get('/list', verifyToken, async (req, res, next) => {
     if (result) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data: result
         });
     } else {
@@ -101,7 +101,7 @@ router.get('/:collectionId', verifyToken, async (req, res, next) => {
     if (result) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data : result
         });
     } else {
@@ -121,7 +121,7 @@ router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
     if (result) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data : result
         });
     } else {
@@ -149,7 +149,7 @@ router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     if (result) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
         });
     } else {
         return res.send({
@@ -169,7 +169,7 @@ router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     if (result.affectedRows <= 1) {
         return res.send({
             code: 200,
-            status: 'SUCCESS'
+            status: 'OK'
         });
     } else {
         return res.send({
@@ -189,7 +189,7 @@ router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, nex
     if (result.affectedRows === 1) {
         return res.send({
             code: 200,
-            status: 'SUCCESS'
+            status: 'OK'
         });
     } else if (result.affectedRows === 0) {
         return res.send({

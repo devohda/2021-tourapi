@@ -43,7 +43,7 @@ const SearchPlace = ({navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -68,7 +68,7 @@ const SearchPlace = ({navigation}) => {
     const LikePlace = (pk) => {
         //공간 좋아요
         try {
-            fetch(`http://34.146.140.88/like/place/${pk}`, {
+            fetch(`http://localhost:3000/like/place/${pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -91,7 +91,7 @@ const SearchPlace = ({navigation}) => {
     const DeleteLikedPlace = (pk) => {
         //공간 좋아요 삭제
         try {
-            fetch(`http://34.146.140.88/like/place/${pk}`, {
+            fetch(`http://localhost:3000/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -100,7 +100,7 @@ const SearchPlace = ({navigation}) => {
                 }
             }).then((res) => res.json())
                 .then((response) => {
-                    getResults()
+                    getResults();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -142,42 +142,42 @@ const SearchPlace = ({navigation}) => {
 
     const PlaceContainer = ({item, index}) => {
         return (
-        <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
-            <View style={{
-                marginBottom: 8,
-                alignItems: 'center',
-                height: 72,
-                marginTop: 22,
-                flexDirection: 'row',
-                justifyContent: 'space-between'
-            }}>
-                <View style={{flexDirection: 'row', width: '85%'}}>
-                    {
-                        item.place_img ?
-                        <Image source={{uri: item.place_img}}
-                        style={{borderRadius: 10, width: 72, height: 72}}/> :
-                        <Image source={require('../../assets/images/here_default.png')}
-                        style={{borderRadius: 10, width: 72, height: 72}}/> 
-                    }
-                    <View flex={1} style={styles.info_container}>
-                        <View flexDirection="row" style={{alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
+                <View style={{
+                    marginBottom: 8,
+                    alignItems: 'center',
+                    height: 72,
+                    marginTop: 22,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between'
+                }}>
+                    <View style={{flexDirection: 'row', width: '85%'}}>
+                        {
+                            item.place_img ?
+                                <Image source={{uri: item.place_img}}
+                                    style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                <Image source={require('../../assets/images/here_default.png')}
+                                    style={{borderRadius: 10, width: 72, height: 72}}/> 
+                        }
+                        <View flex={1} style={styles.info_container}>
+                            <View flexDirection="row" style={{alignItems: 'center'}}>
+                                <AppText
+                                    style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
+                                <View style={styles.score_line}></View>
+                                <Star width={11} height={11} style={{marginTop: 2}}/>
+                                <AppText
+                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                            </View>
+                            <AppText style={{
+                                fontSize: 16,
+                                fontWeight: '700',
+                                color: colors.mainColor
+                            }}>{item.place_name}</AppText>
                             <AppText
-                                style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
-                            <View style={styles.score_line}></View>
-                            <Star width={11} height={11} style={{marginTop: 2}}/>
-                            <AppText
-                                style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                                style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
                         </View>
-                        <AppText style={{
-                            fontSize: 16,
-                            fontWeight: '700',
-                            color: colors.mainColor
-                        }}>{item.place_name}</AppText>
-                        <AppText
-                            style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
                     </View>
-                </View>
-                <TouchableOpacity onPress={() => {
+                    <TouchableOpacity onPress={() => {
                     // let newArr = [...isPress];
                     // if (newArr[index]) {
                     //     newArr[index] = false;
@@ -192,17 +192,17 @@ const SearchPlace = ({navigation}) => {
                     //     setIsPress(newArr);
                     //     likePlace(item.place_pk);
                     // }
-                    if (item.like_flag) {
-                        DeleteLikedPlace(item.place_pk);
-                    } else {
-                        LikePlace(item.place_pk);
-                    }
-                }}>
-                    <Jewel width={26} height={21} style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
-                </TouchableOpacity>
-            </View>
-        </TouchableOpacity>
-    )};
+                        if (item.like_flag) {
+                            DeleteLikedPlace(item.place_pk);
+                        } else {
+                            LikePlace(item.place_pk);
+                        }
+                    }}>
+                        <Jewel width={26} height={21} style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+        );};
 
     return (
         <View style={{backgroundColor: colors.backgroundColor}}>

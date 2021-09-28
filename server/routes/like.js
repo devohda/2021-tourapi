@@ -15,7 +15,7 @@ router.post('/place/:placeId', verifyToken, async (req, res, next) => {
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS'});
+    return res.send({code: 200, status: 'OK'});
 
 });
 
@@ -27,7 +27,7 @@ router.get('/placeList', verifyToken, async (req, res, next) => {
     if (result) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data : result
         });
     } else {
@@ -49,7 +49,7 @@ router.delete('/place/:placeId', verifyToken, async (req, res, next) => {
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS'});
+    return res.send({code: 200, status: 'OK'});
 });
 
 // 보관함 좋아요
@@ -62,7 +62,7 @@ router.post('/collection/:collectionId', verifyToken, async (req, res, next) => 
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS'});
+    return res.send({code: 200, status: 'OK'});
 });
 
 // 보관함 좋아요 조회
@@ -73,7 +73,7 @@ router.get('/collectionList', verifyToken, async (req, res, next) => {
     if (result) {
         return res.send({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data : result
         });
     } else {
@@ -94,7 +94,7 @@ router.delete('/collection/:collectionId', verifyToken, async (req, res, next) =
         return res.send({code: 500, status: 'SERVER ERROR'});
     }
 
-    return res.send({code: 200, status: 'SUCCESS'});
+    return res.send({code: 200, status: 'OK'});
 });
 
 module.exports = router;

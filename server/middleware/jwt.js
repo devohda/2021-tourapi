@@ -22,6 +22,8 @@ exports.verifyToken = async (req, res, next) => {
                 res.locals.user = decodedToken;
                 return next();
             }else{
+                await authService.deleteToken(decodedToken.user_pk);
+                console.log('token 삭제')
                 return res.status(401).json({
                     code: 401,
                     message: '유효하지 않은 토큰'

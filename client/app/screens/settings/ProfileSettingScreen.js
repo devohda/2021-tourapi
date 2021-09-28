@@ -33,7 +33,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://localhost:3000/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -44,11 +44,11 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 .then((response) => {
                     setUserData(response.data);
                     setFalse();
-                    setUserNickname(response.data.user_nickname)
+                    setUserNickname(response.data.user_nickname);
                 })
                 .catch((err) => {
                     console.error(err);
-            });
+                });
 
         } catch (err) {
             console.error(err);
@@ -64,7 +64,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
     };
 
     const Keyword = ({keyword, idx}) => {
-        console.log(keyword)
+        console.log(keyword);
         return (
             <View
                 style={{
@@ -95,7 +95,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', left: 0}}>
-                    <TouchableOpacity onPress={() => {navigation.goBack()}}>
+                    <TouchableOpacity onPress={() => {navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -140,7 +140,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                     </View>
                     <View style={{position: 'absolute', paddingTop: 60, paddingLeft: 64}}>
                         <View style={{...styles.cameraIcon, backgroundColor: colors.defaultColor}}>
-                            <Icon size={18} type="ionicon" name={"camera"} color={colors.gray[5]} style={{padding: 6}}/>
+                            <Icon size={18} type="ionicon" name={'camera'} color={colors.gray[5]} style={{padding: 6}}/>
                         </View>
                     </View>
                 </View>
@@ -181,7 +181,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 </View>
             </ScreenContainerView>
         </ScreenContainer>
-    )
+    );
 };
 
 const styles = StyleSheet.create({

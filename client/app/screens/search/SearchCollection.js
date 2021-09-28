@@ -24,7 +24,7 @@ const SearchCollection = (props, {navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=collection`, {
+            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=collection`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -50,10 +50,10 @@ const SearchCollection = (props, {navigation}) => {
         var newArr = [];
         for(var i=0;i<item.length;i++) {
             if(item[i].created_user_name !== user && item[i].collection_private === 1) continue;
-            else newArr.push(item[i])
+            else newArr.push(item[i]);
         }
         setCollectionList(newArr);
-    }
+    };
 
     const CollectionContainer = ({item}) => {
         const collectionMargin = (Dimensions.get('screen').width - 162 * 2) / 9;
@@ -126,24 +126,24 @@ const SearchCollection = (props, {navigation}) => {
     };
 
     return (
-            <View flexDirection="row" style={{
-                marginBottom: 8,
-                alignItems: 'center',
-                marginTop: 22,
-                width: '100%'
-            }, collectionList.length === 0 && {justifyContent: 'center'}
-            }>
-                {
-                    collectionList.length === 0 ?
-                        <ShowEmpty/> :
-                        <SafeAreaView>
-                            <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
-                                data={collectionList} renderItem={CollectionContainer}
-                                key={(item) => item.collection_pk.toString()}
-                                keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
-                        </SafeAreaView>
-                }
-            </View>
+        <View flexDirection="row" style={{
+            marginBottom: 8,
+            alignItems: 'center',
+            marginTop: 22,
+            width: '100%'
+        }, collectionList.length === 0 && {justifyContent: 'center'}
+        }>
+            {
+                collectionList.length === 0 ?
+                    <ShowEmpty/> :
+                    <SafeAreaView>
+                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
+                            data={collectionList} renderItem={CollectionContainer}
+                            key={(item) => item.collection_pk.toString()}
+                            keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
+                    </SafeAreaView>
+            }
+        </View>
     );
 };
 

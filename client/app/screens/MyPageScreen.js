@@ -20,7 +20,7 @@ const MyPageScreen = ({navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://localhost:3000/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
