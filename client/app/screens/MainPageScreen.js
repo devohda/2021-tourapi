@@ -11,6 +11,9 @@ import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import AppText from '../components/AppText';
 import ScreenContainer from '../components/ScreenContainer';
+import ScreenContainerView from '../components/ScreenContainerView';
+
+import Jewel from '../assets/images/jewel.svg';
 
 export default function MainPageScreen({navigation}) {
     const {colors} = useTheme();
@@ -29,7 +32,8 @@ export default function MainPageScreen({navigation}) {
                     <AppText style={{
                         color: colors.mainColor,
                         fontSize: 28,
-                        fontWeight: 'bold',
+                        fontWeight: '700',
+                        lineHeight: 41.44
                     }}>Here.</AppText>
                 </View>
                 <View style={{position: 'absolute', right: 0}}>
@@ -44,27 +48,23 @@ export default function MainPageScreen({navigation}) {
                 </View>
             </View>
             <ScrollView>
-                <View>
-                    <View style={styles.blackRect}>
-                        <View>
+                <ScreenContainerView>
+                    <View>
+                        <View style={{marginTop: 31}}>
                             <AppText style={{
                                 color: colors.mainColor,
-                                left: 16,
-                                top: 40,
                                 fontSize: 24,
                                 lineHeight: 36,
-                                fontWeight: 'bold'
+                                fontWeight: '700'
                             }}>가장 인기있는</AppText>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     color: colors.mainColor,
-                                    left: 16,
-                                    top: 40,
                                     fontSize: 24,
                                     lineHeight: 36,
-                                    fontWeight: 'bold'
+                                    fontWeight: '700'
                                 }}>보관함</AppText>
-                                <TouchableOpacity style={{top: 44.5, left: 16}}><Icon
+                                <TouchableOpacity style={Platform.OS === 'ios' ? {marginTop: 5} : {marginTop: 4}}><Icon
                                     type="ionicon"
                                     name={'chevron-forward-outline'}
                                     color={colors.mainColor}
@@ -72,8 +72,8 @@ export default function MainPageScreen({navigation}) {
                             </View>
                         </View>
                     </View>
-                    <View style={{position: 'absolute'}}>
-                        <View style={{flexDirection: 'row', left: 16, top: 145}}>
+                    <View>
+                        <View style={{flexDirection: 'row', marginTop: 28}}>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 style={[styles.selectedRankings, {borderBottomColor: colors.red[3]}]}><AppText
                                     style={{
@@ -93,15 +93,14 @@ export default function MainPageScreen({navigation}) {
                                         color: colors.gray[6]
                                     }}>월간</AppText></TouchableOpacity></View>
                         </View>
-                        {/* 데이터 붙여서(for문?) 들어가게 */}
                         <View style={styles.rankingContainer}>
                             <View style={styles.defaultImage}></View>
                             <View style={{marginLeft: 10}}>
                                 <AppText style={{
                                     marginVertical: 8,
                                     fontSize: 16,
-                                    fontWeight: 'bold',
-                                    color: colors.mainColor
+                                    fontWeight: '700',
+                                    color: colors.blue[1]
                                 }}>하루만에 북촌
                                     정복하기</AppText>
                                 <View style={{flexDirection: 'row'}}>
@@ -115,34 +114,37 @@ export default function MainPageScreen({navigation}) {
                             </View>
                         </View>
                     </View>
-                    <View style={{marginTop: 210}}>
+                    <View style={{marginTop: 48}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 수집가</AppText>
-                        <View style={{flexDirection: 'row', marginLeft: '2%'}}>
+                        <View style={{flexDirection: 'row'}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                                 <View style={{alignItems: 'center'}}>
                                     <Image style={styles.authorImage}
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
                                     <AppText style={{
                                         fontSize: 16,
-                                        fontWeight: 'bold',
+                                        fontWeight: '700',
                                         color: colors.mainColor,
-                                        marginTop: 10
+                                        marginTop: 8
                                     }}>K-민선</AppText>
 
-                                    <View style={{flexDirection: 'row'}}>
-                                        {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
+                                    <View style={{flexDirection: 'row', marginTop: 9}}>
                                         <View
                                             style={{
                                                 ...styles.keywordHashTagView,
-                                                backgroundColor: colors.defaultColor
+                                                backgroundColor: colors.defaultColor,
+                                                borderColor: colors.defaultColor,
+                                                color: colors.gray[4],
                                             }}><AppText
-                                                style={styles.keywordHashTag}>#조용한</AppText></View>
+                                                style={{...styles.keywordHashTag, color: colors.gray[4]}}>#조용한</AppText></View>
                                         <View
                                             style={{
                                                 ...styles.keywordHashTagView,
-                                                backgroundColor: colors.defaultColor
+                                                backgroundColor: colors.defaultColor,
+                                                borderColor: colors.defaultColor,
+                                                color: colors.gray[4],
                                             }}><AppText
-                                                style={styles.keywordHashTag}>#따뜻한</AppText></View>
+                                            style={{...styles.keywordHashTag, color: colors.gray[4]}}>#따뜻한</AppText></View>
                                     </View>
                                 </View>
                                 <View style={{alignItems: 'center'}}>
@@ -150,21 +152,24 @@ export default function MainPageScreen({navigation}) {
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
                                     <AppText style={{
                                         fontSize: 16,
-                                        fontWeight: 'bold',
+                                        fontWeight: '700',
                                         color: colors.mainColor,
-                                        marginTop: 10
+                                        marginTop: 8
                                     }}>K-민선</AppText>
 
-                                    <View style={{flexDirection: 'row'}}>
-                                        {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
+                                    <View style={{flexDirection: 'row', marginTop: 9}}>
                                         <View style={{
                                             ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor
-                                        }}><AppText style={styles.keywordHashTag}>#조용한</AppText></View>
+                                            backgroundColor: colors.defaultColor,
+                                            borderColor: colors.defaultColor,
+                                            color: colors.gray[4],
+                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#조용한</AppText></View>
                                         <View style={{
                                             ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor
-                                        }}><AppText style={styles.keywordHashTag}>#따뜻한</AppText></View>
+                                            backgroundColor: colors.defaultColor,
+                                            borderColor: colors.defaultColor,
+                                            color: colors.gray[4],
+                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#따뜻한</AppText></View>
                                     </View>
                                 </View>
                                 <View style={{alignItems: 'center'}}>
@@ -172,36 +177,39 @@ export default function MainPageScreen({navigation}) {
                                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
                                     <AppText style={{
                                         fontSize: 16,
-                                        fontWeight: 'bold',
+                                        fontWeight: '700',
                                         color: colors.mainColor,
-                                        marginTop: 10
+                                        marginTop: 8
                                     }}>K-민선</AppText>
 
-                                    <View style={{flexDirection: 'row'}}>
-                                        {/* 애초에 data를 가져올때 #+'데이터' 형식으로 붙여서 가져오기 */}
+                                    <View style={{flexDirection: 'row', marginTop: 9}}>
                                         <View style={{
                                             ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor
-                                        }}><AppText style={styles.keywordHashTag}>#조용한</AppText></View>
+                                            backgroundColor: colors.defaultColor,
+                                            borderColor: colors.defaultColor,
+                                            color: colors.gray[4],
+                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#조용한</AppText></View>
                                         <View style={{
                                             ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor
-                                        }}><AppText style={styles.keywordHashTag}>#따뜻한</AppText></View>
+                                            backgroundColor: colors.defaultColor,
+                                            borderColor: colors.defaultColor,
+                                            color: colors.gray[4],
+                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#따뜻한</AppText></View>
                                     </View>
                                 </View>
                             </ScrollView>
                         </View>
                     </View>
 
-                    <View style={{marginTop: 45}}>
-                        <AppText style={{...styles.titles, color: colors.mainColor}}>지역 추천</AppText>
-                        <View style={{flexDirection: 'row', marginLeft: '5%'}}>
+                    <View style={{marginTop: 38}}>
+                        <AppText style={{...styles.titles, color: colors.mainColor}}>지역추천</AppText>
+                        <View style={{flexDirection: 'row', marginTop: 18}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                                 <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}}
                                     style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
                                         <AppText
-                                            style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>충청북도
+                                            style={{fontSize: 16, fontWeight: '700', color: colors.backgroundColor}}>충청북도
                                             단양</AppText>
                                         <AppText numberOfLines={2} ellipsizeMode='tail'
                                             style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는
@@ -212,7 +220,7 @@ export default function MainPageScreen({navigation}) {
                                     style={styles.regionImage} imageStyle={{borderRadius: 15}}>
                                     <View style={styles.regionText}>
                                         <AppText
-                                            style={{fontSize: 16, fontWeight: 'bold', color: colors.backgroundColor}}>전라남도
+                                            style={{fontSize: 16, fontWeight: '700', color: colors.backgroundColor}}>전라남도
                                             여수</AppText>
                                         <AppText numberOfLines={2} ellipsizeMode='tail'
                                             style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는
@@ -222,172 +230,110 @@ export default function MainPageScreen({navigation}) {
                             </ScrollView>
                         </View>
                     </View>
-                    <View style={{marginVertical: 45}}>
+                    <View style={{marginTop: 45, marginBottom: 72}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 공간</AppText>
                         <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                            <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
-                                <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                    style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                {/* <View style={{flexDirection: 'row', top: 10, left: 22}}>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star-half-outline"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star-outline"} size={12}></Icon>
-                                </View> */}
-                                <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                    <View style={{flexDirection: 'row'}}>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
+                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                                    <View style={{marginLeft: 8}}>
+                                        <View style={{flexDirection: 'row'}}>
+                                            <AppText style={{
+                                                color: colors.gray[3],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: '700'
+                                            }}>음식점</AppText>
+                                            <AppText style={{
+                                                marginHorizontal: 8, color: colors.gray[4],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: '700'
+                                            }}>|</AppText>
+                                            <Image source={require('../assets/images/review_star.png')}
+                                                style={{
+                                                    width: 10,
+                                                    height: 10,
+                                                    alignSelf: 'center',
+                                                }}></Image>
+                                            <AppText style={{
+                                                color: colors.gray[3],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: '700',
+                                                marginLeft: 2
+                                            }}>4.8</AppText>
+                                        </View>
                                         <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>음식점</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8, color: colors.gray[7],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>|</AppText>
-                                        <Image source={require('../assets/images/review_star.png')}
-                                            style={{
-                                                width: 10,
-                                                height: 10,
-                                                alignSelf: 'center',
-                                                marginTop: '1%'
-                                            }}></Image>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold',
-                                            marginLeft: 2
-                                        }}>4.8</AppText>
+                                            fontSize: 16,
+                                            fontWeight: '700',
+                                            color: colors.mainColor,
+                                            marginVertical: 3
+                                        }}>경복궁</AppText>
+                                        <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
                                     </View>
-                                    <AppText style={{
-                                        fontSize: 16,
-                                        fontWeight: 'bold',
-                                        color: colors.mainColor,
-                                        marginVertical: 3
-                                    }}>경복궁</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
-                                <View style={{justifyContent: 'center', marginLeft: '45%'}}>
-                                    <Image source={require('../assets/images/here_nonclick.png')}
-                                        style={{width: 26, height: 21}}></Image>
+                                <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                                    <View style={{justifyContent: 'center'}}>
+                                    <Jewel width={26} height={21}
+                                            style={{color: colors.red_gray[5]}}/>
+                                    </View>
                                 </View>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                            <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
-                                <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                    style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                {/* <View style={{flexDirection: 'row', top: 10, left: 22}}>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star-half-outline"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star-outline"} size={12}></Icon>
-                                </View> */}
-                                <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                    <View style={{flexDirection: 'row'}}>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 18}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
+                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
+                                    <View style={{marginLeft: 8}}>
+                                        <View style={{flexDirection: 'row'}}>
+                                            <AppText style={{
+                                                color: colors.gray[3],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: '700'
+                                            }}>음식점</AppText>
+                                            <AppText style={{
+                                                marginHorizontal: 8, color: colors.gray[4],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: '700'
+                                            }}>|</AppText>
+                                            <Image source={require('../assets/images/review_star.png')}
+                                                style={{
+                                                    width: 10,
+                                                    height: 10,
+                                                    alignSelf: 'center',
+                                                }}></Image>
+                                            <AppText style={{
+                                                color: colors.gray[3],
+                                                textAlign: 'center',
+                                                fontSize: 10,
+                                                fontWeight: '700',
+                                                marginLeft: 2
+                                            }}>4.8</AppText>
+                                        </View>
                                         <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>음식점</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8, color: colors.gray[7],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>|</AppText>
-                                        <Image source={require('../assets/images/review_star.png')}
-                                            style={{
-                                                width: 10,
-                                                height: 10,
-                                                alignSelf: 'center',
-                                                marginTop: '1%'
-                                            }}></Image>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold',
-                                            marginLeft: 2
-                                        }}>4.8</AppText>
+                                            fontSize: 16,
+                                            fontWeight: '700',
+                                            color: colors.mainColor,
+                                            marginVertical: 3
+                                        }}>경복궁</AppText>
+                                        <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
                                     </View>
-                                    <AppText style={{
-                                        fontSize: 16,
-                                        fontWeight: 'bold',
-                                        color: colors.mainColor,
-                                        marginVertical: 3
-                                    }}>경복궁</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
                                 </View>
-                                <View style={{justifyContent: 'center', marginLeft: '45%'}}>
-                                    <Image source={require('../assets/images/here_nonclick.png')}
-                                        style={{width: 26, height: 21}}></Image>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                            <View style={{flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}}>
-                                <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                    style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                {/* <View style={{flexDirection: 'row', top: 10, left: 22}}>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star-half-outline"} size={12}></Icon>
-                                    <Icon type="ionicon" name={"star-outline"} size={12}></Icon>
-                                </View> */}
-                                <View style={{marginLeft: 8, marginTop: '2%'}}>
-                                    <View style={{flexDirection: 'row'}}>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>음식점</AppText>
-                                        <AppText style={{
-                                            marginHorizontal: 8, color: colors.gray[7],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold'
-                                        }}>|</AppText>
-                                        <Image source={require('../assets/images/review_star.png')}
-                                            style={{
-                                                width: 10,
-                                                height: 10,
-                                                alignSelf: 'center',
-                                                marginTop: '1%'
-                                            }}></Image>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: 'bold',
-                                            marginLeft: 2
-                                        }}>4.8</AppText>
+                                <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                                    <View style={{justifyContent: 'center'}}>
+                                    <Jewel width={26} height={21}
+                                            style={{color: colors.red[3]}}/>
                                     </View>
-                                    <AppText style={{
-                                        fontSize: 16,
-                                        fontWeight: 'bold',
-                                        color: colors.mainColor,
-                                        marginVertical: 3
-                                    }}>경복궁</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
-                                </View>
-                                <View style={{justifyContent: 'center', marginLeft: '45%'}}>
-                                    <Image source={require('../assets/images/here_click.png')}
-                                        style={{width: 26, height: 21}}></Image>
                                 </View>
                             </View>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>
     );
@@ -395,9 +341,6 @@ export default function MainPageScreen({navigation}) {
 
 
 const styles = StyleSheet.create({
-    blackRect: {
-        height: 306,
-    },
     selectedRankings: {
         borderBottomWidth: 1.5,
         paddingBottom: 2
@@ -406,21 +349,21 @@ const styles = StyleSheet.create({
     notSelectedRankings: {},
     selectedRankingsText: {
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: '700'
     },
     rankingContainer: {
         backgroundColor: 'white',
         width: 197,
         height: 282,
-        top: 166,
-        left: 16,
+        marginTop: 10,
         borderRadius: 10,
         shadowOffset: {
-            width: 0,
-            height: 2
+            width: 8,
+            height: 8
         },
         shadowOpacity: 0.25,
         elevation: 3,
+        shadowColor: 'rgba(132, 92, 92, 0.14)',
     },
     defaultImage: {
         backgroundColor: '#c4c4c4',
@@ -432,33 +375,30 @@ const styles = StyleSheet.create({
     },
     titles: {
         fontSize: 22,
-        marginLeft: '5%',
-        fontWeight: 'bold'
+        fontWeight: '700'
     },
     authorImage: {
         width: 88,
         height: 88,
         backgroundColor: '#c4c4c4',
         borderRadius: 50,
-        marginTop: 20,
-        // left: 28
+        marginTop: 20
     },
     authorDesc: {
-        marginTop: 10,
-        // left: 50
+        marginTop: 10
     },
     keywordHashTagView: {
-        color: '#BDC2CA',
-        borderWidth: 1, borderColor: '#EBEBEB', borderRadius: 27, paddingVertical: 5, paddingHorizontal: 10,
+        borderWidth: 1,
+        borderRadius: 27,
+        paddingVertical: 2,
+        paddingHorizontal: 7,
         shadowColor: 'rgba(0,0,0,0.11)',
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.2,
         elevation: 1,
         marginLeft: 5,
-        marginTop: 5
     },
     keywordHashTag: {
-        color: '#BDC2CA',
         elevation: 1,
         justifyContent: 'center',
         alignItems: 'center'
@@ -466,16 +406,14 @@ const styles = StyleSheet.create({
     regionImage: {
         width: 237,
         height: 163,
-        marginTop: 20,
-        marginEnd: 28,
+        marginEnd: 20,
         borderRadius: 10,
         paddingHorizontal: 10
     },
     regionText: {
         position: 'absolute',
         bottom: 10,
-        left: 16,
-
+        marginLeft: 16,
     }
 });
 
