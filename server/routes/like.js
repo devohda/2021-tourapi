@@ -12,11 +12,16 @@ router.post('/place/:placeId', verifyToken, async (req, res, next) => {
     try {
         await likeService.createLikePlace(user.user_pk, placeId);
     } catch (err) {
-        return res.send({code: 500, status: 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'OK'});
-
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 // 장소 좋아요 조회
@@ -25,13 +30,13 @@ router.get('/placeList', verifyToken, async (req, res, next) => {
     const result = await likeService.readLikePlace(user.user_pk);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
             data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -46,10 +51,16 @@ router.delete('/place/:placeId', verifyToken, async (req, res, next) => {
     try {
         await likeService.deleteLikePlace(user.user_pk, placeId);
     } catch (err) {
-        return res.send({code: 500, status: 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'OK'});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 // 보관함 좋아요
@@ -59,10 +70,16 @@ router.post('/collection/:collectionId', verifyToken, async (req, res, next) => 
     try {
         await likeService.createLikeCollection(user.user_pk, collectionId);
     } catch (err) {
-        return res.send({code: 500, status: 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'OK'});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 // 보관함 좋아요 조회
@@ -71,13 +88,13 @@ router.get('/collectionList', verifyToken, async (req, res, next) => {
     const result = await likeService.readLikeCollection(user.user_pk);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
             data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -91,10 +108,16 @@ router.delete('/collection/:collectionId', verifyToken, async (req, res, next) =
     try {
         await likeService.deleteLikeCollection(user.user_pk, collectionId);
     } catch (err) {
-        return res.send({code: 500, status: 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'OK'});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 module.exports = router;

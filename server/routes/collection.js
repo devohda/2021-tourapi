@@ -12,13 +12,13 @@ router.post('/free', verifyToken, async (req, res, next) => {
     const result = await collectionService.createFreeCollection(collectionData, user.user_pk, keywords);
 
     if (result.collection_pk) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
             collectionId : result.collection_pk
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -32,13 +32,13 @@ router.post('/plan', verifyToken, async (req, res, next) => {
     const result = await collectionService.createPlanCollection(collectionData, user.user_pk, keywords);
 
     if (result.collection_pk) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
             collectionId : result.collection_pk
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -53,17 +53,17 @@ router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next)
     const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay);
 
     if (result.affectedRows === 1) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK'
         });
     } else if (result.affectedRows === 0) {
-        return res.send({
+        return res.status(202).json({
             code: 202,
             status: 'EXISTED'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -79,13 +79,13 @@ router.get('/list', verifyToken, async (req, res, next) => {
     const result = await collectionService.readCollectionList(user.user_pk, true, sort, keyword);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
-            data: result
+            data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -99,13 +99,13 @@ router.get('/:collectionId', verifyToken, async (req, res, next) => {
     const result = await collectionService.readCollection(user.user_pk, collectionId);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
             data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -119,13 +119,13 @@ router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
     const result = await collectionService.readCollectionPlaceList(user.user_pk, collectionId);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK',
             data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -147,12 +147,12 @@ router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     const result = await collectionService.updateCollectionPlaceList(user.user_pk, collectionId, placeList);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'OK',
+            status: 'OK'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -167,12 +167,13 @@ router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     const result = await collectionService.deleteCollection(collectionId);
 
     if (result.affectedRows <= 1) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'OK'
+            status: 'OK',
+            data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -187,17 +188,17 @@ router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, nex
     const result = await collectionService.deletePlaceToCollection(collectionId, placeId, planDay);
 
     if (result.affectedRows === 1) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
             status: 'OK'
         });
     } else if (result.affectedRows === 0) {
-        return res.send({
-            code: 202,
-            status: 'NOT EXISTED'
+        return res.status(404).json({
+            code: 404,
+            status: 'NOT EXIST'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });

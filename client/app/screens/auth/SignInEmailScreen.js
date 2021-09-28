@@ -66,7 +66,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                 .catch(error => console.log(error));
 
             console.log(response);
-            switch (response.state) {
+            switch (response.status) {
             case 'NOT EXIST' :
                 Alert.alert('', '가입되지 않은 이메일입니다.');
                 break;

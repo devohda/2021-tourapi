@@ -36,7 +36,7 @@ router.post('/authPhone', async (req, res) => {
 
     return res.status(200).json({
         code: 200,
-        state: 'OK'
+        status: 'OK'
     });
 });
 
@@ -76,7 +76,7 @@ router.post('/makeAccount', async (req, res, next) => {
 
     return res.status(200).json({
         code: 200,
-        state: 'OK'
+        status: 'OK'
     });
 });
 
@@ -92,7 +92,7 @@ router.post('/sameEmail', async (req, res, next) => {
 
     return res.status(200).json({
         code: 200,
-        state: 'OK',
+        status: 'OK',
         data: {isDuplicated}
     });
 });
@@ -109,7 +109,7 @@ router.post('/sameNickname', async (req, res, next) => {
 
     return res.status(200).json({
         code: 200,
-        state: 'OK',
+        status: 'OK',
         data: {isDuplicated}
     });
 });
@@ -129,7 +129,7 @@ router.post('/sameNickname', async (req, res, next) => {
 //         // 해당 유저 존재 X
 //         return res.status(404).json({
 //             code: 404,
-//             state: 'NOT EXIST'
+//             status: 'NOT EXIST'
 //         });
 //     }
 //
@@ -156,7 +156,7 @@ router.post('/sameNickname', async (req, res, next) => {
 //
 //     return res.status(200).json({
 //         code: 200,
-//         state: 'OK',
+//         status: 'OK',
 //         userData: user
 //     });
 // });
@@ -173,7 +173,7 @@ router.post('/loginJWT', async (req, res, next) => {
         if (userData.length !== 1) {
             return res.status(404).json({
                 code: 404,
-                state: 'NOT EXIST'
+                status: 'NOT EXIST'
             });
         }
 
@@ -194,7 +194,7 @@ router.post('/loginJWT', async (req, res, next) => {
         if (user_password !== password) {
             return res.status(403).json({
                 code: 403,
-                state: 'NOT MATCHED'
+                status: 'NOT MATCHED'
             });
         }
 
@@ -203,14 +203,14 @@ router.post('/loginJWT', async (req, res, next) => {
 
         return res.status(200).json({
             code: 200,
-            state: 'OK',
+            status: 'OK',
             accessToken: accessToken
         });
     } catch (err) {
         console.log(err)
         return res.status(501).json({
             code: 501,
-            state: 'SERVER ERROR'
+            status: 'SERVER ERROR'
         });
     }
 });
@@ -221,7 +221,7 @@ router.delete('/logout', verifyToken, async (req, res, next)=> {
 
     return res.status(200).json({
         code: 200,
-        state: 'OK'
+        status: 'OK'
     });
 });
 

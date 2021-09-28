@@ -29,10 +29,17 @@ router.get('/', verifyToken, async (req, res, next) => {
                 break;
         }
     } catch (err) {
-        return res.send({code: 500, status: 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'OK', data});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK',
+        data : data
+    });
 });
 
 module.exports = router;
