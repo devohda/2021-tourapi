@@ -283,7 +283,7 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response.data[0])
+                    console.log(response.data[0])
                     setPlaceData(response.data[0]);
                 })
                 .catch((err) => {
@@ -596,7 +596,9 @@ const PlaceScreen = ({route, navigation}) => {
                             justifyContent: 'center',
                             borderRadius: 10,
                             paddingVertical: 6
-                        }}>
+                        }}
+                        onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name})}
+                        >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
                                 source={require('../assets/images/write_review_icon.png')}></Image>
                             <AppText style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점

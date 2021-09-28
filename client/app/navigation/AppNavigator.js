@@ -12,8 +12,10 @@ import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionSc
 import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
+import ProfileSettingScreen from '../screens/settings/ProfileSettingScreen';
 import {useToken} from '../contexts/TokenContextProvider';
 import SearchScreenForPlan from '../screens/collection/SearchScreenForPlan';
+import MakeReviewScreen from '../screens/review/MakeReviewScreen';
 
 import * as SecureStore from 'expo-secure-store';
 const MainStack = createStackNavigator();
@@ -57,9 +59,11 @@ const AppNavigator = () => {
                     <MainStack.Screen name="Search" component={SearchScreen} />
                     <MainStack.Screen name="SearchForPlan" component={SearchScreenForPlan} />
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
+                    <MainStack.Screen name="MakeReview" component={MakeReviewScreen} />
                     <MainStack.Screen name="MakePlanCollection" component={MakePlanCollectionScreen} />
                     <MainStack.Screen name="MakeFreeCollection" component={MakeFreeCollectionScreen}/>
                     <MainStack.Screen name="SystemSetting" component={SystemSettingScreen} />
+                    <MainStack.Screen name="ProfileSetting" component={ProfileSettingScreen} />
                     <MainStack.Screen name="Authentication2" component={AuthenticationNavigator2}/>
                     <MainStack.Screen name="PlanCollection" component={PlanCollectionScreen} />
                     <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />

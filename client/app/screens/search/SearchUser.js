@@ -2,21 +2,25 @@ import React, {useEffect, useState} from 'react';
 import {View, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Dimensions} from 'react-native';
 import AppText from '../../components/AppText';
 import { useTheme } from '@react-navigation/native';
-import { useSearchKeyword } from '../../contexts/SearchkeywordContextProvider';
+import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
+import { searchResult } from '../../contexts/search/SearchResultContextProvider';
+import { searchUserResult } from '../../contexts/search/SearchUserContextProvider';
+import { useIsFocused } from '@react-navigation/native';
 
 const SearchUser = () => {
     const {colors} = useTheme();
     const [userList, setUserList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-
+    const [searchLength, setSearchLength] = searchUserResult();
     const [token, setToken] = useToken();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getResults();
-    }, [searchKeyword]);
+    }, [searchKeyword, isFocused]);
 
     const getResults = () => {
         try {
@@ -29,6 +33,7 @@ const SearchUser = () => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
+                    setSearchLength(response.data.length);
                     setUserList(response.data);
                 })
                 .catch((err) => {

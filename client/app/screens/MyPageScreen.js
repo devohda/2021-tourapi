@@ -78,63 +78,47 @@ const MyPageScreen = ({navigation}) => {
                                 width: 90,
                                 height: 90,
                                 borderRadius: 60,
-                                position: 'absolute',
                                 backgroundColor: colors.defaultColor,
                             }}
-                            source={require('../assets/images/default_profile.png')}
-                        />
-                        <Image
-                            style={{
-                                width: 30,
-                                height: 30,
-                                marginLeft: '20%',
-                                marginBottom: '17.5%',
-                            }}
-                            source={require('../assets/images/setting.png')}
+                            source={require('../assets/images/here_default.png')}
                         />
                     </View>
-                    <View style={Platform.OS === 'ios' && {marginTop: 5}}>
+                    <View style={{marginTop: 4}}>
                         <AppText
                             style={{
                                 fontSize: 18,
-                                fontWeight: 'bold',
+                                fontWeight: '700',
                                 textAlign: 'center',
                                 color: colors.mainColor,
+                                lineHeight: 28.8
                             }}
                         >
-                            {userData.user_nickname}
+                            hi
+                            {/* {userData.user_nickname} */}
                         </AppText>
                         <View
                             style={{
                                 flexDirection: 'row',
-                                marginTop: Platform.OS === 'ios' ? 8 : 3,
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
                             }}
                         >
-                            <View
-                                style={[
-                                    styles.myPageHashtag,
-                                    {
-                                        borderColor: colors.defaultColor,
-                                        backgroundColor: colors.defaultColor,
-                                        shadowColor: colors.red[8]
-                                    },
-                                ]}
-                            >
-                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[2]}}>#조용한</AppText>
+                            <View style={styles.myPageHashtag}>
+                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[3]}}>#조용한</AppText>
                             </View>
-                            <View
-                                style={[
-                                    styles.myPageHashtag,
-                                    {
-                                        borderColor: colors.defaultColor,
-                                        backgroundColor: colors.defaultColor,
-                                        shadowColor: colors.red[8]
-                                    },
-                                ]}
-                            >
-                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[2]}}>#따뜻한</AppText>
+                            <View style={styles.myPageHashtag}>
+                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[3]}}>#따뜻한</AppText>
                             </View>
                         </View>
+                        <TouchableOpacity style={{marginTop: 8}} onPress={()=>navigation.navigate('ProfileSetting')}>
+                            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                <View style={{...styles.editProfileButton, backgroundColor: colors.defaultColor, borderColor: colors.defaultColor, borderWidth: 1}}>
+                                    <AppText style={{color: colors.gray[5], fontSize: 12, lineHeight: 19.2, paddingVertical: 2.5, paddingHorizontal: 12, fontWeight: '700'}}>
+                                        프로필 수정
+                                    </AppText>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -146,20 +130,26 @@ const MyPageScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
     myPageHashtag: {
-        borderWidth: 1,
         borderRadius: 12,
-        paddingVertical: 2,
-        paddingHorizontal: 5,
-        marginRight: 10,
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.1,
-        elevation: 1,
+        marginHorizontal: 4
     },
-
     myPageHashtagText: {
         fontSize: 12,
         textAlign: 'center',
     },
+    editProfileButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 24,
+        borderRadius: 27,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+        shadowOffset: {
+            width: 3,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        elevation: 1,
+    }
 });
 
 export default MyPageScreen;

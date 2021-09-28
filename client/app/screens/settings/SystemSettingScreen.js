@@ -50,7 +50,9 @@ const SystemSettingScreen = ({navigation}) => {
         {
             index: 1,
             title: '연결된 계정',
-            data: [{index: 1, name: userData.user_email}]
+            // data: [{index: 1, name: userData.user_email}]
+            data: [{index: 1, name: 'userData.user_email'}]
+
         },
         {
             index: 2,
