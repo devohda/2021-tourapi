@@ -15,6 +15,8 @@ import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import ScreenDivideLine from '../components/ScreenDivideLine';
 import {useToken} from '../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
 const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
@@ -23,6 +25,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const postPlace = () => {
         const index = isCollectionClicked.findIndex((element) => element === true);
@@ -36,7 +39,13 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     Alert.alert('', '보관함에 공간이 저장되었습니다.');
                 })
                 .catch((err) => {
@@ -229,6 +238,7 @@ const PlaceScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
     //데이터 받아서 다시해야함
     const [placeScore, setPlaceScore] = useState('4.84');
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
 
     const styles = StyleSheet.create({
@@ -311,7 +321,14 @@ const PlaceScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -327,6 +344,7 @@ const PlaceScreen = ({route, navigation}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
+        const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     
         const checkType = (type) => {
             if (type === 12) {
@@ -371,7 +389,14 @@ const PlaceScreen = ({route, navigation}) => {
                             'x-access-token': token
                         }
                     }).then((res) => res.json())
-                        .then((response) => {
+                        .then(async (response) => {
+                            if(response.code === 401 || response.code === 403 || response.code === 419){
+                                await SecureStore.deleteItemAsync('accessToken');
+                                setToken(null);
+                                setIsSignedIn(false);
+                                return;
+                            }
+
                             getInitialData();
                         })
                         .catch((err) => {
@@ -394,8 +419,14 @@ const PlaceScreen = ({route, navigation}) => {
                             'x-access-token': token
                         }
                     }).then((res) => res.json())
-                        .then((response) => {
-                            // console.log(response)
+                        .then(async (response) => {
+                            if(response.code === 401 || response.code === 403 || response.code === 419){
+                                await SecureStore.deleteItemAsync('accessToken');
+                                setToken(null);
+                                setIsSignedIn(false);
+                                return;
+                            }
+
                             getInitialData();
                         })
                         .catch((err) => {

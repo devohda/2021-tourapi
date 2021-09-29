@@ -3,7 +3,7 @@ import {
     TouchableOpacity,
     View,
     Image,
-    TouchableHighlight,
+    TouchableHighlight, Alert,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -14,12 +14,16 @@ import { useToken } from '../../contexts/TokenContextProvider';
 import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const ShowPlaces = props => {
     const { colors } = useTheme();
     const { day, index, isEditPage, isPress, item, length, navigation, pk} = props;
     const isFree = (typeof day === 'undefined');
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+
     const [isLiked, setIsLiked] = useState(item.like_flag);
     const [placeIndex, setPlaceIndex] = useState(0);
 
@@ -66,7 +70,15 @@ const ShowPlaces = props => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setIsLiked(response.data[index].like_flag);
                     // console.log(response.data)
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
@@ -91,7 +103,15 @@ const ShowPlaces = props => {
                     'x-access-token': token
                 }
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -114,7 +134,15 @@ const ShowPlaces = props => {
                     'x-access-token': token
                 }
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {

@@ -1,10 +1,10 @@
-import React, { memo, useState } from 'react';
-import { View, Image, Switch, StyleSheet, Pressable, Modal } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import React, {memo, useState} from 'react';
+import {View, Image, Switch, StyleSheet, Pressable, Modal} from 'react-native';
+import {useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
 
 import hereIcon from '../../assets/images/appicon.png';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useToken} from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
@@ -20,12 +20,14 @@ const ListItem = props => {
         setIsEnabled(previousState => !previousState);
     };
 
-    return(
-        <> 
+    return (
+        <>
             {
                 props.index === 1 || props.index === 2 ?
-                    <View style={props.index === 1 ? {...styles.list_style, ...styles.list_style_version1} : {...styles.list_style, ...styles.list_style_version2}}>
-                        {props.index === 1 && <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
+                    <View
+                        style={props.index === 1 ? {...styles.list_style, ...styles.list_style_version1} : {...styles.list_style, ...styles.list_style_version2}}>
+                        {props.index === 1 &&
+                        <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
                         {props.index === 2 && <Switch
                             trackColor={{false: colors.gray[6], true: colors.mainColor}}
@@ -39,8 +41,14 @@ const ListItem = props => {
                         {
                             props.index === 4 ?
                                 <>
-                                    <TouchableOpacity onPress={() => {props.data === '로그아웃' && setIsLogout(true);}}>
-                                        <AppText style={{color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3], fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
+                                    <TouchableOpacity onPress={() => {
+                                        props.data === '로그아웃' && setIsLogout(true);
+                                    }}>
+                                        <AppText style={{
+                                            color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3],
+                                            fontSize: 16,
+                                            lineHeight: 20
+                                        }}>{props.data}</AppText>
                                     </TouchableOpacity>
                                     <Modal
                                         transparent={true}
@@ -50,9 +58,15 @@ const ListItem = props => {
                                         }}
                                     >
                                         <View style={styles.centeredView}>
-                                            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                                                <AppText style={{...styles.modalText, color: colors.blue[1]}}>로그아웃 하시겠습니까?</AppText>
-                                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                            <View
+                                                style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                                                <AppText style={{...styles.modalText, color: colors.blue[1]}}>로그아웃
+                                                    하시겠습니까?</AppText>
+                                                <View style={{
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center'
+                                                }}>
                                                     <Pressable
                                                         style={{...styles.button, backgroundColor: colors.gray[4]}}
                                                         onPress={() => setIsLogout(!isLogout)}
@@ -70,14 +84,11 @@ const ListItem = props => {
                                                                     'x-access-token': token
                                                                 },
                                                             }).then((res) => res.json())
-                                                                .then((response) => {
-                                                                    // console.log(response);
-                                                                    // if(response.code === 200){
+                                                                .then(async (response) => {
                                                                     setIsLogout(!isLogout);
-                                                                    // setToken(null);
+                                                                    setToken(null);
                                                                     setIsSignedIn(false);
-                                                                    SecureStore.deleteItemAsync('accessToken');
-                                                                    // }
+                                                                    await SecureStore.deleteItemAsync('accessToken');
                                                                 })
                                                                 .catch((err) => {
                                                                     console.error(err);
@@ -91,20 +102,25 @@ const ListItem = props => {
                                         </View>
                                     </Modal>
                                 </> :
-                                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 16,
+                                    lineHeight: 20
+                                }}>{props.data}</AppText>
                         }
                     </View>
             }
         </>
-    );};
+    );
+};
 
 const areEqual = (prevProps, nextProps) => {
-    const { isSelected } = nextProps;
-    const { isSelected: prevIsSelected } = prevProps;
-    
+    const {isSelected} = nextProps;
+    const {isSelected: prevIsSelected} = prevProps;
+
     /*if the props are equal, it won't update*/
     const isSelectedEqual = isSelected === prevIsSelected;
-  
+
     return isSelectedEqual;
 };
 

@@ -25,11 +25,14 @@ import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
 
 import CalendarTexts from './CalendarTexts';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 export const navigationRef = React.createRef();
 
 const MakePlanCollectionScreen = ({navigation}) => {
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const {colors} = useTheme();
     const styles = StyleSheet.create({
         plusComplete: {
@@ -237,8 +240,15 @@ const MakePlanCollectionScreen = ({navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((responsedata) => {
-                    console.log(responsedata);
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     const item = {
                         'collection_name': collectionName,
                         'collection_private': isEnabled,

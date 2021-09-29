@@ -35,6 +35,8 @@ import {useToken} from '../../contexts/TokenContextProvider';
 // import DragAndDropListForFree from './DragAndDropListForFree';
 import ShowPlacesForFree from './ShowPlacesForFree';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -55,6 +57,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [update, setUpdate] = setUpdated();
 
     const getUserData = () => {
@@ -67,7 +70,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {
@@ -109,7 +119,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionData(response.data);
                     // setPlaceLength(response.data.places.length);
                     // setFalse();
@@ -135,7 +153,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setPlaceData(response.data);
                     setPlaceLength(response.data.length);
                     setFalse();
@@ -164,8 +190,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     planDay: -1,
                 })
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -228,7 +261,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '삭제되었습니다.');
                     navigation.goBack();
                 })
@@ -252,8 +293,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialCollectionData();
                 })
                 .catch((err) => {
@@ -276,8 +324,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialCollectionData();
                 })
                 .catch((err) => {

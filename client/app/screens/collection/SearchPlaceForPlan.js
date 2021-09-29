@@ -7,6 +7,8 @@ import AppText from '../../components/AppText';
 import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const SearchPlaceForPlan = (props, {route, navigation}) => {
     const {colors} = useTheme();
@@ -18,6 +20,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     console.log(props);
 
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const addPlace = (place_pk) => {
         // console.log(day.id)
@@ -35,8 +38,15 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((responsedata) => {
-                    // console.log(responsedata)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '추가되었습니다.');
                 })
                 .catch((err) => {
@@ -62,7 +72,15 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setPlaceList(response.data);
                     setFalse();
                 })

@@ -1,16 +1,18 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { useIsFocused } from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 import AppText from '../../components/AppText';
-import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
-import { useToken } from '../../contexts/TokenContextProvider';
-import { searchPlaceResult } from '../../contexts/search/SearchPlaceContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
+import {searchPlaceResult} from '../../contexts/search/SearchPlaceContextProvider';
 
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const SearchPlace = ({navigation}) => {
     const {colors} = useTheme();
@@ -19,6 +21,7 @@ const SearchPlace = ({navigation}) => {
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     const [searchLength, setSearchLength] = searchPlaceResult();
     const isFocused = useIsFocused();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const [token, setToken] = useToken();
 
@@ -48,10 +51,16 @@ const SearchPlace = ({navigation}) => {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'x-access-token' : token
+                    'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     setSearchLength(response.data.length);
                     setPlaceList(response.data);
                     // setFalse();
@@ -76,7 +85,14 @@ const SearchPlace = ({navigation}) => {
                     'x-access-token': token
                 }
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getResults();
                 })
                 .catch((err) => {
@@ -99,7 +115,14 @@ const SearchPlace = ({navigation}) => {
                     'x-access-token': token
                 }
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getResults();
                 })
                 .catch((err) => {
@@ -157,12 +180,15 @@ const SearchPlace = ({navigation}) => {
                                 <Image source={{uri: item.place_img}}
                                     style={{borderRadius: 10, width: 72, height: 72}}/> :
                                 <Image source={require('../../assets/images/here_default.png')}
-                                    style={{borderRadius: 10, width: 72, height: 72}}/> 
+                                    style={{borderRadius: 10, width: 72, height: 72}}/>
                         }
                         <View flex={1} style={styles.info_container}>
                             <View flexDirection="row" style={{alignItems: 'center'}}>
                                 <AppText
-                                    style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
+                                    style={{
+                                        fontSize: 10,
+                                        color: colors.mainColor
+                                    }}>{checkType(item.place_type)}</AppText>
                                 <View style={styles.score_line}></View>
                                 <Star width={11} height={11} style={{marginTop: 2}}/>
                                 <AppText
@@ -174,35 +200,41 @@ const SearchPlace = ({navigation}) => {
                                 color: colors.mainColor
                             }}>{item.place_name}</AppText>
                             <AppText
-                                style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    color: colors.gray[4]
+                                }}>{item.place_addr}</AppText>
                         </View>
                     </View>
                     <TouchableOpacity onPress={() => {
-                    // let newArr = [...isPress];
-                    // if (newArr[index]) {
-                    //     newArr[index] = false;
-                    //     setIsPress(newArr);
-                    //     deletePlace(item.place_pk);
-                    // } else {
-                    //     for (let i = 0; i < newArr.length; i++) {
-                    //         if (i == index) continue;
-                    //         else newArr[i] = false;
-                    //     }
-                    //     newArr[index] = true;
-                    //     setIsPress(newArr);
-                    //     likePlace(item.place_pk);
-                    // }
+                        // let newArr = [...isPress];
+                        // if (newArr[index]) {
+                        //     newArr[index] = false;
+                        //     setIsPress(newArr);
+                        //     deletePlace(item.place_pk);
+                        // } else {
+                        //     for (let i = 0; i < newArr.length; i++) {
+                        //         if (i == index) continue;
+                        //         else newArr[i] = false;
+                        //     }
+                        //     newArr[index] = true;
+                        //     setIsPress(newArr);
+                        //     likePlace(item.place_pk);
+                        // }
                         if (item.like_flag) {
                             DeleteLikedPlace(item.place_pk);
                         } else {
                             LikePlace(item.place_pk);
                         }
                     }}>
-                        <Jewel width={26} height={21} style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
+                        <Jewel width={26} height={21}
+                            style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                     </TouchableOpacity>
                 </View>
             </TouchableOpacity>
-        );};
+        );
+    };
 
     return (
         <View style={{backgroundColor: colors.backgroundColor}}>

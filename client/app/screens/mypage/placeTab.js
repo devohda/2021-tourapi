@@ -1,6 +1,8 @@
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, SafeAreaView, ScrollView,
-    StyleSheet, View, TouchableOpacity, TouchableWithoutFeedback, Platform} from 'react-native';
+import {
+    Dimensions, FlatList, Image, SafeAreaView, ScrollView,
+    StyleSheet, View, TouchableOpacity, TouchableWithoutFeedback, Platform, Alert
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import AppText from '../../components/AppText';
 import {Icon} from 'react-native-elements';
@@ -8,10 +10,13 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import { useToken } from '../../contexts/TokenContextProvider';
 import { useIsFocused } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const PlaceTab = ({navigation}) => {
     const {colors} = useTheme();
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
 
     const [placeList, setPlaceList] = useState({});
@@ -44,7 +49,15 @@ const PlaceTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setPlaceList(response.data);
                 })
                 .catch((err) => {
@@ -66,7 +79,15 @@ const PlaceTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionList(response.data);
                 })
                 .catch((err) => {

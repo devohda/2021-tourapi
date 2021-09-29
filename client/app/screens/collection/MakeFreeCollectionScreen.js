@@ -17,6 +17,8 @@ import CustomTextInput from '../../components/CustomTextInput';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 export const navigationRef = React.createRef();
 
@@ -103,6 +105,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
     //키워드 수 만큼 press 여부를 만든다
     const [isPress, setIsPress] = useState([]);
     const [putKeywords, setPutKeywords] = useState('');
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
@@ -134,7 +137,15 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((responsedata) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    
                     const item = {
                         'collection_name': collectionName,
                         'collection_private': isEnabled,
@@ -200,7 +211,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
     const getKeywords = useCallback(() => {
         try {
-
             fetch('http://localhost:3000/keyword/list', {
                 method: 'GET',
                 headers: {
@@ -208,7 +218,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                     'Content-Type': 'application/json'
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
                     setKeywordData(response.data);
                     setFalse();
                 })

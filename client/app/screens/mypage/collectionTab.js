@@ -1,6 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View} from 'react-native';
+import {
+    Alert,
+    Dimensions,
+    FlatList,
+    Image,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View
+} from 'react-native';
 import {Icon} from 'react-native-elements';
 import { Button, IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
 
@@ -8,10 +18,13 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
 import { useIsFocused } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const CollectionTab = ({navigation}) => {
 
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
     const [collectionList, setCollectionList] = useState({});
     const [directoryType, setDirectoryType] = useState([
@@ -54,8 +67,16 @@ const CollectionTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then(({data}) => {
-                    setCollectionList(data);
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    setCollectionList(response.data);
                 })
                 .catch((err) => {
                     console.error(err);

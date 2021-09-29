@@ -47,38 +47,37 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            let url = 'http://localhost:3000/auth/loginJWT';
-            let options = {
+            fetch('http://localhost:3000/auth/loginJWT', {
                 method: 'POST',
-                mode: 'cors',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
                     user: {
-                        email, password
+                        email,
+                        password
                     }
                 })
-            };
-            const response = await fetch(url, options)
-                .then(res => res.json())
-                .catch(error => console.log(error));
-
-            console.log(response);
-            switch (response.status) {
-            case 'NOT EXIST' :
-                Alert.alert('', '가입되지 않은 이메일입니다.');
-                break;
-            case 'NOT MATCHED' :
-                Alert.alert('', '비밀번호가 올바르지 않습니다.');
-                break;
-            case 'OK' :
-                await SecureStore.setItemAsync('accessToken', response.accessToken);
-                setToken(response.accessToken);
-                setIsSignedIn(true);
-                break;
-            }
+            }).then(res => res.json())
+                .then(async (response) => {
+                    switch (response.status) {
+                    case 'NOT EXIST' :
+                        Alert.alert('', '가입되지 않은 이메일입니다.');
+                        break;
+                    case 'NOT MATCHED' :
+                        Alert.alert('', '비밀번호가 올바르지 않습니다.');
+                        break;
+                    case 'OK' :
+                        await SecureStore.setItemAsync('accessToken', response.accessToken);
+                        setToken(response.accessToken);
+                        setIsSignedIn(true);
+                        break;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
         } catch (e) {
             console.log(e.toString());
         }

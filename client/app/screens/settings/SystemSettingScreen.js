@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, SectionList, StyleSheet, Switch} from 'react-native';
+import {View, Image, SectionList, StyleSheet, Switch, Alert} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import appJson from '../../../app.json';
 
@@ -9,12 +9,15 @@ import NavigationTop from '../../components/NavigationTop';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import ListItem from './ListItem';
 import { useToken } from '../../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     useEffect(() => {
         getUserData();
@@ -30,7 +33,15 @@ const SystemSettingScreen = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {

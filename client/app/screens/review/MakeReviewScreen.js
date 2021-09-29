@@ -9,10 +9,13 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const MakeReviewScreen = ({route, navigation}) => {
     const { colors } = useTheme();
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const { placeName } = route.params;
     const [isOpened, setIsOpened] = useState(false);
     const [reviews, setReviews] = useState([
@@ -122,7 +125,15 @@ const MakeReviewScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {

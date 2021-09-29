@@ -39,6 +39,8 @@ import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -63,6 +65,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const getUserData = () => {
         try {
@@ -74,7 +77,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {
@@ -135,7 +145,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionData(response.data);
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
@@ -169,7 +186,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setPlaceData(response.data);
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
@@ -245,7 +269,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     planDay: day,
                 })
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -268,7 +299,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     // console.log(response)
                     getInitialCollectionData();
                 })
@@ -292,8 +329,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialCollectionData();
                 })
                 .catch((err) => {
@@ -315,7 +358,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '삭제되었습니다.');
                     navigation.goBack();
                 })
