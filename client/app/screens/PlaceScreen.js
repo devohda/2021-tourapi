@@ -31,7 +31,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         try {
-            fetch(`http://localhost:3000/collection/${collectionId}/place/${placeData.place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionId}/place/${placeData.place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -285,7 +285,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://localhost:3000/place/${data.place_pk}`, {
+            fetch(`http://34.64.185.40/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -313,7 +313,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCollectionList = () => {
         try {
-            fetch('http://localhost:3000/collection/list', {
+            fetch('http://34.64.185.40/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -381,7 +381,7 @@ const PlaceScreen = ({route, navigation}) => {
             const LikePlace = (pk) => {
                 //공간 좋아요
                 try {
-                    fetch(`http://localhost:3000/like/place/${pk}`, {
+                    fetch(`http://34.64.185.40/like/place/${pk}`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -411,7 +411,7 @@ const PlaceScreen = ({route, navigation}) => {
             const DeleteLikedPlace = (pk) => {
                 //공간 좋아요 삭제
                 try {
-                    fetch(`http://localhost:3000/like/place/${pk}`, {
+                    fetch(`http://34.64.185.40/like/place/${pk}`, {
                         method: 'DELETE',
                         headers: {
                             'Accept': 'application/json',

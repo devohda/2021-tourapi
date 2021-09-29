@@ -76,7 +76,7 @@ const ListItem = props => {
                                                     <Pressable
                                                         style={{...styles.button, backgroundColor: colors.mainColor}}
                                                         onPress={() => {
-                                                            fetch('http://localhost:3000/auth/logout', {
+                                                            fetch('http://34.64.185.40/auth/logout', {
                                                                 method: 'DELETE',
                                                                 headers: {
                                                                     'Accept': 'application/json',

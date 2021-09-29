@@ -25,7 +25,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     const addPlace = (place_pk) => {
         // console.log(day.id)
         try {
-            fetch(`http://localhost:3000/collection/${pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${pk}/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -64,7 +64,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

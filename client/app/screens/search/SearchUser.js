@@ -27,7 +27,7 @@ const SearchUser = () => {
 
     const getResults = () => {
         try {
-            fetch(`http://localhost:3000/search?keyword=${decodeURIComponent(searchKeyword)}&type=user`, {
+            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=user`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

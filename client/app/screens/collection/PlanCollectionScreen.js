@@ -69,7 +69,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://localhost:3000/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -137,7 +137,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialCollectionData = () => {
         try {
-            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -178,7 +178,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://localhost:3000/collection/${data.collection_pk}/places`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -258,7 +258,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const deletePlace = (place_pk, day) => {
         //공간 삭제
         try {
-            fetch(`http://localhost:3000/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -291,7 +291,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const LikeCollection = () => {
         //보관함 좋아요
         try {
-            fetch(`http://localhost:3000/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -321,7 +321,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const DeleteLikedCollection = () => {
         //보관함 좋아요 삭제
         try {
-            fetch(`http://localhost:3000/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -350,7 +350,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deleteCollection = () => {
         try {
-            fetch(`http://localhost:3000/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

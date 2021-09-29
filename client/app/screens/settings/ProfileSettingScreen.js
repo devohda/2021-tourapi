@@ -36,7 +36,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://localhost:3000/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

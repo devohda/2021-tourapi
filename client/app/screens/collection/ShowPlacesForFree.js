@@ -49,7 +49,7 @@ const ShowPlacesForFree = props => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://localhost:3000/collection/${pk}/places`, {
+            fetch(`http://34.64.185.40/collection/${pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -82,7 +82,7 @@ const ShowPlacesForFree = props => {
     const LikePlace = (pk) => {
         //공간 좋아요
         try {
-            fetch(`http://localhost:3000/like/place/${pk}`, {
+            fetch(`http://34.64.185.40/like/place/${pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -113,7 +113,7 @@ const ShowPlacesForFree = props => {
     const DeleteLikedPlace = (pk) => {
         //공간 좋아요 삭제
         try {
-            fetch(`http://localhost:3000/like/place/${pk}`, {
+            fetch(`http://34.64.185.40/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

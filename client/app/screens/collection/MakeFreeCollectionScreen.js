@@ -119,7 +119,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
         }
 
         try {
-            fetch('http://localhost:3000/collection/free', {
+            fetch('http://34.64.185.40/collection/free', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -211,7 +211,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
     const getKeywords = useCallback(() => {
         try {
-            fetch('http://localhost:3000/keyword/list', {
+            fetch('http://34.64.185.40/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

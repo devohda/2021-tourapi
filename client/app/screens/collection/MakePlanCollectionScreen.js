@@ -188,7 +188,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://localhost:3000/keyword/list', {
+            fetch('http://34.64.185.40/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -221,7 +221,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
         const endDate = moment(range.endDate).format('YYYY-MM-DD');
 
         try {
-            fetch('http://localhost:3000/collection/plan', {
+            fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

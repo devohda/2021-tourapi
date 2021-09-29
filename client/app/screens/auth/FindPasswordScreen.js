@@ -12,7 +12,7 @@ const FindPasswordScreen = () => {
 
     const sendSMS = () => {
         try {
-            fetch('http://localhost:3000/auth/authPhone', {
+            fetch('http://34.64.185.40/auth/authPhone', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

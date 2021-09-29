@@ -41,7 +41,7 @@ const PlaceTab = ({navigation}) => {
     
     const getLikedPlace = () => {
         try {
-            fetch('http://localhost:3000/like/placeList', {
+            fetch('http://34.64.185.40/like/placeList', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -71,7 +71,7 @@ const PlaceTab = ({navigation}) => {
 
     const getLikedCollection = () => {
         try {
-            fetch('http://localhost:3000/like/collectionList', {
+            fetch('http://34.64.185.40/like/collectionList', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
