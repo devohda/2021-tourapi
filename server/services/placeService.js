@@ -24,7 +24,7 @@ exports.readPlaceList = async (user_pk, keyword) => {
 };
 
 exports.readPlace = async (place_pk) => {
-    const query = `SELECT p.place_pk, place_name, place_addr, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
+    const query = `SELECT p.place_pk, place_name, place_addr, place_type, place_img, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
                    FROM places p
                    LEFT OUTER JOIN like_place lp
                    ON lp.place_pk = p.place_pk
