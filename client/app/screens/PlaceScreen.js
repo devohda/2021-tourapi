@@ -15,6 +15,8 @@ import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import ScreenDivideLine from '../components/ScreenDivideLine';
 import {useToken} from '../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
 const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
@@ -23,12 +25,13 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const postPlace = () => {
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         try {
-            fetch(`http://34.146.140.88/collection/${collectionId}/place/${placeData.place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionId}/place/${placeData.place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -36,7 +39,13 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     Alert.alert('', '보관함에 공간이 저장되었습니다.');
                 })
                 .catch((err) => {
@@ -205,14 +214,14 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     </View>
                 </View>
 
-                    <SafeAreaView flex={1}>
-                        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
+                <SafeAreaView flex={1}>
+                    <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
                         {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
                         {/* <FlatList style={{flex: 1}} flex={1} data={collectionList} renderItem={ShowFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
-                        </ScrollView>
-                    </SafeAreaView>
+                    </ScrollView>
+                </SafeAreaView>
                 {/* </ScrollView> */}
             </RBSheet>
         </>
@@ -229,6 +238,7 @@ const PlaceScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
     //데이터 받아서 다시해야함
     const [placeScore, setPlaceScore] = useState('4.84');
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
 
     const styles = StyleSheet.create({
@@ -275,7 +285,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://34.146.140.88/place/${data.place_pk}`, {
+            fetch(`http://34.64.185.40/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -283,7 +293,7 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data[0])
+                    console.log(response.data[0]);
                     setPlaceData(response.data[0]);
                 })
                 .catch((err) => {
@@ -303,7 +313,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCollectionList = () => {
         try {
-            fetch('http://34.146.140.88/collection/list', {
+            fetch('http://34.64.185.40/collection/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -311,7 +321,14 @@ const PlaceScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -327,6 +344,7 @@ const PlaceScreen = ({route, navigation}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
+        const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     
         const checkType = (type) => {
             if (type === 12) {
@@ -363,7 +381,7 @@ const PlaceScreen = ({route, navigation}) => {
             const LikePlace = (pk) => {
                 //공간 좋아요
                 try {
-                    fetch(`http://34.146.140.88/like/place/${pk}`, {
+                    fetch(`http://34.64.185.40/like/place/${pk}`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -371,8 +389,15 @@ const PlaceScreen = ({route, navigation}) => {
                             'x-access-token': token
                         }
                     }).then((res) => res.json())
-                        .then((response) => {
-                            getInitialData()
+                        .then(async (response) => {
+                            if(response.code === 401 || response.code === 403 || response.code === 419){
+                                await SecureStore.deleteItemAsync('accessToken');
+                                setToken(null);
+                                setIsSignedIn(false);
+                                return;
+                            }
+
+                            getInitialData();
                         })
                         .catch((err) => {
                             console.error(err);
@@ -386,7 +411,7 @@ const PlaceScreen = ({route, navigation}) => {
             const DeleteLikedPlace = (pk) => {
                 //공간 좋아요 삭제
                 try {
-                    fetch(`http://34.146.140.88/like/place/${pk}`, {
+                    fetch(`http://34.64.185.40/like/place/${pk}`, {
                         method: 'DELETE',
                         headers: {
                             'Accept': 'application/json',
@@ -394,9 +419,15 @@ const PlaceScreen = ({route, navigation}) => {
                             'x-access-token': token
                         }
                     }).then((res) => res.json())
-                        .then((response) => {
-                            // console.log(response)
-                            getInitialData()
+                        .then(async (response) => {
+                            if(response.code === 401 || response.code === 403 || response.code === 419){
+                                await SecureStore.deleteItemAsync('accessToken');
+                                setToken(null);
+                                setIsSignedIn(false);
+                                return;
+                            }
+
+                            getInitialData();
                         })
                         .catch((err) => {
                             console.error(err);

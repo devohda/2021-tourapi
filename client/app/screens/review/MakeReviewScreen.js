@@ -9,15 +9,18 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const MakeReviewScreen = ({route, navigation}) => {
     const { colors } = useTheme();
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const { placeName } = route.params;
     const [isOpened, setIsOpened] = useState(false);
     const [reviews, setReviews] = useState([
-        "많이 아쉬워요", "아쉬워요", "괜찮아요", "마음에 들어요!", "다시 방문하고 싶어요!"
-    ])
+        '많이 아쉬워요', '아쉬워요', '괜찮아요', '마음에 들어요!', '다시 방문하고 싶어요!'
+    ]);
     const [ratedScore, setRatedScore] = useState(0);
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
@@ -114,7 +117,7 @@ const MakeReviewScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -122,7 +125,15 @@ const MakeReviewScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {
@@ -150,15 +161,15 @@ const MakeReviewScreen = ({route, navigation}) => {
 
     //받침에 따른 은/는 구분 위한 메서드
     const isEndWithConsonant = (korStr) => {
-        const finalChrCode = korStr.charCodeAt(korStr.length - 1)
+        const finalChrCode = korStr.charCodeAt(korStr.length - 1);
         // 0 = 받침 없음, 그 외 = 받침 있음
-        const finalConsonantCode = (finalChrCode - 44032) % 28
-        return finalConsonantCode !== 0
-    }
+        const finalConsonantCode = (finalChrCode - 44032) % 28;
+        return finalConsonantCode !== 0;
+    };
 
     const getRating = (rating) => {
-        setRatedScore(rating)
-    }
+        setRatedScore(rating);
+    };
 
     const BusyTime = ({keyword, idx}) => {
         return (
@@ -225,216 +236,216 @@ const MakeReviewScreen = ({route, navigation}) => {
     const FacilityLineBreak = () => (
         <View style={{width: '85%'}}>
             <View style={{flexDirection: 'row'}}>
-            {
-                facilityData.map((keyword, idx) => (
-                    <>{idx <= 3 &&
+                {
+                    facilityData.map((keyword, idx) => (
+                        <>{idx <= 3 &&
                         <AroundFacility keyword={keyword} key={idx+'0'}/>}</>
-                ))
-            }
+                    ))
+                }
             </View>
             { isOpened &&
                 <><View style={{flexDirection: 'row'}}>
-                {
-                    facilityData.map((keyword, idx) => (
-                        <>{4 <= idx && idx <= 6 &&
+                    {
+                        facilityData.map((keyword, idx) => (
+                            <>{4 <= idx && idx <= 6 &&
                             <AroundFacility keyword={keyword} key={idx+'1'}/>}</>
-                    ))
-                }
+                        ))
+                    }
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                {
-                    facilityData.map((keyword, idx) => (
-                        <>{7 <= idx && idx <= 10 &&
+                    {
+                        facilityData.map((keyword, idx) => (
+                            <>{7 <= idx && idx <= 10 &&
                             <AroundFacility keyword={keyword} key={idx+'2'}/>}</>
-                    ))
-                }
+                        ))
+                    }
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                {
-                    facilityData.map((keyword, idx) => (
-                        <>{11 <= idx && idx <= 13 &&
+                    {
+                        facilityData.map((keyword, idx) => (
+                            <>{11 <= idx && idx <= 13 &&
                             <AroundFacility keyword={keyword} key={idx+'3'}/>}</>
-                    ))
-                }
+                        ))
+                    }
                 </View>
                 <View style={{flexDirection: 'row'}}>
-                {
-                    facilityData.map((keyword, idx) => (
-                        <>{14 <= idx  &&
+                    {
+                        facilityData.map((keyword, idx) => (
+                            <>{14 <= idx  &&
                             <AroundFacility keyword={keyword} key={idx+'4'}/>}</>
-                    ))
-                }
+                        ))
+                    }
                 </View></>
             }
         </View>
-    )
+    );
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
             <ScrollView>
-            <ScreenContainerView>
-                <View style={{marginTop: 18}}>
-                    <View style={{justifyContent: 'space-between', marginBottom: 8}}>
-                        <View style={{marginBottom: 37}}>
-                            <View style={{flexDirection: 'row'}}>
-                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '700'}}>{placeName}</AppText>
-                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'}</AppText>
-                            </View>
-                            <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>어떤 공간이었나요?</AppText>
-                        </View>
-                        <Rating
-                            type='custom'
-                            ratingCount={5}
-                            imageSize={40}
-                            startingValue={0}
-                            fractions={0}
-                            onFinishRating={getRating}
-                            ratingColor={colors.mainColor}
-                            tintColor={colors.backgroundColor}
-                            ratingBackgroundColor={colors.gray[4]}
-                        />
-                        
-                        {ratedScore !== 0 && <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText>}
-                    </View>
-                </View>
-            </ScreenContainerView>
-            <ScreenDivideLine />
-            <ScreenContainerView>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <View>
-                        <AppText style={{...styles.reviewTitle, color: colors.mainColor}}>
-                            { userData.user_nickname}님의 경험을
-                        </AppText>
-                        <AppText style={{...styles.reviewTitle, color: colors.mainColor}}>
-                            조금 더 들려주세요 :)
-                        </AppText>
-                    </View>
-                    <View style={{
-                        ...styles.categoryBorder,
-                        borderColor: colors.gray[6],
-                        backgroundColor: colors.gray[6],
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
-                        <AppText style={{...styles.categoryText, color: colors.backgroundColor}}>선택</AppText>
-                    </View>
-                </View>
-
-                <View style={{marginTop: 30}}>
-                    <View style={{flexDirection: 'row', marginBottom: 26}}>
-                        <View style={{width: '20%'}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>쾌적성</AppText>
-                        </View>
-                        <View style={{marginLeft: 80}}>
-                            <Rating
-                                type='custom'
-                                ratingCount={5}
-                                imageSize={17}
-                                startingValue={0}
-                                fractions={0}
-                                style={{backgroundColor: colors.backgroundColor}}
-                                ratingColor={colors.mainColor}
-                                tintColor={colors.backgroundColor}
-                                ratingBackgroundColor={colors.gray[4]}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={{flexDirection: 'row', marginBottom: 26}}>
-                        <View style={{width: '20%'}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>접근성</AppText>
-                        </View>
-                        <View style={{marginLeft: 80}}>
-                            <Rating
-                                type='custom'
-                                ratingCount={5}
-                                imageSize={17}
-                                startingValue={0}
-                                fractions={0}
-                                style={{backgroundColor: colors.backgroundColor}}
-                                ratingColor={colors.mainColor}
-                                tintColor={colors.backgroundColor}
-                                ratingBackgroundColor={colors.gray[4]}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={{flexDirection: 'row', marginBottom: 26}}>
-                        <View style={{width: '20%'}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>주변상권</AppText>
-                        </View>
-                        <View style={{marginLeft: 80}}>
-                            <Rating
-                                type='custom'
-                                ratingCount={5}
-                                imageSize={17}
-                                startingValue={0}
-                                fractions={0}
-                                style={{backgroundColor: colors.backgroundColor}}
-                                ratingColor={colors.mainColor}
-                                tintColor={colors.backgroundColor}
-                                ratingBackgroundColor={colors.gray[4]}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={{marginBottom: 26}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>혼잡한 시간대</AppText>
-                            <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
-                        </View>
-                        {/* TODO 아이콘 추가 */}
-                        <View style={{flexDirection: 'row', marginTop: 6}}>
-                        {
-                            busyTimeData.map((keyword, idx) => (
-                                <BusyTime keyword={keyword} key={idx}/>
-                            ))
-                        }
-                        </View>
-                    </View>
-
-                    <View style={{marginBottom: 26}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>주변시설</AppText>
-                            <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
-                        </View>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 6}}>
-                            <FacilityLineBreak />
-                            <TouchableOpacity onPress={()=>setIsOpened(!isOpened)}>
-                                <View>
-                                    { isOpened ?
-                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                            style={{
-                                                width: 15,
-                                                height: 15,
-                                                marginTop: 5,
-                                                transform: [{rotate: '180deg'}],
-                                        }}></Image> :
-                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                            style={{
-                                                width: 15,
-                                                height: 15,
-                                        }}></Image>
-                                    }
+                <ScreenContainerView>
+                    <View style={{marginTop: 18}}>
+                        <View style={{justifyContent: 'space-between', marginBottom: 8}}>
+                            <View style={{marginBottom: 37}}>
+                                <View style={{flexDirection: 'row'}}>
+                                    <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '700'}}>{placeName}</AppText>
+                                    <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'}</AppText>
                                 </View>
-                            </TouchableOpacity>
+                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>어떤 공간이었나요?</AppText>
+                            </View>
+                            <Rating
+                                type='custom'
+                                ratingCount={5}
+                                imageSize={40}
+                                startingValue={0}
+                                fractions={0}
+                                onFinishRating={getRating}
+                                ratingColor={colors.mainColor}
+                                tintColor={colors.backgroundColor}
+                                ratingBackgroundColor={colors.gray[4]}
+                            />
+                        
+                            {ratedScore !== 0 && <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText>}
                         </View>
                     </View>
-                </View>
+                </ScreenContainerView>
+                <ScreenDivideLine />
+                <ScreenContainerView>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                        <View>
+                            <AppText style={{...styles.reviewTitle, color: colors.mainColor}}>
+                                { userData.user_nickname}님의 경험을
+                            </AppText>
+                            <AppText style={{...styles.reviewTitle, color: colors.mainColor}}>
+                            조금 더 들려주세요 :)
+                            </AppText>
+                        </View>
+                        <View style={{
+                            ...styles.categoryBorder,
+                            borderColor: colors.gray[6],
+                            backgroundColor: colors.gray[6],
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <AppText style={{...styles.categoryText, color: colors.backgroundColor}}>선택</AppText>
+                        </View>
+                    </View>
 
-                <View style={{marginBottom: 26}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
-                        <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
-                        <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
-                    </View>
-                    <TouchableOpacity>
-                        <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
-                            <Icon type="ionicon" name={"add-sharp"} size={20} color={colors.mainColor}></Icon>
+                    <View style={{marginTop: 30}}>
+                        <View style={{flexDirection: 'row', marginBottom: 26}}>
+                            <View style={{width: '20%'}}>
+                                <AppText style={{...styles.rateStandard, color: colors.mainColor}}>쾌적성</AppText>
+                            </View>
+                            <View style={{marginLeft: 80}}>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={17}
+                                    startingValue={0}
+                                    fractions={0}
+                                    style={{backgroundColor: colors.backgroundColor}}
+                                    ratingColor={colors.mainColor}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.gray[4]}
+                                />
+                            </View>
                         </View>
-                    </TouchableOpacity>
-                </View>
-            </ScreenContainerView>
+
+                        <View style={{flexDirection: 'row', marginBottom: 26}}>
+                            <View style={{width: '20%'}}>
+                                <AppText style={{...styles.rateStandard, color: colors.mainColor}}>접근성</AppText>
+                            </View>
+                            <View style={{marginLeft: 80}}>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={17}
+                                    startingValue={0}
+                                    fractions={0}
+                                    style={{backgroundColor: colors.backgroundColor}}
+                                    ratingColor={colors.mainColor}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.gray[4]}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={{flexDirection: 'row', marginBottom: 26}}>
+                            <View style={{width: '20%'}}>
+                                <AppText style={{...styles.rateStandard, color: colors.mainColor}}>주변상권</AppText>
+                            </View>
+                            <View style={{marginLeft: 80}}>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={17}
+                                    startingValue={0}
+                                    fractions={0}
+                                    style={{backgroundColor: colors.backgroundColor}}
+                                    ratingColor={colors.mainColor}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.gray[4]}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={{marginBottom: 26}}>
+                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <AppText style={{...styles.rateStandard, color: colors.mainColor}}>혼잡한 시간대</AppText>
+                                <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
+                            </View>
+                            {/* TODO 아이콘 추가 */}
+                            <View style={{flexDirection: 'row', marginTop: 6}}>
+                                {
+                                    busyTimeData.map((keyword, idx) => (
+                                        <BusyTime keyword={keyword} key={idx}/>
+                                    ))
+                                }
+                            </View>
+                        </View>
+
+                        <View style={{marginBottom: 26}}>
+                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <AppText style={{...styles.rateStandard, color: colors.mainColor}}>주변시설</AppText>
+                                <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
+                            </View>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 6}}>
+                                <FacilityLineBreak />
+                                <TouchableOpacity onPress={()=>setIsOpened(!isOpened)}>
+                                    <View>
+                                        { isOpened ?
+                                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                style={{
+                                                    width: 15,
+                                                    height: 15,
+                                                    marginTop: 5,
+                                                    transform: [{rotate: '180deg'}],
+                                                }}></Image> :
+                                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                style={{
+                                                    width: 15,
+                                                    height: 15,
+                                                }}></Image>
+                                        }
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={{marginBottom: 26}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
+                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
+                            <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
+                        </View>
+                        <TouchableOpacity>
+                            <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
+                                <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </ScreenContainerView>
             </ScrollView>
             
             <ScreenContainerView>
@@ -459,7 +470,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                 </TouchableOpacity>
             </ScreenContainerView>
         </ScreenContainer>
-    )
+    );
 };
 
 const styles = StyleSheet.create({

@@ -35,6 +35,8 @@ import {useToken} from '../../contexts/TokenContextProvider';
 // import DragAndDropListForFree from './DragAndDropListForFree';
 import ShowPlacesForFree from './ShowPlacesForFree';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -55,11 +57,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [update, setUpdate] = setUpdated();
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -67,7 +70,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {
@@ -101,7 +111,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const getInitialCollectionData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -109,7 +119,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionData(response.data);
                     // setPlaceLength(response.data.places.length);
                     // setFalse();
@@ -127,7 +145,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}/places`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -135,8 +153,16 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    setPlaceData(response.data)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    setPlaceData(response.data);
                     setPlaceLength(response.data.length);
                     setFalse();
                     // console.log(response.data)
@@ -153,7 +179,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deletePlace = (place_pk) => {
         try {
-            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -164,8 +190,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     planDay: -1,
                 })
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -175,7 +208,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const checkTrue = () => {
         //생성에서 바로 넘어오는 데이터 처리
@@ -198,7 +231,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }
         }
         return false;
-    }
+    };
 
     const checkCreated = () => {
         if(data.collection_private === true || data.collection_private === false) {
@@ -207,7 +240,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             if(collectionData.is_creator) return false;
         }
         return true;
-    }
+    };
 
     const [isPress, setIsPress] = useState([]);
     const setFalse = () => {
@@ -220,7 +253,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deleteCollection = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -228,7 +261,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '삭제되었습니다.');
                     navigation.goBack();
                 })
@@ -239,12 +280,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const LikeCollection = () => {
         //보관함 좋아요
         try {
-            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -252,8 +293,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialCollectionData();
                 })
                 .catch((err) => {
@@ -268,7 +316,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const DeleteLikedCollection = () => {
         //보관함 좋아요 삭제
         try {
-            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -276,8 +324,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialCollectionData();
                 })
                 .catch((err) => {
@@ -323,35 +378,35 @@ const FreeCollectionScreen = ({route, navigation}) => {
         //     closeOnRowPress={true}
         //     nestedScrollEnabled
         // />
-        <SwipeListView
-        data={placeData}
-        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-        keyExtractor={(item, idx) => {idx.toString();}}
-        key={(item, idx) => {idx.toString();}}
-            renderHiddenItem={(item, rowMap) => {
-                return (
-                <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
-                    <TouchableOpacity
-                        style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
-                        onPress={() => {
-                            deletePlace(item.item.place_pk, props.idx)
-                        }}
-                    >
-                        {/* <View style={{justifyContent: 'center', alignItems: 'center'}}> */}
-                            <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
-                        {/* </View> */}
-                    </TouchableOpacity>
-            </View>
-            )}}
-        rightOpenValue={-75}
-        previewRowKey={'0'}
-        previewOpenDelay={3000}
-        disableRightSwipe={true}
-        disableLeftSwipe={checkPrivate() ? false : true}
-        closeOnRowOpen={true}
-        closeOnRowPress={true}
-        nestedScrollEnabled
-    />
+            <SwipeListView
+                data={placeData}
+                renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+                keyExtractor={(item, idx) => {idx.toString();}}
+                key={(item, idx) => {idx.toString();}}
+                renderHiddenItem={(item, rowMap) => {
+                    return (
+                        <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
+                            <TouchableOpacity
+                                style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
+                                onPress={() => {
+                                    deletePlace(item.item.place_pk, props.idx);
+                                }}
+                            >
+                                {/* <View style={{justifyContent: 'center', alignItems: 'center'}}> */}
+                                <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
+                                {/* </View> */}
+                            </TouchableOpacity>
+                        </View>
+                    );}}
+                rightOpenValue={-75}
+                previewRowKey={'0'}
+                previewOpenDelay={3000}
+                disableRightSwipe={true}
+                disableLeftSwipe={checkPrivate() ? false : true}
+                closeOnRowOpen={true}
+                closeOnRowPress={true}
+                nestedScrollEnabled
+            />
         // <SafeAreaView>
         // <FlatList data={placeData}
         //     renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
@@ -359,7 +414,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         //     key={(item, idx) => {idx.toString();}}
         // nestedScrollEnabled/>
         // </SafeAreaView>
-    )}
+        );};
     
     const [showMenu, setShowMenu] = useState(false);
     const keywords = data.keywords;
@@ -367,70 +422,70 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deleteMode = () => {
         setDeleteMenu(true);
-    }
+    };
 
     const DeleteModal = () => (
         <Modal
-        transparent={true}
-        visible={deleteMenu}
-        onRequestClose={() => {
-            setDeleteMenu(!deleteMenu);
-        }}
-    >
-        <View style={styles.centeredView}>
-            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <Pressable
-                        style={{...styles.button, backgroundColor: colors.gray[4]}}
-                        onPress={() => setDeleteMenu(!deleteMenu)}
-                    >
-                        <AppText style={styles.textStyle}>취소하기</AppText>
-                    </Pressable>
-                    <Pressable
-                        style={{...styles.button, backgroundColor: colors.mainColor}}
-                        onPress={() => {
-                            setDeleteMenu(!deleteMenu);
-                            deleteCollection();
-                        }}
-                    >
-                        <AppText style={styles.textStyle}>삭제하기</AppText>
-                    </Pressable>
+            transparent={true}
+            visible={deleteMenu}
+            onRequestClose={() => {
+                setDeleteMenu(!deleteMenu);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.gray[4]}}
+                            onPress={() => setDeleteMenu(!deleteMenu)}
+                        >
+                            <AppText style={styles.textStyle}>취소하기</AppText>
+                        </Pressable>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            onPress={() => {
+                                setDeleteMenu(!deleteMenu);
+                                deleteCollection();
+                            }}
+                        >
+                            <AppText style={styles.textStyle}>삭제하기</AppText>
+                        </Pressable>
+                    </View>
                 </View>
             </View>
-        </View>
-    </Modal>
-    )
+        </Modal>
+    );
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             {
                 showMenu && (
                     <>
-                    <View style={{
-                        position: 'absolute',
-                        width: 80,
-                        // height: 80,
-                        height: 40,
-                        top: 50,
-                        right: 60,
-                        backgroundColor: '#fff',
-                        flex: 1,
-                        borderRadius: 10,
-                        zIndex: 100000000,
+                        <View style={{
+                            position: 'absolute',
+                            width: 80,
+                            // height: 80,
+                            height: 40,
+                            top: 50,
+                            right: 60,
+                            backgroundColor: '#fff',
+                            flex: 1,
+                            borderRadius: 10,
+                            zIndex: 100000000,
     
-                        shadowColor: '#000',
-                        shadowOffset: {
-                            width: 0,
-                            height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        elevation: 5,
+                            shadowColor: '#000',
+                            shadowOffset: {
+                                width: 0,
+                                height: 2,
+                            },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.84,
+                            elevation: 5,
     
-                        overflow: 'visible'
-                    }}>
-                        {/* <TouchableOpacity
+                            overflow: 'visible'
+                        }}>
+                            {/* <TouchableOpacity
                             onPress={() => {
                                 setIsEditPage(true);
                                 setShowMenu(state => !state);
@@ -441,24 +496,24 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 justifyContent: 'center',
                             }}><AppText>수정하기</AppText>
                         </TouchableOpacity> */}
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={async () => {
-                                await deleteMode();
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>삭제하기</AppText></TouchableOpacity>
-                        <DeleteModal />
-                    </View>
-                </>
+                            <View style={{
+                                height: 1,
+                                borderColor: colors.gray[5],
+                                borderWidth: 0.4,
+                                borderRadius: 1,
+                            }}></View>
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    await deleteMode();
+                                }}
+                                style={{
+                                    flex: 1,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}><AppText>삭제하기</AppText></TouchableOpacity>
+                            <DeleteModal />
+                        </View>
+                    </>
                 )
             }
 
@@ -475,27 +530,27 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         if(typeof data.collection_private === 'boolean') {
                             navigation.pop(2);
                         }
-                        else navigation.goBack()}}>
+                        else navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
                 {checkPrivate() && <>
-                {
-                    !isEditPage ?
-                    <View style={{position: 'absolute', right: 0}}>
-                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                            style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
-                            <MoreIcon style={{color: colors.mainColor}}/>
-                        </TouchableOpacity>
-                    </View> :
-                    <View style={{position: 'absolute', right: 0}}>
-                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
-                            <View>
-                                <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                    {
+                        !isEditPage ?
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                                    style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                                    <MoreIcon style={{color: colors.mainColor}}/>
+                                </TouchableOpacity>
+                            </View> :
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
+                                    <View>
+                                        <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                                    </View>
+                                </TouchableOpacity>
                             </View>
-                        </TouchableOpacity>
-                    </View>
-                }</>}
+                    }</>}
             </View>
 
             <ScrollView>
@@ -517,9 +572,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 <AppText style={{...styles.dirFreeText, color: colors.mainColor}}>자유</AppText>
                             </View>
                             {
-                                    keywords.map((keyword, idx) => (
-                                        <Keyword keyword={keyword} key={idx} />
-                                    ))
+                                keywords.map((keyword, idx) => (
+                                    <Keyword keyword={keyword} key={idx} />
+                                ))
                             }
                         </View>
                         <View>
@@ -541,47 +596,47 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             }}>{data.collection_name}</AppText>
                             {
                                 typeof data.collection_private === 'boolean' ?
-                                <AppText style={{
-                                    fontSize: 12,
-                                    fontWeight: '400',
-                                    color: colors.gray[2],
-                                    lineHeight: 19.2,
-                                    marginTop: 12
-                                }}>by. {userData.user_nickname}</AppText> :
-                                <AppText style={{
-                                    fontSize: 12,
-                                    fontWeight: '400',
-                                    color: colors.gray[2],
-                                    lineHeight: 19.2,
-                                    marginTop: 12
-                                }}>by. {collectionData.created_user_name}</AppText>
+                                    <AppText style={{
+                                        fontSize: 12,
+                                        fontWeight: '400',
+                                        color: colors.gray[2],
+                                        lineHeight: 19.2,
+                                        marginTop: 12
+                                    }}>by. {userData.user_nickname}</AppText> :
+                                    <AppText style={{
+                                        fontSize: 12,
+                                        fontWeight: '400',
+                                        color: colors.gray[2],
+                                        lineHeight: 19.2,
+                                        marginTop: 12
+                                    }}>by. {collectionData.created_user_name}</AppText>
                                 
                             }
                         </View>
                         {
-                           userData.user_nickname !== data.created_user_name &&
+                            userData.user_nickname !== data.created_user_name &&
                            <TouchableOpacity onPress={() => {
-                            if (collectionData.like_flag) {
-                                DeleteLikedCollection();
-                            } else {
-                                LikeCollection();
-                            }
-                        }}>
-                                {!(data.collection_private === false || data.collection_private === true) && <View style={{
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginVertical: 5
-                                }}>
-                                    <Jewel width={26} height={21}
-                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                                    <AppText style={{
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
-                                        marginTop: 2
-                                    }}>{collectionData.like_cnt}</AppText>
-                                </View>}
-                            </TouchableOpacity>
+                               if (collectionData.like_flag) {
+                                   DeleteLikedCollection();
+                               } else {
+                                   LikeCollection();
+                               }
+                           }}>
+                               {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                                   justifyContent: 'center',
+                                   alignItems: 'center',
+                                   marginVertical: 5
+                               }}>
+                                   <Jewel width={26} height={21}
+                                       style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                   <AppText style={{
+                                       fontSize: 10,
+                                       fontWeight: '700',
+                                       color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
+                                       marginTop: 2
+                                   }}>{collectionData.like_cnt}</AppText>
+                               </View>}
+                           </TouchableOpacity>
                         }
                     </View>
                 </ScreenContainerView>
@@ -617,7 +672,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
                                     <TouchableOpacity onPress={()=>{
-                                        navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
+                                        navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
                                     }} style={!collectionData.is_creator && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -629,71 +684,71 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     <SafeAreaView>
                                         {
                                             !isEditPage ?
-                                            <SwipeList /> :
-                                            <SwipeList />
+                                                <SwipeList /> :
+                                                <SwipeList />
                                             // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>
-                                    <TouchableOpacity onPress={() => {
-                                        // if(isLimited) setIsLimited(false);
-                                        // else setIsLimited(true);
-                                        // console.log(isLimited)
+                                <TouchableOpacity onPress={() => {
+                                    // if(isLimited) setIsLimited(false);
+                                    // else setIsLimited(true);
+                                    // console.log(isLimited)
+                                }}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        marginTop: 26,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
                                     }}>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            marginTop: 26,
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }}>
-                                            <AppText style={{
-                                                fontSize: 14,
-                                                fontWeight: '400',
-                                                color: colors.gray[2]
-                                            }}>전체보기</AppText>
-                                            <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                                style={{
-                                                    width: 15,
-                                                    height: 15,
-                                                    marginLeft: 10,
-                                                    marginBottom: 5
-                                                }}></Image>
-                                        </View>
-                                    </TouchableOpacity>
-                            </View> :
-                            <View style={{marginTop: 16}}>
-                            <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View>
-                                    <AppText style={{color: colors.gray[4]}}>총 <AppText
-                                        style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
-                                </View>
-                                <TouchableOpacity onPress={()=>{
-                                    if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
-                                    else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                }} style={ checkCreated() && {display:'none'}}>
-                                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                        <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
-                                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
+                                        <AppText style={{
+                                            fontSize: 14,
+                                            fontWeight: '400',
+                                            color: colors.gray[2]
+                                        }}>전체보기</AppText>
+                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                            style={{
+                                                width: 15,
+                                                height: 15,
+                                                marginLeft: 10,
+                                                marginBottom: 5
+                                            }}></Image>
                                     </View>
                                 </TouchableOpacity>
-                            </View>
-                            <View style={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                marginTop: 40,
-                                marginBottom: 52
-                            }}>
-                                <Image source={require('../../assets/images/empty_forDir.png')} style={{
-                                    width: 150,
-                                    height: 120,
+                            </View> :
+                            <View style={{marginTop: 16}}>
+                                <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
+                                    <View>
+                                        <AppText style={{color: colors.gray[4]}}>총 <AppText
+                                            style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
+                                    </View>
+                                    <TouchableOpacity onPress={()=>{
+                                        if(typeof data.collection_private === 'boolean') navigation.navigate('Search');
+                                        else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
+                                    }} style={ checkCreated() && {display:'none'}}>
+                                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                            <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
+                                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    marginBottom: 12
-                                }}></Image>
-                                <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
+                                    marginTop: 40,
+                                    marginBottom: 52
+                                }}>
+                                    <Image source={require('../../assets/images/empty_forDir.png')} style={{
+                                        width: 150,
+                                        height: 120,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        marginBottom: 12
+                                    }}></Image>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
                                     담겨있지 않아요!</AppText>
+                                </View>
                             </View>
-                        </View>
                     }
 
                 </ScreenContainerView>

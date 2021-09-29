@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Dimensions } from 'react-native';
+import {Alert, Dimensions} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 import {useTheme} from '@react-navigation/native';
@@ -14,6 +14,8 @@ import { useToken } from '../contexts/TokenContextProvider';
 import { searchPlaceResult } from '../contexts/search/SearchPlaceContextProvider';
 import { searchCollectionResult } from '../contexts/search/SearchCollectionContextProvider';
 import { searchUserResult } from '../contexts/search/SearchUserContextProvider';
+import {useIsSignedIn} from '../contexts/SignedInContextProvider';
+import * as SecureStore from 'expo-secure-store';
 
 
 const SearchTabNavigator = ({navigation}) => {
@@ -23,6 +25,7 @@ const SearchTabNavigator = ({navigation}) => {
     const [searchPlace, setSearchPlace] = searchPlaceResult();
     const [searchCollection, setSearchCollection] = searchCollectionResult();
     const [searchUser, setSearchUser] = searchUserResult();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     useEffect(() => {
         getUserData();
@@ -30,7 +33,7 @@ const SearchTabNavigator = ({navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -38,7 +41,14 @@ const SearchTabNavigator = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     setUserData(response.data);
                 })
                 .catch((err) => {

@@ -10,10 +10,17 @@ router.get('/:placeId', async (req, res, next) => {
     try {
         data = await placeService.readPlace(placeId);
     } catch (err) {
-        return res.send({code:500, status : 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'SUCCESS', data});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK',
+        data : data
+    });
 });
 
 

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, TextInput} from 'react-native';
+import {View, Image, StyleSheet, TouchableOpacity, TextInput, Alert} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 
@@ -9,6 +9,8 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import { useToken } from '../../contexts/TokenContextProvider';
 
 import BackIcon from '../../assets/images/back-icon.svg';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const ProfileSettingScreen = ({route, navigation}) => {
     useEffect(() => {
@@ -18,6 +20,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
     const { colors } = useTheme();
     
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [userData, setUserData] = useState({});
     const [userNickname, setUserNickname] = useState('');
     const [isPress, setIsPress] = useState([]);
@@ -33,7 +36,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -41,14 +44,22 @@ const ProfileSettingScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                     setFalse();
-                    setUserNickname(response.data.user_nickname)
+                    setUserNickname(response.data.user_nickname);
                 })
                 .catch((err) => {
                     console.error(err);
-            });
+                });
 
         } catch (err) {
             console.error(err);
@@ -64,7 +75,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
     };
 
     const Keyword = ({keyword, idx}) => {
-        console.log(keyword)
+        console.log(keyword);
         return (
             <View
                 style={{
@@ -95,7 +106,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', left: 0}}>
-                    <TouchableOpacity onPress={() => {navigation.goBack()}}>
+                    <TouchableOpacity onPress={() => {navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -140,7 +151,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                     </View>
                     <View style={{position: 'absolute', paddingTop: 60, paddingLeft: 64}}>
                         <View style={{...styles.cameraIcon, backgroundColor: colors.defaultColor}}>
-                            <Icon size={18} type="ionicon" name={"camera"} color={colors.gray[5]} style={{padding: 6}}/>
+                            <Icon size={18} type="ionicon" name={'camera'} color={colors.gray[5]} style={{padding: 6}}/>
                         </View>
                     </View>
                 </View>
@@ -181,7 +192,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 </View>
             </ScreenContainerView>
         </ScreenContainer>
-    )
+    );
 };
 
 const styles = StyleSheet.create({
