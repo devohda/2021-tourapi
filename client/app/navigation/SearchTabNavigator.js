@@ -43,7 +43,7 @@ const SearchTabNavigator = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        Alert.alert('','로그인이 필요합니다');
+                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
