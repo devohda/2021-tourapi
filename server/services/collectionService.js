@@ -103,6 +103,20 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
     }
 };
 
+// 보관함에 장소 추가
+exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+
+    // 자유 보관함의 경우 날짜 없으므로 -1 저장
+    if(!cpm_plan_day) cpm_plan_day = -1;
+
+    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
+                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
+
+    const result = await db.query(query);
+
+    return result;
+};
+
 // 보관함 리스트 조회(검색)
 exports.readCollectionList = async (user_pk, my, sort, keyword) => {
 
@@ -176,20 +190,6 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
     }
 };
 
-// 보관함에 장소 추가
-exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
-
-    // 자유 보관함의 경우 날짜 없으므로 -1 저장
-    if(!cpm_plan_day) cpm_plan_day = -1;
-
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
-
-    const result = await db.query(query);
-
-    return result;
-};
-
 // 보관함 상세 조회
 exports.readCollection = async (user_pk, collection_pk) => {
     // TODO 보관함 type(자유, 일정) 에 따라 쿼리 다르게 타야 함.
@@ -207,15 +207,18 @@ exports.readCollection = async (user_pk, collection_pk) => {
 
         // 보관함 정보 & 보관함 좋아요 상태
         const query1 = `SELECT c.*, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, user_nickname AS created_user_name,
-                               CASE WHEN c.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator,
-                               IFNULL(like_cnt, 0) AS like_cnt
+                               CASE WHEN c.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator, IFNULL(like_cnt, 0) AS like_cnt
                         FROM collections c
                         INNER JOIN users u
                         ON u.user_pk = c.user_pk
+                        LEFT OUTER JOIN (
+                            SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection
+                            WHERE collection_pk = ${collection_pk}
+                            GROUP BY collection_pk
+                        ) llc 
+                        ON llc.collection_pk = c.collection_pk
                         LEFT OUTER JOIN like_collection lc
                         ON lc.collection_pk = c.collection_pk
-                        LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection GROUP BY collection_pk) llc 
-                        ON llc.collection_pk = c.collection_pk
                         AND lc.user_pk = ${user_pk}
                         WHERE c.collection_pk = ${collection_pk}`;
         const [[result1]] = await conn.query(query1);

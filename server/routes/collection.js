@@ -204,4 +204,5 @@ router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, nex
         });
     }
 })
+
 module.exports = router;
