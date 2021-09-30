@@ -293,8 +293,8 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data[0]);
-                    setPlaceData(response.data[0]);
+                    console.log(response.data);
+                    setPlaceData(response.data.placeData);
                 })
                 .catch((err) => {
                     console.error(err);
