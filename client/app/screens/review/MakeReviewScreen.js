@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert, FlatList } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Icon, AirbnbRating, Rating} from 'react-native-elements';
@@ -16,12 +16,16 @@ const MakeReviewScreen = ({route, navigation}) => {
     const { colors } = useTheme();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const { placeName } = route.params;
+    const { placeName, place_pk } = route.params;
     const [isOpened, setIsOpened] = useState(false);
     const [reviews, setReviews] = useState([
         '많이 아쉬워요', '아쉬워요', '괜찮아요', '마음에 들어요!', '다시 방문하고 싶어요!'
     ]);
     const [ratedScore, setRatedScore] = useState(0);
+    const [ratedCleanlinessScore, setRatedCleanlinessScore] = useState(0);
+    const [ratedAccessibilityScore, setRatedAccessibilityScore] = useState(0);
+    const [ratedMarketScore, setRatedMarketScore] = useState(0);
+
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
         {
@@ -145,6 +149,83 @@ const MakeReviewScreen = ({route, navigation}) => {
         }
     };
 
+    const postReview = () => {
+        var postBusyTime = [0,0,0,0];
+        var postFacility = '';
+
+        for (let i = 0; i < busyTimeData.length; i++) {
+            if (isBusyTimePress[i] === true) {
+                postBusyTime[i] = 1;
+            };
+        };
+
+        for (let i = 0; i < facilityData.length; i++) {
+            if (isFacilityPress[i] === true) {
+                postFacility = postFacility + i + ',';
+            };
+        };
+        postFacility = postFacility.substring(0, postFacility.length-1);
+
+
+        // 선택사항이 많으므로 하나 하나 조건 필요
+        var DATA = {
+            review_congestion_moring: postBusyTime[0],
+            review_congestion_afternoon: postBusyTime[1],
+            review_congestion_evening: postBusyTime[2],
+            review_congestion_night: postBusyTime[3],
+        };
+        if(ratedScore) {
+            DATA.review_score = ratedScore;
+        }
+        if(ratedCleanlinessScore) {
+            DATA.review_cleanliness = ratedCleanlinessScore;
+        }
+        if(ratedAccessibilityScore) {
+            DATA.review_accessibility = ratedAccessibilityScore;
+        }
+        if(ratedMarketScore) {
+            DATA.review_market = ratedMarketScore;
+        }
+        if(postFacility !== '') {
+            DATA.review_facility = postFacility;
+        }
+
+        try {
+            fetch(`http://34.64.185.40/place/${place_pk}/review`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    reviewData: DATA,
+                })
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // } 
+                    console.log(response.data) 
+                    Alert.alert('', '리뷰가 등록되었습니다.');
+                    navigation.goBack();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    Alert.alert('', '리뷰 등록에 실패했습니다.');
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < busyTimeData.length; i++) {
@@ -169,6 +250,18 @@ const MakeReviewScreen = ({route, navigation}) => {
 
     const getRating = (rating) => {
         setRatedScore(rating);
+    };
+
+    const getCleanlinessRating = (rating) => {
+        setRatedCleanlinessScore(rating);
+    };
+
+    const getAccessibilityRating = (rating) => {
+        setRatedAccessibilityScore(rating);
+    };
+
+    const getMarketRating = (rating) => {
+        setRatedMarketScore(rating);
     };
 
     const BusyTime = ({keyword, idx}) => {
@@ -306,7 +399,8 @@ const MakeReviewScreen = ({route, navigation}) => {
                                 ratingBackgroundColor={colors.gray[4]}
                             />
                         
-                            {ratedScore !== 0 && <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText>}
+                            {ratedScore !== 0 ? <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText> :
+                            <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
                         </View>
                     </View>
                 </ScreenContainerView>
@@ -344,6 +438,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                     imageSize={17}
                                     startingValue={0}
                                     fractions={0}
+                                    onFinishRating={getCleanlinessRating}
                                     style={{backgroundColor: colors.backgroundColor}}
                                     ratingColor={colors.mainColor}
                                     tintColor={colors.backgroundColor}
@@ -363,6 +458,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                     imageSize={17}
                                     startingValue={0}
                                     fractions={0}
+                                    onFinishRating={getAccessibilityRating}
                                     style={{backgroundColor: colors.backgroundColor}}
                                     ratingColor={colors.mainColor}
                                     tintColor={colors.backgroundColor}
@@ -382,6 +478,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                     imageSize={17}
                                     startingValue={0}
                                     fractions={0}
+                                    onFinishRating={getMarketRating}
                                     style={{backgroundColor: colors.backgroundColor}}
                                     ratingColor={colors.mainColor}
                                     tintColor={colors.backgroundColor}
@@ -457,6 +554,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                         bottom: 10,
                     }}
                     disabled={ratedScore > 0 ? false : true}
+                    onPress={()=>postReview()}
                 >
                     <AppText
                         style={{

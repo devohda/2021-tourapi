@@ -1,8 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert, FlatList } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {useTheme} from '@react-navigation/native';
-import {Icon} from 'react-native-elements';
+import {useTheme, useIsFocused} from '@react-navigation/native';
+import {Icon, Rating} from 'react-native-elements';
 // import MapView, {Marker, UrlTile} from 'react-native-maps';
 import StarScore from '../components/StarScore';
 import NavigationTop from '../components/NavigationTop';
@@ -231,15 +231,16 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
 
 const PlaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const {data} = route.params;
+    const { data } = route.params;
     const [placeData, setPlaceData] = useState({});
+    const [reviewData, setReviewData] = useState({});
     const [collectionList, setCollectionList] = useState([]);
 
     const [token, setToken] = useToken();
     //데이터 받아서 다시해야함
-    const [placeScore, setPlaceScore] = useState('4.84');
+    const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-
+    const isFocused = useIsFocused();
 
     const styles = StyleSheet.create({
         categoryBorder: {
@@ -293,8 +294,10 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data[0]);
-                    setPlaceData(response.data[0]);
+                    console.log(response.data.review);
+                    setPlaceData(response.data.placeData);
+                    setReviewData(response.data.review);
+                    setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2))
                 })
                 .catch((err) => {
                     console.error(err);
@@ -308,7 +311,7 @@ const PlaceScreen = ({route, navigation}) => {
     useEffect(() => {
         getInitialData();
         getCollectionList();
-    }, []);
+    }, [isFocused]);
 
 
     const getCollectionList = () => {
@@ -328,7 +331,6 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -340,7 +342,7 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const PlaceInfo = ({placeData, collectionList, styles, data}) => {
+    const PlaceInfo = ({collectionList, styles, data}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
@@ -470,7 +472,6 @@ const PlaceScreen = ({route, navigation}) => {
                     }}>
                         <Jewel width={26} height={21}
                             style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                        {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
                     </TouchableOpacity>
                     <View style={{
                         borderWidth: 0.5,
@@ -504,7 +505,7 @@ const PlaceScreen = ({route, navigation}) => {
                 {/*장소 사진*/}
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
-                        source={require('../assets/images/here_default.png')}
+                        source={placeData.place_img ? {uri: placeData.place_img} : require('../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
@@ -602,18 +603,47 @@ const PlaceScreen = ({route, navigation}) => {
                             width: '100%',
                             marginVertical: 16
                         }}>
-                            { /* TODO : Score component 재사용성 높이기 => 더 커스터마이징 할 수 있도록 */}
                             <Score name="쾌적성" color={colors.mainColor} marginBottom={5} fontSize={12}
                                 textAlign={'center'}>
-                                <StarScore score={3.8} starSize={12}/>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={14}
+                                    fractions={0}
+                                    readonly
+                                    startingValue={reviewData.review_cleanliness}
+                                    ratingColor={colors.red[3]}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.red_gray[5]}
+                                />
                             </Score>
                             <Score name="접근성" color={colors.mainColor} marginBottom={5} fontSize={12}
                                 textAlign={'center'}>
-                                <StarScore score={3} starSize={12}/>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={14}
+                                    fractions={0}
+                                    readonly
+                                    startingValue={reviewData.review_accessibility}
+                                    ratingColor={colors.red[3]}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.red_gray[5]}
+                                />
                             </Score>
                             <Score name="주변상권" color={colors.mainColor} marginBottom={5} fontSize={12}
                                 textAlign={'center'}>
-                                <StarScore score={4} starSize={12}/>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={14}
+                                    fractions={0}
+                                    readonly
+                                    startingValue={reviewData.review_market}
+                                    ratingColor={colors.red[3]}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.red_gray[5]}
+                                />
                             </Score>
                         </View>
 
@@ -628,7 +658,7 @@ const PlaceScreen = ({route, navigation}) => {
                             borderRadius: 10,
                             paddingVertical: 6
                         }}
-                        onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name})}
+                        onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name, place_pk: placeData.place_pk})}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
                                 source={require('../assets/images/write_review_icon.png')}></Image>

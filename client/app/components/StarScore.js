@@ -14,21 +14,4 @@ const StarScore = (props) => {
         </View>
     )
 }
-// const styles = StyleSheet.create({
-//     score_container: {
-//         width: 25,
-//         height: 15,
-//         backgroundColor: 'black',
-//         borderRadius: 70,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//         marginRight : 3
-//     },
-//     score_text: {
-//         color: 'white',
-//         textAlign: 'center',
-//         fontSize: 10,
-//         fontWeight: 'bold'
-//     }
-// })
 export default StarScore;

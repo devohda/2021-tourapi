@@ -160,7 +160,7 @@ const ShowPlaces = props => {
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1}>
                         <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})} disabled={isEditPage && true}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate('Place', {data: item})} disabled={isEditPage && true}>
                                 <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
                                     {
                                         !isFree &&

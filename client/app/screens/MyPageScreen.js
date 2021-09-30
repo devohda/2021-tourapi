@@ -102,8 +102,7 @@ const MyPageScreen = ({navigation}) => {
                                 lineHeight: 28.8
                             }}
                         >
-                            hi
-                            {/* {userData.user_nickname} */}
+                            {userData.user_nickname}
                         </AppText>
                         <View
                             style={{

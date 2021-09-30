@@ -218,7 +218,8 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                     'Content-Type': 'application/json'
                 },
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then((response) => {
+                    console.log(response.data)
                     setKeywordData(response.data);
                     setFalse();
                 })
