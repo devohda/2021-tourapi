@@ -66,6 +66,37 @@ const SearchCollection = (props, {navigation}) => {
         }
     };
 
+    const countCollectionView = (collection_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const checkPrivate = (item) => {
         var newArr = [];
         for (var i = 0; i < item.length; i++) {
@@ -83,6 +114,7 @@ const SearchCollection = (props, {navigation}) => {
                 ...styles.directoryContainer,
                 shadowColor: colors.red_gray[6]
             }, collectionList.length === 1 ? {width: 172} : {width: '48%'}]} onPress={() => {
+                countCollectionView(item.collection_pk);
                 item.collection_type === 1 ?
                     props.navigation.navigate('PlanCollection', {data: item}) : props.navigation.navigate('FreeCollection', {data: item});
             }}>

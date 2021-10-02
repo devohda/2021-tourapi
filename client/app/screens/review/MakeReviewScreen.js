@@ -169,7 +169,7 @@ const MakeReviewScreen = ({route, navigation}) => {
 
         // 선택사항이 많으므로 하나 하나 조건 필요
         var DATA = {
-            review_congestion_moring: postBusyTime[0],
+            review_congestion_morning: postBusyTime[0],
             review_congestion_afternoon: postBusyTime[1],
             review_congestion_evening: postBusyTime[2],
             review_congestion_night: postBusyTime[3],
@@ -205,16 +205,8 @@ const MakeReviewScreen = ({route, navigation}) => {
                 res.json();
             })
                 .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // } 
-                    console.log(response.data) 
-                    Alert.alert('', '리뷰가 등록되었습니다.');
-                    navigation.goBack();
+                    console.log(response)
+                    Alert.alert('', '리뷰 등록이 완료되었습니다.')
                 })
                 .catch((err) => {
                     console.error(err);
@@ -554,8 +546,9 @@ const MakeReviewScreen = ({route, navigation}) => {
                         bottom: 10,
                     }}
                     disabled={ratedScore > 0 ? false : true}
-                    onPress={()=>postReview()}
-                >
+                    onPress={()=>{
+                        postReview();
+                    }}>
                     <AppText
                         style={{
                             textAlign: 'center',
