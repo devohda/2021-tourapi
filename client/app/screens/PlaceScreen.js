@@ -70,35 +70,6 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         borderColor: isCollectionClicked[idx] ? colors.blue[6] : colors.defaultColor
                     }}>
                         <TouchableOpacity onPress={() => {
-                            // if(borderColor === colors.blue[6]){
-                            //     for(let i=0;i<cData.length;i++) {
-                            //         if(cData[i] === idx) {
-                            //             cData.splice(i, 1)
-                            //             i--;
-                            //         }
-                            //     }
-                            //     setBorderColor(colors.defaultColor);
-                            // }
-                            // else {
-                            //     if(cData.length === 0){
-                            //         setBorderColor(colors.blue[6]);
-                            //         cData.push(idx);
-                            //     }
-                            //     else {
-                            //         for(let i=0;i<item.length;i++) {
-                            //             console.log(i != idx)
-                            //             if(i != idx){
-                            //                 setBorderColor(colors.defaultColor);
-                            //                 cData.splice(i, 1);
-                            //                 i--;
-                            //             } else {
-                            //                 setBorderColor(colors.blue[6]);
-                            //                 cData.push(idx);
-                            //             }
-
-                            //         }
-                            //     }
-                            // }
                             const newArr = [...isCollectionClicked];
                             if (newArr[idx]) {
                                 newArr[idx] = false;

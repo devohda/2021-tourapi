@@ -47,6 +47,7 @@ const windowWidth = Dimensions.get('window').width;
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const {data} = route.params;
+    const keywords = data.keywords;
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
@@ -378,9 +379,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const Keyword = ({item}) => {
+    const Keyword = props => {
         return (
-            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
+            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
         );
     };
 
@@ -697,6 +698,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 }]}>
                                 <AppText style={{...styles.dirFreeText, color: colors.red[3]}}>일정</AppText>
                             </View>
+                            {
+                                keywords.map((keyword, idx) => (
+                                    <Keyword keyword={keyword} key={idx} />
+                                ))
+                            }
                         </View>
                         <View>
                             {checkTrue() &&

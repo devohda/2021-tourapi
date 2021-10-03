@@ -8,7 +8,11 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    FlatList
+    FlatList,
+    Pressable,
+    TextInput,
+    SafeAreaView,
+    ScrollView,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import { Layout, NativeDateService, RangeCalendar } from '@ui-kitten/components';
@@ -28,81 +32,17 @@ import CalendarTexts from './CalendarTexts';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
+import SearchIcon from '../../assets/images/search-icon.svg';
+
 export const navigationRef = React.createRef();
 
 const MakePlanCollectionScreen = ({navigation}) => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const {colors} = useTheme();
-    const styles = StyleSheet.create({
-        plusComplete: {
-            marginBottom: '5%'
-        },
-        selectType: {
-            borderWidth: 1,
-            paddingVertical: 1,
-            paddingHorizontal: 8.5,
-            borderRadius: 12,
-            marginRight: 10,
-            shadowColor: colors.red[8],
-            shadowOffset: {width: 0, height: 1},
-            shadowOpacity: 0.1,
-            elevation: 1,
-            width: 58, height: 28,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        selectTypeClicked: {
-            borderWidth: 1,
-            paddingVertical: 1,
-            paddingHorizontal: 8.5,
-            borderRadius: 12,
-            marginRight: 10,
-            shadowColor: colors.red[8],
-            shadowOffset: {width: 0, height: 1},
-            shadowOpacity: 0.1,
-            elevation: 1,
-            width: 58, height: 28,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        selectTypeTextClicked: {
-            color : colors.defaultColor,
-            fontSize: 14,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            fontWeight: 'bold',
-            marginVertical: 2
-        },
-        selectTypeText: {
-            color: colors.gray[6],
-            fontSize: 14,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            fontWeight: 'bold',
-            marginVertical: 2
-        },
-        selectTypeIcon: {
-            backgroundColor: 'rgb(141, 141, 141)',
-            borderColor: 'black',
-            borderWidth: 1,
-            paddingVertical: 1,
-            paddingHorizontal: 8.5,
-            borderRadius: 12
-        },
-        selectTypeIconDetail: {
-            paddingVertical: 1,
-            borderRadius: 12
-        },
-        defaultImage: {
-            backgroundColor: '#c4c4c4',
-            width: 287,
-            height: 243,
-        }
-    });
-
     const toastRef = useRef();
-    const refRBSheet = useRef();
+    const refCalendarRBSheet = useRef();
+    const refKeywordRBSheet = useRef();
 
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
@@ -165,10 +105,11 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     }
                 }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {
                     borderColor: colors.mainColor,
-                    backgroundColor: colors.mainColor
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}>
+                    backgroundColor: colors.mainColor,
+                    shadowColor: colors.red[8]
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
                     <AppText
-                        style={isPress[keyword.keyword_pk - 1] ? styles.selectTypeTextClicked : styles.selectTypeText}>{keyword.keyword_title}</AppText>
+                        style={isPress[keyword.keyword_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.keyword_title}</AppText>
                 </TouchableOpacity>
             </View>
         );
@@ -217,6 +158,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 showDatas.push(keywordData[i].keyword_title);
             }
         }
+        console.log(showDatas)
         const startDate = moment(range.startDate).format('YYYY-MM-DD');
         const endDate = moment(range.endDate).format('YYYY-MM-DD');
 
@@ -241,13 +183,13 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 res.json();
             })
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
 
                     const item = {
                         'collection_name': collectionName,
@@ -289,14 +231,14 @@ const MakePlanCollectionScreen = ({navigation}) => {
 
         return (
             <TouchableOpacity onPress={()=>{
-                refRBSheet.current.open(); 
+                refCalendarRBSheet.current.open(); 
                 setDate({
                     startDate: new Date(),
                     endDate: new Date
                 });
             }}><AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '400', lineHeight: 22.4}}>{moment(range.startDate).format('YY. MM. DD (dd)')} - {moment(range.endDate).format('YY. MM. DD (dd)')}</AppText>
                 <RBSheet
-                    ref={refRBSheet}
+                    ref={refCalendarRBSheet}
                     closeOnDragDown={true}
                     closeOnPressMask={true}
                     height={600}
@@ -354,7 +296,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                     borderRadius: 10
                                 }}
                                 onPress={() => {
-                                    refRBSheet.current.close();
+                                    refCalendarRBSheet.current.close();
                                     setRange(date);
                                 }}
                             ><AppText
@@ -374,6 +316,193 @@ const MakePlanCollectionScreen = ({navigation}) => {
         );
     };
 
+    const SelectKeyword = () => {
+        const setF = () => {
+            var pressed = [];
+            for (let i = 0; i < keywordData.length; i++) {
+                pressed.push(false);
+            }
+            return pressed;
+        };
+
+        const [searchKeyword, setSearchKeyword] = useState('');
+        const [pressed, setPressed] = useState(setF());
+
+        const Keyword = ({keyword, idx}) => {
+            return (
+                <View key={idx}
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <TouchableOpacity onPress={() => {
+                        if (pressed[keyword.keyword_pk - 1]) {
+                            let newArr = [...pressed];
+                            newArr[keyword.keyword_pk - 1] = false;
+                            setPressed(newArr);
+                        } else {
+                            let newArr = [...pressed];
+                            newArr[keyword.keyword_pk - 1] = true;
+                            setPressed(newArr);
+                        }
+                    }} style={pressed[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {
+                        borderColor: colors.mainColor,
+                        backgroundColor: colors.mainColor,
+                        shadowColor: colors.red[8]
+                    }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
+                        <AppText
+                            style={pressed[keyword.keyword_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[3]}}>{keyword.keyword_title}</AppText>
+                    </TouchableOpacity>
+                </View>
+            );
+        };
+
+
+        return (
+            <>
+                <TouchableOpacity onPress={()=>refKeywordRBSheet.current.open()}>
+                    <Image source={require('../../assets/images/add_keyword.png')}
+                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
+                </TouchableOpacity>
+                <RBSheet
+                ref={refKeywordRBSheet}
+                closeOnDragDown={true}
+                closeOnPressMask={true}
+                height={475}
+                customStyles={{
+                    wrapper: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    },
+                    draggableIcon: {
+                        backgroundColor: colors.gray[4],
+                        width: 110
+                    },
+                    container: {
+                        borderTopLeftRadius: 10,
+                        borderTopRightRadius: 10,
+                        backgroundColor: colors.yellow[7],
+                    }
+                }}
+            >
+                <View style={{backgroundColor: colors.backgroundColor}}>
+                    <ScreenContainerView>
+                        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 19, marginBottom: 17}}>
+                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함
+                                해시태그</AppText>
+                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대 3개</AppText>
+                        </View>
+                        <View flexDirection="row" style={{...styles.search_box, borderColor: colors.mainColor}}>
+                            <TextInput flex={1} style={{fontSize: 16}}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                placeholder=""
+                                placeholderTextColor={colors.gray[5]}
+                                onChangeText={(text)=>setSearchKeyword(text)}
+                            />
+                            <Pressable style={{marginLeft: 5}}>
+                                <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
+                            </Pressable>
+                        </View>
+                        <><View style={{flexDirection: 'row'}}>
+                            {
+                                keywordData.map((keyword, idx) => (
+                                    <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <Keyword keyword={keyword} key={idx+'0000'}/>}</>
+                                ))
+                            }
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            {
+                                keywordData.map((keyword, idx) => (
+                                    <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <Keyword keyword={keyword} key={idx+'1111'}/>}</>
+                                ))
+                            }
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            {
+                                keywordData.map((keyword, idx) => (
+                                    <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <Keyword keyword={keyword} key={idx+'2222'}/>}</>
+                                ))
+                            }
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            {
+                                keywordData.map((keyword, idx) => (
+                                    <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <Keyword keyword={keyword} key={idx+'3333'}/>}</>
+                                ))
+                            }
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            {
+                                keywordData.map((keyword, idx) => (
+                                    <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <Keyword keyword={keyword} key={idx+'4444'}/>}</>
+                                ))
+                            }
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            {
+                                keywordData.map((keyword, idx) => (
+                                    <>{18 <= idx && idx <= 20 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <Keyword keyword={keyword} key={idx+'5555'}/>}</>
+                                ))
+                            }
+                        </View>
+                        </>
+                        <View style={{marginTop: 30, marginBottom: 20, bottom: 0}}>
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor: colors.mainColor,
+                                    backgroundColor: pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? colors.mainColor : colors.gray[5],
+                                    height: 48,
+                                    borderRadius: 10
+                                }}
+                                onPress={() => {
+                                    setIsPress(pressed)
+                                }}
+                                disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
+                            ><AppText
+                                    style={{
+                                        textAlign: 'center',
+                                        padding: 14,
+                                        fontSize: 16,
+                                        color: colors.defaultColor,
+                                        fontWeight: 'bold'
+                                    }}
+                                >선택완료</AppText>
+                            </TouchableOpacity>
+                        </View>
+                    </ScreenContainerView>
+                </View>
+            </RBSheet>
+        </>
+        )
+    }
+
+    const SelectedKeyword = ({keyword, idx}) => {
+        return (
+            <View key={idx}
+                style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+            >
+                <TouchableOpacity style={[styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}
+                    disabled={true}
+                >
+                    <AppText
+                        style={{...styles.selectTypeText, color: colors.mainColor}}>{keyword.keyword_title}</AppText>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title="일정보관함 만들기"/>
@@ -390,9 +519,11 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 <ScreenDivideLine />
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함 키워드</AppText>
-                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함
+                                해시태그</AppText>
+                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>*
+                                최대
                                 3개</AppText>
                         </View>
                         <View style={{
@@ -401,27 +532,16 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         }}>
 
                             <View flexDirection="row">
-                                <Image source={require('../../assets/images/add_keyword.png')}
-                                    style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
-                                {
-                                    keywordData.map((keyword, idx) => (
-                                        <Keyword keyword={keyword} key={idx} />
-                                    ))
-                                }
-                                {/* <FlatList data={keywordData} renderItem={showKeywords} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 20 }} horizontal={true} nestedScrollEnabled/> */}
+                                <SelectKeyword />
+                                    {
+                                        keywordData.map((keyword, idx) => (
+                                            <>{isPress[idx] === true &&
+                                                <SelectedKeyword keyword={keyword} key={idx+'selected'}/>}</>
+                                        ))
+                                    }
                             </View>
                         </View>
                     </View>
-                    {/* <View style={{marginTop: 37, left: 24}}>
-                        <AppText style={{marginVertical: 8, fontSize: 20, fontWeight: 'bold'}}>공동 작성자</AppText>
-                        <View style={{flexDirection: 'row', marginTop: 16}}>
-                            <SafeAreaView>
-                                <FlatList data={users} renderItem={showUsers} keyExtractor={(item) => item.id}
-                                          contentContainerStyle={{paddingBottom: 20}} horizontal={true}
-                                          nestedScrollEnabled/>
-                            </SafeAreaView>
-                        </View>
-                    </View> */}
                     {/* marginBottom은 일단 퍼블리싱때문에 */}
                     <View style={{
                         marginTop: 24,
@@ -456,12 +576,9 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 borderRadius: 10
                             }}
                             onPress={() => {
-                                // if ((DATA.collection_name.length >= 2) && (isPress.filter((value) => value === true).length > 0 && isPress.filter((value) => value === true).length <= 3)) {
                                 postCollections();
-                                // navigation.setOptions({tabBarVisible: true});
-                                // navigation.goBack(null);
-                                // navigation.navigate('PlanCollection');
-                                // }
+                                navigation.setOptions({tabBarVisible: true});
+                                navigation.goBack(null);
                             }}
                             disabled={DATA.collection_name.length < 2 ? true : false}
                         ><AppText
@@ -479,7 +596,85 @@ const MakePlanCollectionScreen = ({navigation}) => {
             </KeyboardAvoidingView>
         </ScreenContainer>
     );
-
 };
+
+const styles = StyleSheet.create({
+    plusComplete: {
+        marginBottom: '5%'
+    },
+    selectType: {
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8.5,
+        borderRadius: 12,
+        marginVertical: 5,
+        marginRight: 10,
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.1,
+        elevation: 1,
+        // width: 58,
+        height: 28,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    selectTypeClicked: {
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8.5,
+        borderRadius: 12,
+        marginVertical: 5,
+        marginRight: 10,
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.1,
+        elevation: 1,
+        // width: 58,
+        height: 28,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    selectTypeTextClicked: {
+        fontSize: 14,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontWeight: 'bold',
+        marginVertical: 2
+    },
+    selectTypeText: {
+        fontSize: 14,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontWeight: 'bold',
+        marginVertical: 2
+    },
+    selectTypeIcon: {
+        backgroundColor: 'rgb(141, 141, 141)',
+        borderColor: 'black',
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8.5,
+        borderRadius: 12
+    },
+    selectTypeIconDetail: {
+        paddingVertical: 1,
+        borderRadius: 12
+    },
+    defaultImage: {
+        backgroundColor: '#c4c4c4',
+        width: 287,
+        height: 243,
+    },
+    plusComplete: {
+        marginBottom: '5%'
+    },
+    bottomSheetBack: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    search_box: {
+        borderBottomWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 18
+    },
+});
 
 export default MakePlanCollectionScreen;
