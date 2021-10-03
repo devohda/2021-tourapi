@@ -10,6 +10,7 @@ const likeRouter = require('./like');
 const keywordRouter = require('./keyword');
 const userRouter = require('./user');
 const viewRouter = require('./view');
+const facilityRouter = require('./facility');
 
 
 // 라우터 파일 등록하기
@@ -21,6 +22,7 @@ router.use('/like', likeRouter);
 router.use('/keyword', keywordRouter);
 router.use('/user', userRouter);
 router.use('/view', viewRouter);
+router.use('/facility', facilityRouter);
 
 
 module.exports = router;
