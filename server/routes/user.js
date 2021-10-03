@@ -17,8 +17,9 @@ router.get('/', verifyToken, (req, res, next) => {
 router.get('/list', async (req, res) => {
     let result;
     const {keyword, popular} = req.query;
+    const filterPopular = popular ? JSON.parse( popular.toLowerCase()) : undefined;
     try {
-        result = await userService.readUserList(keyword, JSON.parse( popular.toLowerCase() ));
+        result = await userService.readUserList(keyword, filterPopular);
     } catch (err) {
         return res.status(500).json({
             code: 500,

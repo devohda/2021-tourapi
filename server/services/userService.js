@@ -13,7 +13,6 @@ exports.readUser = async (user_pk) => {
 // 유저 리스트 조회
 exports.readUserList = async (keyword, popular) => {
 
-    const conn = await db.pool.getConnection();
     let result;
 
     try {
@@ -40,8 +39,7 @@ exports.readUserList = async (keyword, popular) => {
                         LIMIT 10`;
         }
 
-
-        const [result1] = await conn.query(query1);
+        const result1 = await db.query(query1);
 
         result = await Promise.all(result1.map(async user => {
             // 각 유저 별 키워드
@@ -49,14 +47,14 @@ exports.readUserList = async (keyword, popular) => {
                             LEFT OUTER JOIN keywords_users ku 
                             ON ku.keyword_pk = k.keyword_pk 
                             WHERE ku.user_pk = ${user.user_pk}`;
-            const [result2] = await conn.query(query2);
+            const result2 = await db.query(query2);
             const keywords = result2.map(keyword => keyword.keyword_title);
 
             // 각 유저 별 만든 보관함 개수
             const query3 = `SELECT COUNT(*) AS collection_cnt 
                             FROM collections 
                             WHERE user_pk = ${user.user_pk}`;
-            const [[result3]] = await conn.query(query3);
+            const [result3] = await db.query(query3);
             const madeCollectionCnt = result3.collection_cnt;
 
             return {
@@ -69,7 +67,6 @@ exports.readUserList = async (keyword, popular) => {
     } catch (err) {
         console.error(err);
     } finally {
-        conn.release();
         return result;
     }
 };
