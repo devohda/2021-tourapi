@@ -31,15 +31,16 @@ router.post('/:placeId/review', verifyToken, async (req, res, next) => {
     const {reviewData} = req.body;
     const place_pk = req.params.placeId
     const {user} = res.locals;
-
+    const {review_facility, ...reviewData2} = reviewData;
     try {
         const review = {
             user_pk : user.user_pk,
             place_pk : place_pk,
-            ...reviewData
+            ...reviewData2
         }
+        console.log(review_facility)
 
-        await reviewService.createReview(review);
+        await reviewService.createReview(review, review_facility);
     } catch (err) {
         return res.status(500).json({
             code: 500,
