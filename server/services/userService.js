@@ -11,16 +11,35 @@ exports.readUser = async (user_pk) => {
 }
 
 // 유저 리스트 조회
-exports.readUserList = async (keyword) => {
+exports.readUserList = async (keyword, popular) => {
 
     const conn = await db.pool.getConnection();
     let result;
 
     try {
         // 유저 정보
-        const query1 = `SELECT user_pk, user_nickname,user_img 
-                        FROM users u
-                        WHERE user_nickname LIKE ${mysql.escape(`%${keyword}%`)}`;
+        let query1 = `SELECT u.user_pk, user_nickname, user_img
+                      FROM users u`
+
+        if (popular) {
+            query1 = ` SELECT u.user_pk, user_nickname, user_img, IFNULL(cnt, 0) AS like_total_cnt
+                       FROM users u
+                       LEFT OUTER JOIN (
+                           SELECT user_pk, COUNT(*) AS cnt FROM like_collection 
+                           GROUP BY user_pk
+                       ) lc
+                       ON lc.user_pk = u.user_pk`;
+        }
+
+        if (keyword) {
+            query1 += ` WHERE user_nickname LIKE ${mysql.escape(`%${keyword}%`)}`;
+        }
+
+        if(popular){
+            query1 += ` ORDER BY like_total_cnt DESC, u.user_pk ASC
+                        LIMIT 10`;
+        }
+
 
         const [result1] = await conn.query(query1);
 
@@ -45,11 +64,11 @@ exports.readUserList = async (keyword) => {
                 keywords,
                 madeCollectionCnt
             };
-        })); 
+        }));
 
-    }catch (err){
+    } catch (err) {
         console.error(err);
-    }finally {
+    } finally {
         conn.release();
         return result;
     }

@@ -23,7 +23,7 @@ router.get('/', verifyToken, async (req, res, next) => {
                 data = await readCollectionList(null, false, null, keyword);
                 break;
             case 'user':
-                data = await readUserList(keyword);
+                data = await readUserList(keyword, null);
                 break;
             default:
                 break;
