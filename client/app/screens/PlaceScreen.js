@@ -1,8 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert, FlatList } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {useTheme} from '@react-navigation/native';
-import {Icon} from 'react-native-elements';
+import {useTheme, useIsFocused} from '@react-navigation/native';
+import {Icon, Rating} from 'react-native-elements';
 // import MapView, {Marker, UrlTile} from 'react-native-maps';
 import StarScore from '../components/StarScore';
 import NavigationTop from '../components/NavigationTop';
@@ -20,7 +20,6 @@ import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
 const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
-    // const [height, setHeight] = useState(150 + 90 * collectionList.length);
     const [height, setHeight] = useState(150 + 90 * 5);
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
@@ -70,35 +69,6 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         borderColor: isCollectionClicked[idx] ? colors.blue[6] : colors.defaultColor
                     }}>
                         <TouchableOpacity onPress={() => {
-                            // if(borderColor === colors.blue[6]){
-                            //     for(let i=0;i<cData.length;i++) {
-                            //         if(cData[i] === idx) {
-                            //             cData.splice(i, 1)
-                            //             i--;
-                            //         }
-                            //     }
-                            //     setBorderColor(colors.defaultColor);
-                            // }
-                            // else {
-                            //     if(cData.length === 0){
-                            //         setBorderColor(colors.blue[6]);
-                            //         cData.push(idx);
-                            //     }
-                            //     else {
-                            //         for(let i=0;i<item.length;i++) {
-                            //             console.log(i != idx)
-                            //             if(i != idx){
-                            //                 setBorderColor(colors.defaultColor);
-                            //                 cData.splice(i, 1);
-                            //                 i--;
-                            //             } else {
-                            //                 setBorderColor(colors.blue[6]);
-                            //                 cData.push(idx);
-                            //             }
-
-                            //         }
-                            //     }
-                            // }
                             const newArr = [...isCollectionClicked];
                             if (newArr[idx]) {
                                 newArr[idx] = false;
@@ -205,8 +175,8 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     }
                 }}
             >
-                <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{marginTop: 16, backgroundColor: colors.yellow[7], marginHorizontal: 20}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.yellow[7]}}>
                         <AppText
                             style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
                         <Image source={require('../assets/images/folder.png')}
@@ -219,10 +189,8 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
-                        {/* <FlatList style={{flex: 1}} flex={1} data={collectionList} renderItem={ShowFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
                     </ScrollView>
                 </SafeAreaView>
-                {/* </ScrollView> */}
             </RBSheet>
         </>
     );
@@ -231,15 +199,21 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
 
 const PlaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const {data} = route.params;
+    const { data } = route.params;
     const [placeData, setPlaceData] = useState({});
+    const [reviewData, setReviewData] = useState({});
     const [collectionList, setCollectionList] = useState([]);
+    const [facilityData, setFacilityData] = useState([]);
+    const [morningCongestion, setMorningCongestion] = useState(0);
+    const [afternoonCongestion, setAfternoonCongestion] = useState(0);
+    const [eveningCongestion, setEveningCongestion] = useState(0);
+    const [nightCongestion, setNightCongestion] = useState(0);
 
     const [token, setToken] = useToken();
     //데이터 받아서 다시해야함
-    const [placeScore, setPlaceScore] = useState('4.84');
+    const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-
+    const isFocused = useIsFocused();
 
     const styles = StyleSheet.create({
         categoryBorder: {
@@ -293,8 +267,15 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data);
+                    console.log(response.data.review);
                     setPlaceData(response.data.placeData);
+                    setReviewData(response.data.review);
+                    setFacilityData(response.data.review.facility);
+                    setMorningCongestion(response.data.review_congestion_morning);
+                    setAfternoonCongestion(response.data.review_congestion_afternoon);
+                    setEveningCongestion(response.data.review_congestion_evening);
+                    setNightCongestion(response.data.review_congestion_night);
+                    setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2))
                 })
                 .catch((err) => {
                     console.error(err);
@@ -308,12 +289,22 @@ const PlaceScreen = ({route, navigation}) => {
     useEffect(() => {
         getInitialData();
         getCollectionList();
-    }, []);
+        () => {
+            setPlaceData({});
+            setReviewData({});
+            setCollectionList([]);
+            setFacilityData([]);
+            setMorningCongestion(0);
+            setAfternoonCongestion(0);
+            setEveningCongestion(0);
+            setNightCongestion(0);
+        }
+    }, [isFocused]);
 
 
     const getCollectionList = () => {
         try {
-            fetch('http://34.64.185.40/collection/list', {
+            fetch('http://34.64.185.40/collection/list?type=MY', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -328,7 +319,6 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -340,7 +330,7 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const PlaceInfo = ({placeData, collectionList, styles, data}) => {
+    const PlaceInfo = ({collectionList, styles, data}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
@@ -470,7 +460,6 @@ const PlaceScreen = ({route, navigation}) => {
                     }}>
                         <Jewel width={26} height={21}
                             style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                        {/* <Image style={{width: 26, height: 21}} source={isLiked ?  require('../assets/images/here_icon.png') : require('../assets/images/here_icon_nonclicked.png') }></Image> */}
                     </TouchableOpacity>
                     <View style={{
                         borderWidth: 0.5,
@@ -501,10 +490,9 @@ const PlaceScreen = ({route, navigation}) => {
     
         return (
             <>
-                {/*장소 사진*/}
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
-                        source={require('../assets/images/here_default.png')}
+                        source={placeData.place_img ? {uri: placeData.place_img} : require('../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
@@ -530,8 +518,7 @@ const PlaceScreen = ({route, navigation}) => {
                         </View>
                     </View>
                 </View>
-    
-                {/*장소 데이터*/}
+
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
@@ -571,7 +558,27 @@ const PlaceScreen = ({route, navigation}) => {
             </>
         );
     };
-    
+
+    const ShowFacilities = ({item}) => {
+        return (
+            <View style={{
+                borderColor: colors.defaultColor,
+                backgroundColor: colors.defaultColor,
+                borderStyle: 'solid',
+                borderWidth: 1,
+                borderRadius: 30,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 4,
+                paddingHorizontal: 10,
+                marginRight: 10,
+                flexDirection: 'row'
+            }}>
+                <AppText style={{fontSize: 14, color: colors.mainColor}}>{item}</AppText>
+            </View>
+        )
+    }
+
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -583,8 +590,13 @@ const PlaceScreen = ({route, navigation}) => {
                     <View style={{alignItems: 'center'}}>
                         <View flex={1} style={{alignItems: 'center', justifyContent: 'center'}}>
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
-                                <Image style={{width: 30, height: 26, marginTop: 3}}
-                                    source={require('../assets/images/here_icon_nonclicked.png')}></Image>
+                                {
+                                    placeScore !== 0 ?
+                                    <Jewel width={30} height={26}
+                                    style={{color: colors.red[3], marginTop: 4}}/> :
+                                    <Jewel width={30} height={26}
+                                    style={{color: colors.red_gray[5], marginTop: 4}}/>
+                                }
                                 <View style={{marginLeft: 6, marginRight: 4}}><AppText
                                     style={{
                                         fontSize: 22,
@@ -592,7 +604,7 @@ const PlaceScreen = ({route, navigation}) => {
                                         marginRight: 5,
                                         color: colors.mainColor
                                     }}>{placeScore}점</AppText></View>
-                                <View><AppText style={{color: colors.gray[5]}}>(0명)</AppText></View>
+                                <View><AppText style={{color: colors.gray[5]}}>({reviewData.review_total_cnt}명)</AppText></View>
                             </View>
                         </View>
                         <View style={{
@@ -602,18 +614,47 @@ const PlaceScreen = ({route, navigation}) => {
                             width: '100%',
                             marginVertical: 16
                         }}>
-                            { /* TODO : Score component 재사용성 높이기 => 더 커스터마이징 할 수 있도록 */}
                             <Score name="쾌적성" color={colors.mainColor} marginBottom={5} fontSize={12}
                                 textAlign={'center'}>
-                                <StarScore score={3.8} starSize={12}/>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={14}
+                                    fractions={0}
+                                    readonly
+                                    startingValue={reviewData.review_cleanliness}
+                                    ratingColor={colors.red[3]}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.red_gray[5]}
+                                />
                             </Score>
                             <Score name="접근성" color={colors.mainColor} marginBottom={5} fontSize={12}
                                 textAlign={'center'}>
-                                <StarScore score={3} starSize={12}/>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={14}
+                                    fractions={0}
+                                    readonly
+                                    startingValue={reviewData.review_accessibility}
+                                    ratingColor={colors.red[3]}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.red_gray[5]}
+                                />
                             </Score>
                             <Score name="주변상권" color={colors.mainColor} marginBottom={5} fontSize={12}
                                 textAlign={'center'}>
-                                <StarScore score={4} starSize={12}/>
+                                <Rating
+                                    type='custom'
+                                    ratingCount={5}
+                                    imageSize={14}
+                                    fractions={0}
+                                    readonly
+                                    startingValue={reviewData.review_market}
+                                    ratingColor={colors.red[3]}
+                                    tintColor={colors.backgroundColor}
+                                    ratingBackgroundColor={colors.red_gray[5]}
+                                />
                             </Score>
                         </View>
 
@@ -628,7 +669,7 @@ const PlaceScreen = ({route, navigation}) => {
                             borderRadius: 10,
                             paddingVertical: 6
                         }}
-                        onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name})}
+                        onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name, place_pk: placeData.place_pk})}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
                                 source={require('../assets/images/write_review_icon.png')}></Image>
@@ -639,25 +680,28 @@ const PlaceScreen = ({route, navigation}) => {
                 </ScreenContainerView>
                 <ScreenDivideLine/>
                 <ScreenContainerView>
-                    <View style={{marginVertical: 8}}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>혼잡한 시간</AppText>
-                        <View style={{flexDirection: 'row', marginTop: 6}}>
-                            <Time name="오전" iconColor={colors.gray[6]} iconSize={12}/>
-                            <Time name="오후" iconColor={colors.gray[6]} iconSize={12}/>
-                            <Time name="밤" iconColor={colors.gray[6]} iconSize={12}/>
+                        <View style={[{marginVertical: 8}, !morningCongestion && !afternoonCongestion && !eveningCongestion && !nightCongestion && {display: 'none'}]}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>혼잡한 시간</AppText>
+                            <View style={{flexDirection: 'row', marginTop: 6}}>
+                                <Time name="오전" iconColor={colors.gray[6]} iconSize={12} style={!morningCongestion && {display: 'none'}}/>
+                                <Time name="오후" iconColor={colors.gray[6]} iconSize={12} style={!afternoonCongestion && {display: 'none'}}/>
+                                <Time name="저녁" iconColor={colors.gray[6]} iconSize={12} style={!eveningCongestion && {display: 'none'}}/>
+                                <Time name="밤" iconColor={colors.gray[6]} iconSize={12} style={!nightCongestion && {display: 'none'}}/>
+                            </View>
                         </View>
-                    </View>
-                    <View style={{marginVertical: 8}}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>주변시설</AppText>
-                        <View style={{flexDirection: 'row', marginTop: 6}}>
-                            <Facility name="편의점"/>
-                            <Facility name="약국"/>
-                            <Facility name="화장실"/>
-                            <Facility name="쓰레기통"/>
-                            <Facility name="주차장"/>
+                    {
+                        facilityData.length !== 0 &&
+                        <View style={{marginVertical: 8}}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>주변시설</AppText>
+                            <View style={{flexDirection: 'row', marginTop: 6}}>
+                                {
+                                    facilityData.map((item, idx) => (
+                                        <ShowFacilities item={item} key={idx+'0000'}/>
+                                    ))
+                                }
+                            </View>
                         </View>
-                    </View>
-
+                    }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
                     <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>

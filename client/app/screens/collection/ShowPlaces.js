@@ -154,13 +154,47 @@ const ShowPlaces = props => {
         }
     };
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <>
             { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1}>
                         <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})} disabled={isEditPage && true}>
+                            <TouchableOpacity onPress={() => {
+                                countPlaceView(item.place_pk);
+                                props.navigation.navigate('Place', {data: item})
+                            }} disabled={isEditPage && true}>
                                 <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
                                     {
                                         !isFree &&

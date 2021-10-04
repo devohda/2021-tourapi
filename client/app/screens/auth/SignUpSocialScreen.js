@@ -34,7 +34,8 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             color: colors.mainColor,
                             fontSize: 16,
                             fontWeight: '400',
-                            alignSelf: 'flex-end'
+                            alignSelf: 'flex-end',
+                            display: 'none'
                         }}>둘러보기</AppText>
                     </TouchableOpacity>
                 </View>
