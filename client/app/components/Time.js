@@ -21,7 +21,7 @@ const Time = (props) => {
             // 이부분은 placeScreen 보고 받은거라 props로 다시 바꿔도될듯
             flexDirection: 'row',
             width: 60,
-        }}><AppText style={{fontSize: 14, paddingEnd: 4}}>{props.name}</AppText>
+        }}><AppText style={{fontSize: 14, paddingEnd: 4, color: colors.mainColor}}>{props.name}</AppText>
         <Icon type="ionicon" name={"sunny"} color={props.iconColor} size={props.iconSize}></Icon>
         </View>
     )

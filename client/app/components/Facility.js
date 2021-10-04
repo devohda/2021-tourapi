@@ -18,7 +18,7 @@ const Facility = (props) => {
             paddingHorizontal: 10,
             marginRight: 10,
         }}>
-            <AppText style={{fontSize: 14}}>{props.name}</AppText>
+            <AppText style={{fontSize: 14}}>{props}</AppText>
         </View>
     )
 };

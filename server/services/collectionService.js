@@ -24,10 +24,12 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+        if(keywords.length > 0) {
+            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
 
-        const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
-        const result3 = await conn.query(query3, [insertKeywordsSet]);
+            const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
+            const result3 = await conn.query(query3, [insertKeywordsSet]);
+        }
 
         result = {collection_pk};
 
@@ -73,10 +75,11 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
-        console.log(insertKeywordsSet);
-        const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
-        const result3 = await conn.query(query3, [insertKeywordsSet]);
+        if(keywords.length > 0) {
+            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+            const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
+            const result3 = await conn.query(query3, [insertKeywordsSet]);
+        }
 
         // 보관함-장소 매핑에 시간 구획 라인 추가
         for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
@@ -103,8 +106,30 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
     }
 };
 
-// 보관함 리스트 조회(검색)
-exports.readCollectionList = async (user_pk, my, sort, keyword) => {
+// 보관함에 장소 추가
+exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+
+    // 자유 보관함의 경우 날짜 없으므로 -1 저장
+    if(!cpm_plan_day) cpm_plan_day = -1;
+
+    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
+                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
+
+    const result = await db.query(query);
+
+    return result;
+};
+
+// 보관함에 댓글 추가
+exports.createCollectionComment = async (collection_pk, user_pk, comment) => {
+    const query = `INSERT INTO collection_comments (user_pk, collection_pk, collection_comment)
+                   VALUES(${user_pk}, ${collection_pk}, ${mysql.escape(comment)})`
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함 리스트 조회
+exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
 
     // TODO
     //  - 마이페이지 : 보관함 이름, type, 키워드, 좋아요 개수, 장소 개수, 프로필 사진, 공개유무, sorting + 내꺼만
@@ -116,23 +141,50 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
     try {
         await conn.beginTransaction();
 
-        let query1 = `SELECT c.collection_pk, collection_name, collection_type, collection_thumbnail, collection_private, user_nickname AS created_user_name, IFNULL(place_cnt, 0) AS place_cnt, IFNULL(like_cnt, 0) AS like_cnt
+        let day = 100000;
+        if(term){
+            switch (term){
+                case 'DAY':
+                    day = 1;
+                    break;
+                case 'WEEK':
+                    day = 7;
+                    break;
+                case 'MONTH':
+                    day = 30;
+                    break
+            }
+        }
+
+        let query1 = `SELECT c.collection_pk, collection_name, collection_type, collection_thumbnail, collection_private, user_nickname AS created_user_name, 
+                             IFNULL(place_cnt, 0) AS place_cnt, IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt
                       FROM collections c
                       INNER JOIN users u
                       ON u.user_pk = c.user_pk
                       LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
                       ON cpm.collection_pk = c.collection_pk
-                      LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection GROUP BY collection_pk) lc 
+                      LEFT OUTER JOIN (
+                          SELECT collection_pk, COUNT(*) AS like_cnt 
+                          FROM like_collection 
+                          GROUP BY collection_pk
+                      ) lc
                       ON lc.collection_pk = c.collection_pk
+                      LEFT OUTER JOIN (
+                          SELECT collection_pk, COUNT(*) AS view_cnt
+                          FROM view_collection
+                          WHERE (view_time > DATE_SUB(now(), INTERVAL ${day} DAY))
+                          GROUP BY collection_pk
+                      ) vc
+                      ON vc.collection_pk = c.collection_pk
                       `
 
-        if(my || keyword){
+        if(type === 'MY' || keyword){
             query1 += ' WHERE';
 
             if(keyword){
                 query1 += ` collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
             }
-            if(my){
+            if(type === 'MY'){
                 query1 += ` c.user_pk = ${user_pk}`;
             }
         }
@@ -144,8 +196,18 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
             case 'OLD':
                 query1 += ' ORDER BY c.collection_pk ASC';
                 break;
+            case 'LIKE':
+                query1 += ' ORDER BY like_cnt DESC, c.collection_pk DESC';
+                break;
+            case 'POPULAR':
+                query1 += ' ORDER BY view_cnt DESC, c.collection_pk DESC';
+                break
             default:
                 query1 += ' ORDER BY c.collection_pk DESC';
+        }
+
+        if(type === 'MAIN'){
+            query1 += ' LIMIT 10';
         }
 
         const [result1] = await conn.query(query1);
@@ -176,20 +238,6 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
     }
 };
 
-// 보관함에 장소 추가
-exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
-
-    // 자유 보관함의 경우 날짜 없으므로 -1 저장
-    if(!cpm_plan_day) cpm_plan_day = -1;
-
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
-
-    const result = await db.query(query);
-
-    return result;
-};
-
 // 보관함 상세 조회
 exports.readCollection = async (user_pk, collection_pk) => {
     // TODO 보관함 type(자유, 일정) 에 따라 쿼리 다르게 타야 함.
@@ -207,15 +255,18 @@ exports.readCollection = async (user_pk, collection_pk) => {
 
         // 보관함 정보 & 보관함 좋아요 상태
         const query1 = `SELECT c.*, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, user_nickname AS created_user_name,
-                               CASE WHEN c.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator,
-                               IFNULL(like_cnt, 0) AS like_cnt
+                               CASE WHEN c.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator, IFNULL(like_cnt, 0) AS like_cnt
                         FROM collections c
                         INNER JOIN users u
                         ON u.user_pk = c.user_pk
+                        LEFT OUTER JOIN (
+                            SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection
+                            WHERE collection_pk = ${collection_pk}
+                            GROUP BY collection_pk
+                        ) llc 
+                        ON llc.collection_pk = c.collection_pk
                         LEFT OUTER JOIN like_collection lc
                         ON lc.collection_pk = c.collection_pk
-                        LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection GROUP BY collection_pk) llc 
-                        ON llc.collection_pk = c.collection_pk
                         AND lc.user_pk = ${user_pk}
                         WHERE c.collection_pk = ${collection_pk}`;
         const [[result1]] = await conn.query(query1);
@@ -265,7 +316,15 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 };
 
 // 보관함 댓글 리스트
-exports.readCollectionCommentList = async (collection_pk) => {};
+exports.readCollectionCommentList = async (collection_pk) => {
+    const query = `SELECT cc.user_pk, collection_comment, cc_create_time, user_img, user_nickname
+                   FROM collection_comments cc
+                   INNER JOIN users u
+                   ON u.user_pk = cc.user_pk
+                   WHERE collection_pk = ${collection_pk}`
+    const result = await db.query(query);
+    return result;
+};
 
 // 보관함 장소 리스트 수정
 exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) => {

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert, FlatList } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Icon, AirbnbRating, Rating} from 'react-native-elements';
@@ -16,12 +16,16 @@ const MakeReviewScreen = ({route, navigation}) => {
     const { colors } = useTheme();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const { placeName } = route.params;
+    const { placeName, place_pk } = route.params;
     const [isOpened, setIsOpened] = useState(false);
     const [reviews, setReviews] = useState([
         '많이 아쉬워요', '아쉬워요', '괜찮아요', '마음에 들어요!', '다시 방문하고 싶어요!'
     ]);
     const [ratedScore, setRatedScore] = useState(0);
+    const [ratedCleanlinessScore, setRatedCleanlinessScore] = useState(0);
+    const [ratedAccessibilityScore, setRatedAccessibilityScore] = useState(0);
+    const [ratedMarketScore, setRatedMarketScore] = useState(0);
+
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
         {
@@ -41,77 +45,13 @@ const MakeReviewScreen = ({route, navigation}) => {
             data: '밤'
         }]);
 
-    const [facilityData, setFacilityData] = useState([
-        {
-            id : 1,
-            data: '편의점'
-        },
-        {
-            id: 2,
-            data: '화장실'
-        },
-        {
-            id: 3,
-            data: '쓰레기통'
-        },
-        {
-            id: 4,
-            data: '주차장'
-        },
-        {
-            id: 5,
-            data: '약국'
-        },
-        {
-            id: 6,
-            data: '고객지원센터'
-        },
-        {
-            id: 7,
-            data: '유아놀이방'
-        },
-        {
-            id: 8,
-            data: '고객안내센터'
-        },
-        {
-            id: 9,
-            data: '휴게실'
-        },
-        {
-            id: 10,
-            data: '수유시설'
-        },
-        {
-            id: 11,
-            data: '물품보관함'
-        },
-        {
-            id: 12,
-            data: '자전거보관소'
-        },
-        {
-            id: 13,
-            data: '간이음수대'
-        },
-        {
-            id: 14,
-            data: '체육시설'
-        },
-        {
-            id: 15,
-            data: '교통약자용키트'
-        },
-        {
-            id: 16,
-            data: '어린이놀이터'
-        },
-    ]);
+    const [facilityData, setFacilityData] = useState([]);
     const [isBusyTimePress, setIsBusyTimePress] = useState([]);
     const [isFacilityPress, setIsFacilityPress] = useState([]);
 
     useEffect(() => {
         getUserData();
+        getFacilityData();
         setFalse();
     },[]);
 
@@ -145,6 +85,104 @@ const MakeReviewScreen = ({route, navigation}) => {
         }
     };
 
+    const getFacilityData = () => {
+        try {
+            fetch('http://34.64.185.40/facility/list', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+
+                    setFacilityData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const postReview = () => {
+        var postBusyTime = [0,0,0,0];
+        var postFacility = [];
+
+        for (let i = 0; i < busyTimeData.length; i++) {
+            if (isBusyTimePress[i] === true) {
+                postBusyTime[i] = 1;
+            };
+        };
+
+        for (let i = 0; i < facilityData.length; i++) {
+            if (isFacilityPress[i] === true) {
+                postFacility.push(facilityData[i].facility_pk);
+            };
+        };
+
+        // 선택사항이 많으므로 하나 하나 조건 필요
+        var DATA = {
+            review_congestion_morning: postBusyTime[0],
+            review_congestion_afternoon: postBusyTime[1],
+            review_congestion_evening: postBusyTime[2],
+            review_congestion_night: postBusyTime[3],
+        };
+        if(ratedScore) {
+            DATA.review_score = ratedScore;
+        }
+        if(ratedCleanlinessScore) {
+            DATA.review_cleanliness = ratedCleanlinessScore;
+        }
+        if(ratedAccessibilityScore) {
+            DATA.review_accessibility = ratedAccessibilityScore;
+        }
+        if(ratedMarketScore) {
+            DATA.review_market = ratedMarketScore;
+        }
+        if(postFacility.length !== 0) {
+            DATA.review_facility = postFacility;
+        }
+
+        try {
+            fetch(`http://34.64.185.40/place/${place_pk}/review`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    reviewData: DATA,
+                })
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    console.log(response)
+                    Alert.alert('', '리뷰 등록이 완료되었습니다.')
+                })
+                .catch((err) => {
+                    console.error(err);
+                    Alert.alert('', '리뷰 등록에 실패했습니다.');
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const setFalse = () => {
         var pressed = [];
         for (let i = 0; i < busyTimeData.length; i++) {
@@ -169,6 +207,18 @@ const MakeReviewScreen = ({route, navigation}) => {
 
     const getRating = (rating) => {
         setRatedScore(rating);
+    };
+
+    const getCleanlinessRating = (rating) => {
+        setRatedCleanlinessScore(rating);
+    };
+
+    const getAccessibilityRating = (rating) => {
+        setRatedAccessibilityScore(rating);
+    };
+
+    const getMarketRating = (rating) => {
+        setRatedMarketScore(rating);
     };
 
     const BusyTime = ({keyword, idx}) => {
@@ -214,20 +264,20 @@ const MakeReviewScreen = ({route, navigation}) => {
             >
                 <TouchableOpacity onPress={() => {
                     let newArr = [...isFacilityPress];
-                    if (isFacilityPress[keyword.id - 1]) {
-                        newArr[keyword.id - 1] = false;
+                    if (isFacilityPress[keyword.facility_pk - 1]) {
+                        newArr[keyword.facility_pk - 1] = false;
                         setIsFacilityPress(newArr);
                     } else {
-                        newArr[keyword.id - 1] = true;
+                        newArr[keyword.facility_pk - 1] = true;
                         setIsFacilityPress(newArr);
                     }
-                }} style={isFacilityPress[keyword.id - 1] ? [styles.selectTypeClicked, {
+                }} style={isFacilityPress[keyword.facility_pk - 1] ? [styles.selectTypeClicked, {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8],
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
                     <AppText
-                        style={isFacilityPress[keyword.id - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.data}</AppText>
+                        style={isFacilityPress[keyword.facility_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.facility_name}</AppText>
                 </TouchableOpacity>
             </View>
         );
@@ -306,7 +356,8 @@ const MakeReviewScreen = ({route, navigation}) => {
                                 ratingBackgroundColor={colors.gray[4]}
                             />
                         
-                            {ratedScore !== 0 && <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText>}
+                            {ratedScore !== 0 ? <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText> :
+                            <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
                         </View>
                     </View>
                 </ScreenContainerView>
@@ -344,6 +395,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                     imageSize={17}
                                     startingValue={0}
                                     fractions={0}
+                                    onFinishRating={getCleanlinessRating}
                                     style={{backgroundColor: colors.backgroundColor}}
                                     ratingColor={colors.mainColor}
                                     tintColor={colors.backgroundColor}
@@ -363,6 +415,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                     imageSize={17}
                                     startingValue={0}
                                     fractions={0}
+                                    onFinishRating={getAccessibilityRating}
                                     style={{backgroundColor: colors.backgroundColor}}
                                     ratingColor={colors.mainColor}
                                     tintColor={colors.backgroundColor}
@@ -382,6 +435,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                     imageSize={17}
                                     startingValue={0}
                                     fractions={0}
+                                    onFinishRating={getMarketRating}
                                     style={{backgroundColor: colors.backgroundColor}}
                                     ratingColor={colors.mainColor}
                                     tintColor={colors.backgroundColor}
@@ -457,7 +511,9 @@ const MakeReviewScreen = ({route, navigation}) => {
                         bottom: 10,
                     }}
                     disabled={ratedScore > 0 ? false : true}
-                >
+                    onPress={()=>{
+                        postReview();
+                    }}>
                     <AppText
                         style={{
                             textAlign: 'center',

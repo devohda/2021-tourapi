@@ -46,7 +46,7 @@ const SearchPlace = ({navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -62,6 +62,7 @@ const SearchPlace = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    console.log(response);
                     setSearchLength(response.data.length);
                     setPlaceList(response.data);
                     // setFalse();
@@ -137,6 +138,37 @@ const SearchPlace = ({navigation}) => {
         }
     };
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const checkType = (type) => {
         if (type === 12) {
             return '관광지';
@@ -168,7 +200,10 @@ const SearchPlace = ({navigation}) => {
 
     const PlaceContainer = ({item, index}) => {
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: item})}>
+            <TouchableOpacity onPress={() => {
+                countPlaceView(item.place_pk)
+                navigation.navigate('Place', {data: item});
+            }}>
                 <View style={{
                     marginBottom: 8,
                     alignItems: 'center',

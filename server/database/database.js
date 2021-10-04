@@ -10,7 +10,7 @@ const execute = async (query, params) => {
         // console.log(`[SUCCESS] Result : ${rows}`)
         return rows
     } catch (err) {
-        // console.log(`[ERROR] Error while performing Query : ${query}`, err)
+        console.log(`[ERROR] Error while performing Query : ${query}`, err)
         return false
     }
 }
