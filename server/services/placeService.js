@@ -7,13 +7,16 @@ exports.readPlaceList = async (user_pk, keyword, sort, type) => {
     //  검색 페이지
 
     let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(like_cnt, 0) AS like_cnt 
-                   FROM places p
-                   LEFT OUTER JOIN like_place lp
-                   ON lp.place_pk = p.place_pk
-                   AND lp.user_pk = ${user_pk}
-                   LEFT OUTER JOIN (SELECT place_pk, COUNT(*) AS like_cnt FROM like_place GROUP BY place_pk) llp
-                   ON llp.place_pk = p.place_pk
-                   WHERE place_name LIKE ${mysql.escape(`%${keyword}%`)}`;
+                 FROM places p
+                 LEFT OUTER JOIN like_place lp
+                 ON lp.place_pk = p.place_pk
+                 AND lp.user_pk = ${user_pk}
+                 LEFT OUTER JOIN (SELECT place_pk, COUNT(*) AS like_cnt FROM like_place GROUP BY place_pk) llp
+                 ON llp.place_pk = p.place_pk`
+
+    if(keyword){
+        query += `WHERE place_name LIKE ${mysql.escape(`%${keyword}%`)}`;
+    }
 
     if(sort === 'LIKE'){
         query += ' ORDER BY like_cnt DESC, p.place_pk ASC';
@@ -23,7 +26,9 @@ exports.readPlaceList = async (user_pk, keyword, sort, type) => {
         query += ' LIMIT 10';
     }
 
+    console.log(query);
     const result1 = await db.query(query);
+
 
     // 별점 나중에 수정
     const result = result1.map(place => {
