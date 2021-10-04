@@ -24,7 +24,7 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        if(keywords) {
+        if(keywords.length > 0) {
             const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
 
             const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
@@ -75,7 +75,7 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        if(keywords) {
+        if(keywords.length > 0) {
             const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
             const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
             const result3 = await conn.query(query3, [insertKeywordsSet]);
