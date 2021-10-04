@@ -174,7 +174,8 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     isPrivate: forPostEnable,
                     startDate: startDate,
                     endDate: endDate
-                }
+                },
+                keywords: []
             }
         } else {
             forPostData = {
@@ -297,7 +298,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 renderDay={(Date)=>{
                                     return(
                                         <View>
-                                            <AppText style={{color: Date.date >= date.startDate && Date.date <= date.endDate ? colors.backgroundColor : colors.mainColor,
+                                            <AppText style={{
                                                 fontSize: 12, lineHeight: 24, fontWeight: '500', justifyContent: 'center', textAlign: 'center', paddingTop: 10}}>
                                                 {Platform.OS === 'ios' ?
                                                     Date.date.toLocaleDateString().split('.')[2]
