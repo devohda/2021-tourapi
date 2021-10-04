@@ -36,7 +36,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ohda.Here",
-      "versionCode": 3
+      "versionCode": 5
     },
     "web": {
       "favicon": "./app/assets/images/favicon.png"
