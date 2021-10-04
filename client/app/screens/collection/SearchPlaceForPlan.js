@@ -58,6 +58,37 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
         }
     };
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
         getResults();
     }, [searchKeyword]);
@@ -123,7 +154,10 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     };
 
     const PlaceContainer = ({item, index}) => ( 
-        <TouchableOpacity onPress={()=>props.navigation.navigate('Place', {data : item})}>
+        <TouchableOpacity onPress={()=>{
+            countPlaceView(item.place_pk);
+            props.navigation.navigate('Place', {data : item});
+        }}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', width: '85%'}}>
                     {

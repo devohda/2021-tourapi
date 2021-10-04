@@ -45,7 +45,7 @@ const signUp = async (user_email, user_password, user_nickname) => {
         const result = await fetch(url, options)
             .then(res => res.json())
             .then(response => {
-                return response.result === true;
+                return response.code === 200;
             })
             .catch(error => console.log(error));
 

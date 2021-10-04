@@ -37,7 +37,7 @@ const SearchCollection = (props, {navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=collection`, {
+            fetch(`http://34.64.185.40/collection/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -66,6 +66,37 @@ const SearchCollection = (props, {navigation}) => {
         }
     };
 
+    const countCollectionView = (collection_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const checkPrivate = (item) => {
         var newArr = [];
         for (var i = 0; i < item.length; i++) {
@@ -83,6 +114,7 @@ const SearchCollection = (props, {navigation}) => {
                 ...styles.directoryContainer,
                 shadowColor: colors.red_gray[6]
             }, collectionList.length === 1 ? {width: 172} : {width: '48%'}]} onPress={() => {
+                countCollectionView(item.collection_pk);
                 item.collection_type === 1 ?
                     props.navigation.navigate('PlanCollection', {data: item}) : props.navigation.navigate('FreeCollection', {data: item});
             }}>
@@ -131,7 +163,7 @@ const SearchCollection = (props, {navigation}) => {
                         <View flexDirection="row"
                             style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
+                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[4]}}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
@@ -139,7 +171,7 @@ const SearchCollection = (props, {navigation}) => {
                                         style={{width: 8, height: 8, margin: 2}}></Image>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[4],
                                         fontWeight: 'bold'
                                     }}>{item.like_cnt}</AppText>
                                 </View>
@@ -148,7 +180,7 @@ const SearchCollection = (props, {navigation}) => {
                                         style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[4],
                                         fontWeight: 'bold'
                                     }}>{item.place_cnt}</AppText>
                                 </View>
