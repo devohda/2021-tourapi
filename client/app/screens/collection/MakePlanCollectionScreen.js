@@ -162,6 +162,32 @@ const MakePlanCollectionScreen = ({navigation}) => {
         const startDate = moment(range.startDate).format('YYYY-MM-DD');
         const endDate = moment(range.endDate).format('YYYY-MM-DD');
 
+        var forPostEnable = 0;
+        if (isEnabled === true) forPostEnable = 1;
+
+        var forPostData = {};
+        console.log(datas.length)
+        if(datas.length === 0) {
+            forPostData = {
+                collectionData: {
+                    name: collectionName,
+                    isPrivate: forPostEnable,
+                    startDate: startDate,
+                    endDate: endDate
+                }
+            }
+        } else {
+            forPostData = {
+                collectionData: {
+                    name: collectionName,
+                    isPrivate : forPostEnable,
+                    startDate: startDate,
+                    endDate: endDate
+                },
+                keywords: datas
+            }
+        }
+
         try {
             fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
@@ -170,15 +196,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    collectionData : {
-                        name: collectionName,
-                        isPrivate: isEnabled,
-                        startDate: startDate,
-                        endDate: endDate
-                    },
-                    keywords: datas
-                })
+                body: JSON.stringify(forPostData)
             }).then((res) => {
                 res.json();
             })
@@ -190,7 +208,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    console.log(response)
+                    // console.log(response)
 
                     const item = {
                         'collection_name': collectionName,
@@ -400,6 +418,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 autoCorrect={false}
                                 placeholder=""
                                 placeholderTextColor={colors.gray[5]}
+                                onChangeText={(text)=>setSearchKeyword(text)}
                             />
                             <Pressable style={{marginLeft: 5}}>
                                 <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
@@ -408,7 +427,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <><View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{0 <= idx && idx <= 3 && 
+                                    <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'0000'}/>}</>
                                 ))
                             }
@@ -416,7 +435,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{4 <= idx && idx <= 6 && 
+                                    <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'1111'}/>}</>
                                 ))
                             }
@@ -424,7 +443,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{7 <= idx && idx <= 10 && 
+                                    <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'2222'}/>}</>
                                 ))
                             }
@@ -432,7 +451,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{11 <= idx && idx <= 13 && 
+                                    <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'3333'}/>}</>
                                 ))
                             }
@@ -440,7 +459,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{14 <= idx && idx <= 17 && 
+                                    <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'4444'}/>}</>
                                 ))
                             }
@@ -448,7 +467,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{18 <= idx && idx <= 19 && 
+                                    <>{18 <= idx && idx <= 19 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'5555'}/>}</>
                                 ))
                             }
@@ -486,7 +505,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
 
     const SelectedKeyword = ({keyword, idx}) => {
         return (
-            <View key={idx}
+            <View key={idx+'selected'}
                 style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
@@ -536,7 +555,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                     {
                                         keywordData.map((keyword, idx) => (
                                             <>{isPress[idx] === true &&
-                                                <SelectedKeyword keyword={keyword} key={idx+'selected'}/>}</>
+                                                <SelectedKeyword keyword={keyword} key={idx+'selected'} idx={idx+'selected'}/>}</>
                                         ))
                                     }
                             </View>
@@ -571,7 +590,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <TouchableOpacity
                             testID="completed"
                             style={{
-                                backgroundColor: DATA.collection_name.length >= 2 ? colors.mainColor : colors.gray[5],
+                                backgroundColor: DATA.collection_name.length >= 2 && isPress.indexOf(true) !== -1 ? colors.mainColor : colors.gray[5],
                                 height: 48,
                                 borderRadius: 10
                             }}
@@ -580,7 +599,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 navigation.setOptions({tabBarVisible: true});
                                 navigation.goBack(null);
                             }}
-                            disabled={DATA.collection_name.length < 2 ? true : false}
+                            disabled={DATA.collection_name.length < 2 || isPress.indexOf(true) === -1 ? true : false}
                         ><AppText
                                 style={{
                                     textAlign: 'center',

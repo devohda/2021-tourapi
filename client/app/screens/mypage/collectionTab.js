@@ -51,9 +51,6 @@ const CollectionTab = ({navigation}) => {
 
     useEffect(() => {
         getCollectionsFromUsers();
-        // return () => {
-        //     setCollectionList({});
-        // }
     },[isFocused]);
 
     const {colors} = useTheme();
@@ -61,7 +58,7 @@ const CollectionTab = ({navigation}) => {
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch(`http://34.64.185.40/collection/list`, {
+            fetch(`http://34.64.185.40/collection/list?type=MY`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -77,7 +74,6 @@ const CollectionTab = ({navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    console.log(response.data)
 
                     setCollectionList(response.data);
                 })
@@ -123,7 +119,7 @@ const CollectionTab = ({navigation}) => {
 
     const CollectionContainer = ({item}) => {
         return (
-            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
+            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 8000}} onPress={() => {
                 countCollectionView(item.collection_pk);
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
@@ -232,7 +228,7 @@ const CollectionTab = ({navigation}) => {
                         backgroundColor: '#fff',
                         flex: 1,
                         borderRadius: 10,
-                        zIndex: 9900,
+                        zIndex: 0,
 
                         shadowColor: '#000',
                         shadowOffset: {
@@ -262,6 +258,8 @@ const CollectionTab = ({navigation}) => {
                             borderColor: colors.gray[5],
                             borderWidth: 0.4,
                             borderRadius: 1,
+                            zIndex: 9900,
+                            backgroundColor: colors.backgroundColor,
                         }}></View>
                         <TouchableOpacity
                             onPress={() => {
@@ -280,6 +278,7 @@ const CollectionTab = ({navigation}) => {
                             borderColor: colors.gray[5],
                             borderWidth: 0.4,
                             borderRadius: 1,
+                            zIndex: 9900
                         }}></View>
                         <TouchableOpacity
                             onPress={() => {
@@ -313,7 +312,7 @@ const CollectionTab = ({navigation}) => {
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
-                                setShowMenu(!showMenu);
+                                // setShowMenu(!showMenu);
                             }} style={{flexDirection: 'row'}}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"

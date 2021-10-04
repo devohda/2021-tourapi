@@ -17,9 +17,8 @@ import {
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import {Icon} from 'react-native-elements';
+import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
-
 
 // import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
@@ -31,12 +30,17 @@ import { tipsList } from '../../contexts/TipsListContextProvider';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import Jewel from '../../assets/images/jewel.svg';
+import DefaultProfile from '../../assets/images/profile_default.svg';
+
 import {useToken} from '../../contexts/TokenContextProvider';
 // import DragAndDropListForFree from './DragAndDropListForFree';
 import ShowPlacesForFree from './ShowPlacesForFree';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+
+import moment from 'moment';
+import 'moment/locale/ko';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -45,6 +49,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const {data} = route.params;
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
+    const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
@@ -93,6 +98,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         if(typeof data.collection_private !== 'boolean') {
             getInitialCollectionData();
             getInitialPlaceData();
+            getCollectionCommentsData();
         }
 
         setTmpData([
@@ -167,6 +173,69 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setFalse();
                     // console.log(response.data)
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getCollectionCommentsData = () => {
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    setCommentsData(response.data)
+                    console.log(response.data)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const [comments, setComments] = useState('');
+
+    const postCollectionCommentsData = (comment) => {
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: comment
+                })
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+                    getCollectionCommentsData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -371,6 +440,32 @@ const FreeCollectionScreen = ({route, navigation}) => {
         setDeleteMenu(true);
     };
 
+    const [isVisible, setIsVisible] = useState(false);
+    const list = [
+        { title: '프로필 수정하기',
+        onPress: () => {
+            setIsVisible(false)
+        }},
+        { title: '공간 수정하기',
+        onPress: () => {
+            setIsVisible(false)
+        }},
+        { title: '공유하기',
+        onPress: () => {
+            setIsVisible(false)
+        }
+        },
+        {
+            title: '삭제하기',
+            containerStyle: { backgroundColor: colors.red[3] },
+            titleStyle: { color: colors.defaultColor },
+            onPress: () => {
+                deleteMode();
+                setIsVisible(false)
+            }
+        },
+    ];
+
     const DeleteModal = () => (
         <Modal
             transparent={true}
@@ -394,6 +489,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             onPress={() => {
                                 setDeleteMenu(!deleteMenu);
                                 deleteCollection();
+                                setIsVisible(true);
                             }}
                         >
                             <AppText style={styles.textStyle}>삭제하기</AppText>
@@ -403,6 +499,66 @@ const FreeCollectionScreen = ({route, navigation}) => {
             </View>
         </Modal>
     );
+
+    const setBGColor = (idx) => {
+        if (idx === 0 || idx === 2) {
+            return colors.red[3];
+        } else if (idx === 1 || idx === 6) {
+            return '#FFC36A';
+        } else if (idx === 3 || idx === 8) {
+            return '#639A94';
+        } else if (idx === 4 || idx === 5) {
+            return colors.blue[2];
+        } else {
+            return '#8F6DA4';
+        }
+    };
+
+    const ShowComments = props => {
+        const { data, idx } = props;
+        return (
+            <>
+            <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
+                <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
+                    <DefaultProfile width={36} height={36}/>
+                </View>
+                <View>
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginBottom: 8,
+                        flexWrap: 'wrap'
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
+                        <AppText style={{
+                            marginHorizontal: 8,
+                            color: colors.gray[5],
+                            fontSize: 10
+                        }}>|</AppText>
+                        <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                    </View>
+                    <View style={{flex: 1, width: '100%'}}><AppText style={{
+                        fontSize: 12,
+                        color: colors.mainColor,
+                        lineHeight: 16,
+                        fontWeight: '700',
+                        flexWrap: 'wrap',
+                        width: windowWidth - 100
+                    }}>{data.collection_comment}
+                    </AppText></View>
+                </View>
+            </View>
+
+            <View style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.red_gray[6],
+                zIndex: -1000,
+                marginVertical: 12
+            }}></View>
+            </>
+        )
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -486,9 +642,26 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         !isEditPage ?
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                    style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
+                                    disabled={typeof data.collection_private === 'boolean'}
+                                    style={{flex: 1, height: '100%'}} onPress={() => {
+                                        // setShowMenu(state => !state)
+                                        setIsVisible(true);
+                                    }}>
                                     <MoreIcon style={{color: colors.mainColor}}/>
                                 </TouchableOpacity>
+                                <BottomSheet
+                                        isVisible={isVisible}
+                                        containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
+                                        >
+                                        {list.map((l, i) => (
+                                            <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
+                                            <ListItem.Content>
+                                                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                                            </ListItem.Content>
+                                            </ListItem>
+                                        ))}
+                                </BottomSheet>
+                                <DeleteModal />
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
@@ -637,7 +810,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>
-                                <TouchableOpacity onPress={() => {
+                                {/* <TouchableOpacity onPress={() => {
                                     // if(isLimited) setIsLimited(false);
                                     // else setIsLimited(true);
                                     // console.log(isLimited)
@@ -661,7 +834,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                 marginBottom: 5
                                             }}></Image>
                                     </View>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                             </View> :
                             <View style={{marginTop: 16}}>
                                 <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -711,7 +884,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 fontSize: 14,
                                 marginStart: 11,
                                 marginTop: 5
-                            }}>총 <AppText style={{fontWeight: '700'}}>20개</AppText></AppText>
+                            }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
                         </View>
                         <View style={{marginVertical: 20}}>
                             <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
@@ -719,55 +892,27 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     placeholder="보관함에 댓글을 남겨보세요!"
-                                    placeholderTextColor={colors.gray[5]} />
-                                <Pressable style={{marginLeft: 5}}>
+                                    value={comments}
+                                    placeholderTextColor={colors.gray[5]}
+                                    onChangeText={(text)=>setComments(text)}
+                                    />
+                                <Pressable style={{marginLeft: 5}} onPress={()=>{
+                                    postCollectionCommentsData(comments);
+                                    setComments('');
+                                }}>
                                     <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
                                         name={'pencil'} size={16}></Icon>
                                 </Pressable>
                             </View>
                         </View>
-                        <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
-                            <View style={{marginRight: 8}}>
-                                <Image source={require('../../assets/images/here_default.png')}
-                                    style={{width: 40, height: 40, borderRadius: 40, resizeMode: 'stretch'}}/>
-                            </View>
-                            <View>
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginBottom: 8,
-                                    flexWrap: 'wrap'
-                                }}>
-                                    <AppText style={{color: colors.mainColor, fontSize: 12}}>minsun</AppText>
-                                    <AppText style={{
-                                        marginHorizontal: 8,
-                                        color: colors.gray[5],
-                                        fontSize: 10
-                                    }}>|</AppText>
-                                    <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
-                                </View>
-                                <View style={{flex: 1, width: '100%'}}><AppText style={{
-                                    fontSize: 12,
-                                    color: colors.mainColor,
-                                    lineHeight: 16,
-                                    fontWeight: '700',
-                                    flexWrap: 'wrap',
-                                    width: windowWidth - 100
-                                }}>
-                                    종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년
-                                    토박종로 25년 토박이가 알려주는
-                                </AppText></View>
-                            </View>
-                        </View>
-
-                        <View style={{
-                            width: '100%',
-                            height: 1,
-                            backgroundColor: colors.red_gray[6],
-                            zIndex: -1000,
-                            marginVertical: 12
-                        }}></View>
-
+                        {
+                            commentsData.length !== 0 &&
+                            <View style={{marginTop: 4}}>{
+                                commentsData.map((data, idx) => (
+                                    <ShowComments data={data} key={idx} idx={idx}/>
+                                ))
+                            }</View>
+                        }
                     </View>
                 </ScreenContainerView>
             </ScrollView>
@@ -873,7 +1018,15 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 22.4,
         fontWeight: '700'
-    }
+    },
+    authorImage: {
+        width: 44,
+        height: 44,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8
+    },
 });
 
 export default FreeCollectionScreen;

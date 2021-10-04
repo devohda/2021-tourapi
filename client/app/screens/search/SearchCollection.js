@@ -37,7 +37,7 @@ const SearchCollection = (props, {navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=collection`, {
+            fetch(`http://34.64.185.40/collection/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -163,7 +163,7 @@ const SearchCollection = (props, {navigation}) => {
                         <View flexDirection="row"
                             style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
+                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[4]}}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
@@ -171,7 +171,7 @@ const SearchCollection = (props, {navigation}) => {
                                         style={{width: 8, height: 8, margin: 2}}></Image>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[4],
                                         fontWeight: 'bold'
                                     }}>{item.like_cnt}</AppText>
                                 </View>
@@ -180,7 +180,7 @@ const SearchCollection = (props, {navigation}) => {
                                         style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[4],
                                         fontWeight: 'bold'
                                     }}>{item.place_cnt}</AppText>
                                 </View>

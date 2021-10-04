@@ -20,17 +20,84 @@ import DefaultProfile from '../assets/images/profile_default.svg';
 
 export default function MainPageScreen({navigation}) {
     const {colors} = useTheme();
-    const [ popularUser, setPopularUser] = useState([]);
+    const [popularCollection, setPopularCollection] = useState([]);
+    const [popularPlace, setPopularPlace] = useState([]);
+    const [popularUser, setPopularUser] = useState([]);
     const [token, setToken] = useToken();
+    const [days, setDays] = useState('DAY');
     const isFocused = useIsFocused();
 
     useEffect(() => {
+        getPopularCollectionData();
+        getPopularPlaceData();
         getPopularUserData();
-    }, [isFocused]);
+        () => {
+            setPopularCollection([]);
+            setPopularPlace([]);
+            setPopularUser([]);
+        }
+    }, []);
+
+    const getPopularCollectionData = (day) => {
+        try {
+            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=POPULAR&term=${decodeURIComponent(day)}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    setPopularCollection(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getPopularPlaceData = () => {
+        try {
+            fetch(`http://34.64.185.40/place/list?type=MAIN&sort=LIKE`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+                    setPopularPlace(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const getPopularUserData = () => {
         try {
-            fetch('http://34.64.185.40/user/list?popular=true', {
+            fetch('http://34.64.185.40/user/list?type=MAIN&sort=POPULAR', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -56,6 +123,162 @@ export default function MainPageScreen({navigation}) {
         }
     };
 
+    const countCollectionView = (collection_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const LikePlace = (pk) => {
+        //공간 좋아요
+        try {
+            fetch(`http://34.64.185.40/like/place/${pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getInitialData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const DeleteLikedPlace = (pk) => {
+        //공간 좋아요 삭제
+        try {
+            fetch(`http://34.64.185.40/like/place/${pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getInitialData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const ShowPopularCollection = props => {
+        const { item } = props;
+        return (
+            <TouchableOpacity style={[{
+                ...styles.directoryContainer,
+                shadowColor: colors.red_gray[6]
+            }]} onPress={() => {
+                countCollectionView(item.collection_pk);
+                item.collection_type === 1 ?
+                    navigation.navigate('PlanCollection', {data: item}) : navigation.navigate('FreeCollection', {data: item});
+                }}>
+                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
+                    <View style={{height: '68%'}}>
+                        <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <View style={[styles.dirType, {
+                                borderColor: colors.backgroundColor,
+                                backgroundColor: colors.backgroundColor
+                            }]}>
+                                <AppText
+                                    style={item.collection_type === 1 ? {
+                                        ...styles.dirPlanText,
+                                        color: colors.red[3]
+                                        } : {
+                                        ...styles.dirFreeText,
+                                        color: colors.mainColor
+                                    }}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
+                            </View>
+                            {item.collection_private === 1 &&
+                                <View style={{marginRight: 9, marginTop: 8}}>
+                                    <Image style={{width: 20, height: 20}}
+                                        source={require('../assets/images/lock_outline.png')}></Image>
+                                </View>
+                            }
+                        </View>
+                        <Image style={styles.defaultImage}
+                            source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/>
+                    </View>
+                    <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                        <AppText style={{
+                            fontSize: 14,
+                            fontWeight: '400',
+                            color: colors.mainColor
+                        }}>{item.collection_name}</AppText>
+                        <View flexDirection="row"
+                            style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                            <View style={{flexDirection: 'row'}}>
+                                <AppText style={{fontSize: 10, width: '85%', color: colors.gray[4]}}>{item.created_user_name}</AppText>
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                <View style={{flexDirection: 'row'}}>
+                                    <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
+                                        style={{margin: 2}}></Icon>
+                                    <AppText style={{
+                                        fontSize: 10,
+                                        color: colors.gray[4],
+                                        fontWeight: 'bold'
+                                    }}>{item.place_cnt}</AppText>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        )
+    }
 
     const [backgroundColor, setBackgroundColor] = useState(colors.red[3]);
 
@@ -71,7 +294,7 @@ export default function MainPageScreen({navigation}) {
         } else {
             return '#8F6DA4';
         }
-    }
+    };
 
     const ShowPopularUser = props => {
         const { user_nickname } = props.data;
@@ -80,7 +303,7 @@ export default function MainPageScreen({navigation}) {
         return (
             <View style={{alignItems: 'center'}}>
                 <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                    <DefaultProfile width={75} height={75}/>
+                    <DefaultProfile width={70} height={70}/>
                 </View>
                 <AppText style={{
                     fontSize: 14,
@@ -98,7 +321,7 @@ export default function MainPageScreen({navigation}) {
                 }
             </View>
         )
-    }
+    };
 
     const UserKeyword = props => {
         const { data } = props;
@@ -110,6 +333,95 @@ export default function MainPageScreen({navigation}) {
                     borderColor: colors.backgroundColor,
             }}><AppText
                 style={{...styles.keywordHashTag, color: colors.gray[4]}}>#{data}</AppText></View>
+        )
+    };
+
+    const checkType = (type) => {
+        if (type === 12) {
+            return '관광지';
+        } else if (type === 14) {
+            return '문화시설';
+        } else if (type === 15) {
+            return '축제/공연/행사';
+        } else if (type === 28) {
+            return '레포츠';
+        } else if (type === 32) {
+            return '숙박';
+        } else if (type === 38) {
+            return '쇼핑';
+        } else if (type === 39) {
+            return '음식';
+        } else {
+            return '기타';
+        }
+    };
+
+    const ShowPopularPlace = props => {
+        const { data } = props;
+        return (
+            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: data})}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    {
+                            data.place_img ?
+                                <Image source={{uri: data.place_img}}
+                                    style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/> :
+                                <Image source={require('../assets/images/here_default.png')}
+                                    style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/> 
+                    }
+                    <View style={{marginLeft: 8, width: '60%'}}>
+                        <View style={{flexDirection: 'row'}}>
+                            <AppText style={{
+                                color: colors.gray[3],
+                                textAlign: 'center',
+                                fontSize: 10,
+                                fontWeight: '700'
+                            }}>{checkType(data.place_type)}</AppText>
+                            <AppText style={{
+                                marginHorizontal: 8, color: colors.gray[4],
+                                textAlign: 'center',
+                                fontSize: 10,
+                                fontWeight: '700'
+                            }}>|</AppText>
+                            <Image source={require('../assets/images/review_star.png')}
+                                style={{
+                                    width: 10,
+                                    height: 10,
+                                    alignSelf: 'center',
+                                }}></Image>
+                            <AppText style={{
+                                color: colors.gray[3],
+                                textAlign: 'center',
+                                fontSize: 10,
+                                fontWeight: '700',
+                                marginLeft: 2
+                            }}>{data.star}</AppText>
+                        </View>
+                        <AppText style={{
+                            fontSize: 16,
+                            fontWeight: '700',
+                            color: colors.mainColor,
+                            marginVertical: 3,
+                        }}>{data.place_name}</AppText>
+                        <AppText style={{fontSize: 12, color: colors.gray[4]}}>{data.place_addr ? data.place_addr.split(' ')[0] + ' ' + data.place_addr.split(' ')[1] : ''}</AppText>
+                    </View>
+                </View>
+                <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{justifyContent: 'center'}}>
+                        <TouchableOpacity onPress={() => {
+                            if (data.like_flag) {
+                                DeleteLikedPlace(data.place_pk);
+                            } else {
+                                LikePlace(data.place_pk);
+                            }
+                        }}>
+                            <Jewel width={26} height={21}
+                                style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </TouchableOpacity>
         )
     }
 
@@ -170,44 +482,74 @@ export default function MainPageScreen({navigation}) {
                     <View>
                         <View style={{flexDirection: 'row', marginTop: 28}}>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
-                                style={[styles.selectedRankings, {borderBottomColor: colors.red[3]}]}><AppText
-                                    style={{
+                            onPress={()=>{
+                                setDays('DAY');
+                                getPopularCollectionData('DAY');
+                            }}
+                                style={days === 'DAY' ? 
+                                {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
+                                {...styles.notSelectedRankings}
+                            }><AppText
+                                    style={
+                                        days === 'DAY' ?
+                                    {
                                         ...styles.selectedRankingsText,
                                         color: colors.mainColor
-                                    }}>일간</AppText></TouchableOpacity></View>
-                            <View style={{paddingEnd: 42}}><TouchableOpacity
-                                style={styles.notSelectedRankings}><AppText
-                                    style={{
+                                    } :
+                                    {
                                         ...styles.selectedRankingsText,
                                         color: colors.gray[6]
-                                    }}>주간</AppText></TouchableOpacity></View>
+                                    }
+                                }>일간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
-                                style={styles.notSelectedRankings}><AppText
-                                    style={{
+                            onPress={()=>{
+                                setDays('WEEK');
+                                getPopularCollectionData('WEEK');
+                            }}
+                                style={days === 'WEEK' ? 
+                                {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
+                                {...styles.notSelectedRankings}
+                            }><AppText
+                                    style={
+                                        days === 'WEEK' ?
+                                    {
+                                        ...styles.selectedRankingsText,
+                                        color: colors.mainColor
+                                    } :
+                                    {
                                         ...styles.selectedRankingsText,
                                         color: colors.gray[6]
-                                    }}>월간</AppText></TouchableOpacity></View>
+                                    }
+                                }>주간</AppText></TouchableOpacity></View>
+                            <View style={{paddingEnd: 42}}><TouchableOpacity
+                            onPress={()=>{
+                                setDays('MONTH');
+                                getPopularCollectionData('MONTH');
+                            }}
+                                style={days === 'MONTH' ? 
+                                {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
+                                {...styles.notSelectedRankings}
+                            }><AppText
+                                    style={
+                                        days === 'MONTH' ?
+                                    {
+                                        ...styles.selectedRankingsText,
+                                        color: colors.mainColor
+                                    } :
+                                    {
+                                        ...styles.selectedRankingsText,
+                                        color: colors.gray[6]
+                                    }
+                                }>월간</AppText></TouchableOpacity></View>
                         </View>
-                        <View style={styles.rankingContainer}>
-                            <View style={styles.defaultImage}></View>
-                            <View style={{marginLeft: 10}}>
-                                <AppText style={{
-                                    marginVertical: 8,
-                                    fontSize: 16,
-                                    fontWeight: '700',
-                                    color: colors.blue[1]
-                                }}>하루만에 북촌
-                                    정복하기</AppText>
-                                <View style={{flexDirection: 'row'}}>
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        marginEnd: 85,
-                                        color: colors.gray[4]
-                                    }}>meeeeensun</AppText>
-                                    <AppText style={{fontSize: 12, color: colors.gray[4]}}>1.3k</AppText>
-                                </View>
-                            </View>
-                        </View>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            {
+                                popularCollection.map((data, idx) => {
+                                    return (
+                                    <ShowPopularCollection item={data} key={idx} idx={idx} keyword={data.keywords}/>)
+                                })
+                            }
+                        </ScrollView>
                     </View>
                     <View style={{marginTop: 48}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 수집가</AppText>
@@ -223,7 +565,7 @@ export default function MainPageScreen({navigation}) {
                         </View>
                     </View>
 
-                    <View style={{marginTop: 38}}>
+                    {/* <View style={{marginTop: 38}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>지역추천</AppText>
                         <View style={{flexDirection: 'row', marginTop: 18}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -251,109 +593,16 @@ export default function MainPageScreen({navigation}) {
                                 </ImageBackground>
                             </ScrollView>
                         </View>
-                    </View>
+                    </View> */}
+
                     <View style={{marginTop: 45, marginBottom: 72}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 공간</AppText>
-                        <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                    <View style={{marginLeft: 8}}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: '700'
-                                            }}>음식점</AppText>
-                                            <AppText style={{
-                                                marginHorizontal: 8, color: colors.gray[4],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: '700'
-                                            }}>|</AppText>
-                                            <Image source={require('../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: '700',
-                                                marginLeft: 2
-                                            }}>4.8</AppText>
-                                        </View>
-                                        <AppText style={{
-                                            fontSize: 16,
-                                            fontWeight: '700',
-                                            color: colors.mainColor,
-                                            marginVertical: 3
-                                        }}>경복궁</AppText>
-                                        <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
-                                    </View>
-                                </View>
-                                <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                                    <View style={{justifyContent: 'center'}}>
-                                    <Jewel width={26} height={21}
-                                            style={{color: colors.red_gray[5]}}/>
-                                    </View>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Place')}>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 18}}>
-                                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                    <Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 72, height: 72, borderRadius: 15}}></Image>
-                                    <View style={{marginLeft: 8}}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: '700'
-                                            }}>음식점</AppText>
-                                            <AppText style={{
-                                                marginHorizontal: 8, color: colors.gray[4],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: '700'
-                                            }}>|</AppText>
-                                            <Image source={require('../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: '700',
-                                                marginLeft: 2
-                                            }}>4.8</AppText>
-                                        </View>
-                                        <AppText style={{
-                                            fontSize: 16,
-                                            fontWeight: '700',
-                                            color: colors.mainColor,
-                                            marginVertical: 3
-                                        }}>경복궁</AppText>
-                                        <AppText style={{fontSize: 12, color: colors.gray[4]}}>서울시 종로구</AppText>
-                                    </View>
-                                </View>
-                                <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                                    <View style={{justifyContent: 'center'}}>
-                                    <Jewel width={26} height={21}
-                                            style={{color: colors.red[3]}}/>
-                                    </View>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
+                        {
+                            popularPlace.map((data, idx) => {
+                                return (
+                                    <ShowPopularPlace data={data} key={idx} idx={idx}/>)
+                            })
+                        }
                     </View>
                 </ScreenContainerView>
             </ScrollView>
@@ -384,8 +633,9 @@ const styles = StyleSheet.create({
             height: 8
         },
         shadowOpacity: 0.25,
-        elevation: 3,
+        elevation: 1,
         shadowColor: 'rgba(132, 92, 92, 0.14)',
+        marginHorizontal: 6
     },
     defaultImage: {
         backgroundColor: '#c4c4c4',
@@ -434,6 +684,50 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 10,
         marginLeft: 16,
-    }
+    },
+    directoryContainer: {
+        width: 200,
+        height: 274,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        marginBottom: 11,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        shadowOpacity: 1,
+        shadowRadius: 6,
+        elevation: 1,
+        marginRight: 12,
+        marginTop: 20
+    },
+    dirType: {
+        borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 8,
+        borderRadius: 14,
+        elevation: 1,
+        width: 43,
+        height: 22,
+        marginLeft: 9,
+        marginTop: 8,
+        flexDirection: 'row',
+        zIndex: 10000,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dirFreeText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    dirPlanText: {
+        fontSize: 12,
+        fontWeight: 'bold'
+    },
+    defaultImage: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
 });
 

@@ -20,7 +20,6 @@ import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
 const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
 
-    // const [height, setHeight] = useState(150 + 90 * collectionList.length);
     const [height, setHeight] = useState(150 + 90 * 5);
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
@@ -176,8 +175,8 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     }
                 }}
             >
-                <View style={{marginTop: 16, backgroundColor: colors.backgroundColor, marginHorizontal: 20}}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{marginTop: 16, backgroundColor: colors.yellow[7], marginHorizontal: 20}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.yellow[7]}}>
                         <AppText
                             style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
                         <Image source={require('../assets/images/folder.png')}
@@ -192,7 +191,6 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         ))}
                     </ScrollView>
                 </SafeAreaView>
-                {/* </ScrollView> */}
             </RBSheet>
         </>
     );
@@ -291,12 +289,22 @@ const PlaceScreen = ({route, navigation}) => {
     useEffect(() => {
         getInitialData();
         getCollectionList();
+        () => {
+            setPlaceData({});
+            setReviewData({});
+            setCollectionList([]);
+            setFacilityData([]);
+            setMorningCongestion(0);
+            setAfternoonCongestion(0);
+            setEveningCongestion(0);
+            setNightCongestion(0);
+        }
     }, [isFocused]);
 
 
     const getCollectionList = () => {
         try {
-            fetch('http://34.64.185.40/collection/list', {
+            fetch('http://34.64.185.40/collection/list?type=MY', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -482,7 +490,6 @@ const PlaceScreen = ({route, navigation}) => {
     
         return (
             <>
-                {/*장소 사진*/}
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
                         source={placeData.place_img ? {uri: placeData.place_img} : require('../assets/images/here_default.png')}
@@ -512,7 +519,6 @@ const PlaceScreen = ({route, navigation}) => {
                     </View>
                 </View>
     
-                {/*장소 데이터*/}
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
@@ -677,18 +683,10 @@ const PlaceScreen = ({route, navigation}) => {
                         <View style={[{marginVertical: 8}, !morningCongestion && !afternoonCongestion && !eveningCongestion && !nightCongestion && {display: 'none'}]}>
                             <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>혼잡한 시간</AppText>
                             <View style={{flexDirection: 'row', marginTop: 6}}>
-                                { morningCongestion &&
-                                    <Time name="오전" iconColor={colors.gray[6]} iconSize={12}/>
-                                }
-                                { afternoonCongestion &&
-                                    <Time name="오후" iconColor={colors.gray[6]} iconSize={12}/>
-                                }
-                                { eveningCongestion &&
-                                    <Time name="저녁" iconColor={colors.gray[6]} iconSize={12}/>
-                                }
-                                { nightCongestion &&
-                                    <Time name="밤" iconColor={colors.gray[6]} iconSize={12}/>
-                                }
+                                <Time name="오전" iconColor={colors.gray[6]} iconSize={12} style={!morningCongestion && {display: 'none'}}/>
+                                <Time name="오후" iconColor={colors.gray[6]} iconSize={12} style={!afternoonCongestion && {display: 'none'}}/>
+                                <Time name="저녁" iconColor={colors.gray[6]} iconSize={12} style={!eveningCongestion && {display: 'none'}}/>
+                                <Time name="밤" iconColor={colors.gray[6]} iconSize={12} style={!nightCongestion && {display: 'none'}}/>
                             </View>
                         </View>
                     {

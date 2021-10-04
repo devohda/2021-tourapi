@@ -281,8 +281,8 @@ const PlaceTab = ({navigation}) => {
         return (
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
                 countCollectionView(item.collection_pk);
-                item.collection_type === 1 ?
-                    navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
+                if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : item});
+                else navigation.navigate('FreeCollection', {data : item});
             }}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}> 
@@ -439,7 +439,7 @@ const PlaceTab = ({navigation}) => {
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
-                                setShowMenu(!showMenu);
+                                // setShowMenu(!showMenu);
                             }} style={{flexDirection: 'row'}}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"

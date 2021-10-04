@@ -46,7 +46,7 @@ const SearchPlace = ({navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -62,6 +62,7 @@ const SearchPlace = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    console.log(response);
                     setSearchLength(response.data.length);
                     setPlaceList(response.data);
                     // setFalse();
