@@ -54,7 +54,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     }
 
     if(type === 'MAIN'){
-        query += ' LIMIT 10';
+        query += ' LIMIT 3';
     }
 
     console.log(query);
