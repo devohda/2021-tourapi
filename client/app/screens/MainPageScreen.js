@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -7,13 +7,13 @@ import {
     ScrollView,
     ImageBackground, Platform,
 } from 'react-native';
-import { useTheme, useIsFocused } from '@react-navigation/native';
-import { Icon } from 'react-native-elements';
+import {useTheme, useIsFocused} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
 
 import AppText from '../components/AppText';
 import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
-import { useToken } from '../contexts/TokenContextProvider';
+import {useToken} from '../contexts/TokenContextProvider';
 
 import Jewel from '../assets/images/jewel.svg';
 import DefaultProfile from '../assets/images/profile_default.svg';
@@ -35,7 +35,7 @@ export default function MainPageScreen({navigation}) {
             setPopularCollection([]);
             setPopularPlace([]);
             setPopularUser([]);
-        }
+        };
     }, []);
 
     const getPopularCollectionData = (day) => {
@@ -49,7 +49,7 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -68,7 +68,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularPlaceData = () => {
         try {
-            fetch(`http://34.64.185.40/place/list?type=MAIN&sort=LIKE`, {
+            fetch('http://34.64.185.40/place/list?type=MAIN&sort=LIKE', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -77,13 +77,13 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
+                    console.log(response.data);
                     setPopularPlace(response.data);
                 })
                 .catch((err) => {
@@ -106,7 +106,7 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -143,7 +143,7 @@ export default function MainPageScreen({navigation}) {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    console.log(response)
+                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -166,7 +166,7 @@ export default function MainPageScreen({navigation}) {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -196,7 +196,7 @@ export default function MainPageScreen({navigation}) {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -215,7 +215,7 @@ export default function MainPageScreen({navigation}) {
     };
 
     const ShowPopularCollection = props => {
-        const { item } = props;
+        const {item} = props;
         return (
             <TouchableOpacity style={[{
                 ...styles.directoryContainer,
@@ -224,7 +224,7 @@ export default function MainPageScreen({navigation}) {
                 countCollectionView(item.collection_pk);
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data: item}) : navigation.navigate('FreeCollection', {data: item});
-                }}>
+            }}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -236,20 +236,21 @@ export default function MainPageScreen({navigation}) {
                                     style={item.collection_type === 1 ? {
                                         ...styles.dirPlanText,
                                         color: colors.red[3]
-                                        } : {
+                                    } : {
                                         ...styles.dirFreeText,
                                         color: colors.mainColor
                                     }}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
                             </View>
                             {item.collection_private === 1 &&
-                                <View style={{marginRight: 9, marginTop: 8}}>
-                                    <Image style={{width: 20, height: 20}}
-                                        source={require('../assets/images/lock_outline.png')}></Image>
-                                </View>
+                            <View style={{marginRight: 9, marginTop: 8}}>
+                                <Image style={{width: 20, height: 20}}
+                                    source={require('../assets/images/lock_outline.png')}></Image>
+                            </View>
                             }
                         </View>
-                        <Image style={styles.defaultImage}
-                            source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/>
+                        <View style={styles.defaultImageView}>
+                            <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/>
+                        </View>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                         <AppText style={{
@@ -260,7 +261,11 @@ export default function MainPageScreen({navigation}) {
                         <View flexDirection="row"
                             style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 10, width: '85%', color: colors.gray[4]}}>{item.created_user_name}</AppText>
+                                <AppText style={{
+                                    fontSize: 10,
+                                    width: '85%',
+                                    color: colors.gray[4]
+                                }}>{item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{flexDirection: 'row'}}>
@@ -277,8 +282,8 @@ export default function MainPageScreen({navigation}) {
                     </View>
                 </View>
             </TouchableOpacity>
-        )
-    }
+        );
+    };
 
     const [backgroundColor, setBackgroundColor] = useState(colors.red[3]);
 
@@ -297,8 +302,8 @@ export default function MainPageScreen({navigation}) {
     };
 
     const ShowPopularUser = props => {
-        const { user_nickname } = props.data;
-        const { keyword, idx } = props;
+        const {user_nickname} = props.data;
+        const {keyword, idx} = props;
 
         return (
             <View style={{alignItems: 'center'}}>
@@ -315,25 +320,26 @@ export default function MainPageScreen({navigation}) {
                     keyword.length !== 0 &&
                     <View style={{flexDirection: 'row', marginTop: 4}}>{
                         keyword.map((data, idx) => (
-                            <UserKeyword data={data} key={idx+'user'}/>
+                            <UserKeyword data={data} key={idx + 'user'}/>
                         ))
                     }</View>
                 }
             </View>
-        )
+        );
     };
 
     const UserKeyword = props => {
-        const { data } = props;
+        const {data} = props;
         return (
             <View
                 style={{
                     ...styles.keywordHashTagView,
                     backgroundColor: colors.backgroundColor,
                     borderColor: colors.backgroundColor,
-            }}><AppText
-                style={{...styles.keywordHashTag, color: colors.gray[4]}}>#{data}</AppText></View>
-        )
+                }}>
+                <AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#{data}</AppText>
+            </View>
+        );
     };
 
     const checkType = (type) => {
@@ -357,73 +363,76 @@ export default function MainPageScreen({navigation}) {
     };
 
     const ShowPopularPlace = props => {
-        const { data } = props;
+        const {data} = props;
         return (
             <TouchableOpacity onPress={() => navigation.navigate('Place', {data: data})}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    {
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        {
                             data.place_img ?
                                 <Image source={{uri: data.place_img}}
                                     style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/> :
                                 <Image source={require('../assets/images/here_default.png')}
-                                    style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/> 
-                    }
-                    <View style={{marginLeft: 8, width: '60%'}}>
-                        <View style={{flexDirection: 'row'}}>
+                                    style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/>
+                        }
+                        <View style={{marginLeft: 8, width: '60%'}}>
+                            <View style={{flexDirection: 'row'}}>
+                                <AppText style={{
+                                    color: colors.gray[3],
+                                    textAlign: 'center',
+                                    fontSize: 10,
+                                    fontWeight: '700'
+                                }}>{checkType(data.place_type)}</AppText>
+                                <AppText style={{
+                                    marginHorizontal: 8, color: colors.gray[4],
+                                    textAlign: 'center',
+                                    fontSize: 10,
+                                    fontWeight: '700'
+                                }}>|</AppText>
+                                <Image source={require('../assets/images/review_star.png')}
+                                    style={{
+                                        width: 10,
+                                        height: 10,
+                                        alignSelf: 'center',
+                                    }}></Image>
+                                <AppText style={{
+                                    color: colors.gray[3],
+                                    textAlign: 'center',
+                                    fontSize: 10,
+                                    fontWeight: '700',
+                                    marginLeft: 2
+                                }}>{data.star}</AppText>
+                            </View>
                             <AppText style={{
-                                color: colors.gray[3],
-                                textAlign: 'center',
-                                fontSize: 10,
-                                fontWeight: '700'
-                            }}>{checkType(data.place_type)}</AppText>
-                            <AppText style={{
-                                marginHorizontal: 8, color: colors.gray[4],
-                                textAlign: 'center',
-                                fontSize: 10,
-                                fontWeight: '700'
-                            }}>|</AppText>
-                            <Image source={require('../assets/images/review_star.png')}
-                                style={{
-                                    width: 10,
-                                    height: 10,
-                                    alignSelf: 'center',
-                                }}></Image>
-                            <AppText style={{
-                                color: colors.gray[3],
-                                textAlign: 'center',
-                                fontSize: 10,
+                                fontSize: 16,
                                 fontWeight: '700',
-                                marginLeft: 2
-                            }}>{data.star}</AppText>
+                                color: colors.mainColor,
+                                marginVertical: 3,
+                            }}>{data.place_name}</AppText>
+                            <AppText style={{
+                                fontSize: 12,
+                                color: colors.gray[4]
+                            }}>{data.place_addr ? data.place_addr.split(' ')[0] + ' ' + data.place_addr.split(' ')[1] : ''}</AppText>
                         </View>
-                        <AppText style={{
-                            fontSize: 16,
-                            fontWeight: '700',
-                            color: colors.mainColor,
-                            marginVertical: 3,
-                        }}>{data.place_name}</AppText>
-                        <AppText style={{fontSize: 12, color: colors.gray[4]}}>{data.place_addr ? data.place_addr.split(' ')[0] + ' ' + data.place_addr.split(' ')[1] : ''}</AppText>
+                    </View>
+                    <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                        <View style={{justifyContent: 'center'}}>
+                            <TouchableOpacity onPress={() => {
+                                if (data.like_flag) {
+                                    DeleteLikedPlace(data.place_pk);
+                                } else {
+                                    LikePlace(data.place_pk);
+                                }
+                            }}>
+                                <Jewel width={26} height={21}
+                                    style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-                <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                    <View style={{justifyContent: 'center'}}>
-                        <TouchableOpacity onPress={() => {
-                            if (data.like_flag) {
-                                DeleteLikedPlace(data.place_pk);
-                            } else {
-                                LikePlace(data.place_pk);
-                            }
-                        }}>
-                            <Jewel width={26} height={21}
-                                style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-        </TouchableOpacity>
-        )
-    }
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -482,71 +491,72 @@ export default function MainPageScreen({navigation}) {
                     <View>
                         <View style={{flexDirection: 'row', marginTop: 28}}>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
-                            onPress={()=>{
-                                setDays('DAY');
-                                getPopularCollectionData('DAY');
-                            }}
-                                style={days === 'DAY' ? 
-                                {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
-                                {...styles.notSelectedRankings}
-                            }><AppText
+                                onPress={() => {
+                                    setDays('DAY');
+                                    getPopularCollectionData('DAY');
+                                }}
+                                style={days === 'DAY' ?
+                                    {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
+                                    {...styles.notSelectedRankings}
+                                }><AppText
                                     style={
                                         days === 'DAY' ?
-                                    {
-                                        ...styles.selectedRankingsText,
-                                        color: colors.mainColor
-                                    } :
-                                    {
-                                        ...styles.selectedRankingsText,
-                                        color: colors.gray[6]
-                                    }
-                                }>일간</AppText></TouchableOpacity></View>
+                                            {
+                                                ...styles.selectedRankingsText,
+                                                color: colors.mainColor
+                                            } :
+                                            {
+                                                ...styles.selectedRankingsText,
+                                                color: colors.gray[6]
+                                            }
+                                    }>일간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
-                            onPress={()=>{
-                                setDays('WEEK');
-                                getPopularCollectionData('WEEK');
-                            }}
-                                style={days === 'WEEK' ? 
-                                {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
-                                {...styles.notSelectedRankings}
-                            }><AppText
+                                onPress={() => {
+                                    setDays('WEEK');
+                                    getPopularCollectionData('WEEK');
+                                }}
+                                style={days === 'WEEK' ?
+                                    {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
+                                    {...styles.notSelectedRankings}
+                                }><AppText
                                     style={
                                         days === 'WEEK' ?
-                                    {
-                                        ...styles.selectedRankingsText,
-                                        color: colors.mainColor
-                                    } :
-                                    {
-                                        ...styles.selectedRankingsText,
-                                        color: colors.gray[6]
-                                    }
-                                }>주간</AppText></TouchableOpacity></View>
+                                            {
+                                                ...styles.selectedRankingsText,
+                                                color: colors.mainColor
+                                            } :
+                                            {
+                                                ...styles.selectedRankingsText,
+                                                color: colors.gray[6]
+                                            }
+                                    }>주간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
-                            onPress={()=>{
-                                setDays('MONTH');
-                                getPopularCollectionData('MONTH');
-                            }}
-                                style={days === 'MONTH' ? 
-                                {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
-                                {...styles.notSelectedRankings}
-                            }><AppText
+                                onPress={() => {
+                                    setDays('MONTH');
+                                    getPopularCollectionData('MONTH');
+                                }}
+                                style={days === 'MONTH' ?
+                                    {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
+                                    {...styles.notSelectedRankings}
+                                }><AppText
                                     style={
                                         days === 'MONTH' ?
-                                    {
-                                        ...styles.selectedRankingsText,
-                                        color: colors.mainColor
-                                    } :
-                                    {
-                                        ...styles.selectedRankingsText,
-                                        color: colors.gray[6]
-                                    }
-                                }>월간</AppText></TouchableOpacity></View>
+                                            {
+                                                ...styles.selectedRankingsText,
+                                                color: colors.mainColor
+                                            } :
+                                            {
+                                                ...styles.selectedRankingsText,
+                                                color: colors.gray[6]
+                                            }
+                                    }>월간</AppText></TouchableOpacity></View>
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             {
                                 popularCollection.map((data, idx) => {
                                     return (
-                                    <ShowPopularCollection item={data} key={idx} idx={idx} keyword={data.keywords}/>)
+                                        <ShowPopularCollection item={data} key={idx} idx={idx}
+                                            keyword={data.keywords}/>);
                                 })
                             }
                         </ScrollView>
@@ -558,7 +568,7 @@ export default function MainPageScreen({navigation}) {
                                 {
                                     popularUser.map((data, idx) => {
                                         return (
-                                        <ShowPopularUser data={data} key={idx} idx={idx} keyword={data.keywords}/>)
+                                            <ShowPopularUser data={data} key={idx} idx={idx} keyword={data.keywords}/>);
                                     })
                                 }
                             </ScrollView>
@@ -595,12 +605,12 @@ export default function MainPageScreen({navigation}) {
                         </View>
                     </View> */}
 
-                    <View style={{marginTop: 45, marginBottom: 72}}>
+                    <View style={{marginTop: 45, marginBottom: 30}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 공간</AppText>
                         {
                             popularPlace.map((data, idx) => {
                                 return (
-                                    <ShowPopularPlace data={data} key={idx} idx={idx}/>)
+                                    <ShowPopularPlace data={data} key={idx} idx={idx}/>);
                             })
                         }
                     </View>
@@ -637,13 +647,16 @@ const styles = StyleSheet.create({
         shadowColor: 'rgba(132, 92, 92, 0.14)',
         marginHorizontal: 6
     },
+    defaultImageView:{
+        borderTopStartRadius : 10,
+        width: '100%',
+        height: '100%',
+        position: 'absolute'
+    },
     defaultImage: {
         backgroundColor: '#c4c4c4',
-        width: 197,
-        height: 215,
-        borderRadius: 10,
-        borderBottomStartRadius: 0,
-        borderBottomEndRadius: 0
+        width: '100%',
+        height: '100%',
     },
     titles: {
         fontSize: 22,
@@ -723,11 +736,6 @@ const styles = StyleSheet.create({
     dirPlanText: {
         fontSize: 12,
         fontWeight: 'bold'
-    },
-    defaultImage: {
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-    },
+    }
 });
 
