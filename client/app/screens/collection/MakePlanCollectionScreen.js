@@ -298,7 +298,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 renderDay={(Date)=>{
                                     return(
                                         <View>
-                                            <AppText style={{
+                                            <AppText style={{color: Date.date >= date.startDate && Date.date <= date.endDate ? colors.backgroundColor : colors.mainColor,
                                                 fontSize: 12, lineHeight: 24, fontWeight: '500', justifyContent: 'center', textAlign: 'center', paddingTop: 10}}>
                                                 {Platform.OS === 'ios' ?
                                                     Date.date.toLocaleDateString().split('.')[2]
