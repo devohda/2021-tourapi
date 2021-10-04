@@ -45,77 +45,13 @@ const MakeReviewScreen = ({route, navigation}) => {
             data: '밤'
         }]);
 
-    const [facilityData, setFacilityData] = useState([
-        {
-            id : 1,
-            data: '편의점'
-        },
-        {
-            id: 2,
-            data: '화장실'
-        },
-        {
-            id: 3,
-            data: '쓰레기통'
-        },
-        {
-            id: 4,
-            data: '주차장'
-        },
-        {
-            id: 5,
-            data: '약국'
-        },
-        {
-            id: 6,
-            data: '고객지원센터'
-        },
-        {
-            id: 7,
-            data: '유아놀이방'
-        },
-        {
-            id: 8,
-            data: '고객안내센터'
-        },
-        {
-            id: 9,
-            data: '휴게실'
-        },
-        {
-            id: 10,
-            data: '수유시설'
-        },
-        {
-            id: 11,
-            data: '물품보관함'
-        },
-        {
-            id: 12,
-            data: '자전거보관소'
-        },
-        {
-            id: 13,
-            data: '간이음수대'
-        },
-        {
-            id: 14,
-            data: '체육시설'
-        },
-        {
-            id: 15,
-            data: '교통약자용키트'
-        },
-        {
-            id: 16,
-            data: '어린이놀이터'
-        },
-    ]);
+    const [facilityData, setFacilityData] = useState([]);
     const [isBusyTimePress, setIsBusyTimePress] = useState([]);
     const [isFacilityPress, setIsFacilityPress] = useState([]);
 
     useEffect(() => {
         getUserData();
+        getFacilityData();
         setFalse();
     },[]);
 
@@ -149,9 +85,40 @@ const MakeReviewScreen = ({route, navigation}) => {
         }
     };
 
+    const getFacilityData = () => {
+        try {
+            fetch('http://34.64.185.40/facility/list', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+
+                    setFacilityData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const postReview = () => {
         var postBusyTime = [0,0,0,0];
-        var postFacility = '';
+        var postFacility = [];
 
         for (let i = 0; i < busyTimeData.length; i++) {
             if (isBusyTimePress[i] === true) {
@@ -161,11 +128,9 @@ const MakeReviewScreen = ({route, navigation}) => {
 
         for (let i = 0; i < facilityData.length; i++) {
             if (isFacilityPress[i] === true) {
-                postFacility = postFacility + i + ',';
+                postFacility.push(facilityData[i].facility_pk);
             };
         };
-        postFacility = postFacility.substring(0, postFacility.length-1);
-
 
         // 선택사항이 많으므로 하나 하나 조건 필요
         var DATA = {
@@ -186,7 +151,7 @@ const MakeReviewScreen = ({route, navigation}) => {
         if(ratedMarketScore) {
             DATA.review_market = ratedMarketScore;
         }
-        if(postFacility !== '') {
+        if(postFacility.length !== 0) {
             DATA.review_facility = postFacility;
         }
 
@@ -299,20 +264,20 @@ const MakeReviewScreen = ({route, navigation}) => {
             >
                 <TouchableOpacity onPress={() => {
                     let newArr = [...isFacilityPress];
-                    if (isFacilityPress[keyword.id - 1]) {
-                        newArr[keyword.id - 1] = false;
+                    if (isFacilityPress[keyword.facility_pk - 1]) {
+                        newArr[keyword.facility_pk - 1] = false;
                         setIsFacilityPress(newArr);
                     } else {
-                        newArr[keyword.id - 1] = true;
+                        newArr[keyword.facility_pk - 1] = true;
                         setIsFacilityPress(newArr);
                     }
-                }} style={isFacilityPress[keyword.id - 1] ? [styles.selectTypeClicked, {
+                }} style={isFacilityPress[keyword.facility_pk - 1] ? [styles.selectTypeClicked, {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8],
                 }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
                     <AppText
-                        style={isFacilityPress[keyword.id - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.data}</AppText>
+                        style={isFacilityPress[keyword.facility_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.facility_name}</AppText>
                 </TouchableOpacity>
             </View>
         );

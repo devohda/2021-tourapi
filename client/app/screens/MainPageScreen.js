@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -7,16 +7,111 @@ import {
     ScrollView,
     ImageBackground, Platform,
 } from 'react-native';
-import {useTheme} from '@react-navigation/native';
-import {Icon} from 'react-native-elements';
+import { useTheme, useIsFocused } from '@react-navigation/native';
+import { Icon } from 'react-native-elements';
+
 import AppText from '../components/AppText';
 import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
+import { useToken } from '../contexts/TokenContextProvider';
 
 import Jewel from '../assets/images/jewel.svg';
+import DefaultProfile from '../assets/images/profile_default.svg';
 
 export default function MainPageScreen({navigation}) {
     const {colors} = useTheme();
+    const [ popularUser, setPopularUser] = useState([]);
+    const [token, setToken] = useToken();
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        getPopularUserData();
+    }, [isFocused]);
+
+    const getPopularUserData = () => {
+        try {
+            fetch('http://34.64.185.40/user/list?popular=true', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    setPopularUser(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
+    const [backgroundColor, setBackgroundColor] = useState(colors.red[3]);
+
+    const setBGColor = (idx) => {
+        if (idx === 0 || idx === 2) {
+            return colors.red[3];
+        } else if (idx === 1 || idx === 6) {
+            return '#FFC36A';
+        } else if (idx === 3 || idx === 8) {
+            return '#639A94';
+        } else if (idx === 4 || idx === 5) {
+            return colors.blue[2];
+        } else {
+            return '#8F6DA4';
+        }
+    }
+
+    const ShowPopularUser = props => {
+        const { user_nickname } = props.data;
+        const { keyword, idx } = props;
+
+        return (
+            <View style={{alignItems: 'center'}}>
+                <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
+                    <DefaultProfile width={75} height={75}/>
+                </View>
+                <AppText style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    color: colors.mainColor,
+                    marginTop: 8
+                }}>{user_nickname}</AppText>
+                {
+                    keyword.length !== 0 &&
+                    <View style={{flexDirection: 'row', marginTop: 4}}>{
+                        keyword.map((data, idx) => (
+                            <UserKeyword data={data} key={idx+'user'}/>
+                        ))
+                    }</View>
+                }
+            </View>
+        )
+    }
+
+    const UserKeyword = props => {
+        const { data } = props;
+        return (
+            <View
+                style={{
+                    ...styles.keywordHashTagView,
+                    backgroundColor: colors.backgroundColor,
+                    borderColor: colors.backgroundColor,
+            }}><AppText
+                style={{...styles.keywordHashTag, color: colors.gray[4]}}>#{data}</AppText></View>
+        )
+    }
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -118,85 +213,12 @@ export default function MainPageScreen({navigation}) {
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 수집가</AppText>
                         <View style={{flexDirection: 'row'}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                                <View style={{alignItems: 'center'}}>
-                                    <Image style={styles.authorImage}
-                                        source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <AppText style={{
-                                        fontSize: 16,
-                                        fontWeight: '700',
-                                        color: colors.mainColor,
-                                        marginTop: 8
-                                    }}>K-민선</AppText>
-
-                                    <View style={{flexDirection: 'row', marginTop: 9}}>
-                                        <View
-                                            style={{
-                                                ...styles.keywordHashTagView,
-                                                backgroundColor: colors.defaultColor,
-                                                borderColor: colors.defaultColor,
-                                                color: colors.gray[4],
-                                            }}><AppText
-                                                style={{...styles.keywordHashTag, color: colors.gray[4]}}>#조용한</AppText></View>
-                                        <View
-                                            style={{
-                                                ...styles.keywordHashTagView,
-                                                backgroundColor: colors.defaultColor,
-                                                borderColor: colors.defaultColor,
-                                                color: colors.gray[4],
-                                            }}><AppText
-                                            style={{...styles.keywordHashTag, color: colors.gray[4]}}>#따뜻한</AppText></View>
-                                    </View>
-                                </View>
-                                <View style={{alignItems: 'center'}}>
-                                    <Image style={styles.authorImage}
-                                        source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <AppText style={{
-                                        fontSize: 16,
-                                        fontWeight: '700',
-                                        color: colors.mainColor,
-                                        marginTop: 8
-                                    }}>K-민선</AppText>
-
-                                    <View style={{flexDirection: 'row', marginTop: 9}}>
-                                        <View style={{
-                                            ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor,
-                                            borderColor: colors.defaultColor,
-                                            color: colors.gray[4],
-                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#조용한</AppText></View>
-                                        <View style={{
-                                            ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor,
-                                            borderColor: colors.defaultColor,
-                                            color: colors.gray[4],
-                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#따뜻한</AppText></View>
-                                    </View>
-                                </View>
-                                <View style={{alignItems: 'center'}}>
-                                    <Image style={styles.authorImage}
-                                        source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                                    <AppText style={{
-                                        fontSize: 16,
-                                        fontWeight: '700',
-                                        color: colors.mainColor,
-                                        marginTop: 8
-                                    }}>K-민선</AppText>
-
-                                    <View style={{flexDirection: 'row', marginTop: 9}}>
-                                        <View style={{
-                                            ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor,
-                                            borderColor: colors.defaultColor,
-                                            color: colors.gray[4],
-                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#조용한</AppText></View>
-                                        <View style={{
-                                            ...styles.keywordHashTagView,
-                                            backgroundColor: colors.defaultColor,
-                                            borderColor: colors.defaultColor,
-                                            color: colors.gray[4],
-                                        }}><AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#따뜻한</AppText></View>
-                                    </View>
-                                </View>
+                                {
+                                    popularUser.map((data, idx) => {
+                                        return (
+                                        <ShowPopularUser data={data} key={idx} idx={idx} keyword={data.keywords}/>)
+                                    })
+                                }
                             </ScrollView>
                         </View>
                     </View>
@@ -380,9 +402,11 @@ const styles = StyleSheet.create({
     authorImage: {
         width: 88,
         height: 88,
-        backgroundColor: '#c4c4c4',
         borderRadius: 50,
-        marginTop: 20
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 21,
     },
     authorDesc: {
         marginTop: 10
@@ -390,18 +414,14 @@ const styles = StyleSheet.create({
     keywordHashTagView: {
         borderWidth: 1,
         borderRadius: 27,
-        paddingVertical: 2,
         paddingHorizontal: 7,
-        shadowColor: 'rgba(0,0,0,0.11)',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.2,
-        elevation: 1,
         marginLeft: 5,
     },
     keywordHashTag: {
         elevation: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        fontSize: 12
     },
     regionImage: {
         width: 237,

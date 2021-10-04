@@ -407,46 +407,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const SwipeList = props => {
         return (
-            <SwipeListView
-                data={placeData}
-                renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-                keyExtractor={(item, idx) => item.place_pk.toString()}
-                key={(item, idx) => item.place_pk.toString()}
-                renderHiddenItem={(item, rowMap) => {
-                    return (
-                        <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
-                            <TouchableOpacity
-                                style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
-                                onPress={() => {
-                                    deletePlace(item.item.place_pk, props.idx);
-                                }}
-                            >
-                                <View style={{justifyContent: 'center', alignItems: 'center', height: '100%'}}>
-                                    <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    );}}
-                rightOpenValue={-75}
-                previewRowKey={'0'}
-                previewOpenDelay={3000}
-                disableRightSwipe={true}
-                disableLeftSwipe={checkPrivate() ? false : true}
-                closeOnRowOpen={true}
-                closeOnRowPress={true}
-                nestedScrollEnabled
-            />
-        /* {        placeData.map((item, index) => (
-        <TipsList data={item} idx={index} day={props.idx} length={placeLength} key={index} private={collectionData.is_creator}/>
-
-            ))} */
-        // <SafeAreaView>
-        //     <FlatList data={placeData}
-        //       renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-        //       keyExtractor={(item, idx) => {idx.toString();}}
-        //       key={(item, idx) => {idx.toString();}}
-        //   nestedScrollEnabled/>
-        // </SafeAreaView>
+        <SafeAreaView>
+            <FlatList data={placeData}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+              keyExtractor={(item, idx) => {idx.toString();}}
+              key={(item, idx) => {idx.toString();}}
+          nestedScrollEnabled/>
+        </SafeAreaView>
         //         placeData.map((item, index) => (
         // <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>
         //         ))
@@ -847,8 +814,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         alignItems: 'center',
                                         marginBottom: 12
                                     }}></Image>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
-                                    담겨있지 않아요!</AppText>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>보관함이 비어있네요.</AppText>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>마음에 드는 공간을 수집해보세요!</AppText>
                                 </View>
                             </>
                     }

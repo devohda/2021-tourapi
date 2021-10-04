@@ -352,68 +352,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const SwipeList = () => {
         return (
-        // <SwipeListView
-        //     data={placeData}
-        //     keyExtractor={(item) => item.place_pk.toString()}
-        //     key={(item, idx) => {idx.toString()}}
-        //     renderHiddenItem={(item, rowMap) => {
-        //         return (
-        //         <View style={styles.rowBack} key={item.place_pk}>
-        //         <TouchableOpacity
-        //             style={[styles.backRightBtn, styles.backRightBtnRight]}
-        //             onPress={() => {
-        //                 deletePlace(item.item.place_pk)
-        //             }}
-        //         >
-        //             <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
-        //         </TouchableOpacity>
-        //     </View>
-        //     )}}
-        //     rightOpenValue={-75}
-        //     previewRowKey={'0'}
-        //     previewOpenDelay={3000}
-        //     disableRightSwipe={true}
-        //     disableLeftSwipe={checkPrivate()? false : true}
-        //     closeOnRowOpen={true}
-        //     closeOnRowPress={true}
-        //     nestedScrollEnabled
-        // />
-            <SwipeListView
-                data={placeData}
-                renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-                keyExtractor={(item, idx) => {idx.toString();}}
-                key={(item, idx) => {idx.toString();}}
-                renderHiddenItem={(item, rowMap) => {
-                    return (
-                        <View style={{ ...styles.rowBack, backgroundColor: colors.red[3]}} key={item.place_pk}>
-                            <TouchableOpacity
-                                style={{...styles.backRightBtn, backgroundColor: colors.red[3]}}
-                                onPress={() => {
-                                    deletePlace(item.item.place_pk, props.idx);
-                                }}
-                            >
-                                {/* <View style={{justifyContent: 'center', alignItems: 'center'}}> */}
-                                <AppText style={{color: colors.defaultColor}}>삭제하기</AppText>
-                                {/* </View> */}
-                            </TouchableOpacity>
-                        </View>
-                    );}}
-                rightOpenValue={-75}
-                previewRowKey={'0'}
-                previewOpenDelay={3000}
-                disableRightSwipe={true}
-                disableLeftSwipe={checkPrivate() ? false : true}
-                closeOnRowOpen={true}
-                closeOnRowPress={true}
-                nestedScrollEnabled
-            />
-        // <SafeAreaView>
-        // <FlatList data={placeData}
-        //     renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-        //     keyExtractor={(item, idx) => {idx.toString();}}
-        //     key={(item, idx) => {idx.toString();}}
-        // nestedScrollEnabled/>
-        // </SafeAreaView>
+            <>
+                <SafeAreaView>
+                <FlatList data={placeData}
+                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+                    keyExtractor={(item, idx) => {idx.toString();}}
+                    key={(item, idx) => {idx.toString();}}
+                nestedScrollEnabled/>
+                </SafeAreaView>
+            </>
         );};
     
     const [showMenu, setShowMenu] = useState(false);
@@ -745,8 +692,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         alignItems: 'center',
                                         marginBottom: 12
                                     }}></Image>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
-                                    담겨있지 않아요!</AppText>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>보관함이 비어있네요.</AppText>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>마음에 드는 공간을 수집해보세요!</AppText>
                                 </View>
                             </View>
                     }

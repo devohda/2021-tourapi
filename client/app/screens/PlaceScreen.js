@@ -190,7 +190,6 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                         {collectionList.map((item, idx) => (
                             <ShowFreeDir item={item} idx={idx} key={idx}/>
                         ))}
-                        {/* <FlatList style={{flex: 1}} flex={1} data={collectionList} renderItem={ShowFreeDir} keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/> */}
                     </ScrollView>
                 </SafeAreaView>
                 {/* </ScrollView> */}
@@ -206,6 +205,11 @@ const PlaceScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState({});
     const [reviewData, setReviewData] = useState({});
     const [collectionList, setCollectionList] = useState([]);
+    const [facilityData, setFacilityData] = useState([]);
+    const [morningCongestion, setMorningCongestion] = useState(0);
+    const [afternoonCongestion, setAfternoonCongestion] = useState(0);
+    const [eveningCongestion, setEveningCongestion] = useState(0);
+    const [nightCongestion, setNightCongestion] = useState(0);
 
     const [token, setToken] = useToken();
     //데이터 받아서 다시해야함
@@ -268,6 +272,11 @@ const PlaceScreen = ({route, navigation}) => {
                     console.log(response.data.review);
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
+                    setFacilityData(response.data.review.facility);
+                    setMorningCongestion(response.data.review_congestion_morning);
+                    setAfternoonCongestion(response.data.review_congestion_afternoon);
+                    setEveningCongestion(response.data.review_congestion_evening);
+                    setNightCongestion(response.data.review_congestion_night);
                     setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2))
                 })
                 .catch((err) => {
@@ -543,6 +552,26 @@ const PlaceScreen = ({route, navigation}) => {
             </>
         );
     };
+
+    const ShowFacilities = ({item}) => {
+        return (
+            <View style={{
+                borderColor: colors.defaultColor,
+                backgroundColor: colors.defaultColor,
+                borderStyle: 'solid',
+                borderWidth: 1,
+                borderRadius: 30,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 4,
+                paddingHorizontal: 10,
+                marginRight: 10,
+                flexDirection: 'row'
+            }}>
+                <AppText style={{fontSize: 14, color: colors.mainColor}}>{item}</AppText>
+            </View>
+        )
+    }
     
 
     return (
@@ -555,8 +584,13 @@ const PlaceScreen = ({route, navigation}) => {
                     <View style={{alignItems: 'center'}}>
                         <View flex={1} style={{alignItems: 'center', justifyContent: 'center'}}>
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
-                                <Image style={{width: 30, height: 26, marginTop: 3}}
-                                    source={require('../assets/images/here_icon_nonclicked.png')}></Image>
+                                {
+                                    placeScore !== 0 ?
+                                    <Jewel width={30} height={26}
+                                    style={{color: colors.red[3], marginTop: 4}}/> :
+                                    <Jewel width={30} height={26}
+                                    style={{color: colors.red_gray[5], marginTop: 4}}/>
+                                }
                                 <View style={{marginLeft: 6, marginRight: 4}}><AppText
                                     style={{
                                         fontSize: 22,
@@ -564,7 +598,7 @@ const PlaceScreen = ({route, navigation}) => {
                                         marginRight: 5,
                                         color: colors.mainColor
                                     }}>{placeScore}점</AppText></View>
-                                <View><AppText style={{color: colors.gray[5]}}>(0명)</AppText></View>
+                                <View><AppText style={{color: colors.gray[5]}}>({reviewData.review_total_cnt}명)</AppText></View>
                             </View>
                         </View>
                         <View style={{
@@ -640,25 +674,36 @@ const PlaceScreen = ({route, navigation}) => {
                 </ScreenContainerView>
                 <ScreenDivideLine/>
                 <ScreenContainerView>
-                    <View style={{marginVertical: 8}}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>혼잡한 시간</AppText>
-                        <View style={{flexDirection: 'row', marginTop: 6}}>
-                            <Time name="오전" iconColor={colors.gray[6]} iconSize={12}/>
-                            <Time name="오후" iconColor={colors.gray[6]} iconSize={12}/>
-                            <Time name="밤" iconColor={colors.gray[6]} iconSize={12}/>
+                        <View style={[{marginVertical: 8}, !morningCongestion && !afternoonCongestion && !eveningCongestion && !nightCongestion && {display: 'none'}]}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>혼잡한 시간</AppText>
+                            <View style={{flexDirection: 'row', marginTop: 6}}>
+                                { morningCongestion &&
+                                    <Time name="오전" iconColor={colors.gray[6]} iconSize={12}/>
+                                }
+                                { afternoonCongestion &&
+                                    <Time name="오후" iconColor={colors.gray[6]} iconSize={12}/>
+                                }
+                                { eveningCongestion &&
+                                    <Time name="저녁" iconColor={colors.gray[6]} iconSize={12}/>
+                                }
+                                { nightCongestion &&
+                                    <Time name="밤" iconColor={colors.gray[6]} iconSize={12}/>
+                                }
+                            </View>
                         </View>
-                    </View>
-                    <View style={{marginVertical: 8}}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>주변시설</AppText>
-                        <View style={{flexDirection: 'row', marginTop: 6}}>
-                            <Facility name="편의점"/>
-                            <Facility name="약국"/>
-                            <Facility name="화장실"/>
-                            <Facility name="쓰레기통"/>
-                            <Facility name="주차장"/>
+                    {
+                        facilityData.length !== 0 &&
+                        <View style={{marginVertical: 8}}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>주변시설</AppText>
+                            <View style={{flexDirection: 'row', marginTop: 6}}>
+                                {
+                                    facilityData.map((item, idx) => (
+                                        <ShowFacilities item={item} key={idx+'0000'}/>
+                                    ))
+                                }
+                            </View>
                         </View>
-                    </View>
-
+                    }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
                     <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>

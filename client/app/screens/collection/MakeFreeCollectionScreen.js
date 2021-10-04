@@ -53,7 +53,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isVisible, setIsVisible] = useState(false);
 
-    // TODO 배열에 선택된 키워드 pk 값 넣어서 insert 하기.
     const postCollections = () => {
         var datas = [];
         var showDatas = [];
@@ -64,6 +63,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             }
         }
 
+        console.log(datas)
         try {
             fetch('http://34.64.185.40/collection/free', {
                 method: 'POST',
@@ -75,15 +75,14 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 body: JSON.stringify({
                     collectionData: {
                         name: collectionName,
-                        isPrivate: isEnabled,
-                        description: null,
+                        isPrivate: isEnabled
                     },
                     keywords: datas
                 })
             }).then((res) => {
                 res.json();
             })
-                .then(async (response) => {
+                .then((response) => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
                     //     // Alert.alert('','로그인이 필요합니다');
                     //     await SecureStore.deleteItemAsync('accessToken');
@@ -177,7 +176,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         alignItems: 'center'
                     }}
                 >
-                    {/* <TouchableOpacity style={styles.selectType} onPress={pressFunc}> */}
                     <TouchableOpacity onPress={() => {
                         if (pressed[keyword.keyword_pk - 1]) {
                             let newArr = [...pressed];
@@ -240,7 +238,6 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                                 autoCorrect={false}
                                 placeholder=""
                                 placeholderTextColor={colors.gray[5]}
-                                onChangeText={(text)=>setSearchKeyword(text)}
                             />
                             <Pressable style={{marginLeft: 5}}>
                                 <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
@@ -249,7 +246,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <><View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{0 <= idx && idx <= 3 &&
                                         <Keyword keyword={keyword} key={idx+'0000'}/>}</>
                                 ))
                             }
@@ -257,7 +254,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{4 <= idx && idx <= 6 && 
                                         <Keyword keyword={keyword} key={idx+'1111'}/>}</>
                                 ))
                             }
@@ -265,7 +262,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{7 <= idx && idx <= 10 && 
                                         <Keyword keyword={keyword} key={idx+'2222'}/>}</>
                                 ))
                             }
@@ -273,7 +270,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{11 <= idx && idx <= 13 && 
                                         <Keyword keyword={keyword} key={idx+'3333'}/>}</>
                                 ))
                             }
@@ -281,7 +278,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{14 <= idx && idx <= 17 && 
                                         <Keyword keyword={keyword} key={idx+'4444'}/>}</>
                                 ))
                             }
@@ -289,7 +286,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{18 <= idx && idx <= 20 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{18 <= idx && idx <= 19 && 
                                         <Keyword keyword={keyword} key={idx+'5555'}/>}</>
                                 ))
                             }

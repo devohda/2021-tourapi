@@ -158,7 +158,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 showDatas.push(keywordData[i].keyword_title);
             }
         }
-        console.log(showDatas)
+
         const startDate = moment(range.startDate).format('YYYY-MM-DD');
         const endDate = moment(range.endDate).format('YYYY-MM-DD');
 
@@ -182,7 +182,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then(async (response) => {
+                .then((response) => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
                     //     // Alert.alert('','로그인이 필요합니다');
                     //     await SecureStore.deleteItemAsync('accessToken');
@@ -190,6 +190,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
+                    console.log(response)
 
                     const item = {
                         'collection_name': collectionName,
@@ -399,7 +400,6 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 autoCorrect={false}
                                 placeholder=""
                                 placeholderTextColor={colors.gray[5]}
-                                onChangeText={(text)=>setSearchKeyword(text)}
                             />
                             <Pressable style={{marginLeft: 5}}>
                                 <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
@@ -408,7 +408,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <><View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{0 <= idx && idx <= 3 && 
                                         <Keyword keyword={keyword} key={idx+'0000'}/>}</>
                                 ))
                             }
@@ -416,7 +416,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{4 <= idx && idx <= 6 && 
                                         <Keyword keyword={keyword} key={idx+'1111'}/>}</>
                                 ))
                             }
@@ -424,7 +424,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{7 <= idx && idx <= 10 && 
                                         <Keyword keyword={keyword} key={idx+'2222'}/>}</>
                                 ))
                             }
@@ -432,7 +432,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{11 <= idx && idx <= 13 && 
                                         <Keyword keyword={keyword} key={idx+'3333'}/>}</>
                                 ))
                             }
@@ -440,7 +440,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{14 <= idx && idx <= 17 && 
                                         <Keyword keyword={keyword} key={idx+'4444'}/>}</>
                                 ))
                             }
@@ -448,7 +448,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row'}}>
                             {
                                 keywordData.map((keyword, idx) => (
-                                    <>{18 <= idx && idx <= 20 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    <>{18 <= idx && idx <= 19 && 
                                         <Keyword keyword={keyword} key={idx+'5555'}/>}</>
                                 ))
                             }

@@ -24,7 +24,6 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 const CollectionTab = ({navigation}) => {
 
     const [token, setToken] = useToken();
-    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
     const [collectionList, setCollectionList] = useState({});
     const [directoryType, setDirectoryType] = useState([
@@ -50,16 +49,19 @@ const CollectionTab = ({navigation}) => {
         }
     ]);
 
-    // TODO 빈배열 뺐을 때 무한 렌더링 되는 거 해결해야 함
     useEffect(() => {
         getCollectionsFromUsers();
+        // return () => {
+        //     setCollectionList({});
+        // }
     },[isFocused]);
 
     const {colors} = useTheme();
+
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch('http://34.64.185.40/collection/list', {
+            fetch(`http://34.64.185.40/collection/list`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -67,14 +69,15 @@ const CollectionTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response.data)
 
                     setCollectionList(response.data);
                 })
@@ -206,10 +209,6 @@ const CollectionTab = ({navigation}) => {
                                     isClicked: false
                                 })
                         );
-                        // directoryType.map((val, i) =>
-                        //     (i === idx && i === 1) &&
-                        //     getCollectionsFromUsers()
-                        // )
                     }}
                 >
                     <AppText
