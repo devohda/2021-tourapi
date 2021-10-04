@@ -590,7 +590,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                         <TouchableOpacity
                             testID="completed"
                             style={{
-                                backgroundColor: DATA.collection_name.length >= 2 && isPress.indexOf(true) !== -1 ? colors.mainColor : colors.gray[5],
+                                backgroundColor: DATA.collection_name.length >= 2 ? colors.mainColor : colors.gray[5],
                                 height: 48,
                                 borderRadius: 10
                             }}
@@ -599,7 +599,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                 navigation.setOptions({tabBarVisible: true});
                                 navigation.goBack(null);
                             }}
-                            disabled={DATA.collection_name.length < 2 || isPress.indexOf(true) === -1 ? true : false}
+                            disabled={DATA.collection_name.length < 2 ? true : false}
                         ><AppText
                                 style={{
                                     textAlign: 'center',
