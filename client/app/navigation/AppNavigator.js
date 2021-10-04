@@ -12,8 +12,10 @@ import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionSc
 import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
+import ProfileSettingScreen from '../screens/settings/ProfileSettingScreen';
 import {useToken} from '../contexts/TokenContextProvider';
 import SearchScreenForPlan from '../screens/collection/SearchScreenForPlan';
+import MakeReviewScreen from '../screens/review/MakeReviewScreen';
 
 import * as SecureStore from 'expo-secure-store';
 const MainStack = createStackNavigator();
@@ -26,7 +28,7 @@ const AppNavigator = () => {
     const getTokenAndLogin = async () => {
         const accessToken = await SecureStore.getItemAsync('accessToken');
         // TODO 자동로그인 끄려면 밑의 주석 해제 하세요.
-        await SecureStore.deleteItemAsync('accessToken');
+        // await SecureStore.deleteItemAsync('accessToken');
         if(accessToken){
             // 토큰 불러와서 전역 context 에 저장하기.
             setToken(accessToken);
@@ -57,9 +59,11 @@ const AppNavigator = () => {
                     <MainStack.Screen name="Search" component={SearchScreen} />
                     <MainStack.Screen name="SearchForPlan" component={SearchScreenForPlan} />
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
+                    <MainStack.Screen name="MakeReview" component={MakeReviewScreen} />
                     <MainStack.Screen name="MakePlanCollection" component={MakePlanCollectionScreen} />
                     <MainStack.Screen name="MakeFreeCollection" component={MakeFreeCollectionScreen}/>
                     <MainStack.Screen name="SystemSetting" component={SystemSettingScreen} />
+                    <MainStack.Screen name="ProfileSetting" component={ProfileSettingScreen} />
                     <MainStack.Screen name="Authentication2" component={AuthenticationNavigator2}/>
                     <MainStack.Screen name="PlanCollection" component={PlanCollectionScreen} />
                     <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />

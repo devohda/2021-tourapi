@@ -1,34 +1,50 @@
 import React, {useEffect, useState} from 'react';
 import {View, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Dimensions} from 'react-native';
 import AppText from '../../components/AppText';
-import { useTheme } from '@react-navigation/native';
-import { useSearchKeyword } from '../../contexts/SearchkeywordContextProvider';
+import {useTheme} from '@react-navigation/native';
+import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
+import {searchResult} from '../../contexts/search/SearchResultContextProvider';
+import {searchUserResult} from '../../contexts/search/SearchUserContextProvider';
+import {useIsFocused} from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const SearchUser = () => {
     const {colors} = useTheme();
     const [userList, setUserList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-
+    const [searchLength, setSearchLength] = searchUserResult();
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getResults();
-    }, [searchKeyword]);
+    }, [searchKeyword, isFocused]);
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=user`, {
+            fetch(`http://34.64.185.40/user/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'x-access-token' : token
+                    'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if (response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    setSearchLength(response.data.length);
                     setUserList(response.data);
                 })
                 .catch((err) => {
@@ -63,14 +79,23 @@ const SearchUser = () => {
     });
 
     const UserContainer = ({item}) => {
-        return(
+        return (
             <View style={{alignItems: 'center', paddingBottom: 20, marginHorizontal: collectionMargin}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Image style={styles.authorImage}
                         source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                    <View style={{backgroundColor: colors.defaultColor, borderRadius: 50, borderWidth: 5, borderColor: colors.backgroundColor,
-                        width: 32, height: 32, marginBottom: 64, marginLeft: 61, padding: 2,
-                        justifyContent: 'center', alignItems: 'center'
+                    <View style={{
+                        backgroundColor: colors.defaultColor,
+                        borderRadius: 50,
+                        borderWidth: 5,
+                        borderColor: colors.backgroundColor,
+                        width: 32,
+                        height: 32,
+                        marginBottom: 64,
+                        marginLeft: 61,
+                        padding: 2,
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}><AppText style={{color: colors.blue[1], textAlign: 'center', fontSize: 12}}>31</AppText></View>
                 </View>
                 <AppText style={{
@@ -80,11 +105,12 @@ const SearchUser = () => {
                     marginTop: 8
                 }}>{item.user_nickname}</AppText>
 
-                <View style={{flexDirection : 'row', alignItems: 'center', marginTop: 4}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
                     {item.keywords.length != 0 &&
-                                item.keywords.map((k) => {
-                                    return <View style={{marginEnd: 3}}><AppText style={{fontSize : 12, color : colors.gray[4]}}># {k}</AppText></View>;
-                                })}
+                    item.keywords.map((k) => {
+                        return <View style={{marginEnd: 3}}><AppText
+                            style={{fontSize: 12, color: colors.gray[4]}}># {k}</AppText></View>;
+                    })}
                 </View>
             </View>
         );
@@ -97,9 +123,11 @@ const SearchUser = () => {
         }>
             {
                 userList.length === 0 ?
-                    <ShowEmpty /> :
+                    <ShowEmpty/> :
                     <SafeAreaView>
-                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2} data={userList} renderItem={UserContainer} keyExtractor={(item) => item.user_pk.toString()} nestedScrollEnabled />
+                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
+                            data={userList} renderItem={UserContainer}
+                            keyExtractor={(item) => item.user_pk.toString()} nestedScrollEnabled/>
                     </SafeAreaView>
             }
         </View>

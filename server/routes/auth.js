@@ -34,7 +34,10 @@ router.post('/authPhone', async (req, res) => {
             return error;
         });
 
-    res.send({state: 'SUCCESS'});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 
@@ -70,7 +73,11 @@ router.post('/makeAccount', async (req, res, next) => {
     userInfo.salt = salt;
 
     const result = await authService.createUser(userInfo);
-    res.send({result: true});
+
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 // 회원가입 시 중복 확인 - 이메일
@@ -82,7 +89,12 @@ router.post('/sameEmail', async (req, res, next) => {
     if (count >= 1) {
         isDuplicated = true;
     }
-    res.send({code: 200, status: 'SUCCESS', data: {isDuplicated}});
+
+    return res.status(200).json({
+        code: 200,
+        status: 'OK',
+        data: {isDuplicated}
+    });
 });
 
 // 회원가입 시 중복 확인 - 이메일
@@ -94,7 +106,12 @@ router.post('/sameNickname', async (req, res, next) => {
     if (count >= 1) {
         isDuplicated = true;
     }
-    res.send({code: 200, status: 'SUCCESS', data: {isDuplicated}});
+
+    return res.status(200).json({
+        code: 200,
+        status: 'OK',
+        data: {isDuplicated}
+    });
 });
 
 
@@ -104,33 +121,45 @@ router.post('/sameNickname', async (req, res, next) => {
 *
 * */
 
-router.post('/loginEmail', async (req, res, next) => {
-    const {email, password: plainPassword} = req.body.user;
-
-    const userData = await authService.readUserByEmail(email);
-    if (userData.length !== 1) {
-        return res.send({state: 'NOT EXIST'});
-    }
-
-    const {salt, user_password, ...user} = userData[0];
-
-    const makePasswordHashed = (plainPassword) =>
-        new Promise(async (resolve, reject) => {
-            // salt를 가져오는 부분은 각자의 DB에 따라 수정
-            crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
-                if (err) reject(err);
-                resolve(key.toString('base64'));
-            });
-        });
-
-    const password = await makePasswordHashed(plainPassword);
-
-    if (user_password !== password) {
-        return res.send({state: 'NOT MATCHED'});
-    }
-
-    return res.send({state: 'SUCCESS', userData: user});
-});
+// router.post('/loginEmail', async (req, res, next) => {
+//     const {email, password: plainPassword} = req.body.user;
+//
+//     const userData = await authService.readUserByEmail(email);
+//     if (userData.length !== 1) {
+//         // 해당 유저 존재 X
+//         return res.status(404).json({
+//             code: 404,
+//             status: 'NOT EXIST'
+//         });
+//     }
+//
+//     const {salt, user_password, ...user} = userData[0];
+//
+//     const makePasswordHashed = (plainPassword) =>
+//         new Promise(async (resolve, reject) => {
+//             // salt를 가져오는 부분은 각자의 DB에 따라 수정
+//             crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+//                 if (err) reject(err);
+//                 resolve(key.toString('base64'));
+//             });
+//         });
+//
+//     const password = await makePasswordHashed(plainPassword);
+//
+//     if (user_password !== password) {
+//         // 비밀번호 틀렸을 때
+//         return res.status(403).json({
+//             code: 403,
+//             state: 'NOT MATCHED'
+//         });
+//     }
+//
+//     return res.status(200).json({
+//         code: 200,
+//         status: 'OK',
+//         userData: user
+//     });
+// });
 
 // jwt 토큰을 이용한 로그인
 router.post('/loginJWT', async (req, res, next) => {
@@ -142,9 +171,11 @@ router.post('/loginJWT', async (req, res, next) => {
 
         // [1] 해당 유저 정보 없음.
         if (userData.length !== 1) {
-            return res.send({state: 'NOT EXIST'});
+            return res.status(404).json({
+                code: 404,
+                status: 'NOT EXIST'
+            });
         }
-
 
         // 비밀번호 일치 확인
         const {salt, user_password, ...user} = userData[0];
@@ -161,16 +192,26 @@ router.post('/loginJWT', async (req, res, next) => {
 
         // [2] 비밀번호 일치 하지 않음.
         if (user_password !== password) {
-            return res.send({state: 'NOT MATCHED'});
+            return res.status(403).json({
+                code: 403,
+                status: 'NOT MATCHED'
+            });
         }
 
         // jwt 토큰 발급.
         const accessToken = await authService.createToken(user);
 
-        return res.send({code: 200, state: 'SUCCESS', accessToken});
+        return res.status(200).json({
+            code: 200,
+            status: 'OK',
+            accessToken: accessToken
+        });
     } catch (err) {
         console.log(err)
-        return res.send({code: 501, state: 'SERVER ERROR'});
+        return res.status(501).json({
+            code: 501,
+            status: 'SERVER ERROR'
+        });
     }
 });
 
@@ -178,8 +219,10 @@ router.delete('/logout', verifyToken, async (req, res, next)=> {
     const {user} = res.locals;
     await authService.deleteToken(user.user_pk);
 
-    return res.send({code: 200, state: 'SUCCESS'});
-
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
 });
 
 module.exports = router;

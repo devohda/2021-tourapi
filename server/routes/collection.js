@@ -12,13 +12,13 @@ router.post('/free', verifyToken, async (req, res, next) => {
     const result = await collectionService.createFreeCollection(collectionData, user.user_pk, keywords);
 
     if (result.collection_pk) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             collectionId : result.collection_pk
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -32,20 +32,20 @@ router.post('/plan', verifyToken, async (req, res, next) => {
     const result = await collectionService.createPlanCollection(collectionData, user.user_pk, keywords);
 
     if (result.collection_pk) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             collectionId : result.collection_pk
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
     }
 });
 
-// 보관함에 장소 추가하기
+// 보관함에 장소 추가
 router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
     const {collectionId, placeId} = req.params;
     const {planDay} = req.body;
@@ -53,39 +53,61 @@ router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next)
     const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay);
 
     if (result.affectedRows === 1) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS'
+            status: 'OK'
         });
     } else if (result.affectedRows === 0) {
-        return res.send({
+        return res.status(202).json({
             code: 202,
             status: 'EXISTED'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
     }
 });
 
+// 보관함 댓글 생성
+router.post('/:collectionId/comments', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
+    const {comment} = req.body;
+    const result = await collectionService.createCollectionComment(collectionId, user.user_pk, comment);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
 // READ
 // 보관함 리스트 조회
 router.get('/list', verifyToken, async (req, res, next) => {
     // 검색, 장소에서 보관함 추가할 때, 마이페이지 에서 사용
-    const {sort, keyword} = req.query;
+    const {sort, keyword, type, term} = req.query;
     const {user} = res.locals;
-    const result = await collectionService.readCollectionList(user.user_pk, true, sort, keyword);
+    const user_pk = user ? user.user_pk : null;
+
+    const result = await collectionService.readCollectionList(user_pk, type, sort, keyword, term);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS',
-            data: result
+            status: 'OK',
+            data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -99,13 +121,13 @@ router.get('/:collectionId', verifyToken, async (req, res, next) => {
     const result = await collectionService.readCollection(user.user_pk, collectionId);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -119,13 +141,13 @@ router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
     const result = await collectionService.readCollectionPlaceList(user.user_pk, collectionId);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK',
             data : result
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -133,12 +155,27 @@ router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
 })
 
 // 보관함 댓글 리스트 조회
-router.get('/:collectionId/comments',async (req, res, next) => {
+router.get('/:collectionId/comments', async (req, res, next) => {
+    const {collectionId} = req.params;
+    const result = await collectionService.readCollectionCommentList(collectionId);
 
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK',
+            data : result
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 })
 
+
 // UPDATE
-// 보관함 장소 리스트 수정
+// TODO 보관함 장소 리스트 수정
 router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
     const {user} = res.locals;
@@ -147,12 +184,12 @@ router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     const result = await collectionService.updateCollectionPlaceList(user.user_pk, collectionId, placeList);
 
     if (result) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS',
+            status: 'OK'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -167,12 +204,12 @@ router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     const result = await collectionService.deleteCollection(collectionId);
 
     if (result.affectedRows <= 1) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS'
+            status: 'OK'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
@@ -187,20 +224,21 @@ router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, nex
     const result = await collectionService.deletePlaceToCollection(collectionId, placeId, planDay);
 
     if (result.affectedRows === 1) {
-        return res.send({
+        return res.status(200).json({
             code: 200,
-            status: 'SUCCESS'
+            status: 'OK'
         });
     } else if (result.affectedRows === 0) {
-        return res.send({
-            code: 202,
-            status: 'NOT EXISTED'
+        return res.status(404).json({
+            code: 404,
+            status: 'NOT EXIST'
         });
     } else {
-        return res.send({
+        return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
         });
     }
 })
+
 module.exports = router;

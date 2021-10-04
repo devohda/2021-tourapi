@@ -3,10 +3,12 @@ import {Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList,
 import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
-import AppText from "../../components/AppText";
-import { useSearchKeyword } from "../../contexts/SearchkeywordContextProvider";
-import ShowEmpty from "../../components/ShowEmpty";
+import AppText from '../../components/AppText';
+import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
+import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const SearchPlaceForPlan = (props, {route, navigation}) => {
     const {colors} = useTheme();
@@ -15,14 +17,15 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    console.log(props)
+    console.log(props);
 
     const [token, setToken] = useToken();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const addPlace = (place_pk) => {
         // console.log(day.id)
         try {
-            fetch(`http://34.146.140.88/collection/${pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${pk}/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -35,9 +38,47 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((responsedata) => {
-                    // console.log(responsedata)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '추가되었습니다.');
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -54,7 +95,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.146.140.88/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -62,7 +103,15 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setPlaceList(response.data);
                     setFalse();
                 })
@@ -105,15 +154,18 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
     };
 
     const PlaceContainer = ({item, index}) => ( 
-        <TouchableOpacity onPress={()=>props.navigation.navigate('Place', {data : item})}>
+        <TouchableOpacity onPress={()=>{
+            countPlaceView(item.place_pk);
+            props.navigation.navigate('Place', {data : item});
+        }}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', width: '85%'}}>
                     {
                         item.place_img ?
-                        <Image source={{uri: item.place_img}}
-                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                        <Image source={require('../../assets/images/here_default.png')}
-                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                            <Image source={{uri: item.place_img}}
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
+                            <Image source={require('../../assets/images/here_default.png')}
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                     }
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -133,20 +185,25 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                         setIsPress(newArr);
                         // deletePlace(item.place_pk)
                     } else {
-                        for(let i=0;i<newArr.length;i++) {
-                            if(i == index) continue;
-                            else newArr[i] = false;
-                        }
+                        // for(let i=0;i<newArr.length;i++) {
+                        //     if(i == index) continue;
+                        //     else newArr[i] = false;
+                        // }
                         newArr[index] = true;
                         setIsPress(newArr);
-                        addPlace(item.place_pk)
+                        addPlace(item.place_pk);
                     }
                 }}
                 style={{width: '15%'}}
+                disabled={isPress[index] && true}
                 >
-                    <View style={{height: 28, backgroundColor: colors.mainColor, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={[{height: 28, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}, isPress[index] ? {backgroundColor: colors.gray[6]} : {backgroundColor: colors.mainColor}]}>
                         <View style={{paddingVertical: 4.5, paddingHorizontal: 4.5}}>
-                            <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가하기</AppText>
+                            {
+                                isPress[index] ?
+                                    <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가완료</AppText> :
+                                    <AppText style={{color: colors.backgroundColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500'}}>추가하기</AppText>
+                            }
                         </View>
                     </View>
                 </TouchableOpacity>

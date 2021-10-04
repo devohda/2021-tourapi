@@ -10,10 +10,17 @@ router.get('/list', async (req, res) => {
     try {
         result = await keywordService.readKeywordList(); 
     } catch (err) {
-        return res.send({code: 500, status: 'SERVER ERROR'});
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
 
-    return res.send({code: 200, status: 'SUCCESS', data: result});
+    return res.status(200).json({
+        code: 200,
+        status: 'OK',
+        data : result
+    });
 });
 
 module.exports = router;

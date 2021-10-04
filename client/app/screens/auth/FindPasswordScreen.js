@@ -9,9 +9,10 @@ import PhoneInput from 'react-native-phone-number-input';
 const FindPasswordScreen = () => {
     const [email, setEmail] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState(null);
+
     const sendSMS = () => {
         try {
-            fetch('http://34.146.140.88/auth/authPhone', {
+            fetch('http://34.64.185.40/auth/authPhone', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -25,6 +26,7 @@ const FindPasswordScreen = () => {
             console.error(err);
         }
     };
+
     return (
         <ScreenContainer>
             <View>

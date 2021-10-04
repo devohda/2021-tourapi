@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import {useIsFocused, useTheme} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import {Icon} from 'react-native-elements';
+import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 // import MapView, {Marker} from 'react-native-maps';
 
@@ -28,7 +28,7 @@ import {useToken} from '../../contexts/TokenContextProvider';
 import { updatedList } from '../../contexts/UpdatedListContextProvider';
 
 import TipsList from './TipsList';
-import DragAndDropList from './DragAndDropList';
+// import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
 
 import Jewel from '../../assets/images/jewel.svg';
@@ -36,17 +36,22 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
+import DefaultProfile from '../../assets/images/profile_default.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const {data} = route.params;
+    const keywords = data.keywords;
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
+    const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
     const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
@@ -63,10 +68,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const getUserData = () => {
         try {
-            fetch('http://34.146.140.88/user', {
+            fetch('http://34.64.185.40/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -74,7 +80,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setUserData(response.data);
                 })
                 .catch((err) => {
@@ -122,12 +135,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
         } else {
             getInitialCollectionData();
             getInitialPlaceData();
+            getCollectionCommentsData();
         }
     }, [isFocused]);
 
     const getInitialCollectionData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -135,7 +149,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setCollectionData(response.data);
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
@@ -146,9 +167,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         newArr.push({
                             id: i,
                             days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
-                        })
+                        });
                     }
-                    setPlanDays(newArr)
+                    setPlanDays(newArr);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -161,7 +182,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}/places`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -169,8 +190,15 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    setPlaceData(response.data)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    setPlaceData(response.data);
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
                         if(response.data[i].place_pk === -1 || response.data[i].place_pk === -2) exceptLength += 1;
@@ -183,6 +211,69 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
                     setIsPress(pressed);
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getCollectionCommentsData = () => {
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    setCommentsData(response.data)
+                    console.log(response.data)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const [comments, setComments] = useState('');
+
+    const postCollectionCommentsData = (comment) => {
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: comment
+                })
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+                    getCollectionCommentsData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -215,7 +306,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }
         }
         return false;
-    }
+    };
 
     const checkCreated = () => {
         if(data.collection_private === true || data.collection_private === false) {
@@ -224,17 +315,17 @@ const PlanCollectionScreen = ({route, navigation}) => {
             if(collectionData.is_creator) return false;
         }
         return true;
-    }
+    };
 
     const [isPress, setIsPress] = useState([]);
 
-    const setFalse = () => {
-    };
+    // const setFalse = () => {
+    // };
 
     const deletePlace = (place_pk, day) => {
         //공간 삭제
         try {
-            fetch(`http://34.146.140.88/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -245,7 +336,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     planDay: day,
                 })
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -255,12 +353,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     const LikeCollection = () => {
         //보관함 좋아요
         try {
-            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -268,7 +366,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     // console.log(response)
                     getInitialCollectionData();
                 })
@@ -284,7 +388,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const DeleteLikedCollection = () => {
         //보관함 좋아요 삭제
         try {
-            fetch(`http://34.146.140.88/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -292,8 +396,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response)
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     getInitialCollectionData();
                 })
                 .catch((err) => {
@@ -307,7 +417,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deleteCollection = () => {
         try {
-            fetch(`http://34.146.140.88/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -315,7 +425,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '삭제되었습니다.');
                     navigation.goBack();
                 })
@@ -326,11 +443,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
 
-    const Keyword = ({item}) => {
+    const Keyword = props => {
         return (
-            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {item}</AppText>
+            <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
         );
     };
 
@@ -354,56 +471,20 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const rowSwipeAnimatedValues = {};
-    Array(20)
-        .fill('')
-        .forEach((_, i) => {
-            rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
-        });
-
-
     const SwipeList = props => {
         return (
-        // <SwipeListView
-        //     data={placeData}
-        //     renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-        //     keyExtractor={(item, idx) => {idx.toString();}}
-        //     key={(item, idx) => {idx.toString();}}
-        //     renderHiddenItem={(item, rowMap) => {
-        //         return (
-        //             <View style={ item.item.place_pk > 0 ? { ...styles.rowBack, backgroundColor: colors.red[1]} : { ...styles.rowBackTime, backgroundColor: colors.red[1]}} key={item.place_pk}>
-        //                 <TouchableOpacity
-        //                     style={{...styles.backRightBtn, backgroundColor: colors.red[1]}}
-        //                     onPress={() => {
-        //                         deletePlace(item.item.place_pk, props.idx)
-        //                     }}
-        //                 >
-        //                     <View>
-        //                         <AppText style={{color: colors.defaultColor}}>삭제</AppText>
-        //                     </View>
-        //                 </TouchableOpacity>
-        //             </View>
-        //         );}}
-        //     rightOpenValue={-75}
-        //     previewRowKey={'0'}
-        //     previewOpenDelay={3000}
-        //     disableRightSwipe={true}
-        //     disableLeftSwipe={checkPrivate() ? false : true}
-        //     closeOnRowOpen={true}
-        //     closeOnRowPress={true}
-        //     nestedScrollEnabled
-        // />
         <SafeAreaView>
-        <FlatList data={placeData}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-            keyExtractor={(item, idx) => {idx.toString();}}
-            key={(item, idx) => {idx.toString();}}
-        nestedScrollEnabled/>
+            <FlatList data={placeData}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+              keyExtractor={(item, idx) => {idx.toString();}}
+              key={(item, idx) => {idx.toString();}}
+          nestedScrollEnabled/>
         </SafeAreaView>
-    )};
+        );};
 
     const EditList = props => (
-        <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
+        <View></View>
+        // <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
     );
 
     const ShowDays = ({item, index}) => {
@@ -434,7 +515,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </View>
                 {!isEditPage ? <SwipeList idx={idx} key={idx}/> : <EditList idx={idx} key={idx}/>}
 
-                <TouchableOpacity onPress={() => {
+                {/* <TouchableOpacity onPress={() => {
                 // if(isLimited) setIsLimited(false);
                 // else setIsLimited(true);
                 // console.log(isLimited)
@@ -457,7 +538,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 marginBottom: 5
                             }}></Image>
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </>
         );
     };
@@ -467,43 +548,69 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deleteMode = () => {
         setDeleteMenu(true);
-    }
+    };
+
+    const [isVisible, setIsVisible] = useState(false);
+    const list = [
+        { title: '프로필 수정하기',
+        onPress: () => {
+            setIsVisible(false)
+        }},
+        { title: '공간 수정하기',
+        onPress: () => {
+            setIsVisible(false)
+        }},
+        { title: '공유하기',
+        onPress: () => {
+            setIsVisible(false)
+        }
+        },
+        {
+            title: '삭제하기',
+            containerStyle: { backgroundColor: colors.red[3] },
+            titleStyle: { color: colors.defaultColor },
+            onPress: () => {
+                deleteMode();
+                setIsVisible(false)
+            }
+        },
+    ];
 
     const DeleteModal = () => (
         <Modal
-        transparent={true}
-        visible={deleteMenu}
-        onRequestClose={() => {
-            setDeleteMenu(!deleteMenu);
-        }}
-    >
-        <View style={styles.centeredView}>
-            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <Pressable
-                        style={{...styles.button, backgroundColor: colors.gray[4]}}
-                        onPress={() => setDeleteMenu(!deleteMenu)}
-                    >
-                        <AppText style={styles.textStyle}>취소하기</AppText>
-                    </Pressable>
-                    <Pressable
-                        style={{...styles.button, backgroundColor: colors.mainColor}}
-                        onPress={() => {
-                            setDeleteMenu(!deleteMenu);
-                            deleteCollection();
-                        }}
-                    >
-                        <AppText style={styles.textStyle}>삭제하기</AppText>
-                    </Pressable>
+            transparent={true}
+            visible={deleteMenu}
+            onRequestClose={() => {
+                setDeleteMenu(!deleteMenu);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.gray[4]}}
+                            onPress={() => setDeleteMenu(!deleteMenu)}
+                        >
+                            <AppText style={styles.textStyle}>취소하기</AppText>
+                        </Pressable>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            onPress={() => {
+                                setDeleteMenu(!deleteMenu);
+                                deleteCollection();
+                                setIsVisible(true);
+                            }}
+                        >
+                            <AppText style={styles.textStyle}>삭제하기</AppText>
+                        </Pressable>
+                    </View>
                 </View>
             </View>
-        </View>
-    </Modal>
-    )
+        </Modal>
+    );
 
     const setDate = () => {
-
         //data로 오는 거 처리
         if(data.collection_private === true || data.collection_private === false) {
             return `${startDate} - ${endDate}`;
@@ -527,8 +634,67 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 else return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}`;
             }
         }
+    };
 
-    }
+    const setBGColor = (idx) => {
+        if (idx === 0 || idx === 2) {
+            return colors.red[3];
+        } else if (idx === 1 || idx === 6) {
+            return '#FFC36A';
+        } else if (idx === 3 || idx === 8) {
+            return '#639A94';
+        } else if (idx === 4 || idx === 5) {
+            return colors.blue[2];
+        } else {
+            return '#8F6DA4';
+        }
+    };
+
+    const ShowComments = props => {
+        const { data, idx } = props;
+        return (
+            <>
+            <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
+                <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
+                    <DefaultProfile width={36} height={36}/>
+                </View>
+                <View>
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginBottom: 8,
+                        flexWrap: 'wrap'
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
+                        <AppText style={{
+                            marginHorizontal: 8,
+                            color: colors.gray[5],
+                            fontSize: 10
+                        }}>|</AppText>
+                        <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                    </View>
+                    <View style={{flex: 1, width: '100%'}}><AppText style={{
+                        fontSize: 12,
+                        color: colors.mainColor,
+                        lineHeight: 16,
+                        fontWeight: '700',
+                        flexWrap: 'wrap',
+                        width: windowWidth - 100
+                    }}>{data.collection_comment}
+                    </AppText></View>
+                </View>
+            </View>
+
+            <View style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.red_gray[6],
+                zIndex: -1000,
+                marginVertical: 12
+            }}></View>
+            </>
+        )
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -566,7 +732,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }}><AppText>수정</AppText>
+                            }}><AppText>수정하기</AppText>
                         </TouchableOpacity> */}
                         <View style={{
                             height: 1,
@@ -577,12 +743,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         <TouchableOpacity
                             onPress={async () => {
                                 await deleteMode();
+
                             }}
                             style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                            }}><AppText>삭제</AppText></TouchableOpacity>
+                            }}><AppText>삭제하기</AppText></TouchableOpacity>
                         <DeleteModal />
                     </View>
                 )
@@ -601,32 +768,48 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         if(typeof data.collection_private === 'boolean') {
                             navigation.pop(2);
                         }
-                        else navigation.goBack()}}>
+                        else navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
                 {checkPrivate() && <>
-                {
-                    !isEditPage ?
-                        <View style={{position: 'absolute', right: 0}}>
-                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                disabled={typeof data.collection_private === 'boolean'}
-                                style={{flex: 1, height: '100%'}} onPress={() => setShowMenu(state => !state)}>
-                                <MoreIcon style={{color: colors.mainColor}}/>
-                            </TouchableOpacity>
-                        </View> :
-                        <View style={{position: 'absolute', right: 0}}>
-                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
-                            onPress={() => {
-                                setIsEditPage(false);
-                                console.log(updatedData)
-                            }}>
-                                <View>
-                                    <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                }</>}
+                    {
+                        !isEditPage ?
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                                    disabled={typeof data.collection_private === 'boolean'}
+                                    style={{flex: 1, height: '100%'}} onPress={() => {
+                                        // setShowMenu(state => !state)
+                                        setIsVisible(true);
+                                    }}>
+                                    <MoreIcon style={{color: colors.mainColor}}/>
+                                </TouchableOpacity>
+                                <BottomSheet
+                                        isVisible={isVisible}
+                                        containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
+                                        >
+                                        {list.map((l, i) => (
+                                            <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
+                                            <ListItem.Content>
+                                                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                                            </ListItem.Content>
+                                            </ListItem>
+                                        ))}
+                                </BottomSheet>
+                                <DeleteModal />
+                            </View> :
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
+                                    onPress={() => {
+                                        setIsEditPage(false);
+                                        console.log(updatedData);
+                                    }}>
+                                    <View>
+                                        <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                    }</>}
             </View>
 
             <ScrollView>
@@ -647,6 +830,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 }]}>
                                 <AppText style={{...styles.dirFreeText, color: colors.red[3]}}>일정</AppText>
                             </View>
+                            {
+                                keywords.map((keyword, idx) => (
+                                    <Keyword keyword={keyword} key={idx} />
+                                ))
+                            }
                         </View>
                         <View>
                             {checkTrue() &&
@@ -668,31 +856,49 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontWeight: '700',
                                 color: colors.mainColor
                             }}>{data.collection_name}</AppText>
+                            {
+                                typeof data.collection_private === 'boolean' ?
+                                    <AppText style={{
+                                        fontSize: 12,
+                                        fontWeight: '400',
+                                        color: colors.gray[2],
+                                        lineHeight: 19.2,
+                                        marginTop: 12
+                                    }}>by. {userData.user_nickname}</AppText> :
+                                    <AppText style={{
+                                        fontSize: 12,
+                                        fontWeight: '400',
+                                        color: colors.gray[2],
+                                        lineHeight: 19.2,
+                                        marginTop: 12
+                                    }}>by. {collectionData.created_user_name}</AppText>
+                                
+                            }
                         </View>
                         {
-                           userData.user_nickname !== data.created_user_name &&
+                            userData.user_nickname !== data.created_user_name &&
                            <TouchableOpacity onPress={() => {
-                                if (collectionData.like_flag) {
-                                    DeleteLikedCollection();
-                                } else {
-                                    LikeCollection();
-                                }
-                            }}>
-                                {!(data.collection_private === false || data.collection_private === true) && <View style={{
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginVertical: 5
-                                }}>
-                                    <Jewel width={26} height={21}
-                                        style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                                    <AppText style={{
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                        color: collectionData.like_cnt ? colors.red[3] : colors.red_gray[3],
-                                        marginTop: 2
-                                    }}>{collectionData.like_cnt}</AppText>
-                                </View>}
-                            </TouchableOpacity>
+                               if (collectionData.like_flag) {
+                                   DeleteLikedCollection();
+                               } else {
+                                   LikeCollection();
+                               }
+                           }}>
+                               {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                                   justifyContent: 'center',
+                                   alignItems: 'center',
+                                   marginVertical: 5
+                               }}>
+                                   <Jewel width={26} height={21}
+                                       style={collectionData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                   <AppText style={{
+                                       fontSize: 10,
+                                       fontWeight: '700',
+                                       color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
+                                       marginTop: 2
+                                   }}>{collectionData.like_cnt}</AppText>
+                               </View>}
+                           </TouchableOpacity>
                         }
                     </View>
                 </ScreenContainerView>
@@ -727,10 +933,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                 </View>
                                 <SafeAreaView>
-                                            {/* {
+                                    {/* {
                                             placeData.length > 5 ?
                                         } */}
-                                            {/* {collectionData.place.map((item, idx) =>(
+                                    {/* {collectionData.place.map((item, idx) =>(
                                             <ShowPlaces item={item} idx={idx} key={idx}/>
                                         ))} */}
                                     {/* <FlatList data={collectionData.places} renderItem={ShowPlaces}
@@ -750,9 +956,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                                 style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                         </View>
                                         <TouchableOpacity onPress={()=>{
-                                                if(typeof data.collection_private === 'boolean') navigation.navigate('Search')
-                                                else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data})
-                                            }} style={checkCreated() && {display: 'none'}}>
+                                            if(typeof data.collection_private === 'boolean') navigation.navigate('Search');
+                                            else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
+                                        }} style={checkCreated() && {display: 'none'}}>
                                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -766,16 +972,16 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     marginTop: 40,
                                     marginBottom: 52
                                 }}>
-                                <Image source={require('../../assets/images/empty_forDir.png')} style={{
-                                    width: 150,
-                                    height: 120,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginBottom: 12
-                                }}></Image>
-                                <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '400'}}>공간이
-                                    담겨있지 않아요!</AppText>
-                            </View>
+                                    <Image source={require('../../assets/images/empty_forDir.png')} style={{
+                                        width: 150,
+                                        height: 120,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        marginBottom: 12
+                                    }}></Image>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>보관함이 비어있네요.</AppText>
+                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>마음에 드는 공간을 수집해보세요!</AppText>
+                                </View>
                             </>
                     }
 
@@ -792,7 +998,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontSize: 14,
                                 marginStart: 11,
                                 marginTop: 5
-                            }}>총 <AppText style={{fontWeight: '700'}}>20개</AppText></AppText>
+                            }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
                         </View>
                         <View style={{marginVertical: 20}}>
                             <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
@@ -800,55 +1006,27 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     placeholder="보관함에 댓글을 남겨보세요!"
-                                    placeholderTextColor={colors.gray[5]} />
-                                <Pressable style={{marginLeft: 5}}>
+                                    value={comments}
+                                    placeholderTextColor={colors.gray[5]}
+                                    onChangeText={(text)=>setComments(text)}
+                                    />
+                                <Pressable style={{marginLeft: 5}} onPress={()=>{
+                                    postCollectionCommentsData(comments);
+                                    setComments('');
+                                }}>
                                     <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
                                         name={'pencil'} size={16}></Icon>
                                 </Pressable>
                             </View>
                         </View>
-                        <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
-                            <View style={{marginRight: 8}}>
-                                <Image source={require('../../assets/images/here_default.png')}
-                                    style={{width: 40, height: 40, borderRadius: 40, resizeMode: 'stretch'}}/>
-                            </View>
-                            <View>
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginBottom: 8,
-                                    flexWrap: 'wrap'
-                                }}>
-                                    <AppText style={{color: colors.mainColor, fontSize: 12}}>minsun</AppText>
-                                    <AppText style={{
-                                        marginHorizontal: 8,
-                                        color: colors.gray[5],
-                                        fontSize: 10
-                                    }}>|</AppText>
-                                    <AppText style={{color: colors.gray[4], fontSize: 12}}>21.06.24</AppText>
-                                </View>
-                                <View style={{flex: 1, width: '100%'}}><AppText style={{
-                                    fontSize: 12,
-                                    color: colors.mainColor,
-                                    lineHeight: 16,
-                                    fontWeight: '700',
-                                    flexWrap: 'wrap',
-                                    width: windowWidth - 100
-                                }}>
-                                    종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년 토박종로 25년 토박이가 알려주는 종로 25년
-                                    토박종로 25년 토박이가 알려주는
-                                </AppText></View>
-                            </View>
-                        </View>
-
-                        <View style={{
-                            width: '100%',
-                            height: 1,
-                            backgroundColor: colors.red_gray[6],
-                            zIndex: -1000,
-                            marginVertical: 12
-                        }}></View>
-
+                        {
+                            commentsData.length !== 0 &&
+                            <View style={{marginTop: 4}}>{
+                                commentsData.map((data, idx) => (
+                                    <ShowComments data={data} key={idx} idx={idx}/>
+                                ))
+                            }</View>
+                        }
                     </View>
                 </ScreenContainerView>
             </ScrollView>
@@ -980,7 +1158,15 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 22.4,
         fontWeight: '700'
-    }
+    },
+    authorImage: {
+        width: 44,
+        height: 44,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8
+    },
 });
 
 export default PlanCollectionScreen;

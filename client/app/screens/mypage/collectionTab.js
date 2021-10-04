@@ -1,6 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
-import {Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View} from 'react-native';
+import {
+    Alert,
+    Dimensions,
+    FlatList,
+    Image,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View
+} from 'react-native';
 import {Icon} from 'react-native-elements';
 import { Button, IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
 
@@ -8,6 +18,8 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
 import { useIsFocused } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const CollectionTab = ({navigation}) => {
 
@@ -37,16 +49,16 @@ const CollectionTab = ({navigation}) => {
         }
     ]);
 
-    // TODO 빈배열 뺐을 때 무한 렌더링 되는 거 해결해야 함
     useEffect(() => {
         getCollectionsFromUsers();
     },[isFocused]);
 
     const {colors} = useTheme();
+
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch('http://34.146.140.88/collection/list', {
+            fetch(`http://34.64.185.40/collection/list?type=MY`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -54,8 +66,47 @@ const CollectionTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then(({data}) => {
-                    setCollectionList(data);
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+
+                    setCollectionList(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const countCollectionView = (collection_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -68,7 +119,8 @@ const CollectionTab = ({navigation}) => {
 
     const CollectionContainer = ({item}) => {
         return (
-            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
+            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 8000}} onPress={() => {
+                countCollectionView(item.collection_pk);
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
             }}>
@@ -153,10 +205,6 @@ const CollectionTab = ({navigation}) => {
                                     isClicked: false
                                 })
                         );
-                        // directoryType.map((val, i) =>
-                        //     (i === idx && i === 1) &&
-                        //     getCollectionsFromUsers()
-                        // )
                     }}
                 >
                     <AppText
@@ -180,7 +228,7 @@ const CollectionTab = ({navigation}) => {
                         backgroundColor: '#fff',
                         flex: 1,
                         borderRadius: 10,
-                        zIndex: 9900,
+                        zIndex: 0,
 
                         shadowColor: '#000',
                         shadowOffset: {
@@ -210,6 +258,8 @@ const CollectionTab = ({navigation}) => {
                             borderColor: colors.gray[5],
                             borderWidth: 0.4,
                             borderRadius: 1,
+                            zIndex: 9900,
+                            backgroundColor: colors.backgroundColor,
                         }}></View>
                         <TouchableOpacity
                             onPress={() => {
@@ -228,6 +278,7 @@ const CollectionTab = ({navigation}) => {
                             borderColor: colors.gray[5],
                             borderWidth: 0.4,
                             borderRadius: 1,
+                            zIndex: 9900
                         }}></View>
                         <TouchableOpacity
                             onPress={() => {
@@ -261,7 +312,7 @@ const CollectionTab = ({navigation}) => {
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
-                                setShowMenu(!showMenu);
+                                // setShowMenu(!showMenu);
                             }} style={{flexDirection: 'row'}}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
