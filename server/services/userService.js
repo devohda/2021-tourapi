@@ -11,7 +11,7 @@ exports.readUser = async (user_pk) => {
 }
 
 // 유저 리스트 조회
-exports.readUserList = async (keyword, sort) => {
+exports.readUserList = async (keyword, sort, type) => {
 
     let result;
 
@@ -35,8 +35,11 @@ exports.readUserList = async (keyword, sort) => {
         }
 
         if(sort === "LIKE"){
-            query1 += ` ORDER BY like_total_cnt DESC, u.user_pk ASC
-                        LIMIT 10`;
+            query1 += ` ORDER BY like_total_cnt DESC, u.user_pk ASC`;
+        }
+
+        if(type === 'MAIN'){
+            query1 += ` LIMIT 10`;
         }
 
         const result1 = await db.query(query1);
