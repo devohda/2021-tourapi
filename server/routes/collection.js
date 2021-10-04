@@ -94,11 +94,11 @@ router.post('/:collectionId/comments', verifyToken, async (req, res, next) => {
 // 보관함 리스트 조회
 router.get('/list', verifyToken, async (req, res, next) => {
     // 검색, 장소에서 보관함 추가할 때, 마이페이지 에서 사용
-    const {sort, keyword, type} = req.query;
+    const {sort, keyword, type, term} = req.query;
     const {user} = res.locals;
     const user_pk = user ? user.user_pk : null;
 
-    const result = await collectionService.readCollectionList(user_pk, type, sort, keyword);
+    const result = await collectionService.readCollectionList(user_pk, type, sort, keyword, term);
 
     if (result) {
         return res.status(200).json({
@@ -206,8 +206,7 @@ router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     if (result.affectedRows <= 1) {
         return res.status(200).json({
             code: 200,
-            status: 'OK',
-            data : result
+            status: 'OK'
         });
     } else {
         return res.status(500).json({

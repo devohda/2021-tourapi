@@ -125,8 +125,8 @@ exports.createCollectionComment = async (collection_pk, user_pk, comment) => {
     return result;
 }
 
-// 보관함 리스트 조회(검색)
-exports.readCollectionList = async (user_pk, type, sort, keyword) => {
+// 보관함 리스트 조회
+exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
 
     // TODO
     //  - 마이페이지 : 보관함 이름, type, 키워드, 좋아요 개수, 장소 개수, 프로필 사진, 공개유무, sorting + 내꺼만
@@ -138,14 +138,41 @@ exports.readCollectionList = async (user_pk, type, sort, keyword) => {
     try {
         await conn.beginTransaction();
 
-        let query1 = `SELECT c.collection_pk, collection_name, collection_type, collection_thumbnail, collection_private, user_nickname AS created_user_name, IFNULL(place_cnt, 0) AS place_cnt, IFNULL(like_cnt, 0) AS like_cnt
+        let day = 100000;
+        if(type === 'MAIN' && term){
+            switch (term){
+                case 'DAY':
+                    day = 1;
+                    break;
+                case 'WEEK':
+                    day = 7;
+                    break;
+                case 'MONTH':
+                    day = 30;
+                    break
+            }
+        }
+
+        let query1 = `SELECT c.collection_pk, collection_name, collection_type, collection_thumbnail, collection_private, user_nickname AS created_user_name, 
+                             IFNULL(place_cnt, 0) AS place_cnt, IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt
                       FROM collections c
                       INNER JOIN users u
                       ON u.user_pk = c.user_pk
                       LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
                       ON cpm.collection_pk = c.collection_pk
-                      LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS like_cnt FROM like_collection GROUP BY collection_pk) lc 
+                      LEFT OUTER JOIN (
+                          SELECT collection_pk, COUNT(*) AS like_cnt 
+                          FROM like_collection 
+                          GROUP BY collection_pk
+                      ) lc
                       ON lc.collection_pk = c.collection_pk
+                      LEFT OUTER JOIN (
+                          SELECT collection_pk, COUNT(*) AS view_cnt
+                          FROM view_collection
+                          WHERE (view_time > DATE_SUB(now(), INTERVAL ${day} DAY))
+                          GROUP BY collection_pk
+                      ) vc
+                      ON vc.collection_pk = c.collection_pk
                       `
 
         if(type === 'MY' || keyword){
@@ -169,6 +196,9 @@ exports.readCollectionList = async (user_pk, type, sort, keyword) => {
             case 'LIKE':
                 query1 += ' ORDER BY like_cnt DESC, c.collection_pk DESC';
                 break;
+            case 'POPULAR':
+                query1 += ' ORDER BY view_cnt DESC, c.collection_pk DESC';
+                break
             default:
                 query1 += ' ORDER BY c.collection_pk DESC';
         }
