@@ -50,7 +50,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
             query += ' ORDER BY view_cnt DESC, p.place_pk ASC';
             break
         default:
-            query += ' ORDER BY c.collection_pk DESC';
+            query += ' ORDER BY p.place_pk ASC';
     }
 
     if(type === 'MAIN'){
