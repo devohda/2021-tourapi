@@ -82,10 +82,10 @@ exports.readPlace = async (place_pk) => {
                            IFNULL(AVG(review_cleanliness),0) AS review_cleanliness, 
                            IFNULL(AVG(review_accessibility),0) AS review_accessibility, 
                            IFNULL(AVG(review_market),0) AS review_market,
-                           CASE WHEN AVG(review_congestion_morning) >= 0.5 THEN 1 ELSE 0 END AS review_congestion_morning,
-                           CASE WHEN AVG(review_congestion_afternoon) >= 0.5 THEN 1 ELSE 0 END AS review_congestion_afternoon,
-                           CASE WHEN AVG(review_congestion_evening) >= 0.5 THEN 1 ELSE 0 END AS review_congestion_evening,
-                           CASE WHEN AVG(review_congestion_night) >= 0.5 THEN 1 ELSE 0 END AS review_congestion_night,
+                           CASE WHEN COUNT(review_congestion_morning) >= 2 THEN 1 ELSE 0 END AS review_congestion_morning,
+                           CASE WHEN COUNT(review_congestion_afternoon) >= 2 THEN 1 ELSE 0 END AS review_congestion_afternoon,
+                           CASE WHEN COUNT(review_congestion_evening) >= 2 THEN 1 ELSE 0 END AS review_congestion_evening,
+                           CASE WHEN COUNT(review_congestion_night) >= 2 THEN 1 ELSE 0 END AS review_congestion_night,
                            COUNT(*) AS review_total_cnt
                     FROM place_reviews
                     WHERE place_pk =${place_pk}`
