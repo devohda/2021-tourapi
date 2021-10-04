@@ -518,7 +518,7 @@ const PlaceScreen = ({route, navigation}) => {
                         </View>
                     </View>
                 </View>
-    
+
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
@@ -578,7 +578,7 @@ const PlaceScreen = ({route, navigation}) => {
             </View>
         )
     }
-    
+
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>

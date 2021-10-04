@@ -4,7 +4,6 @@ const authService = require('../services/authService');
 exports.verifyToken = async (req, res, next) => {
     try {
         const token = req.headers['x-access-token'];
-        console.log(token);
         if(!token){
             return res.status(401).json({
                 code: 401,
@@ -13,7 +12,6 @@ exports.verifyToken = async (req, res, next) => {
         }
 
         const isTokenVerified = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(isTokenVerified);
         if(isTokenVerified){
             const decodedToken = jwt.decode(token);
             const [{access_token}] = await authService.readUserTokenByUserPk(decodedToken.user_pk);
@@ -24,7 +22,6 @@ exports.verifyToken = async (req, res, next) => {
             }else{
                 // 유효하지 않으면 토큰 삭제
                 await authService.deleteToken(decodedToken.user_pk);
-                console.log('token 삭제')
                 return res.status(403).json({
                     code: 403,
                     status: 'INVALID TOKEN'
