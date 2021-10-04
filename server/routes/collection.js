@@ -74,9 +74,11 @@ router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next)
 // 보관함 리스트 조회
 router.get('/list', verifyToken, async (req, res, next) => {
     // 검색, 장소에서 보관함 추가할 때, 마이페이지 에서 사용
-    const {sort, keyword} = req.query;
+    const {sort, keyword, my} = req.query;
     const {user} = res.locals;
-    const result = await collectionService.readCollectionList(user.user_pk, true, sort, keyword);
+    const user_pk = user ? user.user_pk : null;
+
+    const result = await collectionService.readCollectionList(user_pk, my, sort, keyword);
 
     if (result) {
         return res.status(200).json({
