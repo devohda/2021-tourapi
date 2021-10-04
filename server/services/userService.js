@@ -39,7 +39,7 @@ exports.readUserList = async (keyword, sort, type) => {
         }
 
         if(type === 'MAIN'){
-            query1 += ` LIMIT 5`;
+            query1 += ` LIMIT 10`;
         }
 
         const result1 = await db.query(query1);

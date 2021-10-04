@@ -204,7 +204,7 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
         }
 
         if(type === 'MAIN'){
-            query1 += ' LIMIT 3';
+            query1 += ' LIMIT 10';
         }
 
         const [result1] = await conn.query(query1);
