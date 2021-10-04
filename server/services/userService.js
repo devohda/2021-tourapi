@@ -11,7 +11,7 @@ exports.readUser = async (user_pk) => {
 }
 
 // 유저 리스트 조회
-exports.readUserList = async (keyword, popular) => {
+exports.readUserList = async (keyword, sort) => {
 
     let result;
 
@@ -20,7 +20,7 @@ exports.readUserList = async (keyword, popular) => {
         let query1 = `SELECT u.user_pk, user_nickname, user_img
                       FROM users u`
 
-        if (popular) {
+        if (sort === "LIKE") {
             query1 = ` SELECT u.user_pk, user_nickname, user_img, IFNULL(cnt, 0) AS like_total_cnt
                        FROM users u
                        LEFT OUTER JOIN (
@@ -34,7 +34,7 @@ exports.readUserList = async (keyword, popular) => {
             query1 += ` WHERE user_nickname LIKE ${mysql.escape(`%${keyword}%`)}`;
         }
 
-        if(popular){
+        if(sort === "LIKE"){
             query1 += ` ORDER BY like_total_cnt DESC, u.user_pk ASC
                         LIMIT 10`;
         }

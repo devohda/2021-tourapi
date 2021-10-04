@@ -118,7 +118,7 @@ exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) 
 };
 
 // 보관함 리스트 조회(검색)
-exports.readCollectionList = async (user_pk, my, sort, keyword) => {
+exports.readCollectionList = async (user_pk, type, sort, keyword) => {
 
     // TODO
     //  - 마이페이지 : 보관함 이름, type, 키워드, 좋아요 개수, 장소 개수, 프로필 사진, 공개유무, sorting + 내꺼만
@@ -140,13 +140,13 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
                       ON lc.collection_pk = c.collection_pk
                       `
 
-        if(my || keyword){
+        if(type === 'MY' || keyword){
             query1 += ' WHERE';
 
             if(keyword){
                 query1 += ` collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
             }
-            if(my){
+            if(type === 'MY'){
                 query1 += ` c.user_pk = ${user_pk}`;
             }
         }
@@ -163,6 +163,10 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
                 break;
             default:
                 query1 += ' ORDER BY c.collection_pk DESC';
+        }
+
+        if(type === 'MAIN'){
+            query1 += ' LIMIT 10';
         }
 
         const [result1] = await conn.query(query1);

@@ -9,12 +9,12 @@ const {readPlaceList} = require("../services/placeService");
 // [READ]
 // 장소 리스트
 router.get('/list', verifyToken, async (req, res, next) => {
-    const {keyword} = req.query;
+    const {keyword, sort, type} = req.query;
     const {user} = res.locals;
 
     let data;
     try{
-        data = await readPlaceList(user.user_pk, keyword);
+        data = await readPlaceList(user.user_pk, keyword, sort, type);
     }catch (err) {
         return res.status(500).json({
             code: 500,

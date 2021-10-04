@@ -2,16 +2,26 @@ const db = require('../database/database');
 const mysql = require('mysql2');
 
 // 장소 배열 조회
-exports.readPlaceList = async (user_pk, keyword) => {
+exports.readPlaceList = async (user_pk, keyword, sort, type) => {
     // TODO 장소 이름, type, 주소, 사진, 별점, 좋아요
     //  검색 페이지
 
-    const query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
+    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(like_cnt, 0) AS like_cnt 
                    FROM places p
                    LEFT OUTER JOIN like_place lp
                    ON lp.place_pk = p.place_pk
                    AND lp.user_pk = ${user_pk}
+                   LEFT OUTER JOIN (SELECT place_pk, COUNT(*) AS like_cnt FROM like_place GROUP BY place_pk) llp
+                   ON llp.place_pk = p.place_pk
                    WHERE place_name LIKE ${mysql.escape(`%${keyword}%`)}`;
+
+    if(sort === 'LIKE'){
+        query += ' ORDER BY like_cnt DESC, p.place_pk ASC';
+    }
+
+    if(type === 'MAIN'){
+        query += ' LIMIT 10';
+    }
 
     const result1 = await db.query(query);
 
