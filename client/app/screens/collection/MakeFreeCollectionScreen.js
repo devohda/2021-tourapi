@@ -85,46 +85,46 @@ const MakeFreeCollectionScreen = ({navigation}) => {
             }
         }
 
-        // try {
-        //     fetch('http://34.64.185.40/collection/free', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Accept': 'application/json',
-        //             'Content-Type': 'application/json',
-        //             'x-access-token': token
-        //         },
-        //         body: JSON.stringify(forPostData)
-        //     }).then((res) => {
-        //         res.json();
-        //     })
-        //         .then((response) => {
-        //             // if(response.code === 401 || response.code === 403 || response.code === 419){
-        //             //     // Alert.alert('','로그인이 필요합니다');
-        //             //     await SecureStore.deleteItemAsync('accessToken');
-        //             //     setToken(null);
-        //             //     setIsSignedIn(false);
-        //             //     return;
-        //             // }
+        try {
+            fetch('http://34.64.185.40/collection/free', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify(forPostData)
+            }).then((res) => {
+                res.json();
+            })
+                .then((response) => {
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
                     
-        //             const item = {
-        //                 'collection_name': collectionName,
-        //                 'collection_private': isEnabled,
-        //                 'collection_type': 0,
-        //                 'keywords': showDatas,
-        //             };
-        //             Alert.alert('', '자유보관함이 생성되었습니다');
-        //             navigation.navigate('FreeCollection', {
-        //                 data: item
-        //             });
-        //         })
-        //         .catch((err) => {
-        //             console.error(err);
-        //             Alert.alert('', '자유보관함 생성에 실패했습니다');
-        //         });
+                    const item = {
+                        'collection_name': collectionName,
+                        'collection_private': isEnabled,
+                        'collection_type': 0,
+                        'keywords': showDatas,
+                    };
+                    Alert.alert('', '자유보관함이 생성되었습니다');
+                    navigation.navigate('FreeCollection', {
+                        data: item
+                    });
+                })
+                .catch((err) => {
+                    console.error(err);
+                    Alert.alert('', '자유보관함 생성에 실패했습니다');
+                });
 
-        // } catch (err) {
-        //     console.error(err);
-        // }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
