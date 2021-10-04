@@ -7,7 +7,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     //  검색 페이지
 
     let day = 100000;
-    if(type === 'MAIN' && term){
+    if(term){
         switch (term){
             case 'DAY':
                 day = 1;

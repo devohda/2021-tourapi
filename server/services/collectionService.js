@@ -139,7 +139,7 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
         await conn.beginTransaction();
 
         let day = 100000;
-        if(type === 'MAIN' && term){
+        if(term){
             switch (term){
                 case 'DAY':
                     day = 1;
