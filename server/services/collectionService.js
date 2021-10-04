@@ -158,6 +158,9 @@ exports.readCollectionList = async (user_pk, my, sort, keyword) => {
             case 'OLD':
                 query1 += ' ORDER BY c.collection_pk ASC';
                 break;
+            case 'LIKE':
+                query1 += ' ORDER BY like_cnt DESC, c.collection_pk DESC';
+                break;
             default:
                 query1 += ' ORDER BY c.collection_pk DESC';
         }
