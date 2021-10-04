@@ -117,6 +117,14 @@ exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) 
     return result;
 };
 
+// 보관함에 댓글 추가
+exports.createCollectionComment = async (collection_pk, user_pk, comment) => {
+    const query = `INSERT INTO collection_comments (user_pk, collection_pk, collection_comment)
+                   VALUES(${user_pk}, ${collection_pk}, ${mysql.escape(comment)})`
+    const result = await db.query(query);
+    return result;
+}
+
 // 보관함 리스트 조회(검색)
 exports.readCollectionList = async (user_pk, type, sort, keyword) => {
 
@@ -275,7 +283,15 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 };
 
 // 보관함 댓글 리스트
-exports.readCollectionCommentList = async (collection_pk) => {};
+exports.readCollectionCommentList = async (collection_pk) => {
+    const query = `SELECT cc.user_pk, collection_comment, cc_create_time, user_img
+                   FROM collection_comments cc
+                   INNER JOIN users u
+                   ON u.user_pk = cc.user_pk
+                   WHERE collection_pk = ${collection_pk}`
+    const result = await db.query(query);
+    return result;
+};
 
 // 보관함 장소 리스트 수정
 exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) => {

@@ -45,7 +45,7 @@ router.post('/plan', verifyToken, async (req, res, next) => {
     }
 });
 
-// 보관함에 장소 추가하기
+// 보관함에 장소 추가
 router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
     const {collectionId, placeId} = req.params;
     const {planDay} = req.body;
@@ -69,6 +69,26 @@ router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next)
         });
     }
 });
+
+// 보관함 댓글 생성
+router.post('/:collectionId/comments', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {user} = res.locals;
+    const {comment} = req.body;
+    const result = await collectionService.createCollectionComment(collectionId, user.user_pk, comment);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 
 // READ
 // 보관함 리스트 조회
@@ -135,12 +155,27 @@ router.get('/:collectionId/places',verifyToken, async (req, res, next) => {
 })
 
 // 보관함 댓글 리스트 조회
-router.get('/:collectionId/comments',async (req, res, next) => {
+router.get('/:collectionId/comments', async (req, res, next) => {
+    const {collectionId} = req.params;
+    const result = await collectionService.readCollectionCommentList(collectionId);
 
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK',
+            data : result
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 })
 
+
 // UPDATE
-// 보관함 장소 리스트 수정
+// TODO 보관함 장소 리스트 수정
 router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
     const {user} = res.locals;
