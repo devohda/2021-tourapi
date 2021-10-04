@@ -24,10 +24,12 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+        if(keywords) {
+            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
 
-        const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
-        const result3 = await conn.query(query3, [insertKeywordsSet]);
+            const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
+            const result3 = await conn.query(query3, [insertKeywordsSet]);
+        }
 
         result = {collection_pk};
 
@@ -73,10 +75,11 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
-        console.log(insertKeywordsSet);
-        const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
-        const result3 = await conn.query(query3, [insertKeywordsSet]);
+        if(keywords) {
+            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+            const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
+            const result3 = await conn.query(query3, [insertKeywordsSet]);
+        }
 
         // 보관함-장소 매핑에 시간 구획 라인 추가
         for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
