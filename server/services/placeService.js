@@ -2,24 +2,55 @@ const db = require('../database/database');
 const mysql = require('mysql2');
 
 // 장소 배열 조회
-exports.readPlaceList = async (user_pk, keyword, sort, type) => {
+exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     // TODO 장소 이름, type, 주소, 사진, 별점, 좋아요
     //  검색 페이지
 
-    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(like_cnt, 0) AS like_cnt 
+    let day = 100000;
+    if(type === 'MAIN' && term){
+        switch (term){
+            case 'DAY':
+                day = 1;
+                break;
+            case 'WEEK':
+                day = 7;
+                break;
+            case 'MONTH':
+                day = 30;
+                break
+        }
+    }
+
+    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
+                 IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt
                  FROM places p
                  LEFT OUTER JOIN like_place lp
                  ON lp.place_pk = p.place_pk
                  AND lp.user_pk = ${user_pk}
                  LEFT OUTER JOIN (SELECT place_pk, COUNT(*) AS like_cnt FROM like_place GROUP BY place_pk) llp
-                 ON llp.place_pk = p.place_pk`
+                 ON llp.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, COUNT(*) AS view_cnt
+                     FROM view_place
+                     WHERE (view_time > DATE_SUB(now(), INTERVAL ${day} DAY))
+                     GROUP BY place_pk
+                 ) vp
+                 ON vp.place_pk = p.place_pk
+                 `
 
     if(keyword){
         query += `WHERE place_name LIKE ${mysql.escape(`%${keyword}%`)}`;
     }
 
-    if(sort === 'LIKE'){
-        query += ' ORDER BY like_cnt DESC, p.place_pk ASC';
+    switch (sort){
+        case 'LIKE':
+            query += ' ORDER BY like_cnt DESC, p.place_pk ASC';
+            break;
+        case 'POPULAR':
+            query += ' ORDER BY view_cnt DESC, p.place_pk ASC';
+            break
+        default:
+            query += ' ORDER BY c.collection_pk DESC';
     }
 
     if(type === 'MAIN'){
