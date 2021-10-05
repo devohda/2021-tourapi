@@ -308,7 +308,7 @@ const CollectionTab = ({navigation}) => {
                     </ScrollView>
                 </View> */}
 
-                <View flexDirection="row" style={{justifyContent: 'space-between', marginVertical: 14, position: 'relative', zIndex: 1}}>
+                <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 6, marginBottom: 8, position: 'relative', zIndex: 1}}>
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
@@ -349,7 +349,7 @@ const CollectionTab = ({navigation}) => {
 
 const styles = StyleSheet.create({
     directoryContainer: {
-        width: '49%',
+        width: '48%',
         height: 249,
         borderRadius: 10,
         backgroundColor: '#fff',

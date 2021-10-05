@@ -25,12 +25,12 @@ const MyPageNavigation = ({navigation}) => {
                     elevation: 0,
                     shadowOpacity: 0,
                     justifyContent : 'center',
-                    height : 56
+                    height : 40
                 },
                 
                 tabBarIndicatorStyle: {
                     position: 'absolute',
-                    bottom: 14,
+                    bottom: 2,
                     left: (tabWidth - textWidth) / 2,
                     width: textWidth,
                     backgroundColor: colors.red[3],

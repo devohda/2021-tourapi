@@ -442,19 +442,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const [isVisible, setIsVisible] = useState(false);
     const list = [
-        { title: '프로필 수정하기',
-        onPress: () => {
-            setIsVisible(false)
-        }},
-        { title: '공간 수정하기',
-        onPress: () => {
-            setIsVisible(false)
-        }},
-        { title: '공유하기',
-        onPress: () => {
-            setIsVisible(false)
-        }
-        },
+        { title: '프로필 수정하기'},
+        { title: '공간 수정하기'},
+        { title: '공유하기'},
         {
             title: '삭제하기',
             containerStyle: { backgroundColor: colors.red[3] },
@@ -464,8 +454,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 setIsVisible(false)
             }
         },
+        { title: '취소',
+        onPress: () => {
+            setIsVisible(false)
+        }}
     ];
-
+    
     const DeleteModal = () => (
         <Modal
             transparent={true}
@@ -656,7 +650,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         {list.map((l, i) => (
                                             <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
                                             <ListItem.Content>
-                                                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                                                <AppText style={l.titleStyle}>{l.title}</AppText>
                                             </ListItem.Content>
                                             </ListItem>
                                         ))}
@@ -895,6 +889,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     value={comments}
                                     placeholderTextColor={colors.gray[5]}
                                     onChangeText={(text)=>setComments(text)}
+                                    onSubmitEditing={()=>{
+                                        setComments(comments);
+                                        postCollectionCommentsData(comments);
+                                        setComments('');
+                                    }}
                                     />
                                 <Pressable style={{marginLeft: 5}} onPress={()=>{
                                     postCollectionCommentsData(comments);

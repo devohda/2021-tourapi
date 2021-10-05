@@ -18,9 +18,7 @@ import {useToken} from '../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
-const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
-
-    const [height, setHeight] = useState(150 + 90 * 5);
+const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData, height}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
@@ -122,7 +120,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                 </View>
 
                 {idx === collectionList.length - 1 &&
-                <View style={{marginVertical: 22, borderRadius: 10}}>
+                <View style={{marginVertical: 22, borderRadius: 10, bottom: 0}}>
                     <TouchableOpacity
                         style={{
                             height: 48,
@@ -214,6 +212,7 @@ const PlaceScreen = ({route, navigation}) => {
     const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
+    const [height, setHeight] = useState(150 + 90 * collectionList.length);
 
     const styles = StyleSheet.create({
         categoryBorder: {
@@ -319,6 +318,7 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    if(response.data.length > 5) setHeight(150 + 90 * 5);
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -472,7 +472,7 @@ const PlaceScreen = ({route, navigation}) => {
                         refRBSheet.current.open();
                     }}>
                         <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
-                            collectionList={collectionList}/>
+                            collectionList={collectionList} height={height}/>
                     </TouchableOpacity>
                     <View style={{
                         borderWidth: 0.5,

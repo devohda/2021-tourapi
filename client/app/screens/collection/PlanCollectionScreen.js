@@ -42,8 +42,10 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
@@ -161,6 +163,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
 
+                    console.log(response.data)
                     var gap = moment(response.data.collection_end_date.split('T')[0]).diff(moment(response.data.collection_start_date.split('T')[0]), 'days');
                     var newArr = [];
                     for(var i=0;i<=gap;i++) {
@@ -169,6 +172,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
                         });
                     }
+                    console.log(newArr)
                     setPlanDays(newArr);
                 })
                 .catch((err) => {
@@ -552,19 +556,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const [isVisible, setIsVisible] = useState(false);
     const list = [
-        { title: '프로필 수정하기',
-        onPress: () => {
-            setIsVisible(false)
-        }},
-        { title: '공간 수정하기',
-        onPress: () => {
-            setIsVisible(false)
-        }},
-        { title: '공유하기',
-        onPress: () => {
-            setIsVisible(false)
-        }
-        },
+        { title: '프로필 수정하기'},
+        { title: '공간 수정하기'},
+        { title: '공유하기'},
         {
             title: '삭제하기',
             containerStyle: { backgroundColor: colors.red[3] },
@@ -574,6 +568,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 setIsVisible(false)
             }
         },
+        { title: '취소',
+        onPress: () => {
+            setIsVisible(false)
+        }}
     ];
 
     const DeleteModal = () => (
@@ -790,10 +788,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         >
                                         {list.map((l, i) => (
                                             <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
-                                            <ListItem.Content>
-                                                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-                                            </ListItem.Content>
-                                            </ListItem>
+                                                <ListItem.Content>
+                                                    <AppText style={l.titleStyle}>{l.title}</AppText>
+                                                </ListItem.Content>
+                                                </ListItem>
                                         ))}
                                 </BottomSheet>
                                 <DeleteModal />
@@ -925,8 +923,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </View>
 
                 <ScreenContainerView>
-                    {
-                        placeLength !== 0 ?
                             <View style={{marginTop: 16}}>
                                 <View style={{marginBottom: 16}}>
                                     <AppText style={{color: colors.gray[4]}}>총 <AppText
@@ -947,44 +943,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         key={(item, index) => index.toString()}
                                         nestedScrollEnabled/>
                                 </SafeAreaView>
-                            </View> :
-                            <>
-                                <View style={{marginTop: 16}}>
-                                    <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <View>
-                                            <AppText style={{color: colors.gray[4]}}>총 <AppText
-                                                style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
-                                        </View>
-                                        <TouchableOpacity onPress={()=>{
-                                            if(typeof data.collection_private === 'boolean') navigation.navigate('Search');
-                                            else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
-                                        }} style={checkCreated() && {display: 'none'}}>
-                                            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                                <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
-                                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
-                                            </View>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style={{
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginTop: 40,
-                                    marginBottom: 52
-                                }}>
-                                    <Image source={require('../../assets/images/empty_forDir.png')} style={{
-                                        width: 150,
-                                        height: 120,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        marginBottom: 12
-                                    }}></Image>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>보관함이 비어있네요.</AppText>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>마음에 드는 공간을 수집해보세요!</AppText>
-                                </View>
-                            </>
-                    }
-
+                            </View>
                 </ScreenContainerView>
 
                 <ScreenDivideLine style={{marginVertical: 16}}/>
@@ -1009,6 +968,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     value={comments}
                                     placeholderTextColor={colors.gray[5]}
                                     onChangeText={(text)=>setComments(text)}
+                                    onSubmitEditing={()=>{
+                                        setComments(comments);
+                                        postCollectionCommentsData(comments);
+                                        setComments('');
+                                    }}
                                     />
                                 <Pressable style={{marginLeft: 5}} onPress={()=>{
                                     postCollectionCommentsData(comments);

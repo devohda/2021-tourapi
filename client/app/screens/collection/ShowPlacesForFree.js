@@ -308,7 +308,7 @@ const ShowPlacesForFree = props => {
                     {
                         isFree ?
                             <>
-                                <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
+                                {/* <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/> */}
                             </> :
                             <>
                                 {/* <View style={{
@@ -333,7 +333,7 @@ const ShowPlacesForFree = props => {
                         </View>
                     </View> */}
 
-                                <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/>
+                                {/* <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/> */}
                             </>
                     }
                 </View>
