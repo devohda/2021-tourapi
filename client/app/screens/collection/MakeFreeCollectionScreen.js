@@ -364,11 +364,11 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName ? {
+                            style={{
                                 color: colors.mainColor,
                                 fontSize: 20,
                                 fontWeight: 'bold'
-                            } : {fontSize: 20}]}
+                            }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>

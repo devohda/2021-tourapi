@@ -120,11 +120,10 @@ const MyPageScreen = ({navigation}) => {
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
                 height: 24,
-                marginBottom: 20,
                 marginTop: Platform.OS === 'android' ? 20 : 10,
                 marginHorizontal: 20,
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', right: 0}}>
                     <TouchableOpacity onPress={()=>setReportMenu(true)}>
@@ -136,7 +135,7 @@ const MyPageScreen = ({navigation}) => {
             </View>
             <View
                 style={{
-                    backgroundColor: colors.backgroundColor
+                    backgroundColor: colors.backgroundColor,
                 }}
                 className="profile-container"
             >

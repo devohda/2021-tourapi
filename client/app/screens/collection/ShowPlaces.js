@@ -331,7 +331,7 @@ const ShowPlaces = props => {
                         }
                     </View>
                 </TouchableHighlight> :
-                item.cpm_plan_day === day &&
+                item.cpm_plan_day === day && length > 0 &&
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1}>
                     <View style={{

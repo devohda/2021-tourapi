@@ -39,13 +39,13 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                 res.json();
             })
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
+                    // if(response.code === 401 || response.code === 403 || response.code === 419){
+                    //     // Alert.alert('','로그인이 필요합니다');
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
 
                     Alert.alert('', '추가되었습니다.');
                 })
@@ -95,7 +95,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.64.185.40/search?keyword=${decodeURIComponent(searchKeyword)}&type=place`, {
+            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

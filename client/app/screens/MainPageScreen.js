@@ -14,9 +14,11 @@ import AppText from '../components/AppText';
 import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import {useToken} from '../contexts/TokenContextProvider';
+import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
 import Jewel from '../assets/images/jewel.svg';
 import DefaultProfile from '../assets/images/profile_default.svg';
+import * as SecureStore from 'expo-secure-store';
 
 export default function MainPageScreen({navigation}) {
     const {colors} = useTheme();
@@ -26,6 +28,7 @@ export default function MainPageScreen({navigation}) {
     const [token, setToken] = useToken();
     const [days, setDays] = useState('DAY');
     const isFocused = useIsFocused();
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     useEffect(() => {
         getPopularCollectionData();
@@ -68,7 +71,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularPlaceData = () => {
         try {
-            fetch('http://34.64.185.40/place/list?type=MAIN&sort=LIKE', {
+            fetch('http://34.64.185.40/place/list?type=MAIN&sort=POPULAR', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -97,7 +100,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularUserData = () => {
         try {
-            fetch('http://34.64.185.40/user/list?type=MAIN&sort=POPULAR', {
+            fetch('http://34.64.185.40/user/list?type=MAIN&sort=LIKE', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -172,8 +175,7 @@ export default function MainPageScreen({navigation}) {
                         setIsSignedIn(false);
                         return;
                     }
-
-                    getInitialData();
+                    getPopularPlaceData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -202,8 +204,7 @@ export default function MainPageScreen({navigation}) {
                         setIsSignedIn(false);
                         return;
                     }
-
-                    getInitialData();
+                    getPopularPlaceData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -678,7 +679,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 27,
         paddingHorizontal: 7,
-        marginLeft: 5,
+        marginHorizontal: 2.5,
     },
     keywordHashTag: {
         elevation: 1,
@@ -699,8 +700,8 @@ const styles = StyleSheet.create({
         marginLeft: 16,
     },
     directoryContainer: {
-        width: 200,
-        height: 274,
+        width: 180,
+        height: 249,
         borderRadius: 10,
         backgroundColor: '#fff',
         marginBottom: 11,

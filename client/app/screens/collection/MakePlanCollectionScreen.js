@@ -530,7 +530,11 @@ const MakePlanCollectionScreen = ({navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName ? {color: colors.mainColor, fontSize: 20, fontWeight: 'bold'} : {fontSize: 20}]}
+                                style={{
+                                    color: colors.mainColor,
+                                    fontSize: 20,
+                                    fontWeight: 'bold'
+                                }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
                             onChangeText={(name) => setCollectionName(name)}>
                         </CustomTextInput>
