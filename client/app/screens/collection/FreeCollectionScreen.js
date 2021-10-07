@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -19,6 +19,7 @@ import {useTheme, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 // import MapView, {Marker} from 'react-native-maps';
 import AppText from '../../components/AppText';
@@ -64,6 +65,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [update, setUpdate] = setUpdated();
+    const refRBSheet = useRef();
 
     const getUserData = () => {
         try {
@@ -439,33 +441,36 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const deleteMode = () => {
         setDeleteMenu(true);
     };
-
-    const [isVisible, setIsVisible] = useState(false);
     const list = [
-        { title: '프로필 수정하기'},
-        { title: '공간 수정하기'},
-        { title: '공유하기'},
-        {
-            title: '삭제하기',
-            containerStyle: { backgroundColor: colors.red[3] },
-            titleStyle: { color: colors.defaultColor },
-            onPress: () => {
-                deleteMode();
-                setIsVisible(false)
-            }
+        { 
+            title: '공간 수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
         },
-        { title: '취소',
-        onPress: () => {
-            setIsVisible(false)
-        }}
+        { 
+            title: '보관함 정보수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        { 
+            title: '보관함 공유',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        {
+            title: '보관함 삭제',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.red[3], fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
     ];
     
-    const DeleteModal = () => (
+    const DeleteModal = props => (
         <Modal
             transparent={true}
             visible={deleteMenu}
             onRequestClose={() => {
                 setDeleteMenu(!deleteMenu);
+                props.refRBSheet.current.close();
             }}
         >
             <View style={styles.centeredView}>
@@ -474,16 +479,19 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.gray[4]}}
-                            onPress={() => setDeleteMenu(!deleteMenu)}
+                            onPress={() => {
+                                props.refRBSheet.current.close();
+                                setDeleteMenu(!deleteMenu);
+                            }}
                         >
                             <AppText style={styles.textStyle}>취소하기</AppText>
                         </Pressable>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.mainColor}}
                             onPress={() => {
+                                props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
                                 deleteCollection();
-                                setIsVisible(true);
                             }}
                         >
                             <AppText style={styles.textStyle}>삭제하기</AppText>
@@ -638,24 +646,44 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                                     disabled={typeof data.collection_private === 'boolean'}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
-                                        // setShowMenu(state => !state)
-                                        setIsVisible(true);
+                                        refRBSheet.current.open();
                                     }}>
                                     <MoreIcon style={{color: colors.mainColor}}/>
                                 </TouchableOpacity>
-                                <BottomSheet
-                                        isVisible={isVisible}
-                                        containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-                                        >
-                                        {list.map((l, i) => (
-                                            <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
-                                            <ListItem.Content>
+                                <RBSheet
+                                    ref={refRBSheet}
+                                    closeOnDragDown={true}
+                                    closeOnPressMask={true}
+                                    height={250}
+                                    customStyles={{
+                                        wrapper: {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                        },
+                                        draggableIcon: {
+                                            display: 'none'
+                                        },
+                                        container: {
+                                            borderTopLeftRadius: 10,
+                                            borderTopRightRadius: 10,
+                                            backgroundColor: colors.yellow[7],
+                                            paddingTop: 10
+                                        }
+                                    }}
+                                >
+                                    {list.map((l, i) => (
+                                        <TouchableOpacity onPress={()=>{
+                                            console.log(i === 3)
+                                            if(i === 3) {
+                                                setDeleteMenu(true);
+                                            }
+                                        }}>
+                                            <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
                                                 <AppText style={l.titleStyle}>{l.title}</AppText>
-                                            </ListItem.Content>
-                                            </ListItem>
-                                        ))}
-                                </BottomSheet>
-                                <DeleteModal />
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <DeleteModal refRBSheet={refRBSheet}/>
+                                </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>

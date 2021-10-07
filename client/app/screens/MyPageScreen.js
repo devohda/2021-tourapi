@@ -9,8 +9,7 @@ import MyPageNavigation from '../navigation/MypageNavigator';
 import { useToken } from '../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
-// import SettingsIcon from '../assets/images/settings-icon.svg';
-import SettingsIcon from '../assets/images/SystemSettingIcon.svg';
+import SettingsIcon from '../assets/images/settings-icon.svg';
 import ReportIcon from '../assets/images/Report.svg';
 
 const MyPageScreen = ({navigation}) => {
@@ -53,69 +52,6 @@ const MyPageScreen = ({navigation}) => {
         }
     };
 
-    const [reportMenu, setReportMenu] = useState(false);
-    const [confirmMenu, setConfirmMenu] = useState(false);
-
-    const ReportModal = () => (
-        <Modal
-            transparent={true}
-            visible={reportMenu}
-            onRequestClose={() => {
-                setReportMenu(!reportMenu);
-            }}
-        >
-            <View style={styles.centeredView}>
-                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>해당 계정을 신고하시겠습니까?</AppText>
-                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                        <Pressable
-                            style={{...styles.button, backgroundColor: colors.gray[4]}}
-                            onPress={() => setReportMenu(!reportMenu)}
-                        >
-                            <AppText style={styles.textStyle}>취소하기</AppText>
-                        </Pressable>
-                        <Pressable
-                            style={{...styles.button, backgroundColor: colors.red[3]}}
-                            onPress={() => {
-                                setReportMenu(!reportMenu);
-                                setConfirmMenu(true);
-                            }}
-                        >
-                            <AppText style={styles.textStyle}>신고하기</AppText>
-                        </Pressable>
-                    </View>
-                </View>
-            </View>
-        </Modal>
-    );
-
-    const ConfirmModal = () => (
-        <Modal
-            transparent={true}
-            visible={confirmMenu}
-            onRequestClose={() => {
-                setConfirmMenu(!confirmMenu);
-            }}
-        >
-            <View style={styles.centeredView}>
-                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고되었습니다.</AppText>
-                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                        <Pressable
-                            style={{...styles.button, backgroundColor: colors.mainColor}}
-                            onPress={() => {
-                                setConfirmMenu(!confirmMenu);
-                            }}
-                        >
-                            <AppText style={styles.textStyle}>확인</AppText>
-                        </Pressable>
-                    </View>
-                </View>
-            </View>
-        </Modal>
-    );
-
-
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -126,11 +62,9 @@ const MyPageScreen = ({navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity onPress={()=>setReportMenu(true)}>
-                        <AppText style={{color: colors.mainColor, fontSize: 16, fontWeight: '400', lineHeight: 25.6}}>신고하기</AppText>
+                    <TouchableOpacity onPress={() => navigation.navigate('SystemSetting')}>
+                        <SettingsIcon width={24} height={24} style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
-                    <ReportModal />
-                    <ConfirmModal />
                 </View>
             </View>
             <View
@@ -157,19 +91,6 @@ const MyPageScreen = ({navigation}) => {
                             }}
                             source={require('../assets/images/here_default.png')}
                         />
-                        <View style={{position: 'absolute', left: '17%', bottom: '65%', backgroundColor: colors.defaultColor, borderRadius: 50, padding: 7,
-                            shadowOffset: {
-                                width: 4,
-                                height: 4
-                            },
-                            shadowOpacity: 0.25,
-                            elevation: 1,
-                            shadowColor: 'rgba(132, 92, 92, 0.14)',
-                    }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('SystemSetting')}>
-                                <SettingsIcon width={18} height={18} style={{color: colors.gray[5]}}/>
-                            </TouchableOpacity>
-                        </View>
                     </View>
                     <View style={{marginTop: 4}}>
                         <AppText

@@ -18,7 +18,7 @@ import {useToken} from '../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
-const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData, height}) => {
+const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
@@ -151,7 +151,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData,
     return (
         <>
             <View style={{width: '100%'}}>
-                <Icon type="ionicon" name={'add'} color={colors.red_gray[3]} size={28}></Icon>
+                <Icon type="ionicon" name={'add'} color={colors.red_gray[3]} size={26}></Icon>
             </View>
             <RBSheet
                 ref={refRBSheet}
@@ -214,48 +214,6 @@ const PlaceScreen = ({route, navigation}) => {
     const isFocused = useIsFocused();
     const [height, setHeight] = useState(150 + 90 * collectionList.length);
 
-    const styles = StyleSheet.create({
-        categoryBorder: {
-            borderWidth: 1,
-            borderRadius: 14,
-            height: 19,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        categoryText: {
-            color: colors.gray[1],
-            fontSize: 10,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            paddingVertical: 2,
-            paddingHorizontal: 8
-        },
-        reviewImage: {
-            width: 56,
-            height: 56,
-            backgroundColor: '#c4c4c4',
-            borderRadius: 50,
-
-        },
-
-        placeName: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: colors.mainColor
-        },
-
-        iconTabContainer: {
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        location: {
-            color: colors.gray[1],
-            fontSize: 14,
-            marginBottom: 1
-        }
-    });
-
     const getInitialData = () => {
         try {
             fetch(`http://34.64.185.40/place/${data.place_pk}`, {
@@ -270,10 +228,10 @@ const PlaceScreen = ({route, navigation}) => {
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
-                    setMorningCongestion(response.data.review_congestion_morning);
-                    setAfternoonCongestion(response.data.review_congestion_afternoon);
-                    setEveningCongestion(response.data.review_congestion_evening);
-                    setNightCongestion(response.data.review_congestion_night);
+                    setMorningCongestion(response.data.review.review_congestion_morning);
+                    setAfternoonCongestion(response.data.review.review_congestion_afternoon);
+                    setEveningCongestion(response.data.review.review_congestion_evening);
+                    setNightCongestion(response.data.review.review_congestion_night);
                     setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2))
                 })
                 .catch((err) => {
@@ -330,7 +288,7 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const PlaceInfo = ({collectionList, styles, data}) => {
+    const PlaceInfo = ({collectionList}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
@@ -451,39 +409,52 @@ const PlaceScreen = ({route, navigation}) => {
     
             return (
                 <View style={styles.iconTabContainer}>
-                    <TouchableOpacity onPress={() => {
-                        if (placeData.like_flag) {
-                            DeleteLikedPlace(placeData.place_pk);
-                        } else {
-                            LikePlace(placeData.place_pk);
-                        }
-                    }}>
-                        <Jewel width={26} height={21}
-                            style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                    </TouchableOpacity>
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => {
+                            if (placeData.like_flag) {
+                                DeleteLikedPlace(placeData.place_pk);
+                            } else {
+                                LikePlace(placeData.place_pk);
+                            }
+                        }} style={{marginBottom: 2}}>
+                            <Jewel width={26} height={21}
+                                style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>찜</AppText>
+                    </View>
+                    
                     <View style={{
                         borderWidth: 0.5,
                         transform: [{rotate: '90deg'}],
                         width: 42,
                         borderColor: colors.red_gray[5],
-                        marginHorizontal: 30
+                        marginHorizontal: 21
                     }}/>
-                    <TouchableOpacity onPress={() => {
-                        refRBSheet.current.open();
-                    }}>
-                        <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
-                            collectionList={collectionList} height={height}/>
-                    </TouchableOpacity>
+
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+                        <TouchableOpacity onPress={() => {
+                            refRBSheet.current.open();
+                        }}>
+                            <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
+                                collectionList={collectionList} height={height}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>보관함에 추가</AppText>
+                    </View>
+
                     <View style={{
                         borderWidth: 0.5,
                         transform: [{rotate: '90deg'}],
                         width: 42,
                         borderColor: colors.red_gray[5],
-                        marginHorizontal: 30
+                        marginHorizontal: 21
                     }}/>
-                    <TouchableOpacity onPress={onShare}>
-                        <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={28}/>
-                    </TouchableOpacity>
+
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+                        <TouchableOpacity onPress={onShare}>
+                            <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={26}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>공유</AppText>
+                    </View>
                 </View>
             );
         };
@@ -522,7 +493,7 @@ const PlaceScreen = ({route, navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
-                            <AppText style={styles.placeName}>{placeData.place_name}</AppText>
+                            <AppText style={{...styles.placeName, color: colors.mainColor}}>{placeData.place_name}</AppText>
                             <View style={{
                                 ...styles.categoryBorder,
                                 borderColor: colors.red_gray[6],
@@ -530,12 +501,12 @@ const PlaceScreen = ({route, navigation}) => {
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <AppText style={styles.categoryText}>{checkType(placeData.place_type)}</AppText>
+                                <AppText style={{...styles.categoryText, color: colors.gray[1]}}>{checkType(placeData.place_type)}</AppText>
                             </View>
                         </View>
     
                         <PlaceInfo icon={'location'}>
-                            <AppText style={styles.location}>{placeData.place_addr}</AppText>
+                            <AppText style={{...styles.location, color: colors.gray[1]}}>{placeData.place_addr}</AppText>
                             <AppText style={{
                                 color: colors.gray[4],
                                 fontSize: 14,
@@ -1059,4 +1030,41 @@ const PlaceScreen = ({route, navigation}) => {
         </ScreenContainer>
     );
 };
+
+const styles = StyleSheet.create({
+    categoryBorder: {
+        borderWidth: 1,
+        borderRadius: 14,
+        height: 19,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    categoryText: {
+        fontSize: 10,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        paddingVertical: 2,
+        paddingHorizontal: 8
+    },
+    reviewImage: {
+        width: 56,
+        height: 56,
+        backgroundColor: '#c4c4c4',
+        borderRadius: 50,
+    },
+    placeName: {
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    iconTabContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    location: {
+        fontSize: 14,
+        marginBottom: 1
+    }
+});
+
 export default PlaceScreen;

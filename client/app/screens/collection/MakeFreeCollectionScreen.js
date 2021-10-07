@@ -95,7 +95,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 },
                 body: JSON.stringify(forPostData)
             }).then((res) => {
-                res.json();
+                res.text();
             })
                 .then((response) => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
@@ -105,7 +105,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    
+                    console.log(response)
                     const item = {
                         'collection_name': collectionName,
                         'collection_private': isEnabled,
