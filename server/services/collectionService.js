@@ -435,3 +435,11 @@ exports.deletePlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) 
     const result = db.query(query);
     return result;
 }
+
+// 보관함 공간 한줄평 삭제
+exports.deleteCollectionPlaceComment = async (cpm_map_pk) => {
+    const query = `DELETE FROM collection_place_comment
+                   WHERE cpm_map_pk = ${cpm_map_pk}`;
+    const result = await db.query(query);
+    return result;
+}

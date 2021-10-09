@@ -252,7 +252,7 @@ router.put('/:collectionId/replacement/place', verifyToken, async (req, res, nex
     }
 })
 
-// TODO 보관함 장소 한줄평 수정
+// 보관함 장소 한줄평 수정
 router.put('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
     const {cpmMapPk} = req.params;
     const {comment} = req.body;
@@ -327,8 +327,21 @@ router.delete('/:collectionId/placeList/:cpmMapPk/place', verifyToken, async (re
 })
 
 // TODO 보관함 장소 한줄평 삭제
-router.delete('/:collectionId/placeList/:cpmMapPk/review', verifyToken, async (req, res, next) => {
+router.delete('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
+    const {cpmMapPk} = req.params;
+    const result = await collectionService.deleteCollectionPlaceComment(cpmMapPk);
 
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 })
 
 module.exports = router;
