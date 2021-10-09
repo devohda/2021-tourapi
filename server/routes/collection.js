@@ -211,6 +211,25 @@ router.get('/:collectionId/comments', verifyToken, async (req, res, next) => {
     }
 })
 
+// 보관함 대체 공간 리스트
+router.get('/:collectionId/replacement/placeList', verifyToken, async (req, res, next) => {
+    const {cpm_map_pk} = req.body;
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionPlaceReplacement(user.user_pk, cpm_map_pk);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK',
+            data: result
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 
 // UPDATE
 // 보관함 장소 리스트 수정
@@ -337,8 +356,7 @@ router.delete('/:collectionId/replacement/place/:placeId', verifyToken, async (r
 
 // 보관함 대체 공간 전체 삭제
 router.delete('/:collectionId/replacement/placeAll', verifyToken, async (req, res, next) => {
-    const {placeId} = req.params;
-    const {cpm_map_pk, order} = req.body;
+    const {cpm_map_pk} = req.body;
     const result = await collectionService.deleteCollectionPlaceReplacementAll(cpm_map_pk);
 
     if (result) {

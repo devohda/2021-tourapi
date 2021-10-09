@@ -342,6 +342,23 @@ exports.readCollectionCommentList = async (collection_pk) => {
     return result;
 };
 
+// 보관함 대체 공간 리스트
+exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
+    const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_type, cpr_order,
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+                   FROM collection_place_replacement cpr
+                   INNER JOIN places p
+                   ON cpr.place_pk = p.place_pk
+                   LEFT OUTER JOIN like_place lp
+                   ON lp.place_pk = cpr.place_pk
+                   AND lp.user_pk = ${user_pk}
+                   WHERE cpm_map_pk = ${cpm_map_pk}
+                   ORDER BY cpr_order ASC
+                   `
+    const result = await db.query(query);
+    return result;
+};
+
 // 보관함 장소 리스트 수정
 exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, deletePlaceList) => {
 
