@@ -84,11 +84,11 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         // 보관함-장소 매핑에 시간 구획 라인 추가
         for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
             // pm 12
-            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
-                            VALUES (${collection_pk}, -1, ${day})`
+            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
+                            VALUES (${collection_pk}, -1, ${day}, ${day * 2})`
             // pm 6
-            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
-                            VALUES (${collection_pk}, -2, ${day})`
+            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
+                            VALUES (${collection_pk}, -2, ${day}, ${day * 2 + 1})`
 
             await conn.query(query4);
             await conn.query(query5);
