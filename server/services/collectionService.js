@@ -348,6 +348,8 @@ exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, de
     const conn = await db.pool.getConnection();
     let result = false;
     try {
+        await conn.beginTransaction();
+
         for (const placeData of placeList) {
             const query1 = `UPDATE collection_place_map
                             SET cpm_plan_day = ${placeData.planDay}, cpm_order = ${placeData.order}
@@ -361,6 +363,36 @@ exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, de
                                 WHERE cpm_map_pk = ${cpm_map_pk}`
                 await conn.query(query2)
             }
+        }
+
+        result = true;
+        await conn.commit();
+    } catch (err) {
+        result = false;
+        await conn.rollback();
+    } finally {
+        conn.release();
+        return result;
+    }
+};
+
+// 보관함 공간의 대체 공간 리스트 수정
+exports.updateCollectionPlaceReplacement = async (cpm_map_pk, replacementPlaceList) => {
+
+    const conn = await db.pool.getConnection();
+    let result = false;
+
+    try{
+        await conn.beginTransaction();
+
+        const query1 = `DELETE FROM collection_place_replacement
+                        WHERE cpm_map_pk = ${cpm_map_pk}`;
+        await conn.query(query1);
+
+        for(const replacePlace of replacementPlaceList){
+            const query2 = `INSERT INTO collection_place_replacement (cpm_map_pk, place_pk, cpr_order)
+                            VALUES (${replacePlace.cpm_map_pk}, ${replacePlace.placeId}, ${replacePlace.order})`;
+            await conn.query(query2);
         }
 
         result = true;

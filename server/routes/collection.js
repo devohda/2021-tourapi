@@ -109,7 +109,7 @@ router.post('/:collectionId/replacement/place/:placeId', verifyToken, async (req
     }
 })
 
-// TODO 보관함 공간 한줄평 생성
+// 보관함 공간 한줄평 생성
 router.post('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
     const {cpmMapPk} = req.params;
     const {comment} = req.body;
@@ -235,8 +235,21 @@ router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
 })
 
 // TODO 대체 공간 수정
-router.put('/:collectionId/placeList/:cpmMapPk/place', verifyToken, async (req, res, next) => {
+router.put('/:collectionId/replacement/place', verifyToken, async (req, res, next) => {
+    const {cpm_map_pk, replacementPlaceList} = req.body;
+    const result = await collectionService.updateCollectionPlaceReplacement(cpm_map_pk, replacementPlaceList);
 
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 })
 
 // TODO 보관함 장소 한줄평 수정
