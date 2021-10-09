@@ -8,19 +8,21 @@ import {
 import { useTheme } from '@react-navigation/native';
 
 import AppText from '../../components/AppText';
+import AlternativeSpaceList from './AlternativeSpaceList';
 import TipsList from './TipsList';
 
 import Jewel from '../../assets/images/jewel.svg';
-import BackIcon from '../../assets/images/back-icon.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import { useToken } from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import { Icon } from 'react-native-elements';
 
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, navigation, originalData, pk} = props;
+    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited} = props;
+    // console.log(item)
     const isFree = (typeof day === 'undefined');
     const [update, setUpdate] = setUpdated();
     const [token, setToken] = useToken();
@@ -44,7 +46,7 @@ const ShowPlacesForFree = props => {
             return '음식';
         } else {
             return '기타';
-        }
+        };
     };
 
     const getInitialPlaceData = () => {
@@ -172,8 +174,14 @@ const ShowPlacesForFree = props => {
         }
     };
 
+    const checkLimit = () => {
+        if(!isEditPage && !isLimited) {
+            if(index <= 4) return false;
+            else return true;
+        }
+    }
     return (
-        <>
+        <View style={checkLimit() && {display: 'none'}}>
             {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
                 width: '100%',
                 height: 1,
@@ -183,23 +191,25 @@ const ShowPlacesForFree = props => {
             }}></View>} */}
             {/* pk로 바꾸기 */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
-                <View flex={1}>
+                <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            navigation.navigate('Place', {data: props.item})
-                        }} disabled={props.isEditPage && true}>
-                            <View style={{flexDirection: 'row', width: isFree ? '100%' : '90%'}}>
-                                {/* <Image source={{uri: item.place_img}} */}
-                                {
-                                    !isFree &&
-                                <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                    <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
-                                        <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                            {props.item.id}    
-                                        </AppText>
-                                    </View>
-                                </View>
+                            navigation.navigate('Place', {data: item})
+                        }} disabled={isEditPage && true}>
+                            <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', justifyContent: isEditPage ? 'space-between' : 'center', alignItems: 'center'}}>
+                                { isEditPage &&
+                                    <TouchableOpacity onPress={()=>{
+                                        let newArr = [...isDeletedOrigin];
+                                        console.log(newArr)
+                                        newArr[index] = true;
+                                        // setIsDeletedOrigin(newArr);
+                                        isDeleted(newArr);
+                                    }}>
+                                        <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
+                                            <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
+                                        </View>
+                                    </TouchableOpacity>
                                 }
                                 {
                                     item.place_img ?
@@ -221,7 +231,7 @@ const ShowPlacesForFree = props => {
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
-                                            }}>{isFree && checkType(props.item.place_type)}</AppText>
+                                            }}>{checkType(item.place_type)}</AppText>
                                             <AppText style={{
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
@@ -241,26 +251,18 @@ const ShowPlacesForFree = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
                                                 marginLeft: 2
-                                            }}>4.8</AppText>
+                                            }}>{item.star}</AppText>
                                         </View>
                                         <View style={{width: '100%'}}>
-                                            {/* <AppText style={{
-                                            fontSize: 16,
-                                            fontWeight: 'bold',
-                                            color: colors.mainColor,
-                                            marginVertical: 5,
-                                        }}>{item.place_name}</AppText> */}
                                             <AppText style={{
-                                                fontSize: 16,
+                                                fontSize: 14,
                                                 fontWeight: 'bold',
                                                 color: colors.mainColor,
                                                 marginVertical: 5,
-                                            }}>{isFree? props.item.place_name : '제목'}</AppText>
+                                            }}>{item.place_name}</AppText>
                                         </View>
-                                        {/* <AppText
-                                        style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText> */}
                                         <AppText
-                                            style={{fontSize: 12, color: colors.gray[4]}}>{isFree? props.item.place_addr : '서울시 구로구 연동로'}</AppText>
+                                            style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText>
                                     </View>
                                 </View>
                             </View>
@@ -284,7 +286,7 @@ const ShowPlacesForFree = props => {
                             }
                         }}> */}
                             {
-                                !props.isEditPage ?
+                                !isEditPage ?
                                 // <TouchableOpacity onPress={() => {
                                 //     console.log(item.place_pk)
                                 //     console.log(item)
@@ -305,70 +307,11 @@ const ShowPlacesForFree = props => {
                             }
                         </View>
                     </View>
-                    {
-                        isFree ?
-                            <>
-                                {/* <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/> */}
-                            </> :
-                            <>
-                                {/* <View style={{
-                        backgroundColor: colors.defaultColor,
-                        height: 30,
-                        paddingVertical: 6,
-                        paddingHorizontal: 8,
-                        marginBottom: 6,
-                        marginRight: 10,
-                        marginTop: 4,
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                        marginLeft: 36,
-                        borderRadius: 10,
-                    }}>
-                        <View>
-                            <AppText style={{color: colors.blue[1], fontSize: 14, textAlign: 'left'}}>대체 공간 2</AppText>
-                        </View>
-                        <View>
-                            <BackIcon width={10} height={14} style={{color: colors.mainColor, transform: [{rotate: '180deg'}], width: 4, height: 8}}/>
-                        </View>
-                    </View> */}
-
-                                {/* <TipsList data={props.item} idx={props.index} day={props.day} private={props.private}/> */}
-                            </>
-                    }
+                    <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation}/>
+                    <TipsList data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree}/>
                 </View>
             </TouchableHighlight>
-            {/* 받은 데이터를 이용해서 같은 성격의 데이터처럼 넣어야할것같음 */}
-            {/* {
-                props.index === 0 &&
-                <View style={{
-                    height: 30,
-                    paddingVertical: 6,
-                    paddingLeft: 6,
-                    paddingRight: 15,
-                    paddingBottom: 6,
-                    paddingTop: 4,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginLeft: 36,
-                    backgroundColor: colors.backgroundColor
-                }}>
-                    <View style={{
-                        width: '90%',
-                        borderStyle: 'dotted',
-                        borderRadius: 1,
-                        borderWidth: 1,
-                        borderColor: colors.gray[4],
-                        zIndex: -1000
-                    }}></View>
-                    <View style={{marginStart: 6}}>
-                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>12PM</AppText>
-                    </View>
-                </View>
-            } */}
-
-        </>
+        </View>
     );
 };
 

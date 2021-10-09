@@ -3,22 +3,26 @@ import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Di
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon, Rating} from 'react-native-elements';
-// import MapView, {Marker, UrlTile} from 'react-native-maps';
+import MapView, {Marker, UrlTile, PROVIDER_GOOGLE} from 'react-native-maps';
+import ClusteredMapView from "react-native-maps-super-cluster";
+import ClusterView from './ClusterView';
+import * as SecureStore from 'expo-secure-store';
+
 import StarScore from '../components/StarScore';
 import NavigationTop from '../components/NavigationTop';
 import Score from '../components/Score';
 import Time from '../components/Time';
 import Facility from '../components/Facility';
 import AppText from '../components/AppText';
+
 import Jewel from '../assets/images/jewel.svg';
 import ScreenContainer from '../components/ScreenContainer';
 import ScreenContainerView from '../components/ScreenContainerView';
 import ScreenDivideLine from '../components/ScreenDivideLine';
 import {useToken} from '../contexts/TokenContextProvider';
-import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
-const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData, height}) => {
+const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
@@ -151,7 +155,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData,
     return (
         <>
             <View style={{width: '100%'}}>
-                <Icon type="ionicon" name={'add'} color={colors.red_gray[3]} size={28}></Icon>
+                <Icon type="ionicon" name={'add'} color={colors.red_gray[3]} size={26}></Icon>
             </View>
             <RBSheet
                 ref={refRBSheet}
@@ -214,48 +218,6 @@ const PlaceScreen = ({route, navigation}) => {
     const isFocused = useIsFocused();
     const [height, setHeight] = useState(150 + 90 * collectionList.length);
 
-    const styles = StyleSheet.create({
-        categoryBorder: {
-            borderWidth: 1,
-            borderRadius: 14,
-            height: 19,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        categoryText: {
-            color: colors.gray[1],
-            fontSize: 10,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            paddingVertical: 2,
-            paddingHorizontal: 8
-        },
-        reviewImage: {
-            width: 56,
-            height: 56,
-            backgroundColor: '#c4c4c4',
-            borderRadius: 50,
-
-        },
-
-        placeName: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: colors.mainColor
-        },
-
-        iconTabContainer: {
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        location: {
-            color: colors.gray[1],
-            fontSize: 14,
-            marginBottom: 1
-        }
-    });
-
     const getInitialData = () => {
         try {
             fetch(`http://34.64.185.40/place/${data.place_pk}`, {
@@ -266,15 +228,15 @@ const PlaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data.review);
+                    // console.log(response.data.review);
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
-                    setMorningCongestion(response.data.review_congestion_morning);
-                    setAfternoonCongestion(response.data.review_congestion_afternoon);
-                    setEveningCongestion(response.data.review_congestion_evening);
-                    setNightCongestion(response.data.review_congestion_night);
-                    setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2))
+                    setMorningCongestion(response.data.review.review_congestion_morning);
+                    setAfternoonCongestion(response.data.review.review_congestion_afternoon);
+                    setEveningCongestion(response.data.review.review_congestion_evening);
+                    setNightCongestion(response.data.review.review_congestion_night);
+                    setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2));
                 })
                 .catch((err) => {
                     console.error(err);
@@ -330,7 +292,7 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const PlaceInfo = ({collectionList, styles, data}) => {
+    const PlaceInfo = ({collectionList}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
@@ -451,39 +413,52 @@ const PlaceScreen = ({route, navigation}) => {
     
             return (
                 <View style={styles.iconTabContainer}>
-                    <TouchableOpacity onPress={() => {
-                        if (placeData.like_flag) {
-                            DeleteLikedPlace(placeData.place_pk);
-                        } else {
-                            LikePlace(placeData.place_pk);
-                        }
-                    }}>
-                        <Jewel width={26} height={21}
-                            style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                    </TouchableOpacity>
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => {
+                            if (placeData.like_flag) {
+                                DeleteLikedPlace(placeData.place_pk);
+                            } else {
+                                LikePlace(placeData.place_pk);
+                            }
+                        }} style={{marginBottom: 2}}>
+                            <Jewel width={26} height={21}
+                                style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>찜</AppText>
+                    </View>
+                    
                     <View style={{
                         borderWidth: 0.5,
                         transform: [{rotate: '90deg'}],
                         width: 42,
                         borderColor: colors.red_gray[5],
-                        marginHorizontal: 30
+                        marginHorizontal: 21
                     }}/>
-                    <TouchableOpacity onPress={() => {
-                        refRBSheet.current.open();
-                    }}>
-                        <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
-                            collectionList={collectionList} height={height}/>
-                    </TouchableOpacity>
+
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+                        <TouchableOpacity onPress={() => {
+                            refRBSheet.current.open();
+                        }}>
+                            <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
+                                collectionList={collectionList} height={height}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>보관함에 추가</AppText>
+                    </View>
+
                     <View style={{
                         borderWidth: 0.5,
                         transform: [{rotate: '90deg'}],
                         width: 42,
                         borderColor: colors.red_gray[5],
-                        marginHorizontal: 30
+                        marginHorizontal: 21
                     }}/>
-                    <TouchableOpacity onPress={onShare}>
-                        <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={28}/>
-                    </TouchableOpacity>
+
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+                        <TouchableOpacity onPress={onShare}>
+                            <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={26}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>공유</AppText>
+                    </View>
                 </View>
             );
         };
@@ -522,7 +497,7 @@ const PlaceScreen = ({route, navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
-                            <AppText style={styles.placeName}>{placeData.place_name}</AppText>
+                            <AppText style={{...styles.placeName, color: colors.mainColor}}>{placeData.place_name}</AppText>
                             <View style={{
                                 ...styles.categoryBorder,
                                 borderColor: colors.red_gray[6],
@@ -530,12 +505,12 @@ const PlaceScreen = ({route, navigation}) => {
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <AppText style={styles.categoryText}>{checkType(placeData.place_type)}</AppText>
+                                <AppText style={{...styles.categoryText, color: colors.gray[1]}}>{checkType(placeData.place_type)}</AppText>
                             </View>
                         </View>
     
                         <PlaceInfo icon={'location'}>
-                            <AppText style={styles.location}>{placeData.place_addr}</AppText>
+                            <AppText style={{...styles.location, color: colors.gray[1]}}>{placeData.place_addr}</AppText>
                             <AppText style={{
                                 color: colors.gray[4],
                                 fontSize: 14,
@@ -577,8 +552,95 @@ const PlaceScreen = ({route, navigation}) => {
                 <AppText style={{fontSize: 14, color: colors.mainColor}}>{item}</AppText>
             </View>
         )
-    }
+    };
 
+    const list = [
+        {
+            id: 1,
+            data: 'hi'
+        },
+        {
+            id: 2,
+            data: 'ghgh'
+        }
+    ]
+
+    const Markers = props => {
+        var lng = props.idx===0 ? 126.9779482762618 : 126.9775482762115
+        return (
+            <Marker coordinate={{
+                latitude: 37.56633546113615,
+                longitude: lng
+            }}
+                     title={props.data.data}
+                     description="기본값입니다"/>
+        )
+    };
+
+    const window = Dimensions.get("window");
+    const WIDTH = window.width;
+    const HEIGHT = window.height
+
+    const ASPECT_RATIO = WIDTH / HEIGHT;
+    const LATITUDE_DELTA = 0.35;
+    const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+    const INITIAL_POSITION = {
+    latitude: 41.924447,
+    longitude: -87.687339,
+    latitudeDelta: 1,
+    longitudeDelta: 1
+    };
+
+    const COORDS = [
+        {
+          location: {
+            latitude: 42,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.1,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.2,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.3,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.4,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        }
+    ];
+
+    const renderMarker = data => {
+        console.log(data); console.log('hi')
+        return (
+            <MapView.Marker key={data.location.latitude} coordinate={data.location} />
+        )
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -591,7 +653,7 @@ const PlaceScreen = ({route, navigation}) => {
                         <View flex={1} style={{alignItems: 'center', justifyContent: 'center'}}>
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
                                 {
-                                    placeScore !== 0 ?
+                                    placeScore != 0.00 ?
                                     <Jewel width={30} height={26}
                                     style={{color: colors.red[3], marginTop: 4}}/> :
                                     <Jewel width={30} height={26}
@@ -704,8 +766,8 @@ const PlaceScreen = ({route, navigation}) => {
                     }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
-                    <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
-                    {/* TODO 카카오 지도 api 가져오기
+                    {/* <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
+                    
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
@@ -714,14 +776,22 @@ const PlaceScreen = ({route, navigation}) => {
                                      latitudeDelta: 0.0015,
                                      longitudeDelta: 0.0015,
                                  }}
-                        ><Marker coordinate={{
-                            latitude: 37.56633546113615,
-                            longitude: 126.9779482762618
-                        }}
-                                 title="서울시청"
-                                 description="기본값입니다"/>
+                        >
+                        {
+                            list.map((data, idx) => (
+                                <Markers data={data} key={idx + 'user'} idx={idx}/>
+                            ))
+                        }
                         </MapView>
-                    </View> */}
+                        {/* <ClusteredMapView
+                            style={{height: 200}}
+                            accessor={m => m.location}
+                            data={COORDS}
+                            initialRegion={INITIAL_POSITION}
+                            renderMarker={renderMarker}
+                        /> */}
+                        <ClusterView />
+                    </View>
                 </View>
                 <View>
                     <View style={{alignItems: 'center'}}>
@@ -1059,4 +1129,41 @@ const PlaceScreen = ({route, navigation}) => {
         </ScreenContainer>
     );
 };
+
+const styles = StyleSheet.create({
+    categoryBorder: {
+        borderWidth: 1,
+        borderRadius: 14,
+        height: 19,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    categoryText: {
+        fontSize: 10,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        paddingVertical: 2,
+        paddingHorizontal: 8
+    },
+    reviewImage: {
+        width: 56,
+        height: 56,
+        backgroundColor: '#c4c4c4',
+        borderRadius: 50,
+    },
+    placeName: {
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    iconTabContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    location: {
+        fontSize: 14,
+        marginBottom: 1
+    }
+});
+
 export default PlaceScreen;

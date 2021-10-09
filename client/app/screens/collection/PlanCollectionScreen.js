@@ -1,4 +1,4 @@
-import React, {useState, useEffect, cloneElement} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -14,11 +14,12 @@ import {
     Modal,
     Alert
 } from 'react-native';
-import {useIsFocused, useTheme} from '@react-navigation/native';
-import styled from 'styled-components/native';
-import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
+import {useTheme, useIsFocused} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
-// import MapView, {Marker} from 'react-native-maps';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -28,7 +29,7 @@ import {useToken} from '../../contexts/TokenContextProvider';
 import { updatedList } from '../../contexts/UpdatedListContextProvider';
 
 import TipsList from './TipsList';
-// import DragAndDropList from './DragAndDropList';
+import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
 
 import Jewel from '../../assets/images/jewel.svg';
@@ -50,12 +51,10 @@ const windowHeight = Dimensions.get('window').height;
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const {data} = route.params;
-    const keywords = data.keywords;
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [isLimited, setIsLimited] = useState(true);
     const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
     const [updatedData, setUpdatedData] = updatedList();
@@ -65,12 +64,18 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [planDays, setPlanDays] = useState([]);
+    const [keywords, setKeywords] = useState([]);
 
     const isFocused = useIsFocused();
+    const [isLimited, setIsLimited] = useState(false);
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const refRBSheet = useRef();
+    const isDeleted = (deletedData) => {
+        setIsDeletedOrigin(deletedData);
+    };
 
     const getUserData = () => {
         try {
@@ -102,6 +107,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     useEffect(() => {
+        getInitialCollectionData();
+        getInitialPlaceData();
+        getCollectionCommentsData();
+
         setTmpData([{
             day: 1,
             places : [
@@ -112,6 +121,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 {
                     id: 2,
                     tip: '두번째 팁'
+                },
+                {
+                    id: 3,
+                    tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
+                },
+                {
+                    id: 4,
+                    tip: '네번째 팁'
                 }
             ]
         }, {
@@ -130,15 +147,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         ]);
 
         getUserData();
-
-        if(typeof data.collection_private === 'boolean') {
-            setStartDate(moment(data.startDate).format('YYYY.MM.DD'));
-            setEndDate(moment(data.endDate).format('YYYY.MM.DD'));
-        } else {
-            getInitialCollectionData();
-            getInitialPlaceData();
-            getCollectionCommentsData();
-        }
     }, [isFocused]);
 
     const getInitialCollectionData = () => {
@@ -162,8 +170,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     setCollectionData(response.data);
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
+                    setKeywords(response.data.keywords);
 
-                    console.log(response.data)
+                    // console.log(response.data)
                     var gap = moment(response.data.collection_end_date.split('T')[0]).diff(moment(response.data.collection_start_date.split('T')[0]), 'days');
                     var newArr = [];
                     for(var i=0;i<=gap;i++) {
@@ -172,8 +181,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
                         });
                     }
-                    console.log(newArr)
                     setPlanDays(newArr);
+                    setFalse(newArr);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -214,7 +223,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         pressed.push(false);
                     }
                     setIsPress(pressed);
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setDeletedData(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -243,7 +252,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         return;
                     }
                     setCommentsData(response.data)
-                    console.log(response.data)
+                    // console.log(response.data)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -289,45 +298,28 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
-        if(typeof data.collection_private === 'boolean') {
-            if(data.collection_private === true) return true;
-            else return false;
-        } else {
-            if(collectionData.collection_private === 1) return true;
-        }
+        if (collectionData.collection_private) return true;
         return false;
     };
 
     const checkPrivate = () => {
-        // if(data.collection_private === true || data.collection_private === false) {
-        if(typeof data.collection_private === 'boolean') {
-
-            return false;
-        } else {
-            if (collectionData.is_creator) {
-                return true;
-            }
-        }
+        if (collectionData.is_creator) return true;
         return false;
-    };
-
-    const checkCreated = () => {
-        if(data.collection_private === true || data.collection_private === false) {
-            return false;
-        } else {
-            if(collectionData.is_creator) return false;
-        }
-        return true;
     };
 
     const [isPress, setIsPress] = useState([]);
 
-    // const setFalse = () => {
-    // };
+    const checkDeletedPlace = () => {
+        for(var i=0;i<isDeletedOrigin.length;i++) {
+            if(isDeletedOrigin[i] === true) {
+                // console.log(placeData[i]);
+                deletePlace(placeData[i].place_pk, placeData[i].cpm_plan_day);
+            }
+        }
+    };
 
     const deletePlace = (place_pk, day) => {
-        //공간 삭제
+        // 공간 삭제
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
@@ -455,44 +447,67 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
-    const checkType = (type) => {
-        if (type === 12) {
-            return '관광지';
-        } else if (type === 14) {
-            return '문화시설';
-        } else if (type === 15) {
-            return '축제/공연/행사';
-        } else if (type === 28) {
-            return '레포츠';
-        } else if (type === 32) {
-            return '숙박';
-        } else if (type === 38) {
-            return '쇼핑';
-        } else if (type === 39) {
-            return '음식';
-        } else {
-            return '기타';
+    const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
+    const setDeletedData = (data) => {
+        var newArr = [];
+        for(var i=0;i<data.length;i++) {
+            newArr.push(false);
         }
-    };
+        setIsDeletedOrigin(newArr);
+        // isDeleted(newArr);
+    }
 
     const SwipeList = props => {
         return (
         <SafeAreaView>
             <FlatList data={placeData}
-              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}/>}
               keyExtractor={(item, idx) => {idx.toString();}}
               key={(item, idx) => {idx.toString();}}
           nestedScrollEnabled/>
+
         </SafeAreaView>
         );};
 
     const EditList = props => (
-        <View></View>
+        // <View></View>
         // <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
+        <SafeAreaView>
+        <FlatList data={placeData}
+            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}/>}
+            keyExtractor={(item, idx) => {idx.toString();}}
+            key={(item, idx) => {idx.toString();}}
+        nestedScrollEnabled/>
+        </SafeAreaView>
     );
+
+    const setFalse = (data) => {
+        var pressed = [];
+        for (let i = 0; i < data.length; i++) {
+            pressed.push(false);
+        }
+        setIsLimited(pressed);
+    };
 
     const ShowDays = ({item, index}) => {
         const idx = index;
+        const checkLength = () => {
+            var placeLengthInDay = 0;
+            for(var i=0;i<placeData.length;i++) {
+                if(idx === 0) {
+                    if((placeData[i].cpm_plan_day === -1 || placeData[i].cpm_plan_day === idx)&& placeData[i].place_pk != -1 && placeData[i].place_pk != -2) {
+                        placeLengthInDay += 1;
+                    }
+                }
+                else {
+                    if(placeData[i].cpm_plan_day === idx && placeData[i].place_pk != -1 && placeData[i].place_pk != -2) {
+                    // console.log(placeData[i])
+                    placeLengthInDay += 1;
+                    }
+                }
+            }
+            return placeLengthInDay;
+        }
         return (
             <>
                 <View>
@@ -506,7 +521,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : item})}
+                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : idx})}
                                 style={!collectionData.is_creator && {display: 'none'}}
                             >
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
@@ -518,31 +533,58 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     </View>
                 </View>
                 {!isEditPage ? <SwipeList idx={idx} key={idx}/> : <EditList idx={idx} key={idx}/>}
-
-                {/* <TouchableOpacity onPress={() => {
-                // if(isLimited) setIsLimited(false);
-                // else setIsLimited(true);
-                // console.log(isLimited)
-                }}>
+                {checkLength() > 5 && !isEditPage && <TouchableOpacity>
                     <View style={{
                         flexDirection: 'row',
+                        marginVertical: 16,
                         justifyContent: 'center',
                         alignItems: 'center'
                     }}>
-                        <AppText style={{
-                            fontSize: 14,
-                            fontWeight: '400',
-                            color: colors.gray[2]
-                        }}>전체보기</AppText>
-                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                            style={{
-                                width: 15,
-                                height: 15,
-                                marginLeft: 10,
-                                marginBottom: 5
-                            }}></Image>
+                        { !isLimited[idx] ?
+                        <TouchableOpacity onPress={()=>{
+                            var newArr = [...isLimited];
+                            newArr[idx] = true;
+                            setIsLimited(newArr);
+                        }}
+                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        >
+                            <AppText style={{
+                                fontSize: 14,
+                                fontWeight: '400',
+                                color: colors.gray[2]
+                            }}>전체보기</AppText>
+                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginLeft: 10,
+                                    marginBottom: 5
+                                }}></Image>
+                        </TouchableOpacity> :
+                        <TouchableOpacity onPress={()=>{
+                            var newArr = [...isLimited];
+                            newArr[idx] = false;
+                            setIsLimited(newArr);
+                        }}
+                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        >
+                            <AppText style={{
+                                fontSize: 14,
+                                fontWeight: '400',
+                                color: colors.gray[2]
+                            }}>닫기</AppText>
+                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginLeft: 10,
+                                    marginTop: 7,
+                                    transform: [{rotate: '180deg'}]
+                                }}></Image>
+                        </TouchableOpacity>
+                        }
                     </View>
-                </TouchableOpacity> */}
+                </TouchableOpacity>}
             </>
         );
     };
@@ -554,27 +596,30 @@ const PlanCollectionScreen = ({route, navigation}) => {
         setDeleteMenu(true);
     };
 
-    const [isVisible, setIsVisible] = useState(false);
     const list = [
-        { title: '프로필 수정하기'},
-        { title: '공간 수정하기'},
-        { title: '공유하기'},
-        {
-            title: '삭제하기',
-            containerStyle: { backgroundColor: colors.red[3] },
-            titleStyle: { color: colors.defaultColor },
-            onPress: () => {
-                deleteMode();
-                setIsVisible(false)
-            }
+        { 
+            title: '공간 수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
         },
-        { title: '취소',
-        onPress: () => {
-            setIsVisible(false)
-        }}
+        { 
+            title: '보관함 정보수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        { 
+            title: '보관함 공유',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        {
+            title: '보관함 삭제',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.red[3], fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
     ];
 
-    const DeleteModal = () => (
+    const DeleteModal = props => (
         <Modal
             transparent={true}
             visible={deleteMenu}
@@ -588,16 +633,19 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.gray[4]}}
-                            onPress={() => setDeleteMenu(!deleteMenu)}
+                            onPress={() => {
+                                props.refRBSheet.current.close();
+                                setDeleteMenu(!deleteMenu);
+                            }}
                         >
                             <AppText style={styles.textStyle}>취소하기</AppText>
                         </Pressable>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.mainColor}}
                             onPress={() => {
+                                props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
                                 deleteCollection();
-                                setIsVisible(true);
                             }}
                         >
                             <AppText style={styles.textStyle}>삭제하기</AppText>
@@ -609,28 +657,22 @@ const PlanCollectionScreen = ({route, navigation}) => {
     );
 
     const setDate = () => {
-        //data로 오는 거 처리
-        if(data.collection_private === true || data.collection_private === false) {
-            return `${startDate} - ${endDate}`;
-        }
-        else if(data.collection_private === 0 || data.collection_private === 1) {
-            if(Object.keys(collectionData).length === 0 && collectionData.constructor === Object) return '';
-            else {
-                //년도가 다를 경우
-                if(parseInt(startDate.split('-')[0]) !== parseInt(endDate.split('-')[0])) {
-                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('YYYY.MM.DD')}`;
-                }
-                //월이 다를 경우
-                if(parseInt(startDate.split('-')[1]) !== parseInt(endDate.split('-')[1])) {
-                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('MM.DD')}`;
-                }
-                //일이 다를 경우
-                if(parseInt(startDate.split('-')[2]) !== parseInt(endDate.split('-')[2])) {
-                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('DD')}`;
-                }
-                //시작일과 종료일이 같을 경우
-                else return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}`;
+        if(Object.keys(collectionData).length === 0 && collectionData.constructor === Object) return '';
+        else {
+            //년도가 다를 경우
+            if(parseInt(startDate.split('-')[0]) !== parseInt(endDate.split('-')[0])) {
+                return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('YYYY.MM.DD')}`;
             }
+            //월이 다를 경우
+            if(parseInt(startDate.split('-')[1]) !== parseInt(endDate.split('-')[1])) {
+                return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('MM.DD')}`;
+            }
+            //일이 다를 경우
+            if(parseInt(startDate.split('-')[2]) !== parseInt(endDate.split('-')[2])) {
+                return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('DD')}`;
+            }
+            //시작일과 종료일이 같을 경우
+            else return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}`;
         }
     };
 
@@ -696,63 +738,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {
-                showMenu && (
-                    <View style={{
-                        position: 'absolute',
-                        width: 80,
-                        // height: 80,
-                        height: 40,
-                        top: 50,
-                        right: 60,
-                        backgroundColor: '#fff',
-                        flex: 1,
-                        borderRadius: 10,
-                        zIndex: 100000000,
-    
-                        shadowColor: '#000',
-                        shadowOffset: {
-                            width: 0,
-                            height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        elevation: 5,
-    
-                        overflow: 'visible'
-                    }}>
-                        {/* <TouchableOpacity
-                            onPress={() => {
-                                setIsEditPage(true);
-                                setShowMenu(state => !state);
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>수정하기</AppText>
-                        </TouchableOpacity> */}
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={async () => {
-                                await deleteMode();
-
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>삭제하기</AppText></TouchableOpacity>
-                        <DeleteModal />
-                    </View>
-                )
-            }
-
             <View flexDirection="row" style={{
                 height: 24,
                 marginBottom: 20,
@@ -763,7 +748,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        if(typeof data.collection_private === 'boolean') {
+                        if(data.now) {
                             navigation.pop(2);
                         }
                         else navigation.goBack();}}>
@@ -775,32 +760,60 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         !isEditPage ?
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                    disabled={typeof data.collection_private === 'boolean'}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
-                                        // setShowMenu(state => !state)
-                                        setIsVisible(true);
+                                        refRBSheet.current.open();
                                     }}>
                                     <MoreIcon style={{color: colors.mainColor}}/>
                                 </TouchableOpacity>
-                                <BottomSheet
-                                        isVisible={isVisible}
-                                        containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-                                        >
-                                        {list.map((l, i) => (
-                                            <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
-                                                <ListItem.Content>
-                                                    <AppText style={l.titleStyle}>{l.title}</AppText>
-                                                </ListItem.Content>
-                                                </ListItem>
-                                        ))}
-                                </BottomSheet>
-                                <DeleteModal />
+                                <RBSheet
+                                    ref={refRBSheet}
+                                    closeOnDragDown={true}
+                                    closeOnPressMask={true}
+                                    height={250}
+                                    customStyles={{
+                                        wrapper: {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                        },
+                                        draggableIcon: {
+                                            display: 'none'
+                                        },
+                                        container: {
+                                            borderTopLeftRadius: 10,
+                                            borderTopRightRadius: 10,
+                                            backgroundColor: colors.yellow[7],
+                                            paddingTop: 10
+                                        }
+                                    }}
+                                >
+                                    {list.map((l, i) => (
+                                        <TouchableOpacity onPress={()=>{
+                                            // console.log(i === 3)
+                                            if(i === 0) {
+                                                setIsEditPage(true);
+                                            }
+                                            if(i === 1) {
+                                                refRBSheet.current.close();
+                                                navigation.navigate('MakePlanCollection', {data: collectionData, update: true});
+                                            }
+                                            if(i === 3) {
+                                                setDeleteMenu(true);
+                                            }
+                                        }}>
+                                            <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
+                                                <AppText style={l.titleStyle}>{l.title}</AppText>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <DeleteModal refRBSheet={refRBSheet}/>
+                                </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditPage(false);
-                                        console.log(updatedData);
+                                        console.log('나 맞아용!!!!!!')
+                                        isDeleted(isDeletedOrigin);
+                                        checkDeletedPlace();
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -853,28 +866,17 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontSize: 22,
                                 fontWeight: '700',
                                 color: colors.mainColor
-                            }}>{data.collection_name}</AppText>
-                            {
-                                typeof data.collection_private === 'boolean' ?
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        fontWeight: '400',
-                                        color: colors.gray[2],
-                                        lineHeight: 19.2,
-                                        marginTop: 12
-                                    }}>by. {userData.user_nickname}</AppText> :
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        fontWeight: '400',
-                                        color: colors.gray[2],
-                                        lineHeight: 19.2,
-                                        marginTop: 12
-                                    }}>by. {collectionData.created_user_name}</AppText>
-                                
-                            }
+                            }}>{collectionData.collection_name}</AppText>
+                            <AppText style={{
+                                fontSize: 12,
+                                fontWeight: '400',
+                                color: colors.gray[2],
+                                lineHeight: 19.2,
+                                marginTop: 12
+                            }}>by. {collectionData.created_user_name}</AppText>
                         </View>
                         {
-                            userData.user_nickname !== data.created_user_name &&
+                            userData.user_nickname !== collectionData.created_user_name &&
                            <TouchableOpacity onPress={() => {
                                if (collectionData.like_flag) {
                                    DeleteLikedCollection();
@@ -882,7 +884,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                    LikeCollection();
                                }
                            }}>
-                               {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                               <View style={{
                                    justifyContent: 'center',
                                    alignItems: 'center',
                                    marginVertical: 5
@@ -895,15 +897,15 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
                                        marginTop: 2
                                    }}>{collectionData.like_cnt}</AppText>
-                               </View>}
+                               </View>
                            </TouchableOpacity>
                         }
                     </View>
                 </ScreenContainerView>
 
                 <View style={{marginTop: 20}}>
-                    <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
-                    {/* TODO 카카오 지도 api 가져오기
+                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
+                    
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
@@ -919,7 +921,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                  title="서울시청"
                                  description="기본값입니다"/>
                         </MapView>
-                    </View> */}
+                    </View>
                 </View>
 
                 <ScreenContainerView>

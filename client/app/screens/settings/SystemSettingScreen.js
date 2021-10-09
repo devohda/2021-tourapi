@@ -11,6 +11,8 @@ import ListItem from './ListItem';
 import { useToken } from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import { ScrollView } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
@@ -70,8 +72,9 @@ const SystemSettingScreen = ({navigation}) => {
         },
         {
             index: 3,
-            data: [{index: 1, name: '문의하기'}, {index: 2, name: '새로운 소식'}, {
-                index: 3,
+            data: [{index: 1, name: '문의하기'}, {index: 2, name: '새로운 소식'}, {index: 3, name: '신고하기'},
+            {
+                index: 4,
                 name: '버전 정보 ' + appJson.expo.version
             }]
         },
@@ -111,13 +114,14 @@ const SystemSettingScreen = ({navigation}) => {
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop title="설정" navigation={navigation}/>
 
-            <ScreenContainerView>
+            <ScreenContainerView flex={1}>
                 <SectionList sections={systemMenu}
                     keyExtractor={(item, index) => item + index}
                     renderItem={({item, section: {index}}) => <SettingListItem data={item.name} index={index}/>}
                     renderSectionHeader={({section: {title, index}}) => <HeaderItem title={title} index={index}/>}
                     renderSectionFooter={({section: {index}}) => <FooterItem index={index}/>}
                     stickySectionHeadersEnabled={false}
+                    showsVerticalScrollIndicator={false}
                 />
             </ScreenContainerView>
         </ScreenContainer>

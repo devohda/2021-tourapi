@@ -18,9 +18,9 @@ const Time = (props) => {
             paddingVertical: 8,
             paddingHorizontal: 10,
             marginRight: 10,
-            // 이부분은 placeScreen 보고 받은거라 props로 다시 바꿔도될듯
             flexDirection: 'row',
             width: 60,
+            ...props.style
         }}><AppText style={{fontSize: 14, paddingEnd: 4, color: colors.mainColor}}>{props.name}</AppText>
         <Icon type="ionicon" name={"sunny"} color={props.iconColor} size={props.iconSize}></Icon>
         </View>

@@ -95,10 +95,8 @@ const CollectionTab = ({navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
-                .then((response) => {
+            }).then(res => res.json())
+            .then(response => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
                     //     // Alert.alert('','로그인이 필요합니다');
                     //     await SecureStore.deleteItemAsync('accessToken');
