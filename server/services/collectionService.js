@@ -308,7 +308,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
                    ON lp.place_pk = cpm.place_pk
                    AND lp.user_pk = ${user_pk}
                    WHERE collection_pk = ${collection_pk}
-                   ORDER BY cpm_plan_day ASC, cpm_map_pk ASC`;
+                   ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
     const result = await db.query(query);
     return result;
@@ -333,19 +333,9 @@ exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) =>
     let result;
 
     try {
-        await conn.beginTransaction();
 
-        const query1 = `DELETE FROM collection_place_map 
-                        WHERE collection_pk = ${collection_pk}`
-        const [result1] = await conn.query(query1);
 
-        for (const place of placeList) {
-            const query2 = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                            VALUES (${collection_pk}, ${place.placeId}, ${place.planDay})`
-            await conn.query(query2)
-        }
 
-        result = true;
         await conn.commit();
     }catch (err){
         result = false;
