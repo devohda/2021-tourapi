@@ -136,6 +136,14 @@ exports.createCollectionPlaceReplacement = async (cpm_map_pk, place_pk, cpr_orde
     return result;
 }
 
+// 보관함 공간에 한줄평 생성
+exports.createCollectionPlaceComment = async (cpm_map_pk, cpc_comment) => {
+    const query = `INSERT INTO collection_place_comment (cpm_map_pk, cpc_comment)
+                   VALUES (${cpm_map_pk}, ${mysql.escape(cpc_comment)})`;
+    const result = await db.query(query);
+    return result;
+}
+
 // 보관함 리스트 조회
 exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
 

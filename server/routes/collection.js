@@ -90,7 +90,7 @@ router.post('/:collectionId/comments', verifyToken, async (req, res, next) => {
     }
 })
 
-// TODO 보관함 대체 공간 생성
+// 보관함 대체 공간 생성
 router.post('/:collectionId/replacement/place/:placeId', verifyToken, async (req, res, next) => {
     const {placeId} = req.params;
     const {cpm_map_pk, order} = req.body;
@@ -110,11 +110,10 @@ router.post('/:collectionId/replacement/place/:placeId', verifyToken, async (req
 })
 
 // TODO 보관함 공간 한줄평 생성
-router.post('/:collectionId/placeList/:cpmMapPk/review', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.params;
-    const {user} = res.locals;
+router.post('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
+    const {cpmMapPk} = req.params;
     const {comment} = req.body;
-    const result = await collectionService.createCollectionComment(collectionId, user.user_pk, comment);
+    const result = await collectionService.createCollectionPlaceComment(cpmMapPk, comment);
 
     if (result) {
         return res.status(200).json({
