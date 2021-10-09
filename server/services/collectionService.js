@@ -406,6 +406,15 @@ exports.updateCollectionPlaceReplacement = async (cpm_map_pk, replacementPlaceLi
     }
 };
 
+// 보관함 공간 한줄평 수정
+exports.updateCollectionPlaceComment = async (cpm_map_pk, comment) => {
+    const query = `UPDATE collection_place_comment
+                   SET cpc_comment = ${mysql.escape(comment)}
+                   WHERE cpm_map_pk = ${cpm_map_pk}`
+    const result = await db.query(query);
+    return result;
+}
+
 // 보관함 삭제
 exports.deleteCollection = async (collection_pk) => {
     const query = `DELETE FROM collections WHERE collection_pk = ${collection_pk}`;
