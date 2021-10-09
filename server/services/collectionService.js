@@ -327,15 +327,27 @@ exports.readCollectionCommentList = async (collection_pk) => {
 };
 
 // 보관함 장소 리스트 수정
-exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) => {
+exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, deletePlaceList) => {
 
     const conn = await db.pool.getConnection();
-    let result;
-
+    let result = false;
     try {
+        for (const placeData of placeList) {
+            const query1 = `UPDATE collection_place_map
+                            SET cpm_plan_day = ${placeData.planDay}, cpm_order = ${placeData.order}
+                            WHERE cpm_map_pk = ${placeData.cpm_map_pk}`;
+            await conn.query(query1);
+        }
+        // 삭제할 장소가 있으면 삭제하기
+        if(deletePlaceList){
+            for (const cpm_map_pk of deletePlaceList){
+                const query2 = `DELETE FROM collection_place_map 
+                                WHERE cpm_map_pk = ${cpm_map_pk}`
+                await conn.query(query2)
+            }
+        }
 
-
-
+        result = true;
         await conn.commit();
     }catch (err){
         result = false;

@@ -179,9 +179,9 @@ router.get('/:collectionId/comments', async (req, res, next) => {
 router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
     const {user} = res.locals;
-    const {placeList} = req.body;
+    const {placeList, deletePlaceList} = req.body;
 
-    const result = await collectionService.updateCollectionPlaceList(user.user_pk, collectionId, placeList);
+    const result = await collectionService.updateCollectionPlaceList(user.user_pk, collectionId, placeList, deletePlaceList);
 
     if (result) {
         return res.status(200).json({
