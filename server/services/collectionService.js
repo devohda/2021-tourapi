@@ -436,6 +436,23 @@ exports.deletePlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) 
     return result;
 }
 
+// 보관함 대체 공간 1개 삭제
+exports.deleteCollectionPlaceReplacement = async (cpm_map_pk, placeId) => {
+    const query = `DELETE FROM collection_place_replacement
+                   WHERE cpm_map_pk = ${cpm_map_pk}
+                   AND place_pk = ${placeId}`;
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함 대체 공간 전체 삭제
+exports.deleteCollectionPlaceReplacementAll = async (cpm_map_pk) => {
+    const query = `DELETE FROM collection_place_replacement
+                   WHERE cpm_map_pk = ${cpm_map_pk}`;
+    const result = await db.query(query);
+    return result;
+}
+
 // 보관함 공간 한줄평 삭제
 exports.deleteCollectionPlaceComment = async (cpm_map_pk) => {
     const query = `DELETE FROM collection_place_comment
