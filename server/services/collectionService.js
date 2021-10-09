@@ -107,13 +107,13 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
 };
 
 // 보관함에 장소 추가
-exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day, cpm_order) => {
 
     // 자유 보관함의 경우 날짜 없으므로 -1 저장
     if(!cpm_plan_day) cpm_plan_day = -1;
 
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
+    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
+                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day}, ${cpm_order})`;
 
     const result = await db.query(query);
 

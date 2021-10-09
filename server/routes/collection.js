@@ -48,9 +48,9 @@ router.post('/plan', verifyToken, async (req, res, next) => {
 // 보관함에 장소 추가
 router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
     const {collectionId, placeId} = req.params;
-    const {planDay} = req.body;
+    const {planDay, order} = req.body;
 
-    const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay);
+    const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay, order);
 
     if (result.affectedRows === 1) {
         return res.status(200).json({
