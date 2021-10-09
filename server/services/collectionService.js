@@ -299,7 +299,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, 
+    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
                           CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
