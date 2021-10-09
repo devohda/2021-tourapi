@@ -10,12 +10,11 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
 import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
-import SearchPlaceForPlan from './SearchPlaceForPlan';
+import SearchPlaceForAdd from './SearchPlaceForAdd';
 
-const SearchScreenForPlan = ({route, navigation}) => {
+const SearchScreenForAdd = ({route, navigation}) => {
     const {colors} = useTheme();
     const { pk, placeData, day } = route.params;
-    console.log(route.params)
     const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     useEffect(() => {setSearchKeyword('')}, []);
@@ -160,7 +159,7 @@ const SearchScreenForPlan = ({route, navigation}) => {
                         </Pressable>
                     </View>
                     {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForPlan pk={pk} placeData={placeData} day={day} navigation={navigation} />
+                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} />
                     }
                 </ScreenContainerView>
 
@@ -192,4 +191,4 @@ const SearchScreenForPlan = ({route, navigation}) => {
     );
 };
 
-export default SearchScreenForPlan;
+export default SearchScreenForAdd;

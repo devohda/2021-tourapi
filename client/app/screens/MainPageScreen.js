@@ -146,7 +146,6 @@ export default function MainPageScreen({navigation}) {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -481,11 +480,6 @@ export default function MainPageScreen({navigation}) {
                                     lineHeight: 36,
                                     fontWeight: '700'
                                 }}>보관함</AppText>
-                                <TouchableOpacity style={Platform.OS === 'ios' ? {marginTop: 5} : {marginTop: 4}}><Icon
-                                    type="ionicon"
-                                    name={'chevron-forward-outline'}
-                                    color={colors.mainColor}
-                                    size={26}></Icon></TouchableOpacity>
                             </View>
                         </View>
                     </View>

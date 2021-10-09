@@ -16,12 +16,11 @@ import {
     Alert
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
-import styled from 'styled-components/native';
-import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
+import {Icon} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-// import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
@@ -34,7 +33,8 @@ import Jewel from '../../assets/images/jewel.svg';
 import DefaultProfile from '../../assets/images/profile_default.svg';
 
 import {useToken} from '../../contexts/TokenContextProvider';
-// import DragAndDropListForFree from './DragAndDropListForFree';
+import DragAndDropListForFree from './DragAndDropListForFree';
+// import Example from './App2';
 import ShowPlacesForFree from './ShowPlacesForFree';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
@@ -52,20 +52,20 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [isLimited, setIsLimited] = useState(true);
-    const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
-    const [tmpPlaceData, setTmpPlaceData] = useState([]);
-    const [visible, setVisible] = useState(false);
     const [isEditPage, setIsEditPage] = useState(false);
     const isFocused = useIsFocused();
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLimited, setIsLimited] = useState(false);
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [update, setUpdate] = setUpdated();
+    const [keywords, setKeywords] = useState([]);
     const refRBSheet = useRef();
+    const isDeleted = (deletedData) => {
+        setIsDeletedOrigin(deletedData);
+    };
 
     const getUserData = () => {
         try {
@@ -97,11 +97,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     useEffect(() => {
-        if(typeof data.collection_private !== 'boolean') {
-            getInitialCollectionData();
-            getInitialPlaceData();
-            getCollectionCommentsData();
-        }
+        getInitialCollectionData();
+        getInitialPlaceData();
+        getCollectionCommentsData();
 
         setTmpData([
             {
@@ -114,6 +112,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }
         ]);
         getUserData();
+        // getPlaceCommentsData();
         // setUpdate(false)
     }, [isFocused]);
 
@@ -137,10 +136,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     }
 
                     setCollectionData(response.data);
-                    // setPlaceLength(response.data.places.length);
-                    // setFalse();
-                    // console.log(response.data)
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setKeywords(response.data.keywords);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -169,12 +165,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    console.log(response.data)
 
                     setPlaceData(response.data);
                     setPlaceLength(response.data.length);
                     setFalse();
-                    // console.log(response.data)
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setDeletedData(response.data)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -203,6 +199,63 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         return;
                     }
                     setCommentsData(response.data)
+                    // console.log(response.data)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getPlaceCommentsData = () => {
+        try {
+            fetch(`http://34.64.185.40/collection/${pk}/placeList/${item.cpm_map_pk}/comment`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    // setCommentsData(response.data)
+                    console.log(response.data)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getReplacementData = (map_pk) => {
+        try {
+            fetch(`http://34.64.185.40/collection/${pk}/replacement/placeList`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                     console.log(response.data)
                 })
                 .catch((err) => {
@@ -248,7 +301,17 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const deletePlace = (place_pk) => {
+    const checkDeletedPlace = () => {
+        for(var i=0;i<isDeletedOrigin.length;i++) {
+            if(isDeletedOrigin[i] === true) {
+                // console.log(placeData[i]);
+                deletePlace(placeData[i].place_pk, placeData[i].cpm_plan_day);
+            }
+        }
+    };
+
+    const deletePlace = (place_pk, day) => {
+        // 공간 삭제
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
                 method: 'DELETE',
@@ -258,12 +321,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
                 body: JSON.stringify({
-                    planDay: -1,
+                    planDay: day,
                 })
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -282,35 +344,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        //생성에서 바로 넘어오는 데이터 처리
-        if(typeof data === 'undefined') {
-            if (collectionData.collection_private === 0) return false;
-        } else {
-            if (data.collection_private === false) return false;
-        }
-        if (collectionData.collection_private === 0) return false;
-        return true;
-    };
-
-    const checkPrivate = () => {
-        //생성에서 바로 넘어오는 데이터 처리
-        if(typeof data.collection_private === 'boolean') {
-            return false;
-        } else {
-            if (collectionData.is_creator) {
-                return true;
-            }
-        }
+        if (collectionData.collection_private) return true;
         return false;
     };
 
-    const checkCreated = () => {
-        if(data.collection_private === true || data.collection_private === false) {
-            return false;
-        } else {
-            if(collectionData.is_creator) return false;
-        }
-        return true;
+    const checkPrivate = () => {
+        if (collectionData.is_creator) return true;
+        return false;
     };
 
     const [isPress, setIsPress] = useState([]);
@@ -421,26 +461,38 @@ const FreeCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
+    const setDeletedData = (data) => {
+        var newArr = [];
+        for(var i=0;i<data.length;i++) {
+            newArr.push(false);
+        }
+        setIsDeletedOrigin(newArr);
+        // isDeleted(newArr);
+    }
+
     const SwipeList = () => {
+        //일반 페이지에서 불러오기, 추가, 수정, 삭제 모두 가능하도록
+        // getPlaceCommentsData();
         return (
             <>
                 <SafeAreaView>
-                <FlatList data={placeData}
-                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
-                    keyExtractor={(item, idx) => {idx.toString();}}
-                    key={(item, idx) => {idx.toString();}}
-                nestedScrollEnabled/>
+                    <FlatList data={placeData}
+                        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}/>}
+                        keyExtractor={(item, idx) => {idx.toString();}}
+                        key={(item, idx) => {idx.toString();}}
+                    nestedScrollEnabled/>
                 </SafeAreaView>
             </>
         );};
     
     const [showMenu, setShowMenu] = useState(false);
-    const keywords = data.keywords;
     const [deleteMenu, setDeleteMenu] = useState(false);
 
     const deleteMode = () => {
         setDeleteMenu(true);
     };
+
     const list = [
         { 
             title: '공간 수정',
@@ -564,64 +616,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {
-                showMenu && (
-                    <>
-                        <View style={{
-                            position: 'absolute',
-                            width: 80,
-                            // height: 80,
-                            height: 40,
-                            top: 50,
-                            right: 60,
-                            backgroundColor: '#fff',
-                            flex: 1,
-                            borderRadius: 10,
-                            zIndex: 100000000,
-    
-                            shadowColor: '#000',
-                            shadowOffset: {
-                                width: 0,
-                                height: 2,
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 3.84,
-                            elevation: 5,
-    
-                            overflow: 'visible'
-                        }}>
-                            {/* <TouchableOpacity
-                            onPress={() => {
-                                setIsEditPage(true);
-                                setShowMenu(state => !state);
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>수정하기</AppText>
-                        </TouchableOpacity> */}
-                            <View style={{
-                                height: 1,
-                                borderColor: colors.gray[5],
-                                borderWidth: 0.4,
-                                borderRadius: 1,
-                            }}></View>
-                            <TouchableOpacity
-                                onPress={async () => {
-                                    await deleteMode();
-                                }}
-                                style={{
-                                    flex: 1,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}><AppText>삭제하기</AppText></TouchableOpacity>
-                            <DeleteModal />
-                        </View>
-                    </>
-                )
-            }
-
             <View flexDirection="row" style={{
                 height: 24,
                 marginBottom: 20,
@@ -632,7 +626,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        if(typeof data.collection_private === 'boolean') {
+                        if(data.now) {
                             navigation.pop(2);
                         }
                         else navigation.goBack();}}>
@@ -644,7 +638,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         !isEditPage ?
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                    disabled={typeof data.collection_private === 'boolean'}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
                                         refRBSheet.current.open();
                                     }}>
@@ -672,7 +665,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 >
                                     {list.map((l, i) => (
                                         <TouchableOpacity onPress={()=>{
-                                            console.log(i === 3)
+                                            if(i === 0) {
+                                                setIsEditPage(true);
+                                            }
+                                            if(i === 1) {
+                                                refRBSheet.current.close();
+                                                navigation.navigate('MakeFreeCollection', {data: collectionData, update: true});
+                                            }
                                             if(i === 3) {
                                                 setDeleteMenu(true);
                                             }
@@ -686,7 +685,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
-                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => setIsEditPage(false)}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
+                                    onPress={() => {
+                                        setIsEditPage(false);
+                                        console.log('나 맞아용!!!!!!')
+                                        isDeleted(isDeletedOrigin);
+                                        checkDeletedPlace();
+                                    }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
                                     </View>
@@ -735,28 +740,17 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 fontSize: 22,
                                 fontWeight: '700',
                                 color: colors.mainColor
-                            }}>{data.collection_name}</AppText>
-                            {
-                                typeof data.collection_private === 'boolean' ?
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        fontWeight: '400',
-                                        color: colors.gray[2],
-                                        lineHeight: 19.2,
-                                        marginTop: 12
-                                    }}>by. {userData.user_nickname}</AppText> :
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        fontWeight: '400',
-                                        color: colors.gray[2],
-                                        lineHeight: 19.2,
-                                        marginTop: 12
-                                    }}>by. {collectionData.created_user_name}</AppText>
-                                
-                            }
+                            }}>{collectionData.collection_name}</AppText>
+                            <AppText style={{
+                                fontSize: 12,
+                                fontWeight: '400',
+                                color: colors.gray[2],
+                                lineHeight: 19.2,
+                                marginTop: 12
+                            }}>by. {collectionData.created_user_name}</AppText>
                         </View>
                         {
-                            userData.user_nickname !== data.created_user_name &&
+                            userData.user_nickname !== collectionData.created_user_name &&
                            <TouchableOpacity onPress={() => {
                                if (collectionData.like_flag) {
                                    DeleteLikedCollection();
@@ -764,7 +758,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                    LikeCollection();
                                }
                            }}>
-                               {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                               <View style={{
                                    justifyContent: 'center',
                                    alignItems: 'center',
                                    marginVertical: 5
@@ -777,15 +771,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
                                        marginTop: 2
                                    }}>{collectionData.like_cnt}</AppText>
-                               </View>}
+                               </View>
                            </TouchableOpacity>
                         }
                     </View>
                 </ScreenContainerView>
 
                 <View style={{marginTop: 20}}>
-                    <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
-                    {/* TODO 카카오 지도 api 가져오기
+                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
+                    
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
@@ -801,7 +795,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                  title="서울시청"
                                  description="기본값입니다"/>
                         </MapView>
-                    </View> */}
+                    </View>
                 </View>
 
                 <ScreenContainerView>
@@ -814,7 +808,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
                                     <TouchableOpacity onPress={()=>{
-                                        navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
+                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1});
                                     }} style={!collectionData.is_creator && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -827,36 +821,66 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         {
                                             !isEditPage ?
                                                 <SwipeList /> :
-                                                <SwipeList />
+                                                // <Example />
+                                                <FlatList data={placeData}
+                                                renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}/>}
+                                                keyExtractor={(item, idx) => {idx.toString();}}
+                                                key={(item, idx) => {idx.toString();}}
+                                            nestedScrollEnabled/>
                                             // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>
-                                {/* <TouchableOpacity onPress={() => {
+                                {placeLength > 5 && !isEditPage && <TouchableOpacity onPress={() => {
                                     // if(isLimited) setIsLimited(false);
                                     // else setIsLimited(true);
                                     // console.log(isLimited)
                                 }}>
                                     <View style={{
                                         flexDirection: 'row',
-                                        marginTop: 26,
+                                        marginVertical: 16,
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }}>
-                                        <AppText style={{
-                                            fontSize: 14,
-                                            fontWeight: '400',
-                                            color: colors.gray[2]
-                                        }}>전체보기</AppText>
-                                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                            style={{
-                                                width: 15,
-                                                height: 15,
-                                                marginLeft: 10,
-                                                marginBottom: 5
-                                            }}></Image>
+                                        {
+                                            !isLimited ?
+                                            <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                                            >
+                                                <AppText style={{
+                                                fontSize: 14,
+                                                fontWeight: '400',
+                                                color: colors.gray[2]
+                                                }}>전체보기</AppText>
+                                                <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                    style={{
+                                                        width: 15,
+                                                        height: 15,
+                                                        marginLeft: 10,
+                                                        marginBottom: 5
+                                                }}></Image>
+                                            </TouchableOpacity> :
+                                            <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                                            >
+                                                <AppText style={{
+                                                fontSize: 14,
+                                                fontWeight: '400',
+                                                color: colors.gray[2]
+                                                }}>닫기</AppText>
+                                                <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                    style={{
+                                                        width: 15,
+                                                        height: 15,
+                                                        marginLeft: 10,
+                                                        marginTop: 7,
+                                                        transform: [{rotate: '180deg'}]
+                                                }}></Image>
+                                            </TouchableOpacity>
+                                        }
+
                                     </View>
-                                </TouchableOpacity> */}
+                                </TouchableOpacity>}
                             </View> :
                             <View style={{marginTop: 16}}>
                                 <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -865,9 +889,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
                                     <TouchableOpacity onPress={()=>{
-                                        if(typeof data.collection_private === 'boolean') navigation.navigate('Search');
-                                        else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
-                                    }} style={ checkCreated() && {display:'none'}}>
+                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : data});
+                                    }} style={ !checkPrivate() && {display:'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

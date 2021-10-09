@@ -10,20 +10,18 @@ import {useToken} from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-const SearchPlaceForPlan = (props, {route, navigation}) => {
+const SearchPlaceForAdd = (props, {route, navigation}) => {
     const {colors} = useTheme();
     const { pk, placeData, day} = props;
     const [placeList, setPlaceList] = useState([]);
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    console.log(props);
 
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const addPlace = (place_pk) => {
-        // console.log(day.id)
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${place_pk}`, {
                 method: 'POST',
@@ -33,12 +31,11 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                     'x-access-token': token
                 },
                 body: JSON.stringify({
-                    planDay: day.id,
+                    planDay: day,
+                    order: placeData.length,
                 })
-            }).then((res) => {
-                res.json();
-            })
-                .then(async (response) => {
+            }).then(res => res.json())
+            .then(response => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
                     //     // Alert.alert('','로그인이 필요합니다');
                     //     await SecureStore.deleteItemAsync('accessToken');
@@ -46,6 +43,7 @@ const SearchPlaceForPlan = (props, {route, navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
+                    console.log(response)
 
                     Alert.alert('', '추가되었습니다.');
                 })
@@ -241,4 +239,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SearchPlaceForPlan;
+export default SearchPlaceForAdd;
