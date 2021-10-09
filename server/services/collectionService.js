@@ -84,11 +84,11 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         // 보관함-장소 매핑에 시간 구획 라인 추가
         for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
             // pm 12
-            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
-                            VALUES (${collection_pk}, -1, ${day})`
+            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
+                            VALUES (${collection_pk}, -1, ${day}, ${day * 2})`
             // pm 6
-            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
-                            VALUES (${collection_pk}, -2, ${day})`
+            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
+                            VALUES (${collection_pk}, -2, ${day}, ${day * 2 + 1})`
 
             await conn.query(query4);
             await conn.query(query5);
@@ -107,13 +107,13 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
 };
 
 // 보관함에 장소 추가
-exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day, cpm_order) => {
 
     // 자유 보관함의 경우 날짜 없으므로 -1 저장
     if(!cpm_plan_day) cpm_plan_day = -1;
 
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
+    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
+                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day}, ${cpm_order})`;
 
     const result = await db.query(query);
 
@@ -299,7 +299,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, 
+    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
                           CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
@@ -308,7 +308,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
                    ON lp.place_pk = cpm.place_pk
                    AND lp.user_pk = ${user_pk}
                    WHERE collection_pk = ${collection_pk}
-                   ORDER BY cpm_plan_day ASC, cpm_map_pk ASC`;
+                   ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
     const result = await db.query(query);
     return result;
@@ -327,22 +327,24 @@ exports.readCollectionCommentList = async (collection_pk) => {
 };
 
 // 보관함 장소 리스트 수정
-exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) => {
+exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, deletePlaceList) => {
 
     const conn = await db.pool.getConnection();
-    let result;
-
+    let result = false;
     try {
-        await conn.beginTransaction();
-
-        const query1 = `DELETE FROM collection_place_map 
-                        WHERE collection_pk = ${collection_pk}`
-        const [result1] = await conn.query(query1);
-
-        for (const place of placeList) {
-            const query2 = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                            VALUES (${collection_pk}, ${place.placeId}, ${place.planDay})`
-            await conn.query(query2)
+        for (const placeData of placeList) {
+            const query1 = `UPDATE collection_place_map
+                            SET cpm_plan_day = ${placeData.planDay}, cpm_order = ${placeData.order}
+                            WHERE cpm_map_pk = ${placeData.cpm_map_pk}`;
+            await conn.query(query1);
+        }
+        // 삭제할 장소가 있으면 삭제하기
+        if(deletePlaceList){
+            for (const cpm_map_pk of deletePlaceList){
+                const query2 = `DELETE FROM collection_place_map 
+                                WHERE cpm_map_pk = ${cpm_map_pk}`
+                await conn.query(query2)
+            }
         }
 
         result = true;
