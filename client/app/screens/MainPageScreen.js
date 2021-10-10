@@ -86,7 +86,7 @@ export default function MainPageScreen({navigation}) {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data);
+                    // console.log(response.data);
                     setPopularPlace(response.data);
                 })
                 .catch((err) => {
@@ -467,21 +467,21 @@ export default function MainPageScreen({navigation}) {
                             <AppText style={{
                                 color: colors.mainColor,
                                 fontSize: 24,
-                                lineHeight: 36,
+                                lineHeight: 33.6,
                                 fontWeight: '700'
                             }}>가장 인기있는</AppText>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     color: colors.mainColor,
                                     fontSize: 24,
-                                    lineHeight: 36,
+                                    lineHeight: 33.6,
                                     fontWeight: '700'
                                 }}>보관함</AppText>
                             </View>
                         </View>
                     </View>
                     <View>
-                        <View style={{flexDirection: 'row', marginTop: 28}}>
+                        <View style={{flexDirection: 'row', marginTop: 12}}>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 onPress={() => {
                                     setDays('DAY');

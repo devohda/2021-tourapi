@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
-import AppText from '../components/AppText';
+import AppText from '../../components/AppText';
 import MapView, { Marker, Callout} from 'react-native-maps';
 import ClusteredMapView from 'react-native-maps-super-cluster';
 import { COORDS, INITIAL_POSITION } from "./Data";

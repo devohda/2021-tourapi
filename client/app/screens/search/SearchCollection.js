@@ -8,7 +8,8 @@ import {
     SafeAreaView,
     Dimensions,
     TouchableOpacity,
-    StyleSheet, Alert
+    StyleSheet, Alert,
+    TouchableWithoutFeedback
 } from 'react-native';
 import {useIsFocused, useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
@@ -105,6 +106,76 @@ const SearchCollection = (props, {navigation}) => {
         }
         setCollectionList(newArr);
     };
+
+    const [showMenu, setShowMenu] = useState(false);
+    const [currentMenu, setCurrentMenu] = useState('최신순');
+
+    const SelectBox = () => {
+        return (
+            <>
+            {
+            showMenu && <View style={{
+                position: 'absolute',
+                width: 80,
+                height: 80,
+                backgroundColor: '#fff',
+                // flex: 1,
+                borderRadius: 10,
+                zIndex: 0,
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                overflow: 'visible'
+                }}>
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('최신순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평최신순점순</AppText>
+                        {currentMenu === '최신순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0,
+                        backgroundColor: colors.backgroundColor,
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                </View>
+            }
+            </>
+    );};
 
     const CollectionContainer = ({item}) => {
         const collectionMargin = (Dimensions.get('screen').width - 162 * 2) / 9;
@@ -203,12 +274,29 @@ const SearchCollection = (props, {navigation}) => {
             {
                 collectionList.length === 0 ?
                     <ShowEmpty/> :
-                    <SafeAreaView>
-                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
-                            data={collectionList} renderItem={CollectionContainer}
-                            key={(item) => item.collection_pk.toString()}
-                            keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
-                    </SafeAreaView>
+                    <View>
+                        {/* <View style={{position: 'relative'}}>
+                        <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                            <View flexDirection="row" flex={1} style={{justifyContent: 'flex-end'}}>
+                                <TouchableOpacity onPress={()=>{
+                                    setShowMenu(!showMenu);
+                                }} style={{flexDirection: 'row'}}>
+                                    <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                    <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                        name={'chevron-down-outline'} size={16}></Icon>
+                                </TouchableOpacity>
+                                <SelectBox />
+                            </View>
+                        </TouchableWithoutFeedback>
+                        </View> */}
+                        <SafeAreaView flex={1}>
+                            <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
+                                data={collectionList} renderItem={CollectionContainer}
+                                key={(item) => item.collection_pk.toString()}
+                                keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
+                        </SafeAreaView>
+                    </View>
+
             }
         </View>
     );

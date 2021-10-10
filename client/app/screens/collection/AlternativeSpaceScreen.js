@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import {Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -46,6 +48,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const [isEditSpace, setIsEditSpace] = useState(false);
     const isFocused = useIsFocused();
     const [token, setToken] = useToken();
+    const refRBSheet = useRef();
 
     useEffect(() => {
         getInitialData();
@@ -156,6 +159,101 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         }
     };
 
+    const [deleteMenu, setDeleteMenu] = useState(false);
+
+    const list = [
+        { 
+            title: '대체공간 수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        {
+            title: '대체공간 삭제',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.red[3], fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+    ];
+    
+    const DeleteModal = props => (
+        <Modal
+            transparent={true}
+            visible={deleteMenu}
+            onRequestClose={() => {
+                setDeleteMenu(!deleteMenu);
+                props.refRBSheet.current.close();
+            }}
+            style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
+        >
+        <View style={styles.centeredView}>
+            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                <View style={{marginTop: 55}}>
+                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁을 삭제할까요?</AppText>
+                </View>
+                <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                        <TouchableOpacity onPress={() => {
+                                props.refRBSheet.current.close();
+                                setDeleteMenu(!deleteMenu);
+                        }}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            props.refRBSheet.current.close();
+                            setDeleteMenu(!deleteMenu);
+                            // deleteCollection();
+                        }}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </View>
+    </Modal>
+
+        // <Modal
+        //     transparent={true}
+        //     visible={deleteMenu}
+        //     onRequestClose={() => {
+        //         setDeleteMenu(!deleteMenu);
+        //         props.refRBSheet.current.close();
+        //     }}
+        //     style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
+        // >
+        //     <View style={styles.centeredView}>
+        //         <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+        //             <View style={{marginTop: 55}}>
+        //                 <AppText style={{...styles.modalText, color: colors.blue[1]}}>대체공간을 삭제할까요?</AppText>
+        //             </View>
+        //             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+        //                 <Pressable
+        //                     style={{...styles.button, backgroundColor: colors.gray[4]}}
+        //                     onPress={() => {
+        //                         props.refRBSheet.current.close();
+        //                         setDeleteMenu(!deleteMenu);
+        //                     }}
+        //                 >
+        //                     <AppText style={styles.textStyle}>취소하기</AppText>
+        //                 </Pressable>
+        //                 <Pressable
+        //                     style={{...styles.button, backgroundColor: colors.red[3]}}
+        //                     onPress={() => {
+        //                         props.refRBSheet.current.close();
+        //                         setDeleteMenu(!deleteMenu);
+        //                         deleteCollection();
+        //                     }}
+        //                 >
+        //                     <AppText style={styles.textStyle}>삭제하기</AppText>
+        //                 </Pressable>
+        //             </View>
+        //         </View>
+        //     </View>
+        // </Modal>
+    );
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -175,29 +273,78 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 <AppText style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold'}}>
                     대체 공간
                 </AppText>
-                <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                        style={{flex: 1, height: '100%'}}>
-                        <MoreIcon style={{color: colors.mainColor}}/>
-                    </TouchableOpacity>
-                </View>
+                {route.params.private && <>
+                    {
+                        !isEditSpace ?
+                        <View style={{position: 'absolute', right: 0}}>
+                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                                style={{flex: 1, height: '100%'}} onPress={() => {
+                                refRBSheet.current.open();
+                                }}>
+                                <MoreIcon style={{color: colors.mainColor}}/>
+                            </TouchableOpacity>
+                            <RBSheet
+                            ref={refRBSheet}
+                            closeOnDragDown={true}
+                            closeOnPressMask={true}
+                            height={180}
+                            customStyles={{
+                                wrapper: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                },
+                                draggableIcon: {
+                                    display: 'none'
+                                },
+                                container: {
+                                    borderTopLeftRadius: 10,
+                                    borderTopRightRadius: 10,
+                                    backgroundColor: colors.yellow[7],
+                                    paddingTop: 10
+                                }
+                            }}>
+                                {list.map((l, i) => (
+                                <TouchableOpacity onPress={()=>{
+                                    if(i === 0) {
+                                        setIsEditSpace(true);
+                                        refRBSheet.current.close();
+                                    }
+                                    if(i === 1) {
+                                        setDeleteMenu(true);
+                                    }
+                                }}>
+                                    <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
+                                        <AppText style={l.titleStyle}>{l.title}</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                ))}
+                                <DeleteModal refRBSheet={refRBSheet}/>
+                            </RBSheet>
+                        </View> :
+                            <View style={{position: 'absolute', right: 0}}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
+                                    onPress={() => {
+                                        setIsEditSpace(false);
+                                        // console.log('나 맞아용!!!!!!')
+                                        // isDeleted(isDeletedOrigin);
+                                        // checkDeletedPlace();
+                                    }}>
+                                    <View>
+                                        <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                    }</>}
             </View>
-
             <ScreenContainerView>
                 <View>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
                         <TouchableOpacity>
                             <View style={{flexDirection: 'row', width: '100%'}}>
-                            { isEditSpace ?
-                                <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                    <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
-                                </View> :
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>1</AppText>
                                     </View>
                                 </View>
-                            }
                             {
                                 data.place_img ?
                                 <Image source={{uri: data.place_img}}
@@ -255,21 +402,16 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                             </View>
                         </TouchableOpacity>
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            { !isEditSpace ?
-                                <TouchableOpacity onPress={() => {
+                            <TouchableOpacity onPress={() => {
                                     if (placeData.like_flag) {
                                         DeleteLikedPlace(data.place_pk);
                                     } else {
                                         LikePlace(data.place_pk);
                                     }
                                 }}>
-                                    <Jewel width={26} height={21}
+                                <Jewel width={26} height={21}
                                     style={{color: placeData.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
-                                </TouchableOpacity> :
-                                <TouchableOpacity>
-                                    <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
-                                </TouchableOpacity>
-                                }
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
@@ -379,15 +521,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 22,
-        backgroundColor: 'rgba(0,0,0,0.5)'
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalView: {
         backgroundColor: 'white',
         borderRadius: 10,
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        paddingTop: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        height: 150
+        height: 193
     },
     button: {
         borderRadius: 10,
@@ -420,6 +564,46 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 8
     },
+
+    //대체공간 삭제 모달
+    backdrop: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    planContainer : {
+        // height: 30,
+        paddingVertical: 6,
+        paddingLeft: 6,
+        paddingRight: 5,
+        marginBottom: 6,
+        marginRight: 4,
+        marginTop: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '88%'
+    },
+    freeContainer: {
+        // height: 30,
+        paddingVertical: 6,
+        paddingLeft: 6,
+        paddingRight: 5,
+        marginBottom: 6,
+        marginRight: 4,
+        marginTop: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '88%'
+    },
+    shadowOption: {
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        elevation: 1,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+    }
 });
 
 export default AlternativeSpaceScreen;

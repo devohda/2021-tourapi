@@ -629,7 +629,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         >
             <View style={styles.centeredView}>
                 <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제할까요?</AppText>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.gray[4]}}

@@ -219,79 +219,91 @@ const CollectionTab = ({navigation}) => {
     const SelectBox = () => {
         return (
             <>
-                {
-                    showMenu && <View style={{
-                        position: 'absolute',
-                        width: 100,
-                        height: 80,
-                        backgroundColor: '#fff',
+            {
+            showMenu && <View style={{
+                position: 'absolute',
+                width: 80,
+                height: 80,
+                backgroundColor: '#fff',
+                // flex: 1,
+                borderRadius: 10,
+                zIndex: 0,
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                overflow: 'visible'
+                }}>
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('최근 추가순');
+                    }}
+                    style={{
                         flex: 1,
-                        borderRadius: 10,
-                        zIndex: 0,
-
-                        shadowColor: '#000',
-                        shadowOffset: {
-                            width: 0,
-                            height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        elevation: 5,
-
-                        overflow: 'visible'
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
                     }}>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('최근 추가순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>최근 추가순</AppText>
-                        </TouchableOpacity>
-
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                            zIndex: 9900,
-                            backgroundColor: colors.backgroundColor,
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('인기순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>인기순</AppText>
-                        </TouchableOpacity>
-
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                            zIndex: 9900
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('리뷰순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>리뷰순</AppText>
-                        </TouchableOpacity>
-                    </View>
-                }
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                        {currentMenu === '최근 추가순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0,
+                        backgroundColor: colors.backgroundColor,
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('리뷰순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
+                        {currentMenu === '리뷰순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                </View>
+            }
             </>
         );};
 
@@ -320,18 +332,11 @@ const CollectionTab = ({navigation}) => {
                             <SelectBox />
                         </View>
                     </TouchableWithoutFeedback>
-                    <View flexDirection="row">
+                    <View flexDirection="row" style={{marginRight: 8}}>
                         <View flexDirection="row">
-                            <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                name={'funnel'} size={13}></Icon>
+                            <Icon style={{marginTop: Platform.OS === 'android' ? 3 : 1, marginRight: 2}} type="ionicon"
+                                name={'funnel'} size={13} color={colors.mainColor}></Icon>
                             <AppText style={{color: colors.mainColor}}>필터</AppText>
-                        </View>
-                        <View style={{marginHorizontal: 10}}><AppText
-                            style={{color: colors.subColor}}>|</AppText></View>
-                        <View flexDirection="row">
-                            <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                name={'pencil'} size={13}></Icon>
-                            <AppText style={{color: colors.mainColor}}>편집</AppText>
                         </View>
                     </View>
                 </View>

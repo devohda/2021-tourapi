@@ -5,8 +5,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeNavigator from './HomeNavigator';
 import AuthenticationNavigator from './AuthenticationNavigator';
 import AuthenticationNavigator2 from './AuthenticationNavigator2';
-import SearchScreen from '../screens/SearchScreen';
-import PlaceScreen from '../screens/PlaceScreen';
+import SearchScreen from '../screens/search/SearchScreen';
+import PlaceScreen from '../screens/place/PlaceScreen';
 import MakePlanCollectionScreen from '../screens/collection/MakePlanCollectionScreen';
 import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionScreen';
 import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
@@ -16,6 +16,7 @@ import ProfileSettingScreen from '../screens/settings/ProfileSettingScreen';
 import SearchScreenForAdd from '../screens/collection/SearchScreenForAdd';
 import MakeReviewScreen from '../screens/review/MakeReviewScreen';
 import AlternativeSpaceScreen from '../screens/collection/AlternativeSpaceScreen';
+import EntireMap from '../screens/map/EntireMap';
 
 import {useToken} from '../contexts/TokenContextProvider';
 
@@ -70,6 +71,7 @@ const AppNavigator = () => {
                     <MainStack.Screen name="PlanCollection" component={PlanCollectionScreen} />
                     <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />
                     <MainStack.Screen name="AlternativeSpace" component={AlternativeSpaceScreen} />
+                    <MainStack.Screen name="ShowEntireMap" component={EntireMap} />
                 </>
             }
         </MainStack.Navigator>

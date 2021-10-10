@@ -3,14 +3,14 @@ import {Platform, View, Image, StyleSheet, Button, TouchableOpacity, Alert, Moda
 import {useTheme} from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
-import AppText from '../components/AppText';
-import ScreenContainer from '../components/ScreenContainer';
-import MyPageNavigation from '../navigation/MypageNavigator';
-import { useToken } from '../contexts/TokenContextProvider';
-import {useIsSignedIn} from '../contexts/SignedInContextProvider';
+import AppText from '../../components/AppText';
+import ScreenContainer from '../../components/ScreenContainer';
+import MyPageNavigation from '../../navigation/MypageNavigator';
+import { useToken } from '../../contexts/TokenContextProvider';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-import SettingsIcon from '../assets/images/settings-icon.svg';
-import ReportIcon from '../assets/images/Report.svg';
+import SettingsIcon from '../../assets/images/settings-icon.svg';
+import ReportIcon from '../../assets/images/Report.svg';
 
 const MyPageScreen = ({navigation}) => {
     const {colors} = useTheme();
@@ -89,7 +89,7 @@ const MyPageScreen = ({navigation}) => {
                                 borderRadius: 60,
                                 backgroundColor: colors.defaultColor,
                             }}
-                            source={require('../assets/images/here_default.png')}
+                            source={require('../../assets/images/here_default.png')}
                         />
                     </View>
                     <View style={{marginTop: 4}}>

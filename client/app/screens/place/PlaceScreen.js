@@ -8,19 +8,21 @@ import ClusteredMapView from "react-native-maps-super-cluster";
 import ClusterView from './ClusterView';
 import * as SecureStore from 'expo-secure-store';
 
-import StarScore from '../components/StarScore';
-import NavigationTop from '../components/NavigationTop';
-import Score from '../components/Score';
-import Time from '../components/Time';
-import Facility from '../components/Facility';
-import AppText from '../components/AppText';
+import StarScore from '../../components/StarScore';
+import NavigationTop from '../../components/NavigationTop';
+import Score from '../../components/Score';
+import Time from '../../components/Time';
+import Facility from '../../components/Facility';
+import AppText from '../../components/AppText';
 
-import Jewel from '../assets/images/jewel.svg';
-import ScreenContainer from '../components/ScreenContainer';
-import ScreenContainerView from '../components/ScreenContainerView';
-import ScreenDivideLine from '../components/ScreenDivideLine';
-import {useToken} from '../contexts/TokenContextProvider';
-import {useIsSignedIn} from '../contexts/SignedInContextProvider';
+import Jewel from '../../assets/images/jewel.svg';
+import CustomMarker from '../../assets/images/place/map-marker.svg';
+
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import ScreenDivideLine from '../../components/ScreenDivideLine';
+import {useToken} from '../../contexts/TokenContextProvider';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}) => {
     const maxHeight = Dimensions.get('screen').height;
@@ -99,7 +101,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}
                                     </View>
                                     {item.collection_private == 1 &&
                                     <Image style={{width: 10, height: 10, marginLeft: 2}}
-                                        source={require('../assets/images/lock_outline.png')}></Image>}
+                                        source={require('../../assets/images/lock_outline.png')}></Image>}
                                 </View>
                             </View>
                             <View
@@ -181,7 +183,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.yellow[7]}}>
                         <AppText
                             style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
-                        <Image source={require('../assets/images/folder.png')}
+                        <Image source={require('../../assets/images/folder.png')}
                             style={{width: 32, height: 32}}></Image>
                     </View>
                 </View>
@@ -467,27 +469,27 @@ const PlaceScreen = ({route, navigation}) => {
             <>
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
-                        source={placeData.place_img ? {uri: placeData.place_img} : require('../assets/images/here_default.png')}
+                        source={placeData.place_img ? {uri: placeData.place_img} : require('../../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
@@ -571,9 +573,10 @@ const PlaceScreen = ({route, navigation}) => {
             <Marker coordinate={{
                 latitude: 37.56633546113615,
                 longitude: lng
-            }}
-                     title={props.data.data}
-                     description="기본값입니다"/>
+            }} title={props.data.data}
+            description="기본값입니다">
+                <Icon type="ionicon" name={"airplane-outline"}></Icon>
+            </Marker>
         )
     };
 
@@ -641,6 +644,36 @@ const PlaceScreen = ({route, navigation}) => {
             <MapView.Marker key={data.location.latitude} coordinate={data.location} />
         )
     };
+    const [lnt, setLnt] = useState(126.9775482762618);
+    const [region, setRegion] = useState({
+        latitude: 37.56633546113615,
+        longitude: 126.9775482762618,
+        latitudeDelta: 0.0015,
+        longitudeDelta: 0.0015,
+    });
+
+    const onMarkerPress = (event) => {
+        const { id, coordinate } = event.nativeEvent;
+        // console.log(coordinate)
+        const newRegion = { ...region };
+    
+        newRegion.latitude = coordinate.latitude;
+        newRegion.longitude = coordinate.longitude;
+    
+        setRegion(newRegion)
+    };
+
+    const EntireButton = () => {
+        return (
+            <View style={{backgroundColor: colors.backgroundColor}}>
+                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap')}>
+                <View style={{backgroundColor: colors.backgroundColor}}>
+                    <AppText>전체 보기</AppText>
+                </View>
+                </TouchableOpacity>
+            </View>
+        )
+    }
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -734,7 +767,7 @@ const PlaceScreen = ({route, navigation}) => {
                         onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name, place_pk: placeData.place_pk})}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
-                                source={require('../assets/images/write_review_icon.png')}></Image>
+                                source={require('../../assets/images/write_review_icon.png')}></Image>
                             <AppText style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점
                                 남기기</AppText>
                         </TouchableOpacity>
@@ -766,22 +799,29 @@ const PlaceScreen = ({route, navigation}) => {
                     }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
-                    {/* <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
+                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
                     
-                    <View>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                                 initialRegion={{
-                                     latitude: 37.56633546113615,
-                                     longitude: 126.9779482762618,
-                                     latitudeDelta: 0.0015,
-                                     longitudeDelta: 0.0015,
-                                 }}
+                    <View flex={1}>
+                        <EntireButton />
+                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
+                            region={region}
+                            moveOnMarkerPress
+                            tracksViewChanges={false}
+                            provider={PROVIDER_GOOGLE}
+                            onMarkerPress={onMarkerPress}
                         >
-                        {
-                            list.map((data, idx) => (
-                                <Markers data={data} key={idx + 'user'} idx={idx}/>
-                            ))
-                        }
+                            <Marker coordinate={{
+                                latitude: 37.56633546113615,
+                                longitude: 126.9779482762618
+                            }} title={'기본'}
+                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
+                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <CustomMarker />
+                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
+                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
+                                    </View>
+                                </View>
+                            </Marker>
                         </MapView>
                         {/* <ClusteredMapView
                             style={{height: 200}}
@@ -790,7 +830,7 @@ const PlaceScreen = ({route, navigation}) => {
                             initialRegion={INITIAL_POSITION}
                             renderMarker={renderMarker}
                         /> */}
-                        <ClusterView />
+                        {/* <ClusterView /> */}
                     </View>
                 </View>
                 <View>
@@ -1021,7 +1061,7 @@ const PlaceScreen = ({route, navigation}) => {
                                             alignItems: 'center',
                                             marginBottom: 2
                                         }}>
-                                            <Image source={require('../assets/images/here_icon.png')} style={{
+                                            <Image source={require('../../assets/images/here_icon.png')} style={{
                                                 width: 11.36,
                                                 height: 9.23,
                                                 marginTop: 2,
@@ -1060,7 +1100,7 @@ const PlaceScreen = ({route, navigation}) => {
                                             alignItems: 'center',
                                             marginBottom: 2
                                         }}>
-                                            <Image source={require('../assets/images/here_icon.png')} style={{
+                                            <Image source={require('../../assets/images/here_icon.png')} style={{
                                                 width: 11.36,
                                                 height: 9.23,
                                                 marginTop: 2,
@@ -1099,7 +1139,7 @@ const PlaceScreen = ({route, navigation}) => {
                                             alignItems: 'center',
                                             marginBottom: 2
                                         }}>
-                                            <Image source={require('../assets/images/here_icon.png')} style={{
+                                            <Image source={require('../../assets/images/here_icon.png')} style={{
                                                 width: 11.36,
                                                 height: 9.23,
                                                 marginTop: 2,

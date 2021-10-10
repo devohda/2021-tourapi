@@ -3,7 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
 import {useTheme} from '@react-navigation/native';
 
-import MyPageScreen from '../screens/MyPageScreen';
+import MyPageScreen from '../screens/mypage/MyPageScreen';
 import MakeCollectionBtn from '../screens/collection/MakeCollectionBtn';
 import MainPage from '../screens/MainPageScreen';
 

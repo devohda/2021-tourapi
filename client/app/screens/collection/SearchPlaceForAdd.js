@@ -35,7 +35,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                 },
                 body: JSON.stringify({
                     planDay: day,
-                    order: placeData.length + prevLength,
+                    order: placeData.length+prevLength,
                 })
             }).then(res => res.json())
             .then(response => {

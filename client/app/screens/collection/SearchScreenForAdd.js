@@ -64,27 +64,6 @@ const SearchScreenForAdd = ({route, navigation}) => {
         },
     });
 
-    const RecommendedDefault = () => {
-        return (
-            <View style={{marginTop: 16}}>
-                <AppText style={{fontSize: 12, fontWeight: '500', color: colors.gray[5]}}>추천 검색어</AppText>
-                <View>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>고급스러운</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>한국적인</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>아기자기한</AppText></View>
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>힐링</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>관광</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>여유</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>화려한</AppText></View>
-                    </View>
-                </View>
-            </View>
-        );
-    };
-
     const RecommendedPlace = ({name, address}) => {
         return (
             <View style={{marginRight: 8}}>
@@ -159,19 +138,19 @@ const SearchScreenForAdd = ({route, navigation}) => {
                         </Pressable>
                     </View>
                     {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} />
+                        searchKeyword !== '' && <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} />
                     }
                 </ScreenContainerView>
 
-                <ScreenDivideLine/>
+                {searchKeyword !== '' && <ScreenDivideLine/>}
 
                 <ScreenContainerView>
-                    <View style={{marginVertical: 12}}>
+                    <View style={{marginTop: 24, marginBottom: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
                             <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 공간</AppText>
-                            <View style={styles.ad_sticker}>
+                            {/* <View style={styles.ad_sticker}>
                                 <AppText style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</AppText>
-                            </View>
+                            </View> */}
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
