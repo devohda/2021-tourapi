@@ -74,3 +74,36 @@ exports.readUserList = async (keyword, sort, type) => {
     }
 };
 
+//UPDATE
+exports.updateUserInfo = async (user_pk, userData) => {
+    const conn = await db.pool.getConnection();
+    let result = false;
+
+    try {
+        await conn.beginTransaction();
+
+        const query1 = `UPDATE users
+                        SET user_nickname = ${mysql.escape(userData.nickname)}, user_img = ${mysql.escape(userData.img)}
+                        WHERE user_pk = ${user_pk}`;
+        const [result1] = await conn.query(query1);
+
+        const query2 = `DELETE FROM keywords_users
+                        WHERE user_pk = ${user_pk}`;
+        const [result2] = await conn.query(query2);
+
+        for(const keyword_pk of userData.keywords){
+            const query3 = `INSERT INTO keywords_users (user_pk, keyword_pk)
+                            VALUES (${user_pk}, ${keyword_pk})`;
+            await conn.query(query3);
+        }
+
+        result = true;
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        console.error(err);
+    } finally {
+        conn.release();
+        return result;
+    }
+};
