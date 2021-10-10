@@ -287,7 +287,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         </View>
                         <TouchableOpacity onPress={()=>{
                             navigation.navigate('SearchForAdd', {pk: 0, placeData: {}, day : {}});
-                        }}>
+                        }} style={!route.params.private && {display: 'none'}}>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                     <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

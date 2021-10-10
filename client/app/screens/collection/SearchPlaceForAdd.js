@@ -22,6 +22,9 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const addPlace = (place_pk) => {
+
+        var prevLength = isPress.filter(element => (element === true)).length;
+
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${place_pk}`, {
                 method: 'POST',
@@ -32,7 +35,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                 },
                 body: JSON.stringify({
                     planDay: day,
-                    order: placeData.length,
+                    order: placeData.length + prevLength,
                 })
             }).then(res => res.json())
             .then(response => {

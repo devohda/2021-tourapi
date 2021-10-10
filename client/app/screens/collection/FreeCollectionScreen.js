@@ -889,7 +889,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
                                     <TouchableOpacity onPress={()=>{
-                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : data});
+                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1});
                                     }} style={ !checkPrivate() && {display:'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />

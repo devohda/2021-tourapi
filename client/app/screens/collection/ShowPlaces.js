@@ -55,7 +55,7 @@ const ShowPlaces = props => {
     const checkIndex = () => {
         var prevCount = 0;
         for(var i=0;i<index;i++) {
-            if(originData[i].place_pk === -1 || originData[i].place_pk === -2) prevCount += 1;
+            if(originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) prevCount += 1;
         }
         return (index+1) - prevCount;
     };

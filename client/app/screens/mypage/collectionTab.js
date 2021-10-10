@@ -147,32 +147,33 @@ const CollectionTab = ({navigation}) => {
                             fontWeight: '400',
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
-                        <View style={{marginTop: 4, flexDirection: 'row'}}>
+                        <View style={{marginTop: 4, flexDirection: 'row', width: '90%', flexWrap: 'wrap', alignItems: 'flex-start'}}>
                             {item.keywords.map((keyword, idx) => {
                                 return (
                                     <AppText key={idx} style={{
-                                        color: colors.gray[4],
+                                        color: colors.gray[2],
                                         fontSize: 10,
-                                        marginRight: 6.21
+                                        marginRight: 8,
+                                        lineHeight: 14
                                     }}># {keyword}</AppText>);
                             })}
                         </View>
-                        <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                        <View flexDirection="row" style={{position: 'absolute', bottom: 8, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
+                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[2]}}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
                                     <Image source={require('../../assets/images/here_icon.png')}
                                         style={{width: 8, height: 8, margin: 2}}></Image>
-                                    <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                                    <AppText style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>{item.like_cnt}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>
                                     <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
                                         style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[2],
                                         fontWeight: 'bold'
                                     }}>{item.place_cnt}</AppText>
                                 </View>

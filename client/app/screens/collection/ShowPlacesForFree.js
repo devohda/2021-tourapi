@@ -192,12 +192,12 @@ const ShowPlacesForFree = props => {
             {/* pk로 바꾸기 */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
-                    <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
                             navigation.navigate('Place', {data: item})
                         }} disabled={isEditPage && true}>
-                            <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', justifyContent: isEditPage ? 'space-between' : 'center', alignItems: 'center'}}>
+                            <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
                                     <TouchableOpacity onPress={()=>{
                                         let newArr = [...isDeletedOrigin];

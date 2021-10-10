@@ -37,15 +37,15 @@ const AlternativeSpaceList = props => {
 
     return(
         <TouchableOpacity onPress={()=>{
-            if(idx === 0) navigation.navigate('AlternativeSpace', {data: data});
+            if(idx === 0) navigation.navigate('AlternativeSpace', {data: data, private: props.private});
             else navigation.navigate('SearchForAdd', {pk: 0, placeData: {}, day : {}});
         }}>
             <View flex={1} style={{flexDirection: 'row'}}>
                 <View style={[{
                     ...styles.spaceContainer,
                     backgroundColor: colors.defaultColor
-                }, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '98%', marginLeft: 8}]}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 10, width: '95%'}}>
+                }, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%', marginLeft: 0}]}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 10, width: isFree && !isEditPage ? '90%' : '95%'}}>
                         {   idx !== 0 &&
                             <Icon type="ionicon" name={"add"} size={16} color={colors.gray[4]}/>
                         }

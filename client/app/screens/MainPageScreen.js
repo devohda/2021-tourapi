@@ -259,24 +259,21 @@ export default function MainPageScreen({navigation}) {
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
                         <View flexDirection="row"
-                            style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                            style={{marginTop: '24%', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     fontSize: 10,
-                                    width: '85%',
                                     color: colors.gray[4]
                                 }}>{item.created_user_name}</AppText>
                             </View>
-                            <View style={{flexDirection: 'row'}}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                        style={{margin: 2}}></Icon>
-                                    <AppText style={{
-                                        fontSize: 10,
-                                        color: colors.gray[4],
-                                        fontWeight: 'bold'
-                                    }}>{item.place_cnt}</AppText>
-                                </View>
+                            <View style={{flexDirection: 'row', marginRight: 10}}>
+                                <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
+                                    style={{margin: 2}}></Icon>
+                                <AppText style={{
+                                    fontSize: 10,
+                                    color: colors.gray[4],
+                                    fontWeight: 'bold'
+                                }}>{item.place_cnt}</AppText>
                             </View>
                         </View>
                     </View>

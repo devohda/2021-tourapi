@@ -208,7 +208,7 @@ const TipsList = props => {
                 </View>
             </TouchableOpacity>
             }
-            <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: idx === 0 || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: idx === 0 && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '98%'}]}>
+            <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: idx === 0 || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: idx === 0 && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
                 <TouchableOpacity onPress={() => {
                     if(idx === 0) {
                         setEditVisible(true);
