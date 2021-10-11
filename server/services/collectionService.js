@@ -130,7 +130,7 @@ exports.createCollectionComment = async (collection_pk, user_pk, comment) => {
 
 // 보관함 공간에 대체 공간 추가
 exports.createCollectionPlaceReplacement = async (cpm_map_pk, place_pk, cpr_order) => {
-    const query = `INSERT INTO collection_place_replacement (cpm_map_pk, place_pk, cpr_order)
+    const query = `INSERT IGNORE INTO collection_place_replacement (cpm_map_pk, place_pk, cpr_order)
                    VALUES (${cpm_map_pk}, ${place_pk}, ${cpr_order})`
     const result = await db.query(query);
     return result;
@@ -315,14 +315,20 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+    const query = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
                    ON p.place_pk = cpm.place_pk
                    LEFT OUTER JOIN like_place lp
                    ON lp.place_pk = cpm.place_pk
                    AND lp.user_pk = ${user_pk}
+                   LEFT OUTER JOIN (
+                       SELECT cpm_map_pk, COUNT(*) AS replacement_cnt
+                       FROM collection_place_replacement
+                       GROUP BY cpm_map_pk
+                   ) cpr
+                   ON cpr.cpm_map_pk = cpm.cpm_map_pk
                    WHERE collection_pk = ${collection_pk}
                    ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
