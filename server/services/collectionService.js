@@ -110,7 +110,7 @@ exports.createPlanCollection = async (user_pk, collectionData) => {
 exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day, cpm_order) => {
 
     // 자유 보관함의 경우 날짜 없으므로 -1 저장
-    if (!cpm_plan_day) cpm_plan_day = -1;
+    if (cpm_plan_day === undefined) cpm_plan_day = -1;
 
     const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
                    VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day}, ${cpm_order})`;
