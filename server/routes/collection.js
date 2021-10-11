@@ -136,21 +136,16 @@ router.post('/plan', verifyToken, multer.single('img'), async (req, res, next) =
 });
 
 // 보관함에 장소 추가
-router.post('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
-    const {collectionId, placeId} = req.params;
-    const {planDay, order} = req.body;
+router.post('/:collectionId/place', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
+    const {planDay, order, placeId} = req.body;
 
     const result = await collectionService.createPlaceToCollection(collectionId, placeId, planDay, order);
 
-    if (result.affectedRows === 1) {
+    if (result) {
         return res.status(200).json({
             code: 200,
             status: 'OK'
-        });
-    } else if (result.affectedRows === 0) {
-        return res.status(202).json({
-            code: 202,
-            status: 'EXISTED'
         });
     } else {
         return res.status(500).json({
@@ -181,10 +176,10 @@ router.post('/:collectionId/comments', verifyToken, async (req, res, next) => {
 })
 
 // 보관함 대체 공간 생성
-router.post('/:collectionId/replacement/place/:placeId', verifyToken, async (req, res, next) => {
-    const {placeId} = req.params;
-    const {cpm_map_pk, order} = req.body;
-    const result = await collectionService.createCollectionPlaceReplacement(cpm_map_pk, placeId, order);
+router.post('/:collectionId/place/:mapPk/replacement', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
+    const {placeId, order} = req.body;
+    const result = await collectionService.createCollectionPlaceReplacement(mapPk, placeId, order);
 
     if (result) {
         return res.status(200).json({
@@ -200,10 +195,10 @@ router.post('/:collectionId/replacement/place/:placeId', verifyToken, async (req
 })
 
 // 보관함 공간 한줄평 생성
-router.post('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
-    const {cpmMapPk} = req.params;
+router.post('/:collectionId/place/:mapPk/comment', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
     const {comment} = req.body;
-    const result = await collectionService.createCollectionPlaceComment(cpmMapPk, comment);
+    const result = await collectionService.createCollectionPlaceComment(mapPk, comment);
 
     if (result) {
         return res.status(200).json({
@@ -302,10 +297,10 @@ router.get('/:collectionId/comments', verifyToken, async (req, res, next) => {
 })
 
 // 보관함 대체 공간 리스트
-router.get('/:collectionId/replacement/placeList', verifyToken, async (req, res, next) => {
-    const {cpm_map_pk} = req.body;
+router.get('/:collectionId/place/:mapPk/replacements', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
     const {user} = res.locals;
-    const result = await collectionService.readCollectionPlaceReplacement(user.user_pk, cpm_map_pk);
+    const result = await collectionService.readCollectionPlaceReplacement(user.user_pk, mapPk);
 
     if (result) {
         return res.status(200).json({
@@ -399,9 +394,10 @@ router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
 })
 
 // 대체 공간 수정
-router.put('/:collectionId/replacement/place', verifyToken, async (req, res, next) => {
-    const {cpm_map_pk, replacementPlaceList} = req.body;
-    const result = await collectionService.updateCollectionPlaceReplacement(cpm_map_pk, replacementPlaceList);
+router.put('/:collectionId/place/:mapPk/replacement', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
+    const {replacementPlaceList} = req.body;
+    const result = await collectionService.updateCollectionPlaceReplacement(mapPk, replacementPlaceList);
 
     if (result) {
         return res.status(200).json({
@@ -417,10 +413,10 @@ router.put('/:collectionId/replacement/place', verifyToken, async (req, res, nex
 })
 
 // 보관함 장소 한줄평 수정
-router.put('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
-    const {cpmMapPk} = req.params;
+router.put('/:collectionId/place/:mapPk/comment', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
     const {comment} = req.body;
-    const result = await collectionService.updateCollectionPlaceComment(cpmMapPk, comment);
+    const result = await collectionService.updateCollectionPlaceComment(mapPk, comment);
 
     if (result) {
         return res.status(200).json({
@@ -436,13 +432,12 @@ router.put('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req
 })
 
 // DELETE
-// 보관함 삭제
-router.delete('/:collectionId', verifyToken, async (req, res, next) => {
-    const {collectionId} = req.params;
+// 보관함 대체 공간 1개 삭제
+router.delete('/:collectionId/place/:mapPk/replacement/:placeId', verifyToken, async (req, res, next) => {
+    const {mapPk, placeId} = req.params;
+    const result = await collectionService.deleteCollectionPlaceReplacement(mapPk, placeId);
 
-    const result = await collectionService.deleteCollection(collectionId);
-
-    if (result.affectedRows <= 1) {
+    if (result) {
         return res.status(200).json({
             code: 200,
             status: 'OK'
@@ -453,14 +448,48 @@ router.delete('/:collectionId', verifyToken, async (req, res, next) => {
             status: 'SERVER ERROR'
         });
     }
-});
+})
+
+// 보관함 대체 공간 전체 삭제
+router.delete('/:collectionId/place/:mapPk/replacements', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
+    const result = await collectionService.deleteCollectionPlaceReplacementAll(mapPk);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
+// 보관함 장소 한줄평 삭제
+router.delete('/:collectionId/place/:mapPk/comment', verifyToken, async (req, res, next) => {
+    const {mapPk} = req.params;
+    const result = await collectionService.deleteCollectionPlaceComment(mapPk);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 
 // 보관함에 장소 삭제
-router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, next) => {
-    const {collectionId, placeId} = req.params;
-    const {planDay} = req.body;
-
-    const result = await collectionService.deletePlaceToCollection(collectionId, placeId, planDay);
+router.delete('/:collectionId/place/:mapPk', verifyToken, async (req, res, next) => {
+    const {collectionId, mapPk} = req.params;
+    const result = await collectionService.deletePlaceToCollection(collectionId, mapPk);
 
     if (result.affectedRows === 1) {
         return res.status(200).json({
@@ -480,13 +509,13 @@ router.delete('/:collectionId/place/:placeId', verifyToken, async (req, res, nex
     }
 })
 
-// 보관함 대체 공간 1개 삭제
-router.delete('/:collectionId/replacement/place/:placeId', verifyToken, async (req, res, next) => {
-    const {placeId} = req.params;
-    const {cpm_map_pk} = req.body;
-    const result = await collectionService.deleteCollectionPlaceReplacement(cpm_map_pk, placeId);
+// 보관함 삭제
+router.delete('/:collectionId', verifyToken, async (req, res, next) => {
+    const {collectionId} = req.params;
 
-    if (result) {
+    const result = await collectionService.deleteCollection(collectionId);
+
+    if (result.affectedRows <= 1) {
         return res.status(200).json({
             code: 200,
             status: 'OK'
@@ -497,42 +526,6 @@ router.delete('/:collectionId/replacement/place/:placeId', verifyToken, async (r
             status: 'SERVER ERROR'
         });
     }
-})
-
-// 보관함 대체 공간 전체 삭제
-router.delete('/:collectionId/replacement/placeAll', verifyToken, async (req, res, next) => {
-    const {cpm_map_pk} = req.body;
-    const result = await collectionService.deleteCollectionPlaceReplacementAll(cpm_map_pk);
-
-    if (result) {
-        return res.status(200).json({
-            code: 200,
-            status: 'OK'
-        });
-    } else {
-        return res.status(500).json({
-            code: 500,
-            status: 'SERVER ERROR'
-        });
-    }
-})
-
-// 보관함 장소 한줄평 삭제
-router.delete('/:collectionId/placeList/:cpmMapPk/comment', verifyToken, async (req, res, next) => {
-    const {cpmMapPk} = req.params;
-    const result = await collectionService.deleteCollectionPlaceComment(cpmMapPk);
-
-    if (result) {
-        return res.status(200).json({
-            code: 200,
-            status: 'OK'
-        });
-    } else {
-        return res.status(500).json({
-            code: 500,
-            status: 'SERVER ERROR'
-        });
-    }
-})
+});
 
 module.exports = router;

@@ -112,7 +112,7 @@ exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day, 
     // 자유 보관함의 경우 날짜 없으므로 -1 저장
     if (cpm_plan_day === undefined) cpm_plan_day = -1;
 
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
+    const query = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
                    VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day}, ${cpm_order})`;
 
     const result = await db.query(query);
@@ -317,7 +317,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     const query = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
                           CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
-                          cpc_comment AS comment
+                          cpc_comment AS comment, IFNULL(review_score, -1) AS review_score
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
                    ON p.place_pk = cpm.place_pk
@@ -332,6 +332,12 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
                    ON cpr.cpm_map_pk = cpm.cpm_map_pk
                    LEFT OUTER JOIN collection_place_comment cpc
                    ON cpc.cpm_map_pk = cpm.cpm_map_pk
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, AVG(review_score) AS review_score
+                       FROM place_reviews
+                       GROUP BY place_pk
+                   ) pr
+                   ON pr.place_pk = p.place_pk
                    WHERE collection_pk = ${collection_pk}
                    ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
@@ -354,13 +360,19 @@ exports.readCollectionCommentList = async (collection_pk) => {
 // 보관함 대체 공간 리스트
 exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
     const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_type, cpr_order,
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score
                    FROM collection_place_replacement cpr
                    INNER JOIN places p
                    ON cpr.place_pk = p.place_pk
                    LEFT OUTER JOIN like_place lp
                    ON lp.place_pk = cpr.place_pk
                    AND lp.user_pk = ${user_pk}
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, AVG(review_score) AS review_score
+                       FROM place_reviews
+                       GROUP BY place_pk
+                   ) pr
+                   ON pr.place_pk = cpr.place_pk
                    WHERE cpm_map_pk = ${cpm_map_pk}
                    ORDER BY cpr_order ASC
                    `
@@ -485,15 +497,10 @@ exports.deleteCollection = async (collection_pk) => {
 };
 
 // 보관함에 장소 삭제
-exports.deletePlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+exports.deletePlaceToCollection = async (collection_pk, cpm_map_pk) => {
     let query = `DELETE FROM collection_place_map 
-                 WHERE collection_pk = ${collection_pk} 
-                 AND place_pk = ${place_pk}`
+                 WHERE cpm_map_pk = ${cpm_map_pk}`
 
-    // 일정 보관함인 경우
-    if (cpm_plan_day) {
-        query += ` AND cpm_plan_day = ${cpm_plan_day}`
-    }
     const result = db.query(query);
     return result;
 }
