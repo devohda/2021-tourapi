@@ -30,12 +30,13 @@ router.get('/list', verifyToken, async (req, res, next) => {
 })
 
 // 장소 데이터
-router.get('/:placeId', async (req, res, next) => {
+router.get('/:placeId', verifyToken, async (req, res, next) => {
     const {placeId} = req.params;
+    const {user} = res.locals;
     let data;
 
     try {
-        data = await placeService.readPlace(placeId);
+        data = await placeService.readPlace(user.user_pk, placeId);
     } catch (err) {
         return res.status(500).json({
             code: 500,
