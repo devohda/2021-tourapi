@@ -359,6 +359,42 @@ exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
     return result;
 };
 
+// 보관함 정보 수정
+exports.updateCollection = async (collection_pk, collectionData) => {
+    console.log(collectionData);
+
+    const conn = await db.pool.getConnection();
+    let result = false;
+    try {
+        const query1 = `UPDATE collections 
+                        SET collection_name = ${mysql.escape(collectionData.name)},
+                            collection_private = ${collectionData.isPrivate},
+                            collection_thumbnail = ${mysql.escape(collectionData.img)}
+                        WHERE collection_pk = ${collection_pk}`;
+        const [result1] = await conn.query(query1);
+
+        const query2 = `DELETE FROM keywords_collections_map
+                        WHERE collection_pk = ${collection_pk}`;
+        const [result2] = await conn.query(query2);
+
+        for(const keyword_pk of collectionData.keywords){
+            const query3 = `INSERT INTO keywords_collections_map (collection_pk, keyword_pk)
+                            VALUES (${collection_pk}, ${keyword_pk})`;
+            const [result3] = await conn.query(query3);
+        }
+
+        result = true;
+        await conn.commit();
+    } catch (err) {
+        console.log(err);
+        result = false;
+        await conn.rollback();
+    } finally {
+        conn.release();
+        return result;
+    }
+};
+
 // 보관함 장소 리스트 수정
 exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, deletePlaceList) => {
 

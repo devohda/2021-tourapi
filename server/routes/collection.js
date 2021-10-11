@@ -4,6 +4,22 @@ const router = express.Router();
 const collectionService = require('../services/collectionService');
 const {verifyToken} = require('../middleware/jwt');
 
+const Multer = require('multer');
+const {Storage} = require('@google-cloud/storage');
+
+const projectId = 'here-327421'
+const keyFilename = 'here-327421-e0bed35f44b5.json'
+const storage = new Storage({projectId, keyFilename});
+
+const multer = Multer({
+    storage: Multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // no larger than 5mb, you can change as needed.
+    }
+});
+
+const bucket = storage.bucket('here-bucket');
+
 // CREATE
 // 자유 보관함 생성
 router.post('/free', verifyToken, async (req, res, next) => {
@@ -232,6 +248,61 @@ router.get('/:collectionId/replacement/placeList', verifyToken, async (req, res,
 })
 
 // UPDATE
+// 보관함 정보 수정
+router.put('/:collectionId/info', verifyToken, multer.single('img'), async (req, res, next) => {
+    const {collectionId} = req.params;
+
+    if (!req.file) {
+        const {collectionData} = req.body;
+        const result = await collectionService.updateCollection(collectionId, JSON.parse(collectionData));
+
+        if (result) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK'
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
+    }
+
+    const blob = bucket.file(Date.now() + req.file.originalname);
+    const blobStream = blob.createWriteStream();
+
+    blobStream.on('error', err => {
+        next(err);
+    });
+
+    blobStream.on('finish', async () => {
+        // The public URL can be used to directly access the file via HTTP.
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+
+        const {collectionData: stringedCollectionData} = req.body;
+        const collectionData = {
+            ...JSON.parse(stringedCollectionData),
+            img: publicUrl
+        }
+        const result = await collectionService.updateCollection(collectionId, collectionData)
+
+        if (result) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK'
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
+    });
+
+    blobStream.end(req.file.buffer);
+})
+
 // 보관함 장소 리스트 수정
 router.put('/:collectionId/places', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;

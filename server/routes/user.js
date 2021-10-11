@@ -4,45 +4,6 @@ const router = express.Router();
 const {verifyToken} = require('../middleware/jwt')
 const userService = require('../services/userService');
 
-// const {v4: uuid} = require('uuid');
-// const path = require('path');
-//
-// const multer = require('multer');
-// const multerGoogleStorage = require('multer-cloud-storage');
-//
-// const upload = multer({
-//     // GCS_BUCKET : 'here-storage1',
-//     // GCLOUD_PROJECT : 'here-327421',
-//     // GCS_KEYFILE : 'here-327421-e0bed35f44b5.json'
-//
-//     // storage : multerGoogleStorage.storageEngine({
-//     //     GCS_BUCKET : 'here-storage1',
-//     //     GCLOUD_PROJECT : 'here-327421',
-//     //     GCS_KEYFILE : 'here-327421-e0bed35f44b5.json'
-//     // }),
-//
-//
-//     // storage: multerGoogleStorage.storageEngine({
-//     //     bucket: 'here-storage1',
-//     //     projectId: 'here-327421',
-//     //     keyFilename: 'here-327421-e0bed35f44b5.json'
-//     // })
-//
-//     // storage : multer.diskStorage({
-//     //     destination(req, file, cb){
-//     //         cb(null, 'public/')
-//     //     },
-//     //     filename(req, file, cb){
-//     //         const ext = path.extname(file.originalname);
-//     //         cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
-//     //     }
-//     // })
-// });
-//
-// const { Storage } = require('@google-cloud/storage');
-// const storage = new Storage({ keyFilename: './here-327421-e0bed35f44b5.json' });
-// const bucketname = 'here-storage1';
-// const filename = 'here-327421';
 const Multer = require('multer');
 const {Storage} = require('@google-cloud/storage');
 
@@ -89,10 +50,23 @@ router.get('/list', async (req, res) => {
 });
 
 router.put('/info', verifyToken, multer.single('img'), async (req, res, next) => {
+    const {user} = res.locals;
 
     if (!req.file) {
-        res.status(400).send('No file uploaded.');
-        return;
+        const {userData} = req.body;
+        const result = await userService.updateUserInfo(user.user_pk, JSON.parse(userData));
+
+        if (result) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK'
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
     }
 
     const blob = bucket.file(Date.now() + req.file.originalname);
@@ -105,14 +79,12 @@ router.put('/info', verifyToken, multer.single('img'), async (req, res, next) =>
     blobStream.on('finish', async () => {
         // The public URL can be used to directly access the file via HTTP.
         const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-        console.log(publicUrl);
 
         const {userData: stringedUserData} = req.body;
         const userData = {
             ...JSON.parse(stringedUserData),
             img: publicUrl
         }
-        const {user} = res.locals;
         const result = await userService.updateUserInfo(user.user_pk, userData)
 
         if (result) {
