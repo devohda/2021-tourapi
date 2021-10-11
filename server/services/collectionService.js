@@ -316,7 +316,8 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
     // 장소 정보 & 장소 좋아요 상태
 
     const query = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
+                          cpc_comment AS comment
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
                    ON p.place_pk = cpm.place_pk
@@ -329,6 +330,8 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
                        GROUP BY cpm_map_pk
                    ) cpr
                    ON cpr.cpm_map_pk = cpm.cpm_map_pk
+                   LEFT OUTER JOIN collection_place_comment cpc
+                   ON cpc.cpm_map_pk = cpm.cpm_map_pk
                    WHERE collection_pk = ${collection_pk}
                    ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
