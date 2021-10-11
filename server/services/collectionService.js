@@ -112,7 +112,7 @@ exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day, 
     // 자유 보관함의 경우 날짜 없으므로 -1 저장
     if (cpm_plan_day === undefined) cpm_plan_day = -1;
 
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
+    const query = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
                    VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day}, ${cpm_order})`;
 
     const result = await db.query(query);
@@ -485,15 +485,10 @@ exports.deleteCollection = async (collection_pk) => {
 };
 
 // 보관함에 장소 삭제
-exports.deletePlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+exports.deletePlaceToCollection = async (collection_pk, cpm_map_pk) => {
     let query = `DELETE FROM collection_place_map 
-                 WHERE collection_pk = ${collection_pk} 
-                 AND place_pk = ${place_pk}`
+                 WHERE cpm_map_pk = ${cpm_map_pk}`
 
-    // 일정 보관함인 경우
-    if (cpm_plan_day) {
-        query += ` AND cpm_plan_day = ${cpm_plan_day}`
-    }
     const result = db.query(query);
     return result;
 }
