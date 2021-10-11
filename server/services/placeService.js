@@ -22,7 +22,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     }
 
     let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
-                 IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt
+                 IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score
                  FROM places p
                  LEFT OUTER JOIN like_place lp
                  ON lp.place_pk = p.place_pk
@@ -36,6 +36,12 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
                      GROUP BY place_pk
                  ) vp
                  ON vp.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, AVG(review_score) AS review_score
+                     FROM place_reviews
+                     GROUP BY place_pk
+                 ) pr
+                 ON pr.place_pk = p.place_pk
                  `
 
     if(keyword){
@@ -57,14 +63,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
         query += ' LIMIT 3';
     }
 
-    console.log(query);
-    const result1 = await db.query(query);
-
-
-    // 별점 나중에 수정
-    const result = result1.map(place => {
-        return {...place, star: 3}; 
-    });
+    const result = await db.query(query);
 
     return result;
 };
