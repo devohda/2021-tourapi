@@ -313,10 +313,10 @@ const SearchPlace = ({navigation}) => {
                                         fontSize: 10,
                                         color: colors.mainColor
                                     }}>{checkType(item.place_type)}</AppText>
-                                <View style={styles.score_line}></View>
-                                <Star width={11} height={11} style={{marginTop: 2}}/>
+                                <View style={{...styles.score_line, display: parseInt(item.review_score) == -1 && 'none'}}></View>
+                                <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}}/>
                                 <AppText
-                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                             </View>
                             <AppText style={{
                                 fontSize: 16,

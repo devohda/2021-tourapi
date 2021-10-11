@@ -8,7 +8,11 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import BackIcon from '../../assets/images/back-icon.svg';
 
 const AlternativeSpaceList = props => {
-    const { data, idx, day, length, isEditPage, navigation} = props;
+    const { data, idx, day, length, isEditPage, navigation, pk,
+        isReplacementGotten, isGottenReplacementMapPk,
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement,
+        postReplacement, getReplacement, replacementData
+    } = props;
     const {colors} = useTheme();
     const [visible, setVisible] = useState(false);
     const [changedTip, setChangedTip] = useState('');
@@ -19,7 +23,7 @@ const AlternativeSpaceList = props => {
         if(props.private === 1) {
             //수정페이지에서 이미 완성된 한줄평일때만
             if(isEditPage) {
-                if(idx === 0) return false;
+                if(data.replacement_cnt) return false;
                 else return true;
             }
             //일반 페이지에서는 모두 보여준다
@@ -30,15 +34,18 @@ const AlternativeSpaceList = props => {
         //내가 만든게 아닐때
         else {
             //이미 완성된 한줄평일때만
-            if(idx === 0) return false;
+            if(data.replacement_cnt) return false;
             else return true;
         }
     }
 
     return(
         <TouchableOpacity onPress={()=>{
-            if(idx === 0) navigation.navigate('AlternativeSpace', {data: data, private: props.private});
-            else navigation.navigate('SearchForAdd', {pk: 0, placeData: {}, day : {}});
+            if(data.replacement_cnt) {
+                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, postReplacement: postReplacement, pk: pk, getReplacement: getReplacement, replacementData: replacementData});
+                getReplacement(data.cpm_map_pk);
+            }
+            else navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
         }}>
             <View flex={1} style={{flexDirection: 'row'}}>
                 <View style={[{
@@ -46,13 +53,13 @@ const AlternativeSpaceList = props => {
                     backgroundColor: colors.defaultColor
                 }, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%', marginLeft: 0}]}>
                     <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 10, width: isFree && !isEditPage ? '90%' : '95%'}}>
-                        {   idx !== 0 &&
+                        {   !data.replacement_cnt &&
                             <Icon type="ionicon" name={"add"} size={16} color={colors.gray[4]}/>
                         }
-                        <AppText style={{color: idx !== 0 ? colors.gray[4] : colors.blue[1], fontSize: 14, marginLeft: 5}}>{idx === 0 ? '대체 공간 2' : '대체공간 추가하기'}</AppText>
+                        <AppText style={{color: !data.replacement_cnt ? colors.gray[4] : colors.blue[1], fontSize: 14, marginLeft: 5}}>{data.replacement_cnt !== 0 ? `대체 공간 ${data.replacement_cnt}` : '대체공간 추가하기'}</AppText>
                     </View>
                     <View style={{paddingRight: 8}}>
-                        { idx === 0 && <BackIcon width={10} height={14} style={{color: colors.mainColor, transform: [{rotate: '180deg'}], width: 4, height: 8}}/>}
+                        <BackIcon width={10} height={14} style={[{color: colors.mainColor, transform: [{rotate: '180deg'}], width: 4, height: 8}, !data.replacement_cnt && {display: 'none'}]}/>
                     </View>
                 </View>
             </View>

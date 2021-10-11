@@ -19,9 +19,9 @@ import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import { Icon } from 'react-native-elements';
 
-const ShowPlacesForFree = props => {
+const ShowPlacesForReplace = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited, postPlaceComment, putPlaceComment, isCommentDeleted, isDeletedComment} = props;
+    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isLimited, postPlaceComment, putPlaceComment, isCommentDeleted, isDeletedComment} = props;
     // console.log(item)
     const isFree = (typeof day === 'undefined');
     const [update, setUpdate] = setUpdated();
@@ -59,7 +59,7 @@ const ShowPlacesForFree = props => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
                         // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
@@ -92,7 +92,7 @@ const ShowPlacesForFree = props => {
                     'x-access-token': token
                 }
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
                         // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
@@ -123,7 +123,7 @@ const ShowPlacesForFree = props => {
                     'x-access-token': token
                 }
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
                         // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
@@ -190,7 +190,7 @@ const ShowPlacesForFree = props => {
                 marginVertical: 13
             }}></View>} */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
-                <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
+                <View flex={1}>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
@@ -199,11 +199,11 @@ const ShowPlacesForFree = props => {
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
                                     <TouchableOpacity onPress={()=>{
-                                        let newArr = [...isDeletedOrigin];
-                                        console.log(newArr)
-                                        newArr[index] = true;
-                                        // setIsDeletedOrigin(newArr);
-                                        isDeleted(newArr);
+                                        // let newArr = [...isDeletedOrigin];
+                                        // console.log(newArr)
+                                        // newArr[index] = true;
+                                        // // setIsDeletedOrigin(newArr);
+                                        // isDeleted(newArr);
                                     }}>
                                         <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                             <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
@@ -309,12 +309,10 @@ const ShowPlacesForFree = props => {
                             }
                         </View>
                     </View>
-                    <AlternativeSpaceList replacementCnt={item.replacementCnt} data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation}/>
-                    <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                 </View>
             </TouchableHighlight>
         </View>
     );
 };
 
-export default ShowPlacesForFree;
+export default ShowPlacesForReplace;

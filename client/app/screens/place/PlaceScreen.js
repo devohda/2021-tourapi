@@ -24,7 +24,7 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useToken} from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}) => {
+const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height, getCollectionList}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
@@ -33,23 +33,37 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height}
     const postPlace = () => {
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
+        const placeCnt = collectionList[index].place_cnt;
+        const placeId = placeData.place_pk;
+        console.log(collectionId); console.log(placeId)
+        let day = -1;
+        if(collectionList[index].collection_type) day = 0;
+
         try {
-            fetch(`http://34.64.185.40/collection/${collectionId}/place/${placeData.place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionId}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
+                body: {
+                    planDay: day,
+                    order: placeCnt+1,
+                    placeId: placeId,
+                }
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    Alert.alert('', '보관함에 공간이 저장되었습니다.');
+                    console.log(response)
+                    if(response.code === 500) Alert.alert('', '공간 저장에 실패했습니다.');
+                    else if(response.code === 200) Alert.alert('', '보관함에 공간이 저장되었습니다.');
+                    getCollectionList();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -214,7 +228,6 @@ const PlaceScreen = ({route, navigation}) => {
     const [nightCongestion, setNightCongestion] = useState(0);
 
     const [token, setToken] = useToken();
-    //데이터 받아서 다시해야함
     const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
@@ -283,6 +296,7 @@ const PlaceScreen = ({route, navigation}) => {
                         return;
                     }
                     if(response.data.length > 5) setHeight(150 + 90 * 5);
+                    else setHeight(150 + 90 * response.data.length);
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -442,7 +456,7 @@ const PlaceScreen = ({route, navigation}) => {
                             refRBSheet.current.open();
                         }}>
                             <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
-                                collectionList={collectionList} height={height}/>
+                                collectionList={collectionList} height={height} getCollectionList={getCollectionList}/>
                         </TouchableOpacity>
                         <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>보관함에 추가</AppText>
                     </View>
@@ -499,7 +513,9 @@ const PlaceScreen = ({route, navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
-                            <AppText style={{...styles.placeName, color: colors.mainColor}}>{placeData.place_name}</AppText>
+                            <View style={{...styles.placeName, width: '80%'}}>
+                                <AppText style={{...styles.placeName, color: colors.mainColor}}>{placeData.place_name}</AppText>
+                            </View>
                             <View style={{
                                 ...styles.categoryBorder,
                                 borderColor: colors.red_gray[6],
@@ -802,7 +818,7 @@ const PlaceScreen = ({route, navigation}) => {
                     {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
                     
                     <View flex={1}>
-                        <EntireButton />
+                        {/* <EntireButton /> */}
                         <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
                             region={region}
                             moveOnMarkerPress

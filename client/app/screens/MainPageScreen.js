@@ -249,7 +249,8 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                         <View style={styles.defaultImageView}>
-                            <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/>
+                            {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/> */}
+                            <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
                         </View>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
@@ -384,21 +385,24 @@ export default function MainPageScreen({navigation}) {
                                     marginHorizontal: 8, color: colors.gray[4],
                                     textAlign: 'center',
                                     fontSize: 10,
-                                    fontWeight: '700'
+                                    fontWeight: '700',
+                                    display: parseInt(data.review_score) == -1 && 'none'
                                 }}>|</AppText>
                                 <Image source={require('../assets/images/review_star.png')}
                                     style={{
                                         width: 10,
                                         height: 10,
                                         alignSelf: 'center',
+                                        display: parseInt(data.review_score) == -1 && 'none'
                                     }}></Image>
                                 <AppText style={{
                                     color: colors.gray[3],
                                     textAlign: 'center',
                                     fontSize: 10,
                                     fontWeight: '700',
-                                    marginLeft: 2
-                                }}>{data.star}</AppText>
+                                    marginLeft: 2,
+                                    display: parseInt(data.review_score) == -1 && 'none'
+                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                             </View>
                             <AppText style={{
                                 fontSize: 16,

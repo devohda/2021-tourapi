@@ -300,7 +300,7 @@ const PlaceTab = ({navigation}) => {
                 }
                 <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 113, position: 'absolute'}}>
                         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                            <TouchableOpacity onPress={() => {
+                            {/* <TouchableOpacity onPress={() => {
                                 if (item.like_flag) {
                                     DeleteLikedPlace(item.place_pk);
                                 } else {
@@ -309,7 +309,7 @@ const PlaceTab = ({navigation}) => {
                             }}>
                                 <Jewel width={26} height={21}
                                 style={[{marginTop: 10, marginRight: 10}, item.like_flag ? {color: colors.red[3]} : {color: colors.defaultColor}]}/>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                 </View>
                     <View style={{marginLeft: 5, height: 67}}>
@@ -319,11 +319,11 @@ const PlaceTab = ({navigation}) => {
                                 fontSize: 10,
                                 marginTop: 2
                             }}>{checkType(item.place_type)}</AppText>
-                            <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6,}}>|</AppText>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6, display: parseInt(item.review_score) == -1 && 'none'}}>|</AppText>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', display: parseInt(item.review_score) == -1 && 'none'}}>
                                 <Image source={require('../../assets/images/here_icon.png')}
                                     style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                                <AppText style={{color: colors.mainColor, fontSize: 10}}>{item.star}</AppText>
+                                <AppText style={{color: colors.mainColor, fontSize: 10, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                             </View>
                         </View>
                         <View style={{width: '100%'}}>
@@ -370,7 +370,8 @@ const PlaceTab = ({navigation}) => {
                         </View>
                             }
                         </View>
-                        <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/>
+                        {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/> */}
+                        <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                         <AppText style={{

@@ -21,6 +21,8 @@ import { useIsFocused } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
+import DefaultProfile from '../../assets/images/profile_default.svg';
+
 const CollectionTab = ({navigation}) => {
 
     const [token, setToken] = useToken();
@@ -115,7 +117,25 @@ const CollectionTab = ({navigation}) => {
         }
     };
 
-    const CollectionContainer = ({item}) => {
+    const setBGColor = (type) => {
+        // if (idx === 0 || idx === 2) {
+        //     return colors.red[3];
+        // } else if (idx === 1 || idx === 6) {
+        //     return '#FFC36A';
+        // } else if (idx === 3 || idx === 8) {
+        //     return '#639A94';
+        // } else if (idx === 4 || idx === 5) {
+        //     return colors.blue[2];
+        // } else {
+        //     return '#8F6DA4';
+        // }
+        if(type === 'default-red') return colors.red[3];
+        else return colors.blue[2];
+    };
+
+
+    const CollectionContainer = ({item, index}) => {
+        // console.log(item)
         return (
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 8000}} onPress={() => {
                 countCollectionView(item.collection_pk);
@@ -139,7 +159,12 @@ const CollectionTab = ({navigation}) => {
                         </View>
                             }
                         </View>
-                        <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/>
+                        {/* { item.collection_thumbnail ?
+                        <View style={{...styles.defaultImage, backgroundColor: setBGColor(item.collection_thumbnail)}}>
+                            <DefaultProfile width={70} height={70}/>
+                        </View> : */}
+                        <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
+                        {/* } */}
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                         <AppText style={{
@@ -397,6 +422,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         position: 'absolute',
+        justifyContent: 'center',
+        alignContent: 'center'
     },
     selectType: {
         borderWidth: 1,

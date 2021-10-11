@@ -13,7 +13,7 @@ import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
 import ProfileSettingScreen from '../screens/settings/ProfileSettingScreen';
-import SearchScreenForAdd from '../screens/collection/SearchScreenForAdd';
+import SearchScreenForAdd from '../screens/search/SearchScreenForAdd';
 import MakeReviewScreen from '../screens/review/MakeReviewScreen';
 import AlternativeSpaceScreen from '../screens/collection/AlternativeSpaceScreen';
 import EntireMap from '../screens/map/EntireMap';

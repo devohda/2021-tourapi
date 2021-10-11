@@ -128,7 +128,7 @@ const SearchScreen = ({route, navigation}) => {
                         <TextInput flex={1} style={{fontSize: 16}}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            placeholder="원하는 공간을 검색해보세요"
+                            placeholder="원하는 공간/보관함/유저를 검색해보세요"
                             placeholderTextColor={colors.gray[5]}
                             onChangeText={(text) => setK(text)}
                             onSubmitEditing={()=> setSearchKeyword(k)}

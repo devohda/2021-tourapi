@@ -5,7 +5,6 @@ import {useTheme} from '@react-navigation/native';
 import NavigationTop from '../../components/NavigationTop';
 import SearchIcon from '../../assets/images/search-icon.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import SearchTabNavigator from '../../navigation/SearchTabNavigator';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
@@ -14,7 +13,7 @@ import SearchPlaceForAdd from './SearchPlaceForAdd';
 
 const SearchScreenForAdd = ({route, navigation}) => {
     const {colors} = useTheme();
-    const { pk, placeData, day } = route.params;
+    const { pk, placeData, day, replace } = route.params;
     const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     useEffect(() => {setSearchKeyword('')}, []);
@@ -137,9 +136,13 @@ const SearchScreenForAdd = ({route, navigation}) => {
                             <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
                         </Pressable>
                     </View>
-                    {
-                        searchKeyword !== '' && <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} />
-                    }
+                    {searchKeyword !== '' && <View>
+                        {replace ?
+                            <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace}
+                            postReplacement={route.params.postReplacement}
+                            /> :
+                        <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace} />}
+                    </View>}
                 </ScreenContainerView>
 
                 {searchKeyword !== '' && <ScreenDivideLine/>}

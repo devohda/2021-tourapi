@@ -10,8 +10,6 @@ import {
     TextInput,
     Pressable,
     FlatList,
-    Animated,
-    TouchableHighlight,
     Modal,
     Alert
 } from 'react-native';
@@ -26,24 +24,27 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import { tipsList } from '../../contexts/TipsListContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
 
+import DragAndDropListForFree from './DragAndDropListForFree';
+import ShowPlacesForFree from './ShowPlacesForFree';
+
+import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import Jewel from '../../assets/images/jewel.svg';
 import DefaultProfile from '../../assets/images/profile_default.svg';
 
-import {useToken} from '../../contexts/TokenContextProvider';
-import DragAndDropListForFree from './DragAndDropListForFree';
+import moment from 'moment';
+import 'moment/locale/ko';
 // import Example from './App2';
-import ShowPlacesForFree from './ShowPlacesForFree';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-import moment from 'moment';
-import 'moment/locale/ko';
+
 
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const FreeCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
@@ -54,6 +55,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [placeLength, setPlaceLength] = useState(0);
     const [tmpData, setTmpData] = tipsList();
     const [isEditPage, setIsEditPage] = useState(false);
+    
+    const [keywords, setKeywords] = useState([]);
+    
     const isFocused = useIsFocused();
     const [isLimited, setIsLimited] = useState(false);
 
@@ -61,10 +65,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [update, setUpdate] = setUpdated();
-    const [keywords, setKeywords] = useState([]);
     const refRBSheet = useRef();
     const isDeleted = (deletedData) => {
         setIsDeletedOrigin(deletedData);
+    };
+
+    const isCommentDeleted = (deletedCommentData) => {
+        setIsDeletedComment(deletedCommentData);
     };
 
     const getUserData = () => {
@@ -112,8 +119,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }
         ]);
         getUserData();
-        // getPlaceCommentsData();
-        // setUpdate(false)
     }, [isFocused]);
 
     const getInitialCollectionData = () => {
@@ -128,7 +133,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -159,13 +163,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
 
                     setPlaceData(response.data);
                     setPlaceLength(response.data.length);
@@ -304,25 +306,26 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const checkDeletedPlace = () => {
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
-                // console.log(placeData[i]);
-                deletePlace(placeData[i].place_pk, placeData[i].cpm_plan_day);
+                deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
+            }
+        }
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
             }
         }
     };
 
-    const deletePlace = (place_pk, day) => {
+    const deletePlace = (map_pk, day) => {
         // 공간 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${map_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    planDay: day,
-                })
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
@@ -374,7 +377,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -406,7 +408,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -437,7 +438,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -455,6 +455,109 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const postPlaceComment = (cpmMapPk, addedComment) => {
+        //한줄평 등록
+        console.log(addedComment)
+        // try {
+        //     fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Accept': 'application/json',
+        //             'Content-Type': 'application/json',
+        //             'x-access-token': token
+        //         },
+        //         body: {
+        //             comment: addedComment
+        //         }
+        //     }).then((res) => res.json())
+        //         .then(async response => {
+        //             if(response.code === 401 || response.code === 403 || response.code === 419){
+        //                 // Alert.alert('','로그인이 필요합니다');
+        //                 await SecureStore.deleteItemAsync('accessToken');
+        //                 setToken(null);
+        //                 setIsSignedIn(false);
+        //                 return;
+        //             }
+        //             console.log(response)
+        //             getInitialPlaceData();
+        //         })
+        //         .catch((err) => {
+        //             console.error(err);
+        //         });
+
+        // } catch (err) {
+        //     console.error(err);
+        // }
+    };
+
+    const putPlaceComment = (cpmMapPk, editedComment) => {
+        //한줄평 수정
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: {
+                    comment: editedComment
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deletePlaceComment = (cpmMapPk, deletedComment) => {
+        //한줄평 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: {
+                    comment: deletedComment
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const Keyword = props => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
@@ -462,13 +565,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
+    const [isDeletedComment, setIsDeletedComment] = useState([]);
+
     const setDeletedData = (data) => {
         var newArr = [];
         for(var i=0;i<data.length;i++) {
             newArr.push(false);
         }
         setIsDeletedOrigin(newArr);
-        // isDeleted(newArr);
+        setIsDeletedComment(newArr);
     }
 
     const SwipeList = () => {
@@ -478,7 +583,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             <>
                 <SafeAreaView>
                     <FlatList data={placeData}
-                        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}/>}
+                        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>}
                         keyExtractor={(item, idx) => {idx.toString();}}
                         key={(item, idx) => {idx.toString();}}
                     nestedScrollEnabled/>
@@ -686,6 +791,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         setIsEditPage(false);
                                         console.log('나 맞아용!!!!!!')
                                         isDeleted(isDeletedOrigin);
+                                        isCommentDeleted(isDeletedComment);
                                         checkDeletedPlace();
                                     }}>
                                     <View>
@@ -804,7 +910,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
                                     <TouchableOpacity onPress={()=>{
-                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1});
+                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1, replace: false});
                                     }} style={!collectionData.is_creator && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -819,7 +925,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                 <SwipeList /> :
                                                 // <Example />
                                                 <FlatList data={placeData}
-                                                renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}/>}
+                                                renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>}
                                                 keyExtractor={(item, idx) => {idx.toString();}}
                                                 key={(item, idx) => {idx.toString();}}
                                             nestedScrollEnabled/>
@@ -885,7 +991,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                             style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
                                     </View>
                                     <TouchableOpacity onPress={()=>{
-                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1});
+                                        navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1, replace: false});
                                     }} style={ !checkPrivate() && {display:'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />

@@ -68,31 +68,29 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         var forPostData = {};
         if(datas.length === 0) {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate: forPostEnable
-                },
-                keywords: []
+                name: collectionName,
+                isPrivate: forPostEnable,
+                keywords: [],
             }
         } else {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate : forPostEnable
-                },
-                keywords: datas
+                name: collectionName,
+                isPrivate : forPostEnable,
+                keywords: datas,
             }
         }
+
+        let form = new FormData();
+        form.append('collectionData', JSON.stringify(forPostData));
+        form.append('img', 'default-red');
 
         try {
             fetch('http://34.64.185.40/collection/free', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify(forPostData)
+                body : form
             }).then(res => res.json())
             .then(response => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){

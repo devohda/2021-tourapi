@@ -4,47 +4,34 @@ import {
     TouchableOpacity,
     View,
     Image,
-    SafeAreaView,
-    ScrollView,
-    Dimensions,
-    TextInput,
-    Pressable,
-    FlatList,
-    Animated,
-    TouchableHighlight,
     Modal,
-    Alert
+    SafeAreaView,
+    FlatList
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
-import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
+import {Icon} from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import ScreenContainerView from '../../components/ScreenContainerView';
+import {useToken} from '../../contexts/TokenContextProvider';
+import ShowPlacesForReplace from '../collection/ShowPlacesForReplace';
 
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import Jewel from '../../assets/images/jewel.svg';
-import SlideMenu from '../../assets/images/menu_for_edit.svg';
 
-import ShowPlacesForFree from './ShowPlacesForFree';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
-import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-import { useToken } from '../../contexts/TokenContextProvider';
-
 import moment from 'moment';
 import 'moment/locale/ko';
 
-const windowWidth = Dimensions.get('window').width;
-
 const AlternativeSpaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const { data } = route.params;
+    const { data, day, postReplacement, pk, getReplacement } = route.params;
     const [placeData, setPlaceData] = useState({});
+    const [replacementData, setReplacementData] = useState([]);
     const [isEditSpace, setIsEditSpace] = useState(false);
     const isFocused = useIsFocused();
     const [token, setToken] = useToken();
@@ -52,6 +39,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
     useEffect(() => {
         getInitialData();
+        getInitialReplacementData();
         () => {
             setPlaceData({});
         }
@@ -69,6 +57,37 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 .then((response) => {
                     // console.log(response.data.placeData)
                     setPlaceData(response.data.placeData);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getInitialReplacementData = () => {
+        //대체공간 불러오기 (실시간용)
+        try { 
+            fetch(`http://34.64.185.40/collection/${pk}/place/${data.cpm_map_pk}/replacements`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    setReplacementData(response.data);
+                    // getReplacement(data.cpm_map_pk);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -187,7 +206,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         <View style={styles.centeredView}>
             <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
                 <View style={{marginTop: 55}}>
-                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁을 삭제할까요?</AppText>
+                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
                 </View>
                 <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
@@ -213,45 +232,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             </View>
         </View>
     </Modal>
-
-        // <Modal
-        //     transparent={true}
-        //     visible={deleteMenu}
-        //     onRequestClose={() => {
-        //         setDeleteMenu(!deleteMenu);
-        //         props.refRBSheet.current.close();
-        //     }}
-        //     style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
-        // >
-        //     <View style={styles.centeredView}>
-        //         <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-        //             <View style={{marginTop: 55}}>
-        //                 <AppText style={{...styles.modalText, color: colors.blue[1]}}>대체공간을 삭제할까요?</AppText>
-        //             </View>
-        //             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-        //                 <Pressable
-        //                     style={{...styles.button, backgroundColor: colors.gray[4]}}
-        //                     onPress={() => {
-        //                         props.refRBSheet.current.close();
-        //                         setDeleteMenu(!deleteMenu);
-        //                     }}
-        //                 >
-        //                     <AppText style={styles.textStyle}>취소하기</AppText>
-        //                 </Pressable>
-        //                 <Pressable
-        //                     style={{...styles.button, backgroundColor: colors.red[3]}}
-        //                     onPress={() => {
-        //                         props.refRBSheet.current.close();
-        //                         setDeleteMenu(!deleteMenu);
-        //                         deleteCollection();
-        //                     }}
-        //                 >
-        //                     <AppText style={styles.textStyle}>삭제하기</AppText>
-        //                 </Pressable>
-        //             </View>
-        //         </View>
-        //     </View>
-        // </Modal>
     );
 
     return (
@@ -327,6 +307,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                         // console.log('나 맞아용!!!!!!')
                                         // isDeleted(isDeletedOrigin);
                                         // checkDeletedPlace();
+                                        //완료를 눌렀을 경우에만 수정 삭제가 되도록...
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -370,22 +351,25 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
                                                 fontSize: 10,
-                                                fontWeight: 'bold'
+                                                fontWeight: 'bold',
+                                                display: parseInt(data.review_score) == -1 && 'none'
                                             }}>|</AppText>
                                             <Image source={require('../../assets/images/review_star.png')}
                                                 style={{
                                                     width: 10,
                                                     height: 10,
                                                     alignSelf: 'center',
-                                                    marginTop: '1%'
+                                                    marginTop: '1%',
+                                                    display: parseInt(data.review_score) == -1 && 'none'
                                                 }}></Image>
                                             <AppText style={{
                                                 color: colors.gray[3],
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
-                                                marginLeft: 2
-                                            }}>4.8</AppText>
+                                                marginLeft: 2,
+                                                display: parseInt(data.review_score) == -1 && 'none'
+                                            }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                                         </View>
                                         <View style={{width: '100%'}}>
                                             <AppText style={{
@@ -420,15 +404,14 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             <ScreenDivideLine />
 
             <ScreenContainerView>
-                <View style={{marginTop: 16}}>
-                    <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                         <View>
                             <AppText style={{color: colors.gray[4]}}>총 <AppText
-                                // style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
-                                style={{fontWeight: '700'}}>0개</AppText> 대체공간</AppText>
+                                style={{fontWeight: '700'}}>{replacementData.length}개</AppText> 대체공간</AppText>
                         </View>
                         <TouchableOpacity onPress={()=>{
-                            navigation.navigate('SearchForAdd', {pk: 0, placeData: {}, day : {}});
+                            navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
                         }} style={!route.params.private && {display: 'none'}}>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -436,19 +419,15 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                             </View>
                         </TouchableOpacity>
                     </View>
-                    {/* <SafeAreaView>
+                    <SafeAreaView>
                         <SafeAreaView>
-                            {
-                                !isEditSpace ?
-                                <SwipeList /> :
-                                <FlatList data={placeData}
-                                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+                                <FlatList data={replacementData}
+                                    renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} private={0} pk={pk}/>}
                                     keyExtractor={(item, idx) => {idx.toString();}}
                                     key={(item, idx) => {idx.toString();}}
                                     nestedScrollEnabled/>
-                            }
                         </SafeAreaView>
-                    </SafeAreaView> */}
+                    </SafeAreaView>
                 </View>
             </ScreenContainerView>
         </ScreenContainer>

@@ -9,7 +9,7 @@ import AppText from '../../components/AppText';
 import { tipsList } from '../../contexts/TipsListContextProvider';
 
 const TipsList = props => {
-    const { data, idx, day, isEditPage} = props;
+    const { comment, data, idx, day, isEditPage, isCommentDeleted, isDeletedComment} = props;
     const {colors} = useTheme();
     const [addVisible, setAddVisible] = useState(false);
     const [editVisible, setEditVisible] = useState(false);
@@ -63,11 +63,13 @@ const TipsList = props => {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
-                            const newArr = [...tmpData];
-                            if(isFree) newArr[idx].tip = changedTip;
-                            else newArr[day].places[idx].tip = changedTip;
-                            setTmpData(newArr);
-                            // console.log(tmpData)
+                            // const newArr = [...tmpData];
+                            // if(isFree) newArr[idx].tip = changedTip;
+                            // else newArr[day].places[idx].tip = changedTip;
+                            // setTmpData(newArr);
+                            
+                            // console.log(changedTip === '')
+                            // if(changedTip !== '') postPlaceComment(data.cpm_map_pk, changedTip);
                             setAddVisible(false);
                         }}>
                             <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -127,6 +129,7 @@ const TipsList = props => {
                             else newArr[day].places[idx].tip = changedTip;
                             setTmpData(newArr);
                             // console.log(tmpData)
+                            if(changedTip !== comment) putPlaceComment(data.cpm_map_pk, changedTip);
                             setEditVisible(false);
                         }}>
                             <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -179,7 +182,7 @@ const TipsList = props => {
         if(props.private === 1) {
             //수정페이지에서 이미 완성된 한줄평일때만
             if(isEditPage) {
-                if(idx === 0) return false;
+                if(comment) return false;
                 else return true;
             }
             //일반 페이지에서는 모두 보여준다
@@ -190,17 +193,23 @@ const TipsList = props => {
         //내가 만든게 아닐때
         else {
             //이미 완성된 한줄평일때만
-            if(idx === 0) return false;
+            if(comment) return false;
             else return true;
         }
     }
 
     return(
         <View flex={1}>
-        {/* idx === 0 조건은 임의 */}
         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-            { isEditPage && idx === 0 &&
-            <TouchableOpacity onPress={()=>setDeleteVisible(true)} disabled={props.private === 1 ? false : true}>
+            { isEditPage && comment &&
+            <TouchableOpacity onPress={()=>{
+                setDeleteVisible(true);
+                    let newArr = [...isDeletedComment];
+                    console.log(newArr)
+                    newArr[idx] = true;
+                    // setIsDeletedOrigin(newArr);
+                    isCommentDeleted(newArr);
+            }} disabled={props.private === 1 ? false : true}>
                 <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
@@ -208,9 +217,9 @@ const TipsList = props => {
                 </View>
             </TouchableOpacity>
             }
-            <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: idx === 0 || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: idx === 0 && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
+            <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: comment || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: comment && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
                 <TouchableOpacity onPress={() => {
-                    if(idx === 0) {
+                    if(comment) {
                         setEditVisible(true);
                         setChangedTip(defaultValue);
                     }
@@ -220,7 +229,7 @@ const TipsList = props => {
                     }}
                     >
                     <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 6, width: '95%'}}>
-                        {   idx === 0 ?
+                        {   comment ?
                             <Image source={require('../../assets/images/tipIcon.png')}
                             style={{width: 12, height: 12, marginEnd: 8}}></Image> :
                             <Image source={require('../../assets/images/tipIconGray.png')}
@@ -228,8 +237,8 @@ const TipsList = props => {
                         }
                         {
                             isFree ?
-                            <AppText style={{color: idx === 0 ? colors.blue[1] : colors.gray[4], fontSize: 14}}>{idx === 0 ? tmpData[0].tip : '한줄팁 추가하기'}</AppText> :
-                            <AppText style={{color: idx === 0 ? colors.blue[1] : colors.gray[4], fontSize: 14}}>{idx === 0 ? tmpData[0].places[0].tip : '한줄팁 추가하기'}</AppText>
+                            <AppText style={{color: comment ? colors.blue[1] : colors.gray[4], fontSize: 14}}>{comment ? comment : '한줄팁 추가하기'}</AppText> :
+                            <AppText style={{color: comment ? colors.blue[1] : colors.gray[4], fontSize: 14}}>{comment ? comment : '한줄팁 추가하기'}</AppText>
                         }
                     </View>
                 </TouchableOpacity>
