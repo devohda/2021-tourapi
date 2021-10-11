@@ -1,7 +1,7 @@
 const db = require('../database/database');
 const mysql = require('mysql2');
 
-// 장소 배열 조회
+// 공간 배열 조회
 exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     // TODO 장소 이름, type, 주소, 사진, 별점, 좋아요
     //  검색 페이지
@@ -68,7 +68,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     return result;
 };
 
-// 장소 조회
+// 공간 조회
 exports.readPlace = async (place_pk) => {
     const query1 = `SELECT p.place_pk, place_name, place_addr, place_type, place_img, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
                     FROM places p
@@ -77,14 +77,27 @@ exports.readPlace = async (place_pk) => {
                     WHERE p.place_pk=${place_pk}`;
 
     // 과반수 이상이 혼잡하다고 하면 혼잡도 O
+    // const query2 = `SELECT IFNULL(AVG(review_score),0) AS review_score,
+    //                        IFNULL(AVG(review_cleanliness),0) AS review_cleanliness,
+    //                        IFNULL(AVG(review_accessibility),0) AS review_accessibility,
+    //                        IFNULL(AVG(review_market),0) AS review_market,
+    //                        CASE WHEN COUNT(review_congestion_morning) >= 2 THEN 1 ELSE 0 END AS review_congestion_morning,
+    //                        CASE WHEN COUNT(review_congestion_afternoon) >= 2 THEN 1 ELSE 0 END AS review_congestion_afternoon,
+    //                        CASE WHEN COUNT(review_congestion_evening) >= 2 THEN 1 ELSE 0 END AS review_congestion_evening,
+    //                        CASE WHEN COUNT(review_congestion_night) >= 2 THEN 1 ELSE 0 END AS review_congestion_night,
+    //                        COUNT(*) AS review_total_cnt
+    //                 FROM place_reviews
+    //                 WHERE place_pk =${place_pk}`
+
+    // 일단 전송하면 바로 보이는 걸로
     const query2 = `SELECT IFNULL(AVG(review_score),0) AS review_score, 
                            IFNULL(AVG(review_cleanliness),0) AS review_cleanliness, 
                            IFNULL(AVG(review_accessibility),0) AS review_accessibility, 
                            IFNULL(AVG(review_market),0) AS review_market,
-                           CASE WHEN COUNT(review_congestion_morning) >= 2 THEN 1 ELSE 0 END AS review_congestion_morning,
-                           CASE WHEN COUNT(review_congestion_afternoon) >= 2 THEN 1 ELSE 0 END AS review_congestion_afternoon,
-                           CASE WHEN COUNT(review_congestion_evening) >= 2 THEN 1 ELSE 0 END AS review_congestion_evening,
-                           CASE WHEN COUNT(review_congestion_night) >= 2 THEN 1 ELSE 0 END AS review_congestion_night,
+                           CASE WHEN COUNT(review_congestion_morning) >= 1 THEN 1 ELSE 0 END AS review_congestion_morning,
+                           CASE WHEN COUNT(review_congestion_afternoon) >= 1 THEN 1 ELSE 0 END AS review_congestion_afternoon,
+                           CASE WHEN COUNT(review_congestion_evening) >= 1 THEN 1 ELSE 0 END AS review_congestion_evening,
+                           CASE WHEN COUNT(review_congestion_night) >= 1 THEN 1 ELSE 0 END AS review_congestion_night,
                            COUNT(*) AS review_total_cnt
                     FROM place_reviews
                     WHERE place_pk =${place_pk}`
@@ -98,8 +111,8 @@ exports.readPlace = async (place_pk) => {
                         WHERE place_pk = ${place_pk} 
                         GROUP BY facility_pk 
                     ) fp
-                    ON fp.facility_pk = f.facility_pk
-                    WHERE cnt >= 2`
+                    ON fp.facility_pk = f.facility_pk`
+//                     WHERE cnt >= 2` 나중에 활성화 시키기
 
     const result1 = await db.query(query1);
     const result2 = await db.query(query2);
