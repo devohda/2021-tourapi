@@ -131,3 +131,20 @@ exports.readPlace = async (place_pk) => {
     }
     return result;
 };
+
+// 공간 한줄팁 조회
+exports.readPlaceCommentList = async (place_pk) => {
+    const query = `SELECT cpm.collection_pk, cpc_create_time, cpc_comment, collection_name, c.user_pk, user_nickname, user_img                 
+                   FROM collection_place_comment cpc 
+                   INNER JOIN collection_place_map cpm 
+                   ON cpm.cpm_map_pk = cpc.cpm_map_pk
+                   INNER JOIN collections c 
+                   ON c.collection_pk = cpm.collection_pk
+                   INNER JOIN users u 
+                   ON u.user_pk = c.user_pk
+                   WHERE cpm.place_pk = ${place_pk}
+                   ORDER BY cpm.cpm_map_pk DESC
+                   `
+    const result = await db.query(query);
+    return result;
+};
