@@ -45,7 +45,7 @@ exports.readUserList = async (keyword, sort, type) => {
                 query1 += ' ORDER BY like_total_cnt DESC, u.user_pk ASC';
                 break;
             default:
-                query1 += ' ORDER BY u.user_pk ASC';
+                query1 += ' ORDER BY collection_cnt DESC, u.user_pk ASC';
         }
 
         if(type === 'MAIN'){
