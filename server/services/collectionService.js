@@ -360,13 +360,19 @@ exports.readCollectionCommentList = async (collection_pk) => {
 // 보관함 대체 공간 리스트
 exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
     const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_type, cpr_order,
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score
                    FROM collection_place_replacement cpr
                    INNER JOIN places p
                    ON cpr.place_pk = p.place_pk
                    LEFT OUTER JOIN like_place lp
                    ON lp.place_pk = cpr.place_pk
                    AND lp.user_pk = ${user_pk}
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, AVG(review_score) AS review_score
+                       FROM place_reviews
+                       GROUP BY place_pk
+                   ) pr
+                   ON pr.place_pk = cpr.place_pk
                    WHERE cpm_map_pk = ${cpm_map_pk}
                    ORDER BY cpr_order ASC
                    `
