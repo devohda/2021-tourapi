@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const {files} = require("yarn/lib/cli");
 
 // 자유 보관함 생성
-exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
+exports.createFreeCollection = async (user_pk, collectionData) => {
 
     const conn = await db.pool.getConnection();
     let result = false;
@@ -12,8 +12,8 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         await conn.beginTransaction();
 
         // 보관함 생성
-        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private)
-                        VALUES (${mysql.escape(name)}, 0, ${user_pk}, ${isPrivate})`;
+        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private, collection_thumbnail)
+                        VALUES (${mysql.escape(collectionData.name)}, 0, ${user_pk}, ${collectionData.isPrivate}, ${mysql.escape(collectionData.img)})`;
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
@@ -24,8 +24,8 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        if (keywords.length > 0) {
-            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+        if (collectionData.keywords.length > 0) {
+            const insertKeywordsSet = collectionData.keywords.map(keyword => [collection_pk, keyword]);
 
             const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
             const result3 = await conn.query(query3, [insertKeywordsSet]);
@@ -44,7 +44,7 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
 };
 
 // 일정 보관함 생성
-exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, user_pk, keywords) => {
+exports.createPlanCollection = async (user_pk, collectionData) => {
 
     const conn = await db.pool.getConnection();
     let result = false;
@@ -64,8 +64,8 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         await conn.beginTransaction();
 
         // 보관함 생성
-        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private, collection_start_date, collection_end_date)
-                        VALUES (${mysql.escape(name)}, 1, ${user_pk}, ${isPrivate}, ${mysql.escape(startDate)}, ${mysql.escape(endDate)})`;
+        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private, collection_start_date, collection_end_date, collection_thumbnail)
+                        VALUES (${mysql.escape(collectionData.name)}, 1, ${user_pk}, ${collectionData.isPrivate}, ${mysql.escape(collectionData.startDate)}, ${mysql.escape(collectionData.endDate)}, ${mysql.escape(collectionData.img)})`;
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
@@ -75,14 +75,14 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        if (keywords.length > 0) {
-            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+        if (collectionData.keywords.length > 0) {
+            const insertKeywordsSet = collectionData.keywords.map(keyword => [collection_pk, keyword]);
             const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
             const result3 = await conn.query(query3, [insertKeywordsSet]);
         }
 
         // 보관함-장소 매핑에 시간 구획 라인 추가
-        for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
+        for (let day = 0; day <= betweenDay(collectionData.startDate, collectionData.endDate); day++) {
             // pm 12
             const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
                             VALUES (${collection_pk}, -1, ${day}, ${day * 2})`

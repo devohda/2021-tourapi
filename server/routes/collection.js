@@ -22,43 +22,117 @@ const bucket = storage.bucket('here-bucket');
 
 // CREATE
 // 자유 보관함 생성
-router.post('/free', verifyToken, async (req, res, next) => {
-    const {collectionData, keywords} = req.body;
+router.post('/free', verifyToken, multer.single('img'), async (req, res, next) => {
     const {user} = res.locals;
-    const result = await collectionService.createFreeCollection(collectionData, user.user_pk, keywords);
 
-    if (result.collection_pk) {
-        return res.status(200).json({
-            code: 200,
-            status: 'OK',
-            collectionId: result.collection_pk
-        });
-    } else {
-        return res.status(500).json({
-            code: 500,
-            status: 'SERVER ERROR'
-        });
+    if (!req.file) {
+        const {collectionData} = req.body;
+        const result = await collectionService.createFreeCollection(user.user_pk, JSON.parse(collectionData));
+
+        if (result.collection_pk) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK',
+                collectionId: result.collection_pk
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
     }
+
+    const blob = bucket.file(Date.now() + req.file.originalname);
+    const blobStream = blob.createWriteStream();
+
+    blobStream.on('error', err => {
+        next(err);
+    });
+
+    blobStream.on('finish', async () => {
+        // The public URL can be used to directly access the file via HTTP.
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+
+        const {collectionData: stringedCollectionData} = req.body;
+        const collectionData = {
+            ...JSON.parse(stringedCollectionData),
+            img: publicUrl
+        }
+        const result = await collectionService.createFreeCollection(user.user_pk, collectionData)
+
+        if (result.collection_pk) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK',
+                collectionId: result.collection_pk
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
+    });
+
+    blobStream.end(req.file.buffer);
 });
 
 // 일정 보관함 생성
-router.post('/plan', verifyToken, async (req, res, next) => {
-    const {collectionData, keywords} = req.body;
+router.post('/plan', verifyToken, multer.single('img'), async (req, res, next) => {
     const {user} = res.locals;
-    const result = await collectionService.createPlanCollection(collectionData, user.user_pk, keywords);
 
-    if (result.collection_pk) {
-        return res.status(200).json({
-            code: 200,
-            status: 'OK',
-            collectionId: result.collection_pk
-        });
-    } else {
-        return res.status(500).json({
-            code: 500,
-            status: 'SERVER ERROR'
-        });
+    if (!req.file) {
+        const {collectionData} = req.body;
+        const result = await collectionService.createPlanCollection(user.user_pk, JSON.parse(collectionData));
+
+        if (result.collection_pk) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK',
+                collectionId: result.collection_pk
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
     }
+
+    const blob = bucket.file(Date.now() + req.file.originalname);
+    const blobStream = blob.createWriteStream();
+
+    blobStream.on('error', err => {
+        next(err);
+    });
+
+    blobStream.on('finish', async () => {
+        // The public URL can be used to directly access the file via HTTP.
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+
+        const {collectionData: stringedCollectionData} = req.body;
+        const collectionData = {
+            ...JSON.parse(stringedCollectionData),
+            img: publicUrl
+        }
+        const result = await collectionService.createPlanCollection(user.user_pk, collectionData)
+
+        if (result.collection_pk) {
+            return res.status(200).json({
+                code: 200,
+                status: 'OK',
+                collectionId: result.collection_pk
+            });
+        } else {
+            return res.status(500).json({
+                code: 500,
+                status: 'SERVER ERROR'
+            });
+        }
+    });
+
+    blobStream.end(req.file.buffer);
 });
 
 // 보관함에 장소 추가
