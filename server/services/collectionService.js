@@ -317,7 +317,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     const query = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
                           CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
-                          cpc_comment AS comment
+                          cpc_comment AS comment, IFNULL(review_score, -1) AS review_score
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
                    ON p.place_pk = cpm.place_pk
@@ -332,6 +332,12 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
                    ON cpr.cpm_map_pk = cpm.cpm_map_pk
                    LEFT OUTER JOIN collection_place_comment cpc
                    ON cpc.cpm_map_pk = cpm.cpm_map_pk
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, AVG(review_score) AS review_score
+                       FROM place_reviews
+                       GROUP BY place_pk
+                   ) pr
+                   ON pr.place_pk = p.place_pk
                    WHERE collection_pk = ${collection_pk}
                    ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
