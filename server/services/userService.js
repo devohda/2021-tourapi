@@ -17,25 +17,35 @@ exports.readUserList = async (keyword, sort, type) => {
 
     try {
         // 유저 정보
-        let query1 = `SELECT u.user_pk, user_nickname, user_img
-                      FROM users u`
-
-        if (sort === "LIKE") {
-            query1 = ` SELECT u.user_pk, user_nickname, user_img, IFNULL(cnt, 0) AS like_total_cnt
-                       FROM users u
-                       LEFT OUTER JOIN (
-                           SELECT user_pk, COUNT(*) AS cnt FROM like_collection 
-                           GROUP BY user_pk
-                       ) lc
-                       ON lc.user_pk = u.user_pk`;
-        }
+        let query1 = `SELECT u.user_pk, user_nickname, user_img, IFNULL(cnt, 0) AS like_total_cnt, 
+                      IFNULL(collection_cnt, 0) AS collection_cnt
+                      FROM users u
+                      LEFT OUTER JOIN (
+                          SELECT user_pk, COUNT(*) AS cnt FROM like_collection 
+                          GROUP BY user_pk
+                      ) lc
+                      ON lc.user_pk = u.user_pk
+                      LEFT OUTER JOIN (
+                          SELECT user_pk, COUNT(*) AS collection_cnt
+                          FROM collections
+                          GROUP BY user_pk
+                      ) c
+                      ON c.user_pk = u.user_pk
+                      `
 
         if (keyword) {
             query1 += ` WHERE user_nickname LIKE ${mysql.escape(`%${keyword}%`)}`;
         }
 
-        if(sort === "LIKE"){
-            query1 += ` ORDER BY like_total_cnt DESC, u.user_pk ASC`;
+        switch (sort){
+            case 'COLLECTION' :
+                query1 += ' ORDER BY collection_cnt DESC, u.user_pk ASC';
+                break;
+            case 'LIKE':
+                query1 += ' ORDER BY like_total_cnt DESC, u.user_pk ASC';
+                break;
+            default:
+                query1 += ' ORDER BY collection_cnt DESC, u.user_pk ASC';
         }
 
         if(type === 'MAIN'){
@@ -53,17 +63,9 @@ exports.readUserList = async (keyword, sort, type) => {
             const result2 = await db.query(query2);
             const keywords = result2.map(keyword => keyword.keyword_title);
 
-            // 각 유저 별 만든 보관함 개수
-            const query3 = `SELECT COUNT(*) AS collection_cnt 
-                            FROM collections 
-                            WHERE user_pk = ${user.user_pk}`;
-            const [result3] = await db.query(query3);
-            const madeCollectionCnt = result3.collection_cnt;
-
             return {
                 ...user,
-                keywords,
-                madeCollectionCnt
+                keywords
             };
         }));
 
