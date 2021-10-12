@@ -221,6 +221,8 @@ const PlaceScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState({});
     const [reviewData, setReviewData] = useState({});
     const [collectionList, setCollectionList] = useState([]);
+    const [commentList, setCommentList] = useState([]);
+    const [commentLength, setCommentLength] = useState(0);
     const [facilityData, setFacilityData] = useState([]);
     const [morningCongestion, setMorningCongestion] = useState(0);
     const [afternoonCongestion, setAfternoonCongestion] = useState(0);
@@ -239,7 +241,8 @@ const PlaceScreen = ({route, navigation}) => {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
             }).then((res) => res.json())
                 .then((response) => {
@@ -265,6 +268,7 @@ const PlaceScreen = ({route, navigation}) => {
     useEffect(() => {
         getInitialData();
         getCollectionList();
+        getCommentList();
         () => {
             setPlaceData({});
             setReviewData({});
@@ -298,6 +302,36 @@ const PlaceScreen = ({route, navigation}) => {
                     if(response.data.length > 5) setHeight(150 + 90 * 5);
                     else setHeight(150 + 90 * response.data.length);
                     setCollectionList(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getCommentList = () => {
+        try {
+            fetch(`http://34.64.185.40/place/${data.place_pk}/comments`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then(res => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+                    setCommentList(response.data);
+                    setCommentLength(response.data.length);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -689,6 +723,79 @@ const PlaceScreen = ({route, navigation}) => {
                 </TouchableOpacity>
             </View>
         )
+    };
+
+    const ShowComments = props => {
+        const { item, index } = props;
+
+        return (
+            <View key={index}>
+            <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <View>
+                    { item.user_img ?
+                    <Image style={styles.reviewImage}
+                    source={require('../../assets/images/here_default.png')}></Image> :
+                    <Image style={styles.reviewImage}
+                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
+                    }
+                </View>
+                <View style={{marginLeft: 12, marginRight: 20}}>
+                    <View style={{
+                        backgroundColor: colors.defaultColor,
+                        height: 27,
+                        paddingVertical: 6,
+                        paddingLeft: 6,
+                        marginBottom: 6,
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        flexDirection: 'row'
+                    }}>
+                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
+                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
+                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
+                            {item.cpc_comment}</AppText>
+                    </View>
+                    {/* <View><AppText
+                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
+                    </AppText></View> */}
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: 267,
+                        marginTop: 4
+                    }}>
+                        <View style={{flexDirection: 'row'}}>
+                            <AppText style={{
+                                color: colors.gray[3],
+                                fontWeight: 'bold',
+                                fontSize: 12
+                            }}>by. </AppText>
+                            <AppText style={{color: colors.gray[3], fontSize: 12}}>{item.user_nickname}</AppText>
+                        </View>
+                        <View>
+                            <AppText
+                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
+                        </View>
+                    </View>
+                </View>
+            </View>
+
+            <View style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.red_gray[6],
+                zIndex: -1000,
+                marginVertical: 18,
+                display: index === commentLength-1 && 'none'
+            }}></View>
+            </View>
+        )
     }
 
     return (
@@ -859,10 +966,6 @@ const PlaceScreen = ({route, navigation}) => {
                                     color: colors.mainColor,
                                     lineHeight: 32
                                 }}>한줄 TIP</AppText>
-                                <TouchableOpacity style={{alignItems: 'center', justifyContent: 'center'}}>
-                                    <Icon type="ionicon" name={'chevron-forward'} size={20}
-                                        color={colors.mainColor}></Icon>
-                                </TouchableOpacity>
                             </View>
                             <AppText style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</AppText>
                         </View>
@@ -873,178 +976,12 @@ const PlaceScreen = ({route, navigation}) => {
                                 fontSize: 14,
                                 lineHeight: 20.72,
                                 fontWeight: 'bold'
-                            }}>총 20개</AppText></View>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View><Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
-                                <View style={{marginLeft: 12, marginRight: 20}}>
-                                    <View style={{
-                                        backgroundColor: colors.defaultColor,
-                                        width: 267,
-                                        height: 27,
-                                        paddingVertical: 6,
-                                        paddingLeft: 6,
-                                        paddingRight: 61,
-                                        marginBottom: 6,
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexDirection: 'row'
-                                    }}>
-                                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에
-                                            xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                    </View>
-                                    <View><AppText
-                                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4
-                                    }}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                fontWeight: 'bold',
-                                                fontSize: 12
-                                            }}>by. </AppText>
-                                            <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
-                                        </View>
-                                        <View>
-                                            <AppText
-                                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-
-                            <View style={{
-                                width: '100%',
-                                height: 1,
-                                backgroundColor: colors.red_gray[6],
-                                zIndex: -1000,
-                                marginVertical: 18
-                            }}></View>
-
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View><Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
-                                <View style={{marginLeft: 12, marginRight: 20}}>
-                                    <View style={{
-                                        backgroundColor: colors.defaultColor,
-                                        width: 267,
-                                        height: 27,
-                                        paddingVertical: 6,
-                                        paddingLeft: 6,
-                                        paddingRight: 61,
-                                        marginBottom: 6,
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexDirection: 'row'
-                                    }}>
-                                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에
-                                            xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                    </View>
-                                    <View><AppText
-                                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4
-                                    }}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                fontWeight: 'bold',
-                                                fontSize: 12
-                                            }}>by. </AppText>
-                                            <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
-                                        </View>
-                                        <View>
-                                            <AppText
-                                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-
-                            <View style={{
-                                width: '100%',
-                                height: 1,
-                                backgroundColor: colors.red_gray[6],
-                                zIndex: -1000,
-                                marginVertical: 18
-                            }}></View>
-
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View><Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
-                                <View style={{marginLeft: 12, marginRight: 20}}>
-                                    <View style={{
-                                        backgroundColor: colors.defaultColor,
-                                        width: 267,
-                                        height: 27,
-                                        paddingVertical: 6,
-                                        paddingLeft: 6,
-                                        paddingRight: 61,
-                                        marginBottom: 6,
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexDirection: 'row'
-                                    }}>
-                                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에
-                                            xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                    </View>
-                                    <View><AppText
-                                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4
-                                    }}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                fontWeight: 'bold',
-                                                fontSize: 12
-                                            }}>by. </AppText>
-                                            <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
-                                        </View>
-                                        <View>
-                                            <AppText
-                                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                            }}>총 {commentLength}개</AppText></View>
+                            <FlatList data={commentList}
+                                renderItem={({item, index}) => <ShowComments item={item} index={index} key={index} />}
+                                keyExtractor={(item, idx) => {idx.toString();}}
+                                key={(item, idx) => {idx.toString();}}
+                                nestedScrollEnabled/>
                         </View>
                     </View>
                 </View>

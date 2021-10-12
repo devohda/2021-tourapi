@@ -9,7 +9,7 @@ import AppText from '../../components/AppText';
 import { tipsList } from '../../contexts/TipsListContextProvider';
 
 const TipsList = props => {
-    const { comment, data, idx, day, isEditPage, isCommentDeleted, isDeletedComment} = props;
+    const { comment, data, idx, day, isEditPage, postPlaceComment, putPlaceComment, isCommentDeleted, isDeletedComment} = props;
     const {colors} = useTheme();
     const [addVisible, setAddVisible] = useState(false);
     const [editVisible, setEditVisible] = useState(false);
@@ -63,13 +63,7 @@ const TipsList = props => {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
-                            // const newArr = [...tmpData];
-                            // if(isFree) newArr[idx].tip = changedTip;
-                            // else newArr[day].places[idx].tip = changedTip;
-                            // setTmpData(newArr);
-                            
-                            // console.log(changedTip === '')
-                            // if(changedTip !== '') postPlaceComment(data.cpm_map_pk, changedTip);
+                            if(changedTip !== '') postPlaceComment(data.cpm_map_pk, changedTip);
                             setAddVisible(false);
                         }}>
                             <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -99,7 +93,7 @@ const TipsList = props => {
                         <AppText style={{color: colors.gray[3], fontSize: 12, fontWeight: '500', lineHeight: 19.2, textAlign: 'center'}}>{data.place_name}을 위한 팁을 공유해주세요!</AppText>
                     </View>
                     <View style={{marginTop: 14}}>
-                        <TextInput defaultValue={defaultValue} onChangeText={(text)=>{
+                        <TextInput defaultValue={comment} onChangeText={(text)=>{
                                 setChangedTip(text);
                             }}
                             style={{
@@ -124,11 +118,6 @@ const TipsList = props => {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
-                            const newArr = [...tmpData];
-                            if(isFree) newArr[idx].tip = changedTip;
-                            else newArr[day].places[idx].tip = changedTip;
-                            setTmpData(newArr);
-                            // console.log(tmpData)
                             if(changedTip !== comment) putPlaceComment(data.cpm_map_pk, changedTip);
                             setEditVisible(false);
                         }}>
@@ -163,7 +152,9 @@ const TipsList = props => {
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
-                                //삭제 코드
+                                let newArr = [...isDeletedComment];
+                                newArr[idx] = true;
+                                isCommentDeleted(newArr);
                                 setDeleteVisible(false);
                             }}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -200,15 +191,10 @@ const TipsList = props => {
 
     return(
         <View flex={1}>
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+        <View style={[{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}, isDeletedComment[idx] && comment && {display: 'none'}]}>
             { isEditPage && comment &&
             <TouchableOpacity onPress={()=>{
                 setDeleteVisible(true);
-                    let newArr = [...isDeletedComment];
-                    console.log(newArr)
-                    newArr[idx] = true;
-                    // setIsDeletedOrigin(newArr);
-                    isCommentDeleted(newArr);
             }} disabled={props.private === 1 ? false : true}>
                 <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>

@@ -32,10 +32,31 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const { data, day, postReplacement, pk, getReplacement } = route.params;
     const [placeData, setPlaceData] = useState({});
     const [replacementData, setReplacementData] = useState([]);
+    const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
     const [isEditSpace, setIsEditSpace] = useState(false);
     const isFocused = useIsFocused();
     const [token, setToken] = useToken();
     const refRBSheet = useRef();
+
+    const setDeletedData = (data) => {
+        var newArr = [];
+        for(var i=0;i<data.length;i++) {
+            newArr.push(false);
+        }
+        setIsDeletedReplacement(newArr);
+    };
+
+    const isReplacementDeleted = (deletedData) => {
+        setIsDeletedReplacement(deletedData);
+    };
+
+    const checkDeletedReplacement = () => {
+        for(var i=0;i<isDeletedReplacement.length;i++) {
+            if(isDeletedReplacement[i] !== false) {
+                deleteReplacement(data.cpm_map_pk, replacementData[i].place_pk);
+            }
+        }
+    };
 
     useEffect(() => {
         getInitialData();
@@ -51,7 +72,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
             }).then((res) => res.json())
                 .then((response) => {
@@ -85,9 +107,74 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         setToken(null);
                         setIsSignedIn(false);
                         return;
-                    }
+                    };
+                    console.log(response.data)
                     setReplacementData(response.data);
+                    setDeletedData(response.data);
                     // getReplacement(data.cpm_map_pk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deleteReplacement = (cpmMapPk, place_pk) => {
+        //대체공간 삭제
+        console.log(cpmMapPk); console.log(place_pk)
+        try {
+            fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialReplacementData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deleteAllReplacement = (cpmMapPk) => {
+        //대체공간 자체를 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacements`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    navigation.goBack();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -117,6 +204,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         return;
                     }
                     getInitialData();
+                    getInitialReplacementData();
+                    getReplacement(data.cpm_map_pk);
                     console.log(response)
                 })
                 .catch((err) => {
@@ -147,7 +236,9 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         return;
                     }
                     getInitialData();
+                    getInitialReplacementData();
                     console.log(response);
+                    getReplacement(data.cpm_map_pk);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -221,7 +312,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         <TouchableOpacity onPress={() => {
                             props.refRBSheet.current.close();
                             setDeleteMenu(!deleteMenu);
-                            // deleteCollection();
+                            deleteAllReplacement(data.cpm_map_pk);
                         }}>
                             <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
@@ -305,8 +396,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                     onPress={() => {
                                         setIsEditSpace(false);
                                         // console.log('나 맞아용!!!!!!')
-                                        // isDeleted(isDeletedOrigin);
-                                        // checkDeletedPlace();
+                                        isReplacementDeleted(isDeletedReplacement);
+                                        checkDeletedReplacement();
                                         //완료를 눌렀을 경우에만 수정 삭제가 되도록...
                                     }}>
                                     <View>
@@ -388,9 +479,9 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
                             <TouchableOpacity onPress={() => {
                                     if (placeData.like_flag) {
-                                        DeleteLikedPlace(data.place_pk);
+                                        DeleteLikedPlace(placeData.place_pk);
                                     } else {
-                                        LikePlace(data.place_pk);
+                                        LikePlace(placeData.place_pk);
                                     }
                                 }}>
                                 <Jewel width={26} height={21}
@@ -422,7 +513,9 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     <SafeAreaView>
                         <SafeAreaView>
                                 <FlatList data={replacementData}
-                                    renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} private={0} pk={pk}/>}
+                                    renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} private={0} pk={pk} likeFlag={item.like_flag} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
+                                    />}
                                     keyExtractor={(item, idx) => {idx.toString();}}
                                     key={(item, idx) => {idx.toString();}}
                                     nestedScrollEnabled/>

@@ -43,7 +43,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularCollectionData = (day) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=POPULAR&term=${decodeURIComponent(day)}`, {
+            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${decodeURIComponent(day)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -71,7 +71,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularPlaceData = () => {
         try {
-            fetch('http://34.64.185.40/place/list?type=MAIN&sort=POPULAR', {
+            fetch('http://34.64.185.40/place/list?type=MAIN&sort=LIKE', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

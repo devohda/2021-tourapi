@@ -160,11 +160,11 @@ const PlaceTab = ({navigation}) => {
         }
     };
 
-    const LikePlace = (pk) => {
-        //공간 좋아요
+    const DeleteLikedPlace = (pk) => {
+        //공간 좋아요 삭제
         try {
             fetch(`http://34.64.185.40/like/place/${pk}`, {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -189,25 +189,25 @@ const PlaceTab = ({navigation}) => {
         }
     };
 
-    const DeleteLikedPlace = (pk) => {
-        //공간 좋아요 삭제
+    const DeleteLikedCollection = (pk) => {
         try {
-            fetch(`http://34.64.185.40/like/place/${pk}`, {
+            fetch(`http://34.64.185.40/like/collection/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
-                }
-            }).then((res) => res.json())
+                },
+            }).then(res => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    getLikedPlace();
+                    console.log(response);
+                    getLikedCollection();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -300,16 +300,12 @@ const PlaceTab = ({navigation}) => {
                 }
                 <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 113, position: 'absolute'}}>
                         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                            {/* <TouchableOpacity onPress={() => {
-                                if (item.like_flag) {
-                                    DeleteLikedPlace(item.place_pk);
-                                } else {
-                                    LikePlace(item.place_pk);
-                                }
+                            <TouchableOpacity onPress={() => {
+                                DeleteLikedPlace(item.place_pk);
                             }}>
                                 <Jewel width={26} height={21}
-                                style={[{marginTop: 10, marginRight: 10}, item.like_flag ? {color: colors.red[3]} : {color: colors.defaultColor}]}/>
-                            </TouchableOpacity> */}
+                                style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
+                            </TouchableOpacity>
                         </View>
                 </View>
                     <View style={{marginLeft: 5, height: 67}}>
@@ -353,8 +349,9 @@ const PlaceTab = ({navigation}) => {
                 if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : item});
                 else navigation.navigate('FreeCollection', {data : item});
             }}>
-                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
-                    <View style={{height: '68%'}}> 
+                <View style={{overflow: 'hidden', borderRadius: 10}}>
+                    <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
+                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 163, position: 'absolute'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                             <View style={[styles.dirType, {
                                 borderColor: colors.backgroundColor,
@@ -369,42 +366,50 @@ const PlaceTab = ({navigation}) => {
                                 source={require('../../assets/images/lock_outline.png')}></Image>
                         </View>
                             }
+                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                            <TouchableOpacity onPress={() => {
+                                DeleteLikedCollection(item.collection_pk);
+                            }}>
+                                <Jewel width={26} height={21}
+                                style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
+                            </TouchableOpacity>
                         </View>
-                        {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/> */}
-                        <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
                     </View>
-                    <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                        {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/> */}
+                    </View>
+                    <View style={{marginLeft: 10, marginTop: 8, height: 86}}>
                         <AppText style={{
                             fontSize: 14,
                             fontWeight: '400',
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
-                        <View style={{marginTop: 4, flexDirection: 'row'}}>
+                        <View style={{marginTop: 4, flexDirection: 'row', width: '90%', flexWrap: 'wrap', alignItems: 'flex-start'}}>
                             {item.keywords.map((keyword, idx) => {
                                 return (
                                     <AppText key={idx} style={{
-                                        color: colors.gray[4],
+                                        color: colors.gray[2],
                                         fontSize: 10,
-                                        marginRight: 6.21
+                                        marginRight: 8,
+                                        lineHeight: 14
                                     }}># {keyword}</AppText>);
                             })}
                         </View>
-                        <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                        <View flexDirection="row" style={{position: 'absolute', bottom: 15, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
+                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[2]}}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
                                     <Image source={require('../../assets/images/here_icon.png')}
                                         style={{width: 8, height: 8, margin: 2}}></Image>
-                                    <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                                    <AppText style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>{item.like_cnt}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>
                                     <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
                                         style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[2],
                                         fontWeight: 'bold'
                                     }}>{item.place_cnt}</AppText>
                                 </View>
@@ -596,8 +601,7 @@ const styles = StyleSheet.create({
     },
     defaultImage: {
         width: '100%',
-        height: '100%',
-        position: 'absolute',
+        height: 163,
     },
     defaultPlaceImage: {
         width: '100%',

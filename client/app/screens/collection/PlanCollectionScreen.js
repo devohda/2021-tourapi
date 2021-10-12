@@ -94,6 +94,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const isReplacementDeleted = (deletedReplacementData) => {
+        console.log(deletedReplacementData)
         setIsDeletedReplacement(deletedReplacementData);
     };
 
@@ -186,7 +187,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    console.log(response.data)
                     setCollectionData(response.data);
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
@@ -230,7 +231,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-// console.log(response.data)
                     setPlaceData(response.data);
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
@@ -478,19 +478,19 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const postPlaceComment = () => {
+    const postPlaceComment = (mapPk, addedComment) => {
         //한줄평 등록
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${isPostedCommentMapPk}/comment`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: {
-                    comment: isPostedComment
-                }
+                body: JSON.stringify({
+                    comment: addedComment,
+                })
             }).then((res) => res.json())
                 .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
@@ -512,19 +512,19 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const putPlaceComment = (cpmMapPk, editedComment) => {
+    const putPlaceComment = (mapPk, editedComment) => {
         //한줄평 수정
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: {
-                    comment: editedComment
-                }
+                body: JSON.stringify({
+                    comment: editedComment,
+                })
             }).then((res) => res.json())
                 .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
@@ -581,6 +581,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const getReplacement = (cpmMapPk) => {
+        console.log(cpmMapPk)
         //대체공간 불러오기
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
@@ -797,8 +798,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
                 isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
                 isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
-                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement}
-                postReplacement={postReplacement} getReplacement={getReplacement} replacementData={replacementData}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
               />}
               keyExtractor={(item, idx) => {idx.toString();}}
               key={(item, idx) => {idx.toString();}}
@@ -817,8 +819,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
                 isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
                 isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
-                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
-                postReplacement={postReplacement} getReplacement={getReplacement} replacementData={replacementData}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
               />}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
@@ -1144,7 +1147,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditPage(false);
-                                        console.log('나 맞아용!!!!!!')
                                         isDeleted(isDeletedOrigin);
                                         isCommentDeleted(isDeletedComment);
                                         checkDeletedPlace();

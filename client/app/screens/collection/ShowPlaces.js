@@ -26,7 +26,8 @@ const ShowPlaces = props => {
         isCommentEdited, isEditedCommentMapPk, isEditedComment,
         isCommentDeleted, isDeletedComment,
         isReplacementGotten, isGottenReplacementMapPk,
-        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement,
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
+        postPlaceComment, putPlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
     const isFree = (typeof day === 'undefined');
@@ -353,10 +354,10 @@ const ShowPlaces = props => {
                         </View>
                         <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
                             isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
-                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} postReplacement={postReplacement} getReplacement={getReplacement}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
                         />
-                        <TipsList data={props.item} idx={props.index} day={props.day} private={props.private} isEditPage={isEditPage} isFree={isFree} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
+                        <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                     </View>
                 </TouchableHighlight> :
                 item.cpm_plan_day === day && length > 0 &&

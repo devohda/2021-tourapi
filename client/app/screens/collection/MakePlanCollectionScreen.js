@@ -216,8 +216,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
             fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'x-access-token': token
                 },
                 body: form

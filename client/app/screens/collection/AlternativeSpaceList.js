@@ -10,8 +10,8 @@ import BackIcon from '../../assets/images/back-icon.svg';
 const AlternativeSpaceList = props => {
     const { data, idx, day, length, isEditPage, navigation, pk,
         isReplacementGotten, isGottenReplacementMapPk,
-        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement,
-        postReplacement, getReplacement, replacementData
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
+        postReplacement, getReplacement, getInitialPlaceData, replacementData
     } = props;
     const {colors} = useTheme();
     const [visible, setVisible] = useState(false);
@@ -42,7 +42,8 @@ const AlternativeSpaceList = props => {
     return(
         <TouchableOpacity onPress={()=>{
             if(data.replacement_cnt) {
-                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, postReplacement: postReplacement, pk: pk, getReplacement: getReplacement, replacementData: replacementData});
+                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, postReplacement: postReplacement, pk: pk, getReplacement: getReplacement, getInitialPlaceData: getInitialPlaceData, replacementData: replacementData,
+                    isReplacementDeleted: isReplacementDeleted, checkDeletedReplacement: checkDeletedReplacement, isDeletedReplacement: isDeletedReplacement});
                 getReplacement(data.cpm_map_pk);
             }
             else navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
