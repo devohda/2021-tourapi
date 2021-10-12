@@ -136,10 +136,10 @@ const TipsList = props => {
             <Modal
                 visible={deleteVisible}
                 backdropStyle={styles.backdrop}
-                style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
+                style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
                 onBackdropPress={() => setDeleteVisible(false)}>
                 <Card disabled={true}
-                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor}}
+                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
                 >
                     <View style={{marginTop: 55}}>
                         <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁을 삭제할까요?</AppText>
@@ -194,7 +194,7 @@ const TipsList = props => {
         <View style={[{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}, isDeletedComment[idx] && comment && {display: 'none'}]}>
             { isEditPage && comment &&
             <TouchableOpacity onPress={()=>{
-                setDeleteVisible(true);
+                if(props.private) setDeleteVisible(true);
             }} disabled={props.private === 1 ? false : true}>
                 <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -206,11 +206,11 @@ const TipsList = props => {
             <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: comment || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: comment && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
                 <TouchableOpacity onPress={() => {
                     if(comment) {
-                        setEditVisible(true);
+                        if(props.private) setEditVisible(true);
                         setChangedTip(defaultValue);
                     }
                     else {
-                        setAddVisible(true);
+                        if(props.private) setAddVisible(true);
                     }
                     }}
                     >

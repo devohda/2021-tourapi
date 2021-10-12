@@ -6,22 +6,32 @@ import {
     TouchableHighlight, Alert,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { Icon } from 'react-native-elements';
+
 
 import AppText from '../../components/AppText';
-import AlternativeSpaceList from './AlternativeSpaceList';
 import TipsList from './TipsList';
+import { useToken } from '../../contexts/TokenContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
 import { setUpdated } from '../../contexts/SetUpdateContextProviders';
-import { useToken } from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-import { Icon } from 'react-native-elements';
+import AlternativeSpaceList from './AlternativeSpaceList';
+
 
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited, postPlaceComment, putPlaceComment, isCommentDeleted, isDeletedComment} = props;
+    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
+        isCommentPosted, isPostedCommentMapPk, isPostedComment,
+        isCommentEdited, isEditedCommentMapPk, isEditedComment,
+        isCommentDeleted, isDeletedComment,
+        isReplacementGotten, isGottenReplacementMapPk,
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
+        postPlaceComment, putPlaceComment,
+        postReplacement, getReplacement, replacementData
+    } = props;
     // console.log(item)
     const isFree = (typeof day === 'undefined');
     const [update, setUpdate] = setUpdated();
@@ -309,7 +319,11 @@ const ShowPlacesForFree = props => {
                             }
                         </View>
                     </View>
-                    <AlternativeSpaceList replacementCnt={item.replacementCnt} data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation}/>
+                    <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
+                            isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                            replacementData={replacementData}
+                        />
                     <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                 </View>
             </TouchableHighlight>
