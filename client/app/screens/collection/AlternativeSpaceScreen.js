@@ -341,13 +341,15 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
-                <AppText style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold'}}>
-                    대체 공간
-                </AppText>
-                {route.params.private && <>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <AppText style={{color: colors.mainColor, fontSize: 16, fontWeight: 'bold'}}>
+                        대체 공간
+                    </AppText>
+                </View>
+                <>
                     {
                         !isEditSpace ?
-                        <View style={{position: 'absolute', right: 0}}>
+                        <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
                             <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                                 style={{flex: 1, height: '100%'}} onPress={() => {
                                 refRBSheet.current.open();
@@ -391,7 +393,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 <DeleteModal refRBSheet={refRBSheet}/>
                             </RBSheet>
                         </View> :
-                            <View style={{position: 'absolute', right: 0}}>
+                            <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditSpace(false);
@@ -405,7 +407,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                     </View>
                                 </TouchableOpacity>
                             </View>
-                    }</>}
+                    }</>
             </View>
             <ScreenContainerView>
                 <View>

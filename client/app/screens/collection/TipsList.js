@@ -21,7 +21,9 @@ const TipsList = props => {
         isFree? tmpData[0].tip : tmpData[0].places[0].tip
     );
 
-    const AddModal = () => (
+    const AddModal = () => {
+        const [changed, setChanged] = useState('');
+        return (
         <Modal
             visible={addVisible}
             backdropStyle={styles.backdrop}
@@ -39,12 +41,13 @@ const TipsList = props => {
                     </View>
                     <View style={{marginTop: 14}}>
                         <TextInput defaultValue={data.tip} onChangeText={(text)=>{
-                            setChangedTip(text);
+                            setChanged(text);
+                            
                             }}
                             style={{
                                 color: colors.mainColor,
                                 borderWidth: 1,
-                                borderColor: changedTip ? colors.mainColor : colors.defaultColor,
+                                borderColor: changed ? colors.mainColor : colors.defaultColor,
                                 width: 295,
                                 height: 95,
                                 borderRadius: 10,
@@ -63,7 +66,10 @@ const TipsList = props => {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
-                            if(changedTip !== '') postPlaceComment(data.cpm_map_pk, changedTip);
+                            if(changed !== '') {
+                                postPlaceComment(data.cpm_map_pk, changed);
+                                setChangedTip(changed);
+                            }
                             setAddVisible(false);
                         }}>
                             <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -74,9 +80,11 @@ const TipsList = props => {
                 </View>
             </Card>
         </Modal>
-    );
+    )};
 
-    const EditModal = () => (
+    const EditModal = () => {
+        const [changed, setChanged] = useState('');
+        return (
         <Modal
             visible={editVisible}
             backdropStyle={styles.backdrop}
@@ -94,12 +102,12 @@ const TipsList = props => {
                     </View>
                     <View style={{marginTop: 14}}>
                         <TextInput defaultValue={comment} onChangeText={(text)=>{
-                                setChangedTip(text);
+                                setChanged(text);
                             }}
                             style={{
                                 color: colors.mainColor,
                                 borderWidth: 1,
-                                borderColor: changedTip ? colors.mainColor : colors.defaultColor,
+                                borderColor: changed ? colors.mainColor : colors.defaultColor,
                                 width: 295,
                                 height: 95,
                                 borderRadius: 10,
@@ -118,7 +126,10 @@ const TipsList = props => {
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
-                            if(changedTip !== comment) putPlaceComment(data.cpm_map_pk, changedTip);
+                            if(changed !== comment && changed !== '') {
+                                putPlaceComment(data.cpm_map_pk, changed);
+                                setChangedTip(changed);
+                            }
                             setEditVisible(false);
                         }}>
                             <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -129,7 +140,7 @@ const TipsList = props => {
                 </View>
             </Card>
         </Modal>
-    );
+    )};
 
     const DeleteModal = () => {
         return (
