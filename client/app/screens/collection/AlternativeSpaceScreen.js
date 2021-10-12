@@ -410,7 +410,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             <ScreenContainerView>
                 <View>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={()=>navigation.navigate('Place', {data: placeData})}>
                             <View style={{flexDirection: 'row', width: '100%'}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
