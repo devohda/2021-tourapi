@@ -185,38 +185,40 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
         var forPostEnable = 0;
         if (isEnabled === true) forPostEnable = 1;
 
-        var forPostData = {};
+        var forPostData = {};            forPostData = {
+            name: collectionName,
+            isPrivate: forPostEnable,
+            keywords: [],
+        }
         if(datas.length === 0) {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate: forPostEnable,
-                    startDate: startDate,
-                    endDate: endDate
-                },
+                name: collectionName,
+                isPrivate: forPostEnable,
+                startDate: startDate,
+                endDate: endDate,
                 keywords: []
             }
         } else {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate : forPostEnable,
-                    startDate: startDate,
-                    endDate: endDate
-                },
+                name: collectionName,
+                isPrivate : forPostEnable,
+                startDate: startDate,
+                endDate: endDate,
                 keywords: datas
             }
         }
+
+        let form = new FormData();
+        form.append('collectionData', JSON.stringify(forPostData));
+        form.append('img', 'default-red');
 
         try {
             fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify(forPostData)
+                body: form
             }).then(res => res.json())
             .then(response => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){

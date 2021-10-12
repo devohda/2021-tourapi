@@ -10,7 +10,6 @@ import {
     TextInput,
     Pressable,
     FlatList,
-    Animated,
     Modal,
     Alert
 } from 'react-native';
@@ -24,6 +23,8 @@ import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
+import ScreenContainerView from '../../components/ScreenContainerView';
+
 import { tipsList } from '../../contexts/TipsListContextProvider';
 import {useToken} from '../../contexts/TokenContextProvider';
 import { updatedList } from '../../contexts/UpdatedListContextProvider';
@@ -33,18 +34,14 @@ import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
 
 import Jewel from '../../assets/images/jewel.svg';
-import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import SlideMenu from '../../assets/images/menu_for_edit.svg';
 import DefaultProfile from '../../assets/images/profile_default.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -55,11 +52,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
     const [updatedData, setUpdatedData] = updatedList();
-    const [tmpPlaceData, setTmpPlaceData] = useState([]);
-    const [visible, setVisible] = useState(false);
     const [isEditPage, setIsEditPage] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -73,8 +67,35 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const refRBSheet = useRef();
+    const [replacementData, setReplacementData] = useState([]);
+
     const isDeleted = (deletedData) => {
         setIsDeletedOrigin(deletedData);
+    };
+
+    const isCommentPosted = (postedCommentMapPk, postedComment) => {
+        //map pk랑 comment
+        setIsPostedCommentMapPk(postedCommentMapPk);
+        setIsPostedComment(postedComment);
+    };
+
+    const isCommentEdited = (editedCommentMapPk, editedComment) => {
+        //map pk랑 comment
+        setIsEditedCommentMapPk(editedCommentMapPk);
+        setIsEditedComment(editedCommentMapPk);
+    };
+
+    const isCommentDeleted = (deletedCommentData) => {
+        setIsDeletedComment(deletedCommentData);
+    };
+
+    const isReplacementGotten = (gottenReplacementData) => {
+        setIsGottenReplacementMapPk(gottenReplacementData);
+    };
+
+    const isReplacementDeleted = (deletedReplacementData) => {
+        console.log(deletedReplacementData)
+        setIsDeletedReplacement(deletedReplacementData);
     };
 
     const getUserData = () => {
@@ -166,7 +187,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    console.log(response.data)
                     setCollectionData(response.data);
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
@@ -210,7 +231,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPlaceData(response.data);
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
@@ -263,6 +283,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    //댓글
     const [comments, setComments] = useState('');
 
     const postCollectionCommentsData = (comment) => {
@@ -297,6 +318,58 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const checkDeletedPlace = () => {
+        for(var i=0;i<isDeletedOrigin.length;i++) {
+            if(isDeletedOrigin[i] === true) {
+                // console.log(placeData[i]);
+                deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
+            }
+        }
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
+        }
+    };
+
+    const checkDeletedReplacement = () => {
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
+        }
+    }
+
+    const deletePlace = (map_pk, day) => {
+        // 공간 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${map_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const checkTrue = () => {
         if (collectionData.collection_private) return true;
         return false;
@@ -308,29 +381,22 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const [isPress, setIsPress] = useState([]);
-
-    const checkDeletedPlace = () => {
-        for(var i=0;i<isDeletedOrigin.length;i++) {
-            if(isDeletedOrigin[i] === true) {
-                // console.log(placeData[i]);
-                deletePlace(placeData[i].place_pk, placeData[i].cpm_plan_day);
-            }
+    const setFalse = (data) => {
+        var pressed = [];
+        for (let i = 0; i < data.length; i++) {
+            pressed.push(false);
         }
+        setIsLimited(pressed);
     };
-
-    const deletePlace = (place_pk, day) => {
-        // 공간 삭제
+    const deleteCollection = () => {
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    planDay: day,
-                })
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
@@ -340,7 +406,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    getInitialPlaceData();
+                    Alert.alert('', '삭제되었습니다.');
+                    navigation.goBack();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -411,9 +478,226 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const deleteCollection = () => {
+    const postPlaceComment = (mapPk, addedComment) => {
+        //한줄평 등록
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: addedComment,
+                })
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const putPlaceComment = (mapPk, editedComment) => {
+        //한줄평 수정
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: editedComment,
+                })
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deletePlaceComment = (cpmMapPk, deletedComment) => {
+        //한줄평 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: {
+                    comment: deletedComment
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getReplacement = (cpmMapPk) => {
+        console.log(cpmMapPk)
+        //대체공간 불러오기
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    setReplacementData(response.data);
+                    setDeletedReplacementData(response.data)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const setDeletedReplacementData = (data) => {
+        var newArr = [];
+        for(var i=0;i<data.length;i++) {
+            newArr.push(false);
+        }
+        setIsDeletedReplacement(newArr);
+    }
+
+    const postReplacement = (mapPk, placePk, prev) => {
+        //대체공간 추가
+        // console.log(replacementData.length+prev+1);
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    order: replacementData.length+prev+1,
+                    placeId: placePk
+                })
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    // console.log('hi')
+                    console.log(response);
+                    // getInitialPlaceData();
+                    getReplacement(mapPk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const putReplacement = (cpmMapPk, editedComment) => {
+        //대체공간 수정
+        // replacementPlaceList : 추후
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/replacement/place`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: {
+                    replacementPlaceList : replacementPlaceList
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getReplacement(cpmMapPk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deleteReplacement = (cpmMapPk, place_pk) => {
+        //대체공간 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -421,16 +705,47 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+                    console.log(response)
+                    getReplacement(cpmMapPk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
 
-                    Alert.alert('', '삭제되었습니다.');
-                    navigation.goBack();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+    
+    const deleteAllReplacement = (cpmMapPk) => {
+        //대체공간 자체를 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getReplacement(cpmMapPk);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -447,21 +762,46 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    //공간 삭제
     const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
+
+    //한줄평 추가 : map Pk, 코멘트
+    const [isPostedCommentMapPk, setIsPostedCommentMapPk] = useState(0);
+    const [isPostedComment, setIsPostedComment] = useState('');
+
+    //한줄평 수정 : map Pk, 코멘트
+    const [isEditedCommentMapPk, setIsEditedCommentMapPk] = useState(0);
+    const [isEditedComment, setIsEditedComment] = useState('');
+
+    //대체공간 가져오기 : map Pk
+    const [isGottenReplacementMapPk, setIsGottenReplacementMapPk] = useState(0);
+
+    //한줄평 삭제, 대체공간 삭제
+    const [isDeletedComment, setIsDeletedComment] = useState([]);
+    const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
+
     const setDeletedData = (data) => {
         var newArr = [];
         for(var i=0;i<data.length;i++) {
             newArr.push(false);
         }
         setIsDeletedOrigin(newArr);
-        // isDeleted(newArr);
+        setIsDeletedComment(newArr);
     }
 
     const SwipeList = props => {
         return (
         <SafeAreaView>
             <FlatList data={placeData}
-              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}/>}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
+                isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+              />}
               keyExtractor={(item, idx) => {idx.toString();}}
               key={(item, idx) => {idx.toString();}}
           nestedScrollEnabled/>
@@ -473,21 +813,21 @@ const PlanCollectionScreen = ({route, navigation}) => {
         // <View></View>
         // <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
         <SafeAreaView>
-        <FlatList data={placeData}
-            renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}/>}
+            <FlatList data={placeData}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
+                isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+              />}
             keyExtractor={(item, idx) => {idx.toString();}}
             key={(item, idx) => {idx.toString();}}
         nestedScrollEnabled/>
         </SafeAreaView>
     );
-
-    const setFalse = (data) => {
-        var pressed = [];
-        for (let i = 0; i < data.length; i++) {
-            pressed.push(false);
-        }
-        setIsLimited(pressed);
-    };
 
     const ShowDays = ({item, index}) => {
         const idx = index;
@@ -521,7 +861,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : idx})}
+                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : idx, replace: false})}
                                 style={!collectionData.is_creator && {display: 'none'}}
                             >
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
@@ -592,10 +932,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [showMenu, setShowMenu] = useState(false);
     const [deleteMenu, setDeleteMenu] = useState(false);
 
-    const deleteMode = () => {
-        setDeleteMenu(true);
-    };
-
     const list = [
         { 
             title: '공간 수정',
@@ -625,11 +961,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
             visible={deleteMenu}
             onRequestClose={() => {
                 setDeleteMenu(!deleteMenu);
+                props.refRBSheet.current.close();
             }}
         >
             <View style={styles.centeredView}>
                 <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제할까요?</AppText>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.gray[4]}}
@@ -787,7 +1124,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 >
                                     {list.map((l, i) => (
                                         <TouchableOpacity onPress={()=>{
-                                            // console.log(i === 3)
                                             if(i === 0) {
                                                 setIsEditPage(true);
                                             }
@@ -811,8 +1147,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditPage(false);
-                                        console.log('나 맞아용!!!!!!')
                                         isDeleted(isDeletedOrigin);
+                                        isCommentDeleted(isDeletedComment);
                                         checkDeletedPlace();
                                     }}>
                                     <View>

@@ -20,7 +20,16 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 
 const ShowPlaces = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited} = props;
+
+    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
+        isCommentPosted, isPostedCommentMapPk, isPostedComment,
+        isCommentEdited, isEditedCommentMapPk, isEditedComment,
+        isCommentDeleted, isDeletedComment,
+        isReplacementGotten, isGottenReplacementMapPk,
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
+        postPlaceComment, putPlaceComment,
+        postReplacement, getReplacement, replacementData
+    } = props;
     const isFree = (typeof day === 'undefined');
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
@@ -55,7 +64,7 @@ const ShowPlaces = props => {
     const checkIndex = () => {
         var prevCount = 0;
         for(var i=0;i<index;i++) {
-            if(originData[i].place_pk === -1 || originData[i].place_pk === -2) prevCount += 1;
+            if(originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) prevCount += 1;
         }
         return (index+1) - prevCount;
     };
@@ -272,22 +281,25 @@ const ShowPlaces = props => {
                                                         marginHorizontal: 4, color: colors.gray[7],
                                                         textAlign: 'center',
                                                         fontSize: 10,
-                                                        fontWeight: 'bold'
+                                                        fontWeight: 'bold',
+                                                        display: parseInt(item.review_score) == -1 && 'none'
                                                     }}>|</AppText>
                                                     <Image source={require('../../assets/images/review_star.png')}
                                                         style={{
                                                             width: 10,
                                                             height: 10,
                                                             alignSelf: 'center',
-                                                            marginTop: '1%'
+                                                            marginTop: '1%',
+                                                            display: parseInt(item.review_score) == -1 && 'none'
                                                         }}></Image>
                                                     <AppText style={{
                                                         color: colors.gray[3],
                                                         textAlign: 'center',
                                                         fontSize: 10,
                                                         fontWeight: 'bold',
-                                                        marginLeft: 2
-                                                    }}>{item.star}</AppText>
+                                                        marginLeft: 2,
+                                                        display: parseInt(item.review_score) == -1 && 'none'
+                                                    }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                                                 </View>
                                                 <View style={{width: '100%'}}>
                                                     <AppText style={{
@@ -340,8 +352,12 @@ const ShowPlaces = props => {
                                 }
                             </View>
                         </View>
-                        <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation}/>
-                        <TipsList data={props.item} idx={props.index} day={props.day} private={props.private} isEditPage={isEditPage} isFree={isFree} />
+                        <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
+                            isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                            replacementData={replacementData}
+                        />
+                        <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                     </View>
                 </TouchableHighlight> :
                 item.cpm_plan_day === day && length > 0 &&

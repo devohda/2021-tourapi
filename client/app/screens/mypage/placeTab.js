@@ -13,6 +13,8 @@ import { useIsFocused } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
+import Jewel from '../../assets/images/jewel.svg';
+
 const PlaceTab = ({navigation}) => {
     const {colors} = useTheme();
     const [token, setToken] = useToken();
@@ -32,7 +34,6 @@ const PlaceTab = ({navigation}) => {
         }
     ]);
     const [currentRendering, setCurrentRendering] = useState(0);
-
 
     useEffect(() => {
         getLikedPlace();
@@ -57,7 +58,6 @@ const PlaceTab = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPlaceList(response.data);
                 })
                 .catch((err) => {
@@ -87,7 +87,6 @@ const PlaceTab = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -151,6 +150,64 @@ const PlaceTab = ({navigation}) => {
                     //     return;
                     // }
                     console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const DeleteLikedPlace = (pk) => {
+        //공간 좋아요 삭제
+        try {
+            fetch(`http://34.64.185.40/like/place/${pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    getLikedPlace();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const DeleteLikedCollection = (pk) => {
+        try {
+            fetch(`http://34.64.185.40/like/collection/${pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then(res => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response);
+                    getLikedCollection();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -235,44 +292,52 @@ const PlaceTab = ({navigation}) => {
             countPlaceView(item.place_pk);
             navigation.navigate('Place', {data : item});
         }}>
-            <View flex={1} style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
-                <View style={{height: '50%'}}> 
-                    {
-                        item.place_img ?
-                            <Image style={styles.defaultPlaceImage} source={{uri: item.place_img}}/> :
-                            <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
-                    }
+            <View style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
+                {
+                    item.place_img ?
+                        <Image style={styles.defaultPlaceImage} source={{uri: item.place_img}}/> :
+                        <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
+                }
+                <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 113, position: 'absolute'}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                            <TouchableOpacity onPress={() => {
+                                DeleteLikedPlace(item.place_pk);
+                            }}>
+                                <Jewel width={26} height={21}
+                                style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
+                            </TouchableOpacity>
+                        </View>
                 </View>
-                <View flex={1} style={{marginLeft: 5}}>
-                    <View style={{flexDirection: 'row', marginTop: 8}}>
-                        <AppText style={{
-                            color: colors.mainColor,
-                            fontSize: 10,
-                            marginTop: 2
-                        }}>{checkType(item.place_type)}</AppText>
-                        <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6,}}>|</AppText>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <Image source={require('../../assets/images/here_icon.png')}
-                                style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                            <AppText style={{color: colors.mainColor, fontSize: 10}}>4.8</AppText>
+                    <View style={{marginLeft: 5, height: 67}}>
+                        <View style={{flexDirection: 'row', marginTop: 8}}>
+                            <AppText style={{
+                                color: colors.mainColor,
+                                fontSize: 10,
+                                marginTop: 2
+                            }}>{checkType(item.place_type)}</AppText>
+                            <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6, display: parseInt(item.review_score) == -1 && 'none'}}>|</AppText>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', display: parseInt(item.review_score) == -1 && 'none'}}>
+                                <Image source={require('../../assets/images/here_icon.png')}
+                                    style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
+                                <AppText style={{color: colors.mainColor, fontSize: 10, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            </View>
+                        </View>
+                        <View style={{width: '100%'}}>
+                            <AppText style={{
+                                color: colors.mainColor,
+                                fontSize: 16,
+                                fontWeight: 'bold',
+                                lineHeight: 24.8
+                            }}>{item.place_name}</AppText>
+                        </View>
+                        <View style={{width: '90%', flexWrap: 'wrap', alignItems: 'flex-start', height: '100%'}}>
+                            <AppText style={{
+                                color: colors.gray[4],
+                                fontSize: 12,
+                                lineHeight: 19.2
+                            }}>{item.place_addr}</AppText>
                         </View>
                     </View>
-                    <View style={{width: '100%'}}>
-                        <AppText style={{
-                            color: colors.mainColor,
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                            lineHeight: 24.8
-                        }}>{item.place_name}</AppText>
-                    </View>
-                    <View style={{width: '100%'}}>
-                        <AppText style={{
-                            color: colors.gray[4],
-                            fontSize: 12,
-                            lineHeight: 19.2
-                        }}>{item.place_addr}</AppText>
-                    </View>
-                </View>
             </View>
         </TouchableOpacity>
     );
@@ -284,8 +349,9 @@ const PlaceTab = ({navigation}) => {
                 if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : item});
                 else navigation.navigate('FreeCollection', {data : item});
             }}>
-                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
-                    <View style={{height: '68%'}}> 
+                <View style={{overflow: 'hidden', borderRadius: 10}}>
+                    <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
+                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 163, position: 'absolute'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                             <View style={[styles.dirType, {
                                 borderColor: colors.backgroundColor,
@@ -300,41 +366,50 @@ const PlaceTab = ({navigation}) => {
                                 source={require('../../assets/images/lock_outline.png')}></Image>
                         </View>
                             }
+                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                            <TouchableOpacity onPress={() => {
+                                DeleteLikedCollection(item.collection_pk);
+                            }}>
+                                <Jewel width={26} height={21}
+                                style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
+                            </TouchableOpacity>
                         </View>
-                        <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/>
                     </View>
-                    <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                        {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/> */}
+                    </View>
+                    <View style={{marginLeft: 10, marginTop: 8, height: 86}}>
                         <AppText style={{
                             fontSize: 14,
                             fontWeight: '400',
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
-                        <View style={{marginTop: 4, flexDirection: 'row'}}>
+                        <View style={{marginTop: 4, flexDirection: 'row', width: '90%', flexWrap: 'wrap', alignItems: 'flex-start'}}>
                             {item.keywords.map((keyword, idx) => {
                                 return (
                                     <AppText key={idx} style={{
-                                        color: colors.gray[4],
+                                        color: colors.gray[2],
                                         fontSize: 10,
-                                        marginRight: 6.21
+                                        marginRight: 8,
+                                        lineHeight: 14
                                     }}># {keyword}</AppText>);
                             })}
                         </View>
-                        <View flexDirection="row" style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                        <View flexDirection="row" style={{position: 'absolute', bottom: 15, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%'}}>by {item.created_user_name}</AppText>
+                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[2]}}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
                                     <Image source={require('../../assets/images/here_icon.png')}
                                         style={{width: 8, height: 8, margin: 2}}></Image>
-                                    <AppText style={{fontSize: 8, color: colors.hashTagColor, fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                                    <AppText style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>{item.like_cnt}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>
                                     <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
                                         style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
-                                        color: colors.hashTagColor,
+                                        color: colors.gray[2],
                                         fontWeight: 'bold'
                                     }}>{item.place_cnt}</AppText>
                                 </View>
@@ -351,76 +426,91 @@ const PlaceTab = ({navigation}) => {
     const SelectBox = () => {
         return (
             <>
-                {
-                    showMenu && <View style={{
-                        position: 'absolute',
-                        width: 100,
-                        height: 80,
-                        backgroundColor: '#fff',
+            {
+            showMenu && <View style={{
+                position: 'absolute',
+                width: 80,
+                height: 80,
+                backgroundColor: '#fff',
+                // flex: 1,
+                borderRadius: 10,
+                zIndex: 0,
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                overflow: 'visible'
+                }}>
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('최근 추가순');
+                    }}
+                    style={{
                         flex: 1,
-                        borderRadius: 10,
-                        zIndex: 9900,
-
-                        shadowColor: '#000',
-                        shadowOffset: {
-                            width: 0,
-                            height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        elevation: 5,
-
-                        overflow: 'visible'
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
                     }}>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('최근 추가순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>최근 추가순</AppText>
-                        </TouchableOpacity>
-
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('인기순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>인기순</AppText>
-                        </TouchableOpacity>
-
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('리뷰순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>리뷰순</AppText>
-                        </TouchableOpacity>
-                    </View>
-                }
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                        {currentMenu === '최근 추가순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0,
+                        backgroundColor: colors.backgroundColor,
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('리뷰순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
+                        {currentMenu === '리뷰순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                </View>
+            }
             </>
         );};
 
@@ -448,25 +538,16 @@ const PlaceTab = ({navigation}) => {
                             <SelectBox />
                         </View>
                     </TouchableWithoutFeedback>
-                    <View flexDirection="row">
+                    <View flexDirection="row" style={{marginRight: 10}}>
                         <View flexDirection="row">
-                            <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                name={'funnel'} size={13}></Icon>
+                            <Icon style={{marginTop: Platform.OS === 'android' ? 3 : 1, marginRight: 2}} type="ionicon"
+                                name={'funnel'} size={13} color={colors.mainColor}></Icon>
                             <AppText style={{color: colors.mainColor}}>필터</AppText>
-                        </View>
-                        <View style={{marginHorizontal: 10}}><AppText
-                            style={{color: colors.subColor}}>|</AppText></View>
-                        <View flexDirection="row">
-                            <Icon style={{color: colors.mainColor, marginTop: 3, marginRight: 2}} type="ionicon"
-                                name={'pencil'} size={13}></Icon>
-                            <AppText style={{color: colors.mainColor}}>편집</AppText>
                         </View>
                     </View>
                 </View>
                 <SafeAreaView flex={1}>
-                    {/* <ScrollView> */}
                     <SetRendering />
-                    {/* </ScrollView> */}
                 </SafeAreaView>
             </ScreenContainerView>
         </View>
@@ -491,7 +572,7 @@ const styles = StyleSheet.create({
     },
     placeContainer: {
         width: '49%',
-        height: 250,
+        height: 180,
         borderRadius: 10,
         marginBottom: 11,
     },
@@ -520,14 +601,12 @@ const styles = StyleSheet.create({
     },
     defaultImage: {
         width: '100%',
-        height: '100%',
-        position: 'absolute',
+        height: 163,
     },
     defaultPlaceImage: {
         width: '100%',
-        height: '100%',
-        position: 'absolute',
-        borderRadius: 10
+        height: 113,
+        borderRadius: 10,
     },
     selectType: {
         borderWidth: 1,

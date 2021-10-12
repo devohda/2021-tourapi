@@ -43,7 +43,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularCollectionData = (day) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=POPULAR&term=${decodeURIComponent(day)}`, {
+            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${decodeURIComponent(day)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -71,7 +71,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularPlaceData = () => {
         try {
-            fetch('http://34.64.185.40/place/list?type=MAIN&sort=POPULAR', {
+            fetch('http://34.64.185.40/place/list?type=MAIN&sort=LIKE', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -86,7 +86,7 @@ export default function MainPageScreen({navigation}) {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data);
+                    // console.log(response.data);
                     setPopularPlace(response.data);
                 })
                 .catch((err) => {
@@ -249,7 +249,8 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                         <View style={styles.defaultImageView}>
-                            <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/>
+                            {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/> */}
+                            <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
                         </View>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
@@ -259,24 +260,21 @@ export default function MainPageScreen({navigation}) {
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
                         <View flexDirection="row"
-                            style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
+                            style={{marginTop: '24%', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     fontSize: 10,
-                                    width: '85%',
                                     color: colors.gray[4]
                                 }}>{item.created_user_name}</AppText>
                             </View>
-                            <View style={{flexDirection: 'row'}}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                        style={{margin: 2}}></Icon>
-                                    <AppText style={{
-                                        fontSize: 10,
-                                        color: colors.gray[4],
-                                        fontWeight: 'bold'
-                                    }}>{item.place_cnt}</AppText>
-                                </View>
+                            <View style={{flexDirection: 'row', marginRight: 10}}>
+                                <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
+                                    style={{margin: 2}}></Icon>
+                                <AppText style={{
+                                    fontSize: 10,
+                                    color: colors.gray[4],
+                                    fontWeight: 'bold'
+                                }}>{item.place_cnt}</AppText>
                             </View>
                         </View>
                     </View>
@@ -387,21 +385,24 @@ export default function MainPageScreen({navigation}) {
                                     marginHorizontal: 8, color: colors.gray[4],
                                     textAlign: 'center',
                                     fontSize: 10,
-                                    fontWeight: '700'
+                                    fontWeight: '700',
+                                    display: parseInt(data.review_score) == -1 && 'none'
                                 }}>|</AppText>
                                 <Image source={require('../assets/images/review_star.png')}
                                     style={{
                                         width: 10,
                                         height: 10,
                                         alignSelf: 'center',
+                                        display: parseInt(data.review_score) == -1 && 'none'
                                     }}></Image>
                                 <AppText style={{
                                     color: colors.gray[3],
                                     textAlign: 'center',
                                     fontSize: 10,
                                     fontWeight: '700',
-                                    marginLeft: 2
-                                }}>{data.star}</AppText>
+                                    marginLeft: 2,
+                                    display: parseInt(data.review_score) == -1 && 'none'
+                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                             </View>
                             <AppText style={{
                                 fontSize: 16,
@@ -470,21 +471,21 @@ export default function MainPageScreen({navigation}) {
                             <AppText style={{
                                 color: colors.mainColor,
                                 fontSize: 24,
-                                lineHeight: 36,
+                                lineHeight: 33.6,
                                 fontWeight: '700'
                             }}>가장 인기있는</AppText>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     color: colors.mainColor,
                                     fontSize: 24,
-                                    lineHeight: 36,
+                                    lineHeight: 33.6,
                                     fontWeight: '700'
                                 }}>보관함</AppText>
                             </View>
                         </View>
                     </View>
                     <View>
-                        <View style={{flexDirection: 'row', marginTop: 28}}>
+                        <View style={{flexDirection: 'row', marginTop: 12}}>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 onPress={() => {
                                     setDays('DAY');

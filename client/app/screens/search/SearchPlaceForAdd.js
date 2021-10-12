@@ -12,7 +12,7 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 const SearchPlaceForAdd = (props, {route, navigation}) => {
     const {colors} = useTheme();
-    const { pk, placeData, day} = props;
+    const { pk, placeData, day, replace} = props;
     const [placeList, setPlaceList] = useState([]);
     const [searchType, setSearchType] = useState('place');
     const [like, setLike] = useState(false);
@@ -22,8 +22,10 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const addPlace = (place_pk) => {
+        var prevLength = isPress.filter(element => (element === true)).length;
+
         try {
-            fetch(`http://34.64.185.40/collection/${pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${pk}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -32,7 +34,8 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                 },
                 body: JSON.stringify({
                     planDay: day,
-                    order: placeData.length,
+                    order: placeData.length+prevLength+1,
+                    placeId: place_pk,
                 })
             }).then(res => res.json())
             .then(response => {
@@ -168,9 +171,9 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
                             <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
-                            <View style={{...styles.score_line, backgroundColor: colors.gray[4]}}></View>
-                            <Star width={11} height={11} style={{marginTop: 2}} />
-                            <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                            <View style={{...styles.score_line, backgroundColor: colors.gray[4], display: parseInt(item.review_score) == -1 && 'none'}}></View>
+                            <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}} />
+                            <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                         </View>
                         <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
                         <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
@@ -183,13 +186,14 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         setIsPress(newArr);
                         // deletePlace(item.place_pk)
                     } else {
-                        // for(let i=0;i<newArr.length;i++) {
-                        //     if(i == index) continue;
-                        //     else newArr[i] = false;
-                        // }
                         newArr[index] = true;
                         setIsPress(newArr);
-                        addPlace(item.place_pk);
+                        if(replace) {
+                            const postReplacement = props.postReplacement;
+                            var prevLength = isPress.filter(element => (element === true)).length;
+                            postReplacement(pk, item.place_pk, prevLength);
+                        }
+                        else addPlace(item.place_pk);
                     }
                 }}
                 style={{width: '15%'}}

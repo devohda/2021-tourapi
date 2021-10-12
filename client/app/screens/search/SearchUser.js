@@ -43,7 +43,7 @@ const SearchUser = () => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    // console.log(response.data)
                     setSearchLength(response.data.length);
                     setUserList(response.data);
                 })
@@ -83,9 +83,9 @@ const SearchUser = () => {
             <View style={{alignItems: 'center', paddingBottom: 20, marginHorizontal: collectionMargin}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Image style={styles.authorImage}
-                        source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
+                        source={require('../../assets/images/here_default.png')}></Image>
                     <View style={{
-                        backgroundColor: colors.defaultColor,
+                        backgroundColor: colors.red_gray[2],
                         borderRadius: 50,
                         borderWidth: 5,
                         borderColor: colors.backgroundColor,
@@ -96,7 +96,7 @@ const SearchUser = () => {
                         padding: 2,
                         justifyContent: 'center',
                         alignItems: 'center'
-                    }}><AppText style={{color: colors.blue[1], textAlign: 'center', fontSize: 12}}>31</AppText></View>
+                    }}><AppText style={{color: colors.defaultColor, textAlign: 'center', fontSize: 12, fontWeight: '500', lineHeight: 19.2}}>{item.madeCollectionCnt}</AppText></View>
                 </View>
                 <AppText style={{
                     fontSize: 16,
@@ -108,7 +108,7 @@ const SearchUser = () => {
                 <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
                     {item.keywords.length != 0 &&
                     item.keywords.map((k) => {
-                        return <View style={{marginEnd: 3}}><AppText
+                        return <View style={{marginHorizontal: 3}}><AppText
                             style={{fontSize: 12, color: colors.gray[4]}}># {k}</AppText></View>;
                     })}
                 </View>
