@@ -35,7 +35,6 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
         const collectionId = collectionList[index].collection_pk;
         const placeCnt = collectionList[index].place_cnt;
         const placeId = placeData.place_pk;
-        console.log(collectionId); console.log(placeId)
         let day = -1;
         if(collectionList[index].collection_type) day = 0;
 
@@ -759,10 +758,6 @@ const PlaceScreen = ({route, navigation}) => {
                         <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
                             {item.cpc_comment}</AppText>
                     </View>
-                    {/* <View><AppText
-                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                    </AppText></View> */}
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',

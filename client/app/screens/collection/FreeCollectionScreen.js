@@ -292,8 +292,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const [comments, setComments] = useState('');
-
     const postCollectionCommentsData = (comment) => {
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
@@ -944,6 +942,55 @@ const FreeCollectionScreen = ({route, navigation}) => {
         )
     };
 
+    const ShowCollectionComments = () => {
+        const [comments, setComments] = useState('');
+        return (
+            <View style={{marginBottom: 143}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
+                    <AppText style={{
+                        color: colors.gray[3],
+                        fontSize: 14,
+                        marginStart: 11,
+                        marginTop: 5
+                    }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
+                </View>
+                <View style={{marginVertical: 20}}>
+                    <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
+                        <TextInput flex={1} style={{fontSize: 16}}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="보관함에 댓글을 남겨보세요!"
+                            value={comments}
+                            placeholderTextColor={colors.gray[5]}
+                            onChangeText={(text)=>setComments(text)}
+                            onSubmitEditing={()=>{
+                                setComments(comments);
+                                postCollectionCommentsData(comments);
+                                setComments('');
+                            }}
+                            />
+                        <Pressable style={{marginLeft: 5}} onPress={()=>{
+                            postCollectionCommentsData(comments);
+                            setComments('');
+                        }}>
+                            <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
+                                name={'pencil'} size={16}></Icon>
+                        </Pressable>
+                    </View>
+                </View>
+                {
+                    commentsData.length !== 0 &&
+                    <View style={{marginTop: 4}}>{
+                        commentsData.map((data, idx) => (
+                            <ShowComments data={data} key={idx} idx={idx}/>
+                        ))
+                    }</View>
+                }
+            </View>
+        )
+    }
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -1259,49 +1306,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 <ScreenDivideLine style={{marginVertical: 16}}/>
 
                 <ScreenContainerView>
-                    <View style={{marginBottom: 143}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
-                            <AppText style={{
-                                color: colors.gray[3],
-                                fontSize: 14,
-                                marginStart: 11,
-                                marginTop: 5
-                            }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
-                        </View>
-                        <View style={{marginVertical: 20}}>
-                            <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
-                                <TextInput flex={1} style={{fontSize: 16}}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                    placeholder="보관함에 댓글을 남겨보세요!"
-                                    value={comments}
-                                    placeholderTextColor={colors.gray[5]}
-                                    onChangeText={(text)=>setComments(text)}
-                                    onSubmitEditing={()=>{
-                                        setComments(comments);
-                                        postCollectionCommentsData(comments);
-                                        setComments('');
-                                    }}
-                                    />
-                                <Pressable style={{marginLeft: 5}} onPress={()=>{
-                                    postCollectionCommentsData(comments);
-                                    setComments('');
-                                }}>
-                                    <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
-                                        name={'pencil'} size={16}></Icon>
-                                </Pressable>
-                            </View>
-                        </View>
-                        {
-                            commentsData.length !== 0 &&
-                            <View style={{marginTop: 4}}>{
-                                commentsData.map((data, idx) => (
-                                    <ShowComments data={data} key={idx} idx={idx}/>
-                                ))
-                            }</View>
-                        }
-                    </View>
+                    <ShowCollectionComments />
                 </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>

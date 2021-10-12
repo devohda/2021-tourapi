@@ -228,28 +228,26 @@ const ShowPlaces = props => {
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
                         <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                                { isEditPage ?
                                     <TouchableOpacity onPress={()=>{
                                         let newArr = [...isDeletedOrigin];
                                         console.log(newArr)
                                         newArr[index] = true;
                                         // setIsDeletedOrigin(newArr);
                                         isDeleted(newArr);
-                                    }}>
+                                    }} style={!isEditPage && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
                                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                                 <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
                                             </View>
                                         </View>
-                                    </TouchableOpacity> :
-                                    <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
+                                    </TouchableOpacity>
+                                    <View style={[{justifyContent: 'center', alignItems: 'center', marginEnd: 12}, isEditPage && {display: 'none'}]}>
                                         <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                             <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
                                                 {checkIndex()}    
                                             </AppText>
                                         </View>
                                     </View>
-                                }
                             <TouchableOpacity onPress={() => {
                                 countPlaceView(item.place_pk);
                                 props.navigation.navigate('Place', {data: item})

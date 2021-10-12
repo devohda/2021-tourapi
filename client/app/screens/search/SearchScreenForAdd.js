@@ -14,7 +14,6 @@ import SearchPlaceForAdd from './SearchPlaceForAdd';
 const SearchScreenForAdd = ({route, navigation}) => {
     const {colors} = useTheme();
     const { pk, placeData, day, replace } = route.params;
-    const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     useEffect(() => {setSearchKeyword('')}, []);
 
@@ -118,24 +117,31 @@ const SearchScreenForAdd = ({route, navigation}) => {
         );
     };
 
+    const SearchBar = () => {
+        const [k, setK] = useState('');
+
+        return (
+            <View flexDirection="row" style={styles.search_box}>
+                <TextInput flex={1} style={{fontSize: 16}}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder="원하는 공간/보관함/유저를 검색해보세요"
+                    placeholderTextColor={colors.gray[5]}
+                    onChangeText={(text) => setK(text)}
+                    onSubmitEditing={()=> setSearchKeyword(k)}
+                />
+                <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
+                    <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
+                </Pressable>
+            </View>
+        )
+    };
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop title="검색" navigation={navigation}/>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
-                    <View flexDirection="row" style={styles.search_box}>
-                        <TextInput flex={1} style={{fontSize: 16}}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            placeholder="원하는 공간을 검색해보세요"
-                            placeholderTextColor={colors.gray[5]}
-                            onChangeText={(text) => setK(text)}
-                            onSubmitEditing={()=> setSearchKeyword(k)}
-                        />
-                        <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
-                            <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
-                        </Pressable>
-                    </View>
+                <SearchBar />
                     {searchKeyword !== '' && <View>
                         {replace ?
                             <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace}
