@@ -726,7 +726,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const ShowComments = props => {
         const { item, index } = props;
-
+console.log(item)
         return (
             <View key={index}>
             <View style={{
@@ -758,6 +758,10 @@ const PlaceScreen = ({route, navigation}) => {
                         <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
                             {item.cpc_comment}</AppText>
                     </View>
+                    {/* <View><AppText
+                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
+                    </AppText></View> */}
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -925,7 +929,6 @@ const PlaceScreen = ({route, navigation}) => {
                             region={region}
                             moveOnMarkerPress
                             tracksViewChanges={false}
-                            provider={PROVIDER_GOOGLE}
                             onMarkerPress={onMarkerPress}
                         >
                             <Marker coordinate={{
@@ -944,7 +947,7 @@ const PlaceScreen = ({route, navigation}) => {
                         {/* <ClusteredMapView
                             style={{height: 200}}
                             accessor={m => m.location}
-                            data={COORDS}
+                            data={COORDS}a
                             initialRegion={INITIAL_POSITION}
                             renderMarker={renderMarker}
                         /> */}
