@@ -26,7 +26,7 @@ type Item = {
   backgroundColor: string;
 };
 
-function Example() {
+const Example = () => {
   const [data, setData] = useState(exampleData);
 
   const scrollView = useRef<ScrollView>(null);
@@ -43,7 +43,7 @@ function Example() {
             justifyContent: 'center',
             opacity: 0.5,
           }}
-          onLongPress={drag}>
+          onPressIn={drag}>
           <Text
             style={{
               fontWeight: 'bold',

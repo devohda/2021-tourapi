@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const {files} = require("yarn/lib/cli");
 
 // 자유 보관함 생성
-exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
+exports.createFreeCollection = async (user_pk, collectionData) => {
 
     const conn = await db.pool.getConnection();
     let result = false;
@@ -12,8 +12,8 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         await conn.beginTransaction();
 
         // 보관함 생성
-        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private)
-                        VALUES (${mysql.escape(name)}, 0, ${user_pk}, ${isPrivate})`;
+        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private, collection_thumbnail)
+                        VALUES (${mysql.escape(collectionData.name)}, 0, ${user_pk}, ${collectionData.isPrivate}, ${mysql.escape(collectionData.img)})`;
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
@@ -24,8 +24,8 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        if(keywords.length > 0) {
-            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+        if (collectionData.keywords.length > 0) {
+            const insertKeywordsSet = collectionData.keywords.map(keyword => [collection_pk, keyword]);
 
             const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
             const result3 = await conn.query(query3, [insertKeywordsSet]);
@@ -44,7 +44,7 @@ exports.createFreeCollection = async ({name, isPrivate}, user_pk, keywords) => {
 };
 
 // 일정 보관함 생성
-exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, user_pk, keywords) => {
+exports.createPlanCollection = async (user_pk, collectionData) => {
 
     const conn = await db.pool.getConnection();
     let result = false;
@@ -64,8 +64,8 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         await conn.beginTransaction();
 
         // 보관함 생성
-        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private, collection_start_date, collection_end_date)
-                        VALUES (${mysql.escape(name)}, 1, ${user_pk}, ${isPrivate}, ${mysql.escape(startDate)}, ${mysql.escape(endDate)})`;
+        const query1 = `INSERT INTO collections (collection_name, collection_type, user_pk, collection_private, collection_start_date, collection_end_date, collection_thumbnail)
+                        VALUES (${mysql.escape(collectionData.name)}, 1, ${user_pk}, ${collectionData.isPrivate}, ${mysql.escape(collectionData.startDate)}, ${mysql.escape(collectionData.endDate)}, ${mysql.escape(collectionData.img)})`;
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
@@ -75,20 +75,20 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
         const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
-        if(keywords.length > 0) {
-            const insertKeywordsSet = keywords.map(keyword => [collection_pk, keyword]);
+        if (collectionData.keywords.length > 0) {
+            const insertKeywordsSet = collectionData.keywords.map(keyword => [collection_pk, keyword]);
             const query3 = 'INSERT INTO keywords_collections_map (collection_pk, keyword_pk) VALUES ?';
             const result3 = await conn.query(query3, [insertKeywordsSet]);
         }
 
         // 보관함-장소 매핑에 시간 구획 라인 추가
-        for (let day = 0; day <= betweenDay(startDate, endDate); day++) {
+        for (let day = 0; day <= betweenDay(collectionData.startDate, collectionData.endDate); day++) {
             // pm 12
-            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
-                            VALUES (${collection_pk}, -1, ${day})`
+            const query4 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
+                            VALUES (${collection_pk}, -1, ${day}, ${day * 2})`
             // pm 6
-            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day)
-                            VALUES (${collection_pk}, -2, ${day})`
+            const query5 = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order)
+                            VALUES (${collection_pk}, -2, ${day}, ${day * 2 + 1})`
 
             await conn.query(query4);
             await conn.query(query5);
@@ -107,13 +107,13 @@ exports.createPlanCollection = async ({name, isPrivate, startDate, endDate}, use
 };
 
 // 보관함에 장소 추가
-exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day, cpm_order) => {
 
     // 자유 보관함의 경우 날짜 없으므로 -1 저장
-    if(!cpm_plan_day) cpm_plan_day = -1;
+    if (cpm_plan_day === undefined) cpm_plan_day = -1;
 
-    const query = `INSERT IGNORE INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day})`;
+    const query = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day, cpm_order) 
+                   VALUES (${collection_pk}, ${place_pk}, ${cpm_plan_day}, ${cpm_order})`;
 
     const result = await db.query(query);
 
@@ -124,6 +124,22 @@ exports.createPlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) 
 exports.createCollectionComment = async (collection_pk, user_pk, comment) => {
     const query = `INSERT INTO collection_comments (user_pk, collection_pk, collection_comment)
                    VALUES(${user_pk}, ${collection_pk}, ${mysql.escape(comment)})`
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함 공간에 대체 공간 추가
+exports.createCollectionPlaceReplacement = async (cpm_map_pk, place_pk, cpr_order) => {
+    const query = `INSERT IGNORE INTO collection_place_replacement (cpm_map_pk, place_pk, cpr_order)
+                   VALUES (${cpm_map_pk}, ${place_pk}, ${cpr_order})`
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함 공간에 한줄평 생성
+exports.createCollectionPlaceComment = async (cpm_map_pk, cpc_comment) => {
+    const query = `INSERT INTO collection_place_comment (cpm_map_pk, cpc_comment)
+                   VALUES (${cpm_map_pk}, ${mysql.escape(cpc_comment)})`;
     const result = await db.query(query);
     return result;
 }
@@ -142,8 +158,8 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
         await conn.beginTransaction();
 
         let day = 100000;
-        if(term){
-            switch (term){
+        if (term) {
+            switch (term) {
                 case 'DAY':
                     day = 1;
                     break;
@@ -178,18 +194,18 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                       ON vc.collection_pk = c.collection_pk
                       `
 
-        if(type === 'MY' || keyword){
+        if (type === 'MY' || keyword) {
             query1 += ' WHERE';
 
-            if(keyword){
+            if (keyword) {
                 query1 += ` collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
             }
-            if(type === 'MY'){
+            if (type === 'MY') {
                 query1 += ` c.user_pk = ${user_pk}`;
             }
         }
 
-        switch (sort){
+        switch (sort) {
             case 'RESENT':
                 query1 += ' ORDER BY c.collection_pk DESC';
                 break;
@@ -206,7 +222,7 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                 query1 += ' ORDER BY c.collection_pk DESC';
         }
 
-        if(type === 'MAIN'){
+        if (type === 'MAIN') {
             query1 += ' LIMIT 10';
         }
 
@@ -299,16 +315,31 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query = `SELECT cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, 
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag
+    const query = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
+                          cpc_comment AS comment, IFNULL(review_score, -1) AS review_score
                    FROM collection_place_map cpm
                    LEFT OUTER JOIN places p
                    ON p.place_pk = cpm.place_pk
                    LEFT OUTER JOIN like_place lp
                    ON lp.place_pk = cpm.place_pk
                    AND lp.user_pk = ${user_pk}
+                   LEFT OUTER JOIN (
+                       SELECT cpm_map_pk, COUNT(*) AS replacement_cnt
+                       FROM collection_place_replacement
+                       GROUP BY cpm_map_pk
+                   ) cpr
+                   ON cpr.cpm_map_pk = cpm.cpm_map_pk
+                   LEFT OUTER JOIN collection_place_comment cpc
+                   ON cpc.cpm_map_pk = cpm.cpm_map_pk
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, AVG(review_score) AS review_score
+                       FROM place_reviews
+                       GROUP BY place_pk
+                   ) pr
+                   ON pr.place_pk = p.place_pk
                    WHERE collection_pk = ${collection_pk}
-                   ORDER BY cpm_plan_day ASC, cpm_map_pk ASC`;
+                   ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
     const result = await db.query(query);
     return result;
@@ -326,35 +357,137 @@ exports.readCollectionCommentList = async (collection_pk) => {
     return result;
 };
 
-// 보관함 장소 리스트 수정
-exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList) => {
+// 보관함 대체 공간 리스트
+exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
+    const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_type, cpr_order,
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score
+                   FROM collection_place_replacement cpr
+                   INNER JOIN places p
+                   ON cpr.place_pk = p.place_pk
+                   LEFT OUTER JOIN like_place lp
+                   ON lp.place_pk = cpr.place_pk
+                   AND lp.user_pk = ${user_pk}
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, AVG(review_score) AS review_score
+                       FROM place_reviews
+                       GROUP BY place_pk
+                   ) pr
+                   ON pr.place_pk = cpr.place_pk
+                   WHERE cpm_map_pk = ${cpm_map_pk}
+                   ORDER BY cpr_order ASC
+                   `
+    const result = await db.query(query);
+    return result;
+};
+
+// 보관함 정보 수정
+exports.updateCollection = async (collection_pk, collectionData) => {
+    console.log(collectionData);
 
     const conn = await db.pool.getConnection();
-    let result;
-
+    let result = false;
     try {
-        await conn.beginTransaction();
-
-        const query1 = `DELETE FROM collection_place_map 
-                        WHERE collection_pk = ${collection_pk}`
+        const query1 = `UPDATE collections 
+                        SET collection_name = ${mysql.escape(collectionData.name)},
+                            collection_private = ${collectionData.isPrivate},
+                            collection_thumbnail = ${mysql.escape(collectionData.img)}
+                        WHERE collection_pk = ${collection_pk}`;
         const [result1] = await conn.query(query1);
 
-        for (const place of placeList) {
-            const query2 = `INSERT INTO collection_place_map (collection_pk, place_pk, cpm_plan_day) 
-                            VALUES (${collection_pk}, ${place.placeId}, ${place.planDay})`
-            await conn.query(query2)
+        const query2 = `DELETE FROM keywords_collections_map
+                        WHERE collection_pk = ${collection_pk}`;
+        const [result2] = await conn.query(query2);
+
+        for(const keyword_pk of collectionData.keywords){
+            const query3 = `INSERT INTO keywords_collections_map (collection_pk, keyword_pk)
+                            VALUES (${collection_pk}, ${keyword_pk})`;
+            const [result3] = await conn.query(query3);
         }
 
         result = true;
         await conn.commit();
-    }catch (err){
+    } catch (err) {
+        console.log(err);
         result = false;
         await conn.rollback();
-    }finally {
+    } finally {
         conn.release();
         return result;
     }
 };
+
+// 보관함 장소 리스트 수정
+exports.updateCollectionPlaceList = async (user_pk, collection_pk, placeList, deletePlaceList) => {
+
+    const conn = await db.pool.getConnection();
+    let result = false;
+    try {
+        await conn.beginTransaction();
+
+        for (const placeData of placeList) {
+            const query1 = `UPDATE collection_place_map
+                            SET cpm_plan_day = ${placeData.planDay}, cpm_order = ${placeData.order}
+                            WHERE cpm_map_pk = ${placeData.cpm_map_pk}`;
+            await conn.query(query1);
+        }
+        // 삭제할 장소가 있으면 삭제하기
+        if (deletePlaceList) {
+            for (const cpm_map_pk of deletePlaceList) {
+                const query2 = `DELETE FROM collection_place_map 
+                                WHERE cpm_map_pk = ${cpm_map_pk}`
+                await conn.query(query2)
+            }
+        }
+
+        result = true;
+        await conn.commit();
+    } catch (err) {
+        result = false;
+        await conn.rollback();
+    } finally {
+        conn.release();
+        return result;
+    }
+};
+
+// 보관함 공간의 대체 공간 리스트 수정
+exports.updateCollectionPlaceReplacement = async (cpm_map_pk, replacementPlaceList) => {
+
+    const conn = await db.pool.getConnection();
+    let result = false;
+
+    try{
+        await conn.beginTransaction();
+
+        const query1 = `DELETE FROM collection_place_replacement
+                        WHERE cpm_map_pk = ${cpm_map_pk}`;
+        await conn.query(query1);
+
+        for(const replacePlace of replacementPlaceList){
+            const query2 = `INSERT INTO collection_place_replacement (cpm_map_pk, place_pk, cpr_order)
+                            VALUES (${replacePlace.cpm_map_pk}, ${replacePlace.placeId}, ${replacePlace.order})`;
+            await conn.query(query2);
+        }
+
+        result = true;
+        await conn.commit();
+    } catch (err) {
+        result = false;
+        await conn.rollback();
+    } finally {
+        conn.release();
+        return result;
+    }
+};
+
+// 보관함 공간 한줄평 수정
+exports.updateCollectionPlaceComment = async (cpm_map_pk, comment) => {
+    const query = `UPDATE collection_place_comment
+                   SET cpc_comment = ${mysql.escape(comment)}
+                   WHERE cpm_map_pk = ${cpm_map_pk}`
+    const result = await db.query(query);
+    return result;
+}
 
 // 보관함 삭제
 exports.deleteCollection = async (collection_pk) => {
@@ -364,15 +497,35 @@ exports.deleteCollection = async (collection_pk) => {
 };
 
 // 보관함에 장소 삭제
-exports.deletePlaceToCollection = async (collection_pk, place_pk, cpm_plan_day) => {
+exports.deletePlaceToCollection = async (collection_pk, cpm_map_pk) => {
     let query = `DELETE FROM collection_place_map 
-                 WHERE collection_pk = ${collection_pk} 
-                 AND place_pk = ${place_pk}`
+                 WHERE cpm_map_pk = ${cpm_map_pk}`
 
-    // 일정 보관함인 경우
-    if(cpm_plan_day){
-        query += ` AND cpm_plan_day = ${cpm_plan_day}`
-    }
     const result = db.query(query);
+    return result;
+}
+
+// 보관함 대체 공간 1개 삭제
+exports.deleteCollectionPlaceReplacement = async (cpm_map_pk, placeId) => {
+    const query = `DELETE FROM collection_place_replacement
+                   WHERE cpm_map_pk = ${cpm_map_pk}
+                   AND place_pk = ${placeId}`;
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함 대체 공간 전체 삭제
+exports.deleteCollectionPlaceReplacementAll = async (cpm_map_pk) => {
+    const query = `DELETE FROM collection_place_replacement
+                   WHERE cpm_map_pk = ${cpm_map_pk}`;
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함 공간 한줄평 삭제
+exports.deleteCollectionPlaceComment = async (cpm_map_pk) => {
+    const query = `DELETE FROM collection_place_comment
+                   WHERE cpm_map_pk = ${cpm_map_pk}`;
+    const result = await db.query(query);
     return result;
 }

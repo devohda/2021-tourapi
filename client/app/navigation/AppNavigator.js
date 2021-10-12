@@ -5,17 +5,20 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeNavigator from './HomeNavigator';
 import AuthenticationNavigator from './AuthenticationNavigator';
 import AuthenticationNavigator2 from './AuthenticationNavigator2';
-import SearchScreen from '../screens/SearchScreen';
-import PlaceScreen from '../screens/PlaceScreen';
+import SearchScreen from '../screens/search/SearchScreen';
+import PlaceScreen from '../screens/place/PlaceScreen';
 import MakePlanCollectionScreen from '../screens/collection/MakePlanCollectionScreen';
 import MakeFreeCollectionScreen from '../screens/collection/MakeFreeCollectionScreen';
 import PlanCollectionScreen from '../screens/collection/PlanCollectionScreen';
 import FreeCollectionScreen from '../screens/collection/FreeCollectionScreen';
 import SystemSettingScreen from '../screens/settings/SystemSettingScreen';
 import ProfileSettingScreen from '../screens/settings/ProfileSettingScreen';
-import {useToken} from '../contexts/TokenContextProvider';
-import SearchScreenForPlan from '../screens/collection/SearchScreenForPlan';
+import SearchScreenForAdd from '../screens/search/SearchScreenForAdd';
 import MakeReviewScreen from '../screens/review/MakeReviewScreen';
+import AlternativeSpaceScreen from '../screens/collection/AlternativeSpaceScreen';
+import EntireMap from '../screens/map/EntireMap';
+
+import {useToken} from '../contexts/TokenContextProvider';
 
 import * as SecureStore from 'expo-secure-store';
 const MainStack = createStackNavigator();
@@ -57,7 +60,7 @@ const AppNavigator = () => {
                 <>
                     <MainStack.Screen name="App" children={({navigation}) => <HomeNavigator navigation={navigation}/>}/>
                     <MainStack.Screen name="Search" component={SearchScreen} />
-                    <MainStack.Screen name="SearchForPlan" component={SearchScreenForPlan} />
+                    <MainStack.Screen name="SearchForAdd" component={SearchScreenForAdd} />
                     <MainStack.Screen name="Place" component={PlaceScreen}/>
                     <MainStack.Screen name="MakeReview" component={MakeReviewScreen} />
                     <MainStack.Screen name="MakePlanCollection" component={MakePlanCollectionScreen} />
@@ -67,6 +70,8 @@ const AppNavigator = () => {
                     <MainStack.Screen name="Authentication2" component={AuthenticationNavigator2}/>
                     <MainStack.Screen name="PlanCollection" component={PlanCollectionScreen} />
                     <MainStack.Screen name="FreeCollection" component={FreeCollectionScreen} />
+                    <MainStack.Screen name="AlternativeSpace" component={AlternativeSpaceScreen} />
+                    <MainStack.Screen name="ShowEntireMap" component={EntireMap} />
                 </>
             }
         </MainStack.Navigator>

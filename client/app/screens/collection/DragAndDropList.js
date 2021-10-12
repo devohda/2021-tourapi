@@ -175,7 +175,7 @@ function ListAnimation({
             <PanGestureHandler onGestureEvent={gestureHandler}>
                 <Animated.View>
                     <ShowPlaces day={day} item={data} index={index} key={index} isEditPage={isEditPage}
-                        isPress={isPress}/>
+                        isPress={isPress} length={data.length}/>
                 </Animated.View>
             </PanGestureHandler>
         </Animated.View>

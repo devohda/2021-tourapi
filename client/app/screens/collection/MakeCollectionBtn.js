@@ -6,7 +6,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import {useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
 
-export default function MakeCollectionBtn({navigation}) {
+export default function MakeCollectionBtn({route, navigation}) {
     const refRBSheet = useRef();
     const [clicked, setClicked] = useState(false);
     const {colors} = useTheme();
@@ -61,7 +61,7 @@ export default function MakeCollectionBtn({navigation}) {
                             margin: 10
                         }} onPress={() => {
                             refRBSheet.current.close();
-                            navigation.navigate('MakePlanCollection');
+                            navigation.navigate('MakePlanCollection', {update: false});
                             navigation.setOptions({tabBarVisible: false});
                         }}>
                             <AppText style={{
@@ -88,7 +88,7 @@ export default function MakeCollectionBtn({navigation}) {
                             margin: 10
                         }} onPress={() => {
                             refRBSheet.current.close();
-                            navigation.navigate('MakeFreeCollection');
+                            navigation.navigate('MakeFreeCollection', {update: false});
                             navigation.setOptions({tabBarVisible: false});
                         }}>
                             <AppText style={{

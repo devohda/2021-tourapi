@@ -31,14 +31,13 @@ import SearchIcon from '../../assets/images/search-icon.svg';
 
 export const navigationRef = React.createRef();
 
-const MakeFreeCollectionScreen = ({navigation}) => {
+const MakeFreeCollectionScreen = ({route, navigation}) => {
 
     const [token, setToken] = useToken();
     const {colors} = useTheme();
-
-
     const toastRef = useRef();
     const refRBSheet = useRef();
+    const { data, update } = route.params;
 
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
@@ -69,35 +68,31 @@ const MakeFreeCollectionScreen = ({navigation}) => {
         var forPostData = {};
         if(datas.length === 0) {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate: forPostEnable
-                },
-                keywords: []
+                name: collectionName,
+                isPrivate: forPostEnable,
+                keywords: [],
             }
         } else {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate : forPostEnable
-                },
-                keywords: datas
+                name: collectionName,
+                isPrivate : forPostEnable,
+                keywords: datas,
             }
         }
+
+        let form = new FormData();
+        form.append('collectionData', JSON.stringify(forPostData));
+        form.append('img', 'default-red');
 
         try {
             fetch('http://34.64.185.40/collection/free', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify(forPostData)
-            }).then((res) => {
-                res.json();
-            })
-                .then((response) => {
+                body : form
+            }).then(res => res.json())
+            .then(response => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
                     //     // Alert.alert('','로그인이 필요합니다');
                     //     await SecureStore.deleteItemAsync('accessToken');
@@ -105,12 +100,10 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    
+                    console.log(response)
                     const item = {
-                        'collection_name': collectionName,
-                        'collection_private': isEnabled,
-                        'collection_type': 0,
-                        'keywords': showDatas,
+                        'collection_pk': response.collectionId,
+                        'now': true,
                     };
                     Alert.alert('', '자유보관함이 생성되었습니다');
                     navigation.navigate('FreeCollection', {
@@ -137,6 +130,12 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
     useEffect(() => {
         getKeywords();
+        if(update) {
+            setCollectionName(data.collection_name);
+            if(data.collection_private) {
+                setIsEnabled(true);
+            }
+        }
     }, []);
 
     const getKeywords = useCallback(() => {
@@ -149,9 +148,13 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data)
+                    // console.log(response.data)
                     setKeywordData(response.data);
-                    setFalse();
+                    // console.log(update)
+                    if(update) {
+                        setFalseUpdated(response.data);
+                    }
+                    else setFalse();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -170,6 +173,15 @@ const MakeFreeCollectionScreen = ({navigation}) => {
         setIsPress(pressed);
     };
 
+    const setFalseUpdated = (keywords) => {
+        var pressed = [];
+        for (let i = 0; i < keywords.length; i++) {
+            if(data.keywords.indexOf(keywords[i].keyword_title) !== -1) pressed.push(true);
+            else pressed.push(false);
+        }
+        setIsPress(pressed);
+    };
+
     const SelectKeyword = () => {
         const setF = () => {
             var pressed = [];
@@ -184,7 +196,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
         const Keyword = ({keyword, idx}) => {
             return (
-                <View
+                <View key={idx}
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'center',
@@ -359,18 +371,20 @@ const MakeFreeCollectionScreen = ({navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <NavigationTop navigation={navigation} title="자유보관함 만들기"/>
+            <NavigationTop navigation={navigation} title={update ? "자유보관함 수정" : "자유보관함 만들기"}/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName ? {
+                            style={{
                                 color: colors.mainColor,
                                 fontSize: 20,
                                 fontWeight: 'bold'
-                            } : {fontSize: 20}]}
+                            }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
-                            onChangeText={(name) => setCollectionName(name)}>
+                            onChangeText={(name) => setCollectionName(name)}
+                            value={collectionName}
+                        >
                         </CustomTextInput>
                     </View>
                 </ScreenContainerView>
@@ -392,10 +406,12 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                             <View flexDirection="row">
                                 <SelectKeyword />
                                 {
-                                    keywordData.map((keyword, idx) => (
+                                    keywordData.map((keyword, idx) => {
+                                        // console.log(isPress)
+                                        return (
                                         <>{isPress[idx] === true &&
                                             <SelectedKeyword keyword={keyword} key={idx+'selected'}/>}</>
-                                    ))
+                                    )})
                                 }
                             </View>
                         </View>
@@ -437,7 +453,7 @@ const MakeFreeCollectionScreen = ({navigation}) => {
                                     color: colors.defaultColor,
                                     fontWeight: 'bold'
                                 }}
-                            >보관함 만들기</AppText>
+                            >{update ? "보관함 수정" : "보관함 만들기"}</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>

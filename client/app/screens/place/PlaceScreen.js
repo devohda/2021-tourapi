@@ -3,24 +3,28 @@ import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Di
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon, Rating} from 'react-native-elements';
-// import MapView, {Marker, UrlTile} from 'react-native-maps';
-import StarScore from '../components/StarScore';
-import NavigationTop from '../components/NavigationTop';
-import Score from '../components/Score';
-import Time from '../components/Time';
-import Facility from '../components/Facility';
-import AppText from '../components/AppText';
-import Jewel from '../assets/images/jewel.svg';
-import ScreenContainer from '../components/ScreenContainer';
-import ScreenContainerView from '../components/ScreenContainerView';
-import ScreenDivideLine from '../components/ScreenDivideLine';
-import {useToken} from '../contexts/TokenContextProvider';
+import MapView, {Marker, UrlTile, PROVIDER_GOOGLE} from 'react-native-maps';
+import ClusteredMapView from "react-native-maps-super-cluster";
+import ClusterView from './ClusterView';
 import * as SecureStore from 'expo-secure-store';
-import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
-const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}) => {
+import StarScore from '../../components/StarScore';
+import NavigationTop from '../../components/NavigationTop';
+import Score from '../../components/Score';
+import Time from '../../components/Time';
+import Facility from '../../components/Facility';
+import AppText from '../../components/AppText';
 
-    const [height, setHeight] = useState(150 + 90 * 5);
+import Jewel from '../../assets/images/jewel.svg';
+import CustomMarker from '../../assets/images/place/map-marker.svg';
+
+import ScreenContainer from '../../components/ScreenContainer';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import ScreenDivideLine from '../../components/ScreenDivideLine';
+import {useToken} from '../../contexts/TokenContextProvider';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+
+const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height, getCollectionList}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
@@ -29,23 +33,36 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     const postPlace = () => {
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
+        const placeCnt = collectionList[index].place_cnt;
+        const placeId = placeData.place_pk;
+        let day = -1;
+        if(collectionList[index].collection_type) day = 0;
+
         try {
-            fetch(`http://34.64.185.40/collection/${collectionId}/place/${placeData.place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionId}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
+                body: {
+                    planDay: day,
+                    order: placeCnt+1,
+                    placeId: placeId,
+                }
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    Alert.alert('', '보관함에 공간이 저장되었습니다.');
+                    console.log(response)
+                    if(response.code === 500) Alert.alert('', '공간 저장에 실패했습니다.');
+                    else if(response.code === 200) Alert.alert('', '보관함에 공간이 저장되었습니다.');
+                    getCollectionList();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -97,7 +114,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                                     </View>
                                     {item.collection_private == 1 &&
                                     <Image style={{width: 10, height: 10, marginLeft: 2}}
-                                        source={require('../assets/images/lock_outline.png')}></Image>}
+                                        source={require('../../assets/images/lock_outline.png')}></Image>}
                                 </View>
                             </View>
                             <View
@@ -122,7 +139,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                 </View>
 
                 {idx === collectionList.length - 1 &&
-                <View style={{marginVertical: 22, borderRadius: 10}}>
+                <View style={{marginVertical: 22, borderRadius: 10, bottom: 0}}>
                     <TouchableOpacity
                         style={{
                             height: 48,
@@ -153,7 +170,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
     return (
         <>
             <View style={{width: '100%'}}>
-                <Icon type="ionicon" name={'add'} color={colors.red_gray[3]} size={28}></Icon>
+                <Icon type="ionicon" name={'add'} color={colors.red_gray[3]} size={26}></Icon>
             </View>
             <RBSheet
                 ref={refRBSheet}
@@ -179,7 +196,7 @@ const ShowDirectories = ({refRBSheet, styles, colors, collectionList, placeData}
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.yellow[7]}}>
                         <AppText
                             style={{fontSize: 18, fontWeight: 'bold', marginTop: '1%', color: colors.mainColor}}>보관함에 추가하기</AppText>
-                        <Image source={require('../assets/images/folder.png')}
+                        <Image source={require('../../assets/images/folder.png')}
                             style={{width: 32, height: 32}}></Image>
                     </View>
                 </View>
@@ -203,6 +220,8 @@ const PlaceScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState({});
     const [reviewData, setReviewData] = useState({});
     const [collectionList, setCollectionList] = useState([]);
+    const [commentList, setCommentList] = useState([]);
+    const [commentLength, setCommentLength] = useState(0);
     const [facilityData, setFacilityData] = useState([]);
     const [morningCongestion, setMorningCongestion] = useState(0);
     const [afternoonCongestion, setAfternoonCongestion] = useState(0);
@@ -210,52 +229,10 @@ const PlaceScreen = ({route, navigation}) => {
     const [nightCongestion, setNightCongestion] = useState(0);
 
     const [token, setToken] = useToken();
-    //데이터 받아서 다시해야함
     const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
-
-    const styles = StyleSheet.create({
-        categoryBorder: {
-            borderWidth: 1,
-            borderRadius: 14,
-            height: 19,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        categoryText: {
-            color: colors.gray[1],
-            fontSize: 10,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            paddingVertical: 2,
-            paddingHorizontal: 8
-        },
-        reviewImage: {
-            width: 56,
-            height: 56,
-            backgroundColor: '#c4c4c4',
-            borderRadius: 50,
-
-        },
-
-        placeName: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: colors.mainColor
-        },
-
-        iconTabContainer: {
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        location: {
-            color: colors.gray[1],
-            fontSize: 14,
-            marginBottom: 1
-        }
-    });
+    const [height, setHeight] = useState(150 + 90 * collectionList.length);
 
     const getInitialData = () => {
         try {
@@ -263,19 +240,20 @@ const PlaceScreen = ({route, navigation}) => {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    console.log(response.data.review);
+                    // console.log(response.data.review);
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
-                    setMorningCongestion(response.data.review_congestion_morning);
-                    setAfternoonCongestion(response.data.review_congestion_afternoon);
-                    setEveningCongestion(response.data.review_congestion_evening);
-                    setNightCongestion(response.data.review_congestion_night);
-                    setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2))
+                    setMorningCongestion(response.data.review.review_congestion_morning);
+                    setAfternoonCongestion(response.data.review.review_congestion_afternoon);
+                    setEveningCongestion(response.data.review.review_congestion_evening);
+                    setNightCongestion(response.data.review.review_congestion_night);
+                    setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2));
                 })
                 .catch((err) => {
                     console.error(err);
@@ -289,6 +267,7 @@ const PlaceScreen = ({route, navigation}) => {
     useEffect(() => {
         getInitialData();
         getCollectionList();
+        getCommentList();
         () => {
             setPlaceData({});
             setReviewData({});
@@ -319,6 +298,8 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    if(response.data.length > 5) setHeight(150 + 90 * 5);
+                    else setHeight(150 + 90 * response.data.length);
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -330,7 +311,37 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const PlaceInfo = ({collectionList, styles, data}) => {
+    const getCommentList = () => {
+        try {
+            fetch(`http://34.64.185.40/place/${data.place_pk}/comments`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then(res => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response.data)
+                    setCommentList(response.data);
+                    setCommentLength(response.data.length);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const PlaceInfo = ({collectionList}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
@@ -451,39 +462,52 @@ const PlaceScreen = ({route, navigation}) => {
     
             return (
                 <View style={styles.iconTabContainer}>
-                    <TouchableOpacity onPress={() => {
-                        if (placeData.like_flag) {
-                            DeleteLikedPlace(placeData.place_pk);
-                        } else {
-                            LikePlace(placeData.place_pk);
-                        }
-                    }}>
-                        <Jewel width={26} height={21}
-                            style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
-                    </TouchableOpacity>
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => {
+                            if (placeData.like_flag) {
+                                DeleteLikedPlace(placeData.place_pk);
+                            } else {
+                                LikePlace(placeData.place_pk);
+                            }
+                        }} style={{marginBottom: 2}}>
+                            <Jewel width={26} height={21}
+                                style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>찜</AppText>
+                    </View>
+                    
                     <View style={{
                         borderWidth: 0.5,
                         transform: [{rotate: '90deg'}],
                         width: 42,
                         borderColor: colors.red_gray[5],
-                        marginHorizontal: 30
+                        marginHorizontal: 21
                     }}/>
-                    <TouchableOpacity onPress={() => {
-                        refRBSheet.current.open();
-                    }}>
-                        <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
-                            collectionList={collectionList}/>
-                    </TouchableOpacity>
+
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+                        <TouchableOpacity onPress={() => {
+                            refRBSheet.current.open();
+                        }}>
+                            <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
+                                collectionList={collectionList} height={height} getCollectionList={getCollectionList}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>보관함에 추가</AppText>
+                    </View>
+
                     <View style={{
                         borderWidth: 0.5,
                         transform: [{rotate: '90deg'}],
                         width: 42,
                         borderColor: colors.red_gray[5],
-                        marginHorizontal: 30
+                        marginHorizontal: 21
                     }}/>
-                    <TouchableOpacity onPress={onShare}>
-                        <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={28}/>
-                    </TouchableOpacity>
+
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+                        <TouchableOpacity onPress={onShare}>
+                            <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={26}/>
+                        </TouchableOpacity>
+                        <AppText style={{color: colors.red_gray[2], fontSize: 10, fontWeight: '400', lineHeight: 16}}>공유</AppText>
+                    </View>
                 </View>
             );
         };
@@ -492,27 +516,27 @@ const PlaceScreen = ({route, navigation}) => {
             <>
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
-                        source={placeData.place_img ? {uri: placeData.place_img} : require('../assets/images/here_default.png')}
+                        source={placeData.place_img ? {uri: placeData.place_img} : require('../../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../assets/images/here_default.png')}
+                                source={require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
@@ -522,7 +546,9 @@ const PlaceScreen = ({route, navigation}) => {
                 <ScreenContainerView>
                     <View style={{marginVertical: 18}}>
                         <View flexDirection="row" style={{justifyContent: 'space-between', marginBottom: 8}}>
-                            <AppText style={styles.placeName}>{placeData.place_name}</AppText>
+                            <View style={{...styles.placeName, width: '80%'}}>
+                                <AppText style={{...styles.placeName, color: colors.mainColor}}>{placeData.place_name}</AppText>
+                            </View>
                             <View style={{
                                 ...styles.categoryBorder,
                                 borderColor: colors.red_gray[6],
@@ -530,12 +556,12 @@ const PlaceScreen = ({route, navigation}) => {
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <AppText style={styles.categoryText}>{checkType(placeData.place_type)}</AppText>
+                                <AppText style={{...styles.categoryText, color: colors.gray[1]}}>{checkType(placeData.place_type)}</AppText>
                             </View>
                         </View>
     
                         <PlaceInfo icon={'location'}>
-                            <AppText style={styles.location}>{placeData.place_addr}</AppText>
+                            <AppText style={{...styles.location, color: colors.gray[1]}}>{placeData.place_addr}</AppText>
                             <AppText style={{
                                 color: colors.gray[4],
                                 fontSize: 14,
@@ -577,8 +603,195 @@ const PlaceScreen = ({route, navigation}) => {
                 <AppText style={{fontSize: 14, color: colors.mainColor}}>{item}</AppText>
             </View>
         )
-    }
+    };
 
+    const list = [
+        {
+            id: 1,
+            data: 'hi'
+        },
+        {
+            id: 2,
+            data: 'ghgh'
+        }
+    ]
+
+    const Markers = props => {
+        var lng = props.idx===0 ? 126.9779482762618 : 126.9775482762115
+        return (
+            <Marker coordinate={{
+                latitude: 37.56633546113615,
+                longitude: lng
+            }} title={props.data.data}
+            description="기본값입니다">
+                <Icon type="ionicon" name={"airplane-outline"}></Icon>
+            </Marker>
+        )
+    };
+
+    const window = Dimensions.get("window");
+    const WIDTH = window.width;
+    const HEIGHT = window.height
+
+    const ASPECT_RATIO = WIDTH / HEIGHT;
+    const LATITUDE_DELTA = 0.35;
+    const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+    const INITIAL_POSITION = {
+    latitude: 41.924447,
+    longitude: -87.687339,
+    latitudeDelta: 1,
+    longitudeDelta: 1
+    };
+
+    const COORDS = [
+        {
+          location: {
+            latitude: 42,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.1,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.2,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.3,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        },
+        {
+          location: {
+            latitude: 42.4,
+            longitude: -87,
+            longitudeDelta: LONGITUDE_DELTA,
+            latitudeDelta: LATITUDE_DELTA
+          }
+        }
+    ];
+
+    const renderMarker = data => {
+        console.log(data); console.log('hi')
+        return (
+            <MapView.Marker key={data.location.latitude} coordinate={data.location} />
+        )
+    };
+    const [lnt, setLnt] = useState(126.9775482762618);
+    const [region, setRegion] = useState({
+        latitude: 37.56633546113615,
+        longitude: 126.9775482762618,
+        latitudeDelta: 0.0015,
+        longitudeDelta: 0.0015,
+    });
+
+    const onMarkerPress = (event) => {
+        const { id, coordinate } = event.nativeEvent;
+        // console.log(coordinate)
+        const newRegion = { ...region };
+    
+        newRegion.latitude = coordinate.latitude;
+        newRegion.longitude = coordinate.longitude;
+    
+        setRegion(newRegion)
+    };
+
+    const EntireButton = () => {
+        return (
+            <View style={{backgroundColor: colors.backgroundColor}}>
+                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap')}>
+                <View style={{backgroundColor: colors.backgroundColor}}>
+                    <AppText>전체 보기</AppText>
+                </View>
+                </TouchableOpacity>
+            </View>
+        )
+    };
+
+    const ShowComments = props => {
+        const { item, index } = props;
+
+        return (
+            <View key={index}>
+            <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <View>
+                    { item.user_img ?
+                    <Image style={styles.reviewImage}
+                    source={require('../../assets/images/here_default.png')}></Image> :
+                    <Image style={styles.reviewImage}
+                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
+                    }
+                </View>
+                <View style={{marginLeft: 12, marginRight: 20}}>
+                    <View style={{
+                        backgroundColor: colors.defaultColor,
+                        height: 27,
+                        paddingVertical: 6,
+                        paddingLeft: 6,
+                        marginBottom: 6,
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        flexDirection: 'row'
+                    }}>
+                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
+                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
+                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
+                            {item.cpc_comment}</AppText>
+                    </View>
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: 267,
+                        marginTop: 4
+                    }}>
+                        <View style={{flexDirection: 'row'}}>
+                            <AppText style={{
+                                color: colors.gray[3],
+                                fontWeight: 'bold',
+                                fontSize: 12
+                            }}>by. </AppText>
+                            <AppText style={{color: colors.gray[3], fontSize: 12}}>{item.user_nickname}</AppText>
+                        </View>
+                        <View>
+                            <AppText
+                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
+                        </View>
+                    </View>
+                </View>
+            </View>
+
+            <View style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.red_gray[6],
+                zIndex: -1000,
+                marginVertical: 18,
+                display: index === commentLength-1 && 'none'
+            }}></View>
+            </View>
+        )
+    }
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -591,7 +804,7 @@ const PlaceScreen = ({route, navigation}) => {
                         <View flex={1} style={{alignItems: 'center', justifyContent: 'center'}}>
                             <View flex={1} flexDirection="row" style={{marginTop: 3, alignItems: 'center'}}>
                                 {
-                                    placeScore !== 0 ?
+                                    placeScore != 0.00 ?
                                     <Jewel width={30} height={26}
                                     style={{color: colors.red[3], marginTop: 4}}/> :
                                     <Jewel width={30} height={26}
@@ -672,7 +885,7 @@ const PlaceScreen = ({route, navigation}) => {
                         onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name, place_pk: placeData.place_pk})}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
-                                source={require('../assets/images/write_review_icon.png')}></Image>
+                                source={require('../../assets/images/write_review_icon.png')}></Image>
                             <AppText style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점
                                 남기기</AppText>
                         </TouchableOpacity>
@@ -704,24 +917,39 @@ const PlaceScreen = ({route, navigation}) => {
                     }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
-                    <Image source={require('../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
-                    {/* TODO 카카오 지도 api 가져오기
-                    <View>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                                 initialRegion={{
-                                     latitude: 37.56633546113615,
-                                     longitude: 126.9779482762618,
-                                     latitudeDelta: 0.0015,
-                                     longitudeDelta: 0.0015,
-                                 }}
-                        ><Marker coordinate={{
-                            latitude: 37.56633546113615,
-                            longitude: 126.9779482762618
-                        }}
-                                 title="서울시청"
-                                 description="기본값입니다"/>
+                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
+                    
+                    <View flex={1}>
+                        {/* <EntireButton /> */}
+                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
+                            region={region}
+                            moveOnMarkerPress
+                            tracksViewChanges={false}
+                            provider={PROVIDER_GOOGLE}
+                            onMarkerPress={onMarkerPress}
+                        >
+                            <Marker coordinate={{
+                                latitude: 37.56633546113615,
+                                longitude: 126.9779482762618
+                            }} title={'기본'}
+                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
+                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <CustomMarker />
+                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
+                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
+                                    </View>
+                                </View>
+                            </Marker>
                         </MapView>
-                    </View> */}
+                        {/* <ClusteredMapView
+                            style={{height: 200}}
+                            accessor={m => m.location}
+                            data={COORDS}
+                            initialRegion={INITIAL_POSITION}
+                            renderMarker={renderMarker}
+                        /> */}
+                        {/* <ClusterView /> */}
+                    </View>
                 </View>
                 <View>
                     <View style={{alignItems: 'center'}}>
@@ -733,10 +961,6 @@ const PlaceScreen = ({route, navigation}) => {
                                     color: colors.mainColor,
                                     lineHeight: 32
                                 }}>한줄 TIP</AppText>
-                                <TouchableOpacity style={{alignItems: 'center', justifyContent: 'center'}}>
-                                    <Icon type="ionicon" name={'chevron-forward'} size={20}
-                                        color={colors.mainColor}></Icon>
-                                </TouchableOpacity>
                             </View>
                             <AppText style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</AppText>
                         </View>
@@ -747,178 +971,12 @@ const PlaceScreen = ({route, navigation}) => {
                                 fontSize: 14,
                                 lineHeight: 20.72,
                                 fontWeight: 'bold'
-                            }}>총 20개</AppText></View>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View><Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
-                                <View style={{marginLeft: 12, marginRight: 20}}>
-                                    <View style={{
-                                        backgroundColor: colors.defaultColor,
-                                        width: 267,
-                                        height: 27,
-                                        paddingVertical: 6,
-                                        paddingLeft: 6,
-                                        paddingRight: 61,
-                                        marginBottom: 6,
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexDirection: 'row'
-                                    }}>
-                                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에
-                                            xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                    </View>
-                                    <View><AppText
-                                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4
-                                    }}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                fontWeight: 'bold',
-                                                fontSize: 12
-                                            }}>by. </AppText>
-                                            <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
-                                        </View>
-                                        <View>
-                                            <AppText
-                                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-
-                            <View style={{
-                                width: '100%',
-                                height: 1,
-                                backgroundColor: colors.red_gray[6],
-                                zIndex: -1000,
-                                marginVertical: 18
-                            }}></View>
-
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View><Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
-                                <View style={{marginLeft: 12, marginRight: 20}}>
-                                    <View style={{
-                                        backgroundColor: colors.defaultColor,
-                                        width: 267,
-                                        height: 27,
-                                        paddingVertical: 6,
-                                        paddingLeft: 6,
-                                        paddingRight: 61,
-                                        marginBottom: 6,
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexDirection: 'row'
-                                    }}>
-                                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에
-                                            xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                    </View>
-                                    <View><AppText
-                                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4
-                                    }}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                fontWeight: 'bold',
-                                                fontSize: 12
-                                            }}>by. </AppText>
-                                            <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
-                                        </View>
-                                        <View>
-                                            <AppText
-                                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-
-                            <View style={{
-                                width: '100%',
-                                height: 1,
-                                backgroundColor: colors.red_gray[6],
-                                zIndex: -1000,
-                                marginVertical: 18
-                            }}></View>
-
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View><Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image></View>
-                                <View style={{marginLeft: 12, marginRight: 20}}>
-                                    <View style={{
-                                        backgroundColor: colors.defaultColor,
-                                        width: 267,
-                                        height: 27,
-                                        paddingVertical: 6,
-                                        paddingLeft: 6,
-                                        paddingRight: 61,
-                                        marginBottom: 6,
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        flexDirection: 'row'
-                                    }}>
-                                        <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                            color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                                        <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>근처에
-                                            xxx파전 맛집에서 막걸리 한잔 캬</AppText>
-                                    </View>
-                                    <View><AppText
-                                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                                    </AppText></View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        width: 267,
-                                        marginTop: 4
-                                    }}>
-                                        <View style={{flexDirection: 'row'}}>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                fontWeight: 'bold',
-                                                fontSize: 12
-                                            }}>by. </AppText>
-                                            <AppText style={{color: colors.gray[3], fontSize: 12}}>minsun</AppText>
-                                        </View>
-                                        <View>
-                                            <AppText
-                                                style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                            }}>총 {commentLength}개</AppText></View>
+                            <FlatList data={commentList}
+                                renderItem={({item, index}) => <ShowComments item={item} index={index} key={index} />}
+                                keyExtractor={(item, idx) => {idx.toString();}}
+                                key={(item, idx) => {idx.toString();}}
+                                nestedScrollEnabled/>
                         </View>
                     </View>
                 </View>
@@ -951,7 +1009,7 @@ const PlaceScreen = ({route, navigation}) => {
                                             alignItems: 'center',
                                             marginBottom: 2
                                         }}>
-                                            <Image source={require('../assets/images/here_icon.png')} style={{
+                                            <Image source={require('../../assets/images/here_icon.png')} style={{
                                                 width: 11.36,
                                                 height: 9.23,
                                                 marginTop: 2,
@@ -990,7 +1048,7 @@ const PlaceScreen = ({route, navigation}) => {
                                             alignItems: 'center',
                                             marginBottom: 2
                                         }}>
-                                            <Image source={require('../assets/images/here_icon.png')} style={{
+                                            <Image source={require('../../assets/images/here_icon.png')} style={{
                                                 width: 11.36,
                                                 height: 9.23,
                                                 marginTop: 2,
@@ -1029,7 +1087,7 @@ const PlaceScreen = ({route, navigation}) => {
                                             alignItems: 'center',
                                             marginBottom: 2
                                         }}>
-                                            <Image source={require('../assets/images/here_icon.png')} style={{
+                                            <Image source={require('../../assets/images/here_icon.png')} style={{
                                                 width: 11.36,
                                                 height: 9.23,
                                                 marginTop: 2,
@@ -1059,4 +1117,41 @@ const PlaceScreen = ({route, navigation}) => {
         </ScreenContainer>
     );
 };
+
+const styles = StyleSheet.create({
+    categoryBorder: {
+        borderWidth: 1,
+        borderRadius: 14,
+        height: 19,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    categoryText: {
+        fontSize: 10,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        paddingVertical: 2,
+        paddingHorizontal: 8
+    },
+    reviewImage: {
+        width: 56,
+        height: 56,
+        backgroundColor: '#c4c4c4',
+        borderRadius: 50,
+    },
+    placeName: {
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    iconTabContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    location: {
+        fontSize: 14,
+        marginBottom: 1
+    }
+});
+
 export default PlaceScreen;

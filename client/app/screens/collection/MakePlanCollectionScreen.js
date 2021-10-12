@@ -36,13 +36,14 @@ import SearchIcon from '../../assets/images/search-icon.svg';
 
 export const navigationRef = React.createRef();
 
-const MakePlanCollectionScreen = ({navigation}) => {
+const MakePlanCollectionScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const {colors} = useTheme();
     const toastRef = useRef();
     const refCalendarRBSheet = useRef();
     const refKeywordRBSheet = useRef();
+    const { data, update } = route.params;
 
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
@@ -58,6 +59,8 @@ const MakePlanCollectionScreen = ({navigation}) => {
         startDate: new Date(),
         endDate: new Date()
     });
+    const [originStartDate, setOriginStartDate] = useState(new Date());
+    const [originEndDate, setOriginEndDate] = useState(new Date());
     const i18n = {
         dayNames: {
             short: ['일', '월', '화', '수', '목', '금', '토'],
@@ -124,6 +127,20 @@ const MakePlanCollectionScreen = ({navigation}) => {
 
     useEffect(() => {
         getKeywords();
+        if(update) {
+            setCollectionName(data.collection_name);
+            if(data.collection_private) {
+                setIsEnabled(true);
+            }
+            console.log(range)
+            var newArr = {
+                startDate: data.collection_start_date,
+                endDate: data.collection_end_date,
+            };
+            // newArr.startDate = data.collection_start_date;
+            // newArr.endDate = data.collection_end_date;
+            setRange(newArr);
+        }
     }, []);
 
     const getKeywords = useCallback(() => {
@@ -138,8 +155,10 @@ const MakePlanCollectionScreen = ({navigation}) => {
             }).then((res) => res.json())
                 .then((response) => {
                     setKeywordData(response.data);
-                    setFalse();
-                    // console.log(keywordData);
+                    if(update) {
+                        setFalseUpdated(response.data);
+                    }
+                    else setFalse();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -151,7 +170,8 @@ const MakePlanCollectionScreen = ({navigation}) => {
     }, []);
 
     const postCollections = () => {
-        var datas = []; var showDatas = [];
+        var datas = [];
+        var showDatas = [];
         for (let i = 0; i < keywordData.length; i++) {
             if (isPress[i] === true) {
                 datas.push(keywordData[i].keyword_pk);
@@ -165,43 +185,42 @@ const MakePlanCollectionScreen = ({navigation}) => {
         var forPostEnable = 0;
         if (isEnabled === true) forPostEnable = 1;
 
-        var forPostData = {};
-        console.log(datas.length)
+        var forPostData = {};            forPostData = {
+            name: collectionName,
+            isPrivate: forPostEnable,
+            keywords: [],
+        }
         if(datas.length === 0) {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate: forPostEnable,
-                    startDate: startDate,
-                    endDate: endDate
-                },
+                name: collectionName,
+                isPrivate: forPostEnable,
+                startDate: startDate,
+                endDate: endDate,
                 keywords: []
             }
         } else {
             forPostData = {
-                collectionData: {
-                    name: collectionName,
-                    isPrivate : forPostEnable,
-                    startDate: startDate,
-                    endDate: endDate
-                },
+                name: collectionName,
+                isPrivate : forPostEnable,
+                startDate: startDate,
+                endDate: endDate,
                 keywords: datas
             }
         }
+
+        let form = new FormData();
+        form.append('collectionData', JSON.stringify(forPostData));
+        form.append('img', 'default-red');
 
         try {
             fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify(forPostData)
-            }).then((res) => {
-                res.json();
-            })
-                .then((response) => {
+                body: form
+            }).then(res => res.json())
+            .then(response => {
                     // if(response.code === 401 || response.code === 403 || response.code === 419){
                     //     // Alert.alert('','로그인이 필요합니다');
                     //     await SecureStore.deleteItemAsync('accessToken');
@@ -209,24 +228,26 @@ const MakePlanCollectionScreen = ({navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-                    // console.log(response)
+                    console.log(response)
 
                     const item = {
-                        'collection_name': collectionName,
-                        'collection_private': isEnabled,
-                        'collection_type': 1,
-                        'keywords': showDatas,
-                        'startDate': startDate,
-                        'endDate': endDate
+                        'collection_pk': response.collectionId,
+                        'now': true
                     };
-                    Alert.alert('', '일정보관함이 생성되었습니다');
-                    navigation.navigate('PlanCollection', {
-                        data: item
-                    });
+                    if(update) {
+                        Alert.alert('', '일정보관함이 수정되었습니다');
+                        // navigation.goBack();
+                    } else {
+                        Alert.alert('', '일정보관함이 생성되었습니다');
+                        navigation.navigate('PlanCollection', {
+                            data: item
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
-                    Alert.alert('', '일정보관함 생성에 실패했습니다');
+                    if(update) Alert.alert('', '일정보관함 수정에 실패했습니다');
+                    else Alert.alert('', '일정보관함 생성에 실패했습니다');
                 });
 
         } catch (err) {
@@ -242,10 +263,19 @@ const MakePlanCollectionScreen = ({navigation}) => {
         setIsPress(pressed);
     };
 
+    const setFalseUpdated = (keywords) => {
+        var pressed = [];
+        for (let i = 0; i < keywords.length; i++) {
+            if(data.keywords.indexOf(keywords[i].keyword_title) !== -1) pressed.push(true);
+            else pressed.push(false);
+        }
+        setIsPress(pressed);
+    };
+    
     const ShowCalendar = () => {
         const [date, setDate] = useState({
-            startDate: new Date(),
-            endDate: new Date()
+            startDate: update? originStartDate : new Date(),
+            endDate: update? originEndDate : new Date
         });
         const [textColor, setTextColor] = useState(colors.mainColor);
 
@@ -253,8 +283,8 @@ const MakePlanCollectionScreen = ({navigation}) => {
             <TouchableOpacity onPress={()=>{
                 refCalendarRBSheet.current.open(); 
                 setDate({
-                    startDate: new Date(),
-                    endDate: new Date
+                    startDate: update? originStartDate : new Date(),
+                    endDate: update? originEndDate : new Date
                 });
             }}><AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '400', lineHeight: 22.4}}>{moment(range.startDate).format('YY. MM. DD (dd)')} - {moment(range.endDate).format('YY. MM. DD (dd)')}</AppText>
                 <RBSheet
@@ -525,14 +555,20 @@ const MakePlanCollectionScreen = ({navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <NavigationTop navigation={navigation} title="일정보관함 만들기"/>
+            <NavigationTop navigation={navigation} title={update ? "일정보관함 수정" : "일정보관함 만들기"}/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                            style={[collectionName ? {color: colors.mainColor, fontSize: 20, fontWeight: 'bold'} : {fontSize: 20}]}
+                                style={{
+                                    color: colors.mainColor,
+                                    fontSize: 20,
+                                    fontWeight: 'bold'
+                                }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
-                            onChangeText={(name) => setCollectionName(name)}>
+                            onChangeText={(name) => setCollectionName(name)}
+                            value={collectionName}
+                        >
                         </CustomTextInput>
                     </View>
                 </ScreenContainerView>
@@ -562,7 +598,6 @@ const MakePlanCollectionScreen = ({navigation}) => {
                             </View>
                         </View>
                     </View>
-                    {/* marginBottom은 일단 퍼블리싱때문에 */}
                     <View style={{
                         marginTop: 24,
                         flexDirection: 'row',
@@ -609,7 +644,7 @@ const MakePlanCollectionScreen = ({navigation}) => {
                                     color: colors.defaultColor,
                                     fontWeight: 'bold'
                                 }}
-                            >보관함 만들기</AppText>
+                            >{update ? "보관함 수정" : "보관함 만들기"}</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>

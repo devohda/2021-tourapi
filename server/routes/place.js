@@ -50,6 +50,28 @@ router.get('/:placeId', async (req, res, next) => {
     });
 });
 
+// 장소 한줄평 조회
+router.get('/:placeId/comments', async (req, res, next) => {
+    const {placeId} = req.params;
+    let result;
+
+    try {
+        result = await placeService.readPlaceCommentList(placeId);
+    } catch (err) {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+
+    return res.status(200).json({
+        code: 200,
+        status: 'OK',
+        data : result
+    });
+
+})
+
 //[CREATE]
 // 장소 리뷰 생성
 router.post('/:placeId/review', verifyToken, async (req, res, next) => {

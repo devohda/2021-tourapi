@@ -1,19 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from 'react-native';
-import ScreenContainer from '../components/ScreenContainer';
 import {useTheme} from '@react-navigation/native';
-import NavigationTop from '../components/NavigationTop';
-import SearchIcon from '../assets/images/search-icon.svg';
-import ScreenContainerView from '../components/ScreenContainerView';
-import SearchTabNavigator from '../navigation/SearchTabNavigator';
-import ScreenDivideLine from '../components/ScreenDivideLine';
-import Star from '../assets/images/search/star.svg';
-import AppText from '../components/AppText';
-import {useSearchKeyword} from '../contexts/search/SearchkeywordContextProvider';
+
+import ScreenContainer from '../../components/ScreenContainer';
+import NavigationTop from '../../components/NavigationTop';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import SearchTabNavigator from '../../navigation/SearchTabNavigator';
+import ScreenDivideLine from '../../components/ScreenDivideLine';
+import AppText from '../../components/AppText';
+import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+
+import SearchIcon from '../../assets/images/search-icon.svg';
+import Star from '../../assets/images/search/star.svg';
 
 const SearchScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const [k, setK] = useState('');
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     useEffect(() => {setSearchKeyword('')}, []);
 
@@ -62,31 +63,10 @@ const SearchScreen = ({route, navigation}) => {
         },
     });
 
-    const RecommendedDefault = () => {
-        return (
-            <View style={{marginTop: 16}}>
-                <AppText style={{fontSize: 12, fontWeight: '500', color: colors.gray[5]}}>추천 검색어</AppText>
-                <View>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>고급스러운</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>한국적인</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>아기자기한</AppText></View>
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>힐링</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>관광</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>여유</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>화려한</AppText></View>
-                    </View>
-                </View>
-            </View>
-        );
-    };
-
     const RecommendedPlace = ({name, address}) => {
         return (
             <View style={{marginRight: 8}}>
-                <Image source={require('../assets/images/here_default.png')}
+                <Image source={require('../../assets/images/here_default.png')}
                     style={{width: 141, height: 101, borderRadius: 10}}/>
                 <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
                     <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -122,7 +102,7 @@ const SearchScreen = ({route, navigation}) => {
                     height: 162,
                     width: 162,
                 }}>
-                    <Image source={require('../assets/images/here_default.png')} style={{width: 162, height: 162}}/>
+                    <Image source={require('../../assets/images/here_default.png')} style={{width: 162, height: 162}}/>
                 </View>
                 <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
                     <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
@@ -138,38 +118,46 @@ const SearchScreen = ({route, navigation}) => {
         );
     };
 
+    const SearchBar = () => {
+        const [k, setK] = useState('');
+
+        return (
+            <View flexDirection="row" style={styles.search_box}>
+                <TextInput flex={1} style={{fontSize: 16}}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder="원하는 공간/보관함/유저를 검색해보세요"
+                    placeholderTextColor={colors.gray[5]}
+                    onChangeText={(text) => setK(text)}
+                    onSubmitEditing={()=> setSearchKeyword(k)}
+                />
+                <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
+                    <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
+                </Pressable>
+            </View>
+        )
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop title="검색" navigation={navigation}/>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
-                    <View flexDirection="row" style={styles.search_box}>
-                        <TextInput flex={1} style={{fontSize: 16}}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            placeholder="원하는 공간을 검색해보세요"
-                            placeholderTextColor={colors.gray[5]}
-                            onChangeText={(text) => setK(text)}
-                            onSubmitEditing={()=> setSearchKeyword(k)}
-                        />
-                        <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
-                            <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
-                        </Pressable>
-                    </View>
+                    <SearchBar />
                     {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchTabNavigator navigation={navigation} />
+                        searchKeyword !== '' && <SearchTabNavigator navigation={navigation} />
                     }
                 </ScreenContainerView>
 
-                <ScreenDivideLine/>
+                {searchKeyword !== '' && <ScreenDivideLine/>}
 
                 <ScreenContainerView>
-                    <View style={{marginVertical: 12}}>
+                    <View style={{marginTop: 24, marginBottom: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
                             <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 공간</AppText>
-                            <View style={styles.ad_sticker}>
+                            {/* <View style={styles.ad_sticker}>
                                 <AppText style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</AppText>
-                            </View>
+                            </View> */}
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>

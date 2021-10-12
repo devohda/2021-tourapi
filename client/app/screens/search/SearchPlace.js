@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView} from 'react-native';
+import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView, TouchableWithoutFeedback} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
+import { Icon } from 'react-native-elements';
 
 import AppText from '../../components/AppText';
 import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
@@ -189,14 +190,99 @@ const SearchPlace = ({navigation}) => {
         }
     };
 
-    const [isPress, setIsPress] = useState([]);
-    // const setFalse = () => {
-    //     var pressed = [];
-    //     for (let i = 0; i < placeList.length; i++) {
-    //         pressed.push(false);
-    //     }
-    //     setIsPress(pressed);
-    // };
+    const [showMenu, setShowMenu] = useState(false);
+    const [currentMenu, setCurrentMenu] = useState('평점순');
+
+    const SelectBox = () => {
+        return (
+            <>
+            {
+            showMenu && <View style={{
+                position: 'absolute',
+                width: 80,
+                height: 80,
+                backgroundColor: '#fff',
+                // flex: 1,
+                borderRadius: 10,
+                zIndex: 0,
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                overflow: 'visible'
+                }}>
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('평점순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                        {currentMenu === '평점순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0,
+                        backgroundColor: colors.backgroundColor,
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('인기순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                    
+                    <View style={{
+                        height: 1,
+                        borderColor: colors.gray[5],
+                        borderWidth: 0.4,
+                        borderRadius: 1,
+                        zIndex: 0
+                    }}></View>
+                    
+                    <TouchableOpacity
+                    onPress={() => {
+                        setShowMenu(false);
+                        setCurrentMenu('거리순');
+                    }}
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        paddingLeft: 8.5
+                    }}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
+                        {currentMenu === '거리순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                    </TouchableOpacity>
+                </View>
+            }
+            </>
+        );};
 
     const PlaceContainer = ({item, index}) => {
         return (
@@ -210,9 +296,9 @@ const SearchPlace = ({navigation}) => {
                     height: 72,
                     marginTop: 22,
                     flexDirection: 'row',
-                    justifyContent: 'space-between'
+                    justifyContent: 'space-between',
                 }}>
-                    <View style={{flexDirection: 'row', width: '85%'}}>
+                    <View style={{flexDirection: 'row', width: '85%'}} flex={1}>
                         {
                             item.place_img ?
                                 <Image source={{uri: item.place_img}}
@@ -227,10 +313,10 @@ const SearchPlace = ({navigation}) => {
                                         fontSize: 10,
                                         color: colors.mainColor
                                     }}>{checkType(item.place_type)}</AppText>
-                                <View style={styles.score_line}></View>
-                                <Star width={11} height={11} style={{marginTop: 2}}/>
+                                <View style={{...styles.score_line, display: parseInt(item.review_score) == -1 && 'none'}}></View>
+                                <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}}/>
                                 <AppText
-                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{item.star}</AppText>
+                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                             </View>
                             <AppText style={{
                                 fontSize: 16,
@@ -275,15 +361,31 @@ const SearchPlace = ({navigation}) => {
     };
 
     return (
-        <View style={{backgroundColor: colors.backgroundColor}}>
-            <ScrollView>
+        <View style={{backgroundColor: colors.backgroundColor}} flex={1}>
+            <ScrollView flex={1}>
                 {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
-                        <SafeAreaView>
+                        <>
+                        {/* <View style={{position: 'relative'}}>
+                        <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                            <View flexDirection="row" flex={1} style={{justifyContent: 'flex-end'}}>
+                                <TouchableOpacity onPress={()=>{
+                                    setShowMenu(!showMenu);
+                                }} style={{flexDirection: 'row'}}>
+                                    <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                    <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                        name={'chevron-down-outline'} size={16}></Icon>
+                                </TouchableOpacity>
+                                <SelectBox />
+                            </View>
+                        </TouchableWithoutFeedback>
+                        </View> */}
+                        <SafeAreaView flex={1}>
                             <FlatList data={placeList} renderItem={PlaceContainer}
                                 keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
+                        </>
                 }
             </ScrollView>
         </View>

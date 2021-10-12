@@ -5,18 +5,15 @@ import {useTheme} from '@react-navigation/native';
 import NavigationTop from '../../components/NavigationTop';
 import SearchIcon from '../../assets/images/search-icon.svg';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import SearchTabNavigator from '../../navigation/SearchTabNavigator';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
 import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
-import SearchPlaceForPlan from './SearchPlaceForPlan';
+import SearchPlaceForAdd from './SearchPlaceForAdd';
 
-const SearchScreenForPlan = ({route, navigation}) => {
+const SearchScreenForAdd = ({route, navigation}) => {
     const {colors} = useTheme();
-    const { pk, placeData, day } = route.params;
-    console.log(route.params)
-    const [k, setK] = useState('');
+    const { pk, placeData, day, replace } = route.params;
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     useEffect(() => {setSearchKeyword('')}, []);
 
@@ -64,27 +61,6 @@ const SearchScreenForPlan = ({route, navigation}) => {
             textAlign: 'center',
         },
     });
-
-    const RecommendedDefault = () => {
-        return (
-            <View style={{marginTop: 16}}>
-                <AppText style={{fontSize: 12, fontWeight: '500', color: colors.gray[5]}}>추천 검색어</AppText>
-                <View>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>고급스러운</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>한국적인</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>아기자기한</AppText></View>
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>힐링</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>관광</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>여유</AppText></View>
-                        <View style={[styles.dirType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor}]}><AppText style={styles.dirFreeText}>화려한</AppText></View>
-                    </View>
-                </View>
-            </View>
-        );
-    };
 
     const RecommendedPlace = ({name, address}) => {
         return (
@@ -141,38 +117,49 @@ const SearchScreenForPlan = ({route, navigation}) => {
         );
     };
 
+    const SearchBar = () => {
+        const [k, setK] = useState('');
+
+        return (
+            <View flexDirection="row" style={styles.search_box}>
+                <TextInput flex={1} style={{fontSize: 16}}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder="원하는 공간/보관함/유저를 검색해보세요"
+                    placeholderTextColor={colors.gray[5]}
+                    onChangeText={(text) => setK(text)}
+                    onSubmitEditing={()=> setSearchKeyword(k)}
+                />
+                <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
+                    <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
+                </Pressable>
+            </View>
+        )
+    };
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop title="검색" navigation={navigation}/>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
-                    <View flexDirection="row" style={styles.search_box}>
-                        <TextInput flex={1} style={{fontSize: 16}}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            placeholder="원하는 공간을 검색해보세요"
-                            placeholderTextColor={colors.gray[5]}
-                            onChangeText={(text) => setK(text)}
-                            onSubmitEditing={()=> setSearchKeyword(k)}
-                        />
-                        <Pressable style={{marginLeft: 5}} onPress={() => setSearchKeyword(k)}>
-                            <SearchIcon width={26} height={26} style={{color: colors.gray[5]}}/>
-                        </Pressable>
-                    </View>
-                    {
-                        searchKeyword === '' ? <RecommendedDefault /> : <SearchPlaceForPlan pk={pk} placeData={placeData} day={day} navigation={navigation} />
-                    }
+                <SearchBar />
+                    {searchKeyword !== '' && <View>
+                        {replace ?
+                            <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace}
+                            postReplacement={route.params.postReplacement}
+                            /> :
+                        <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace} />}
+                    </View>}
                 </ScreenContainerView>
 
-                <ScreenDivideLine/>
+                {searchKeyword !== '' && <ScreenDivideLine/>}
 
                 <ScreenContainerView>
-                    <View style={{marginVertical: 12}}>
+                    <View style={{marginTop: 24, marginBottom: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
                             <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 공간</AppText>
-                            <View style={styles.ad_sticker}>
+                            {/* <View style={styles.ad_sticker}>
                                 <AppText style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</AppText>
-                            </View>
+                            </View> */}
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
@@ -192,4 +179,4 @@ const SearchScreenForPlan = ({route, navigation}) => {
     );
 };
 
-export default SearchScreenForPlan;
+export default SearchScreenForAdd;

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, cloneElement} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -10,65 +10,93 @@ import {
     TextInput,
     Pressable,
     FlatList,
-    Animated,
     Modal,
     Alert
 } from 'react-native';
-import {useIsFocused, useTheme} from '@react-navigation/native';
-import styled from 'styled-components/native';
-import {Icon, ListItem, Button, BottomSheet} from 'react-native-elements';
+import {useTheme, useIsFocused} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
-// import MapView, {Marker} from 'react-native-maps';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
+import ScreenContainerView from '../../components/ScreenContainerView';
+
 import { tipsList } from '../../contexts/TipsListContextProvider';
 import {useToken} from '../../contexts/TokenContextProvider';
 import { updatedList } from '../../contexts/UpdatedListContextProvider';
 
 import TipsList from './TipsList';
-// import DragAndDropList from './DragAndDropList';
+import DragAndDropList from './DragAndDropList';
 import ShowPlaces from './ShowPlaces';
 
 import Jewel from '../../assets/images/jewel.svg';
-import ScreenContainerView from '../../components/ScreenContainerView';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import SlideMenu from '../../assets/images/menu_for_edit.svg';
 import DefaultProfile from '../../assets/images/profile_default.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const PlanCollectionScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const {data} = route.params;
-    const keywords = data.keywords;
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [isLimited, setIsLimited] = useState(true);
-    const [isTrue, setIsTrue] = useState(false);
     const [tmpData, setTmpData] = tipsList();
     const [updatedData, setUpdatedData] = updatedList();
-    const [tmpPlaceData, setTmpPlaceData] = useState([]);
-    const [visible, setVisible] = useState(false);
     const [isEditPage, setIsEditPage] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [planDays, setPlanDays] = useState([]);
+    const [keywords, setKeywords] = useState([]);
 
     const isFocused = useIsFocused();
+    const [isLimited, setIsLimited] = useState(false);
 
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const refRBSheet = useRef();
+    const [replacementData, setReplacementData] = useState([]);
+
+    const isDeleted = (deletedData) => {
+        setIsDeletedOrigin(deletedData);
+    };
+
+    const isCommentPosted = (postedCommentMapPk, postedComment) => {
+        //map pk랑 comment
+        setIsPostedCommentMapPk(postedCommentMapPk);
+        setIsPostedComment(postedComment);
+    };
+
+    const isCommentEdited = (editedCommentMapPk, editedComment) => {
+        //map pk랑 comment
+        setIsEditedCommentMapPk(editedCommentMapPk);
+        setIsEditedComment(editedCommentMapPk);
+    };
+
+    const isCommentDeleted = (deletedCommentData) => {
+        setIsDeletedComment(deletedCommentData);
+    };
+
+    const isReplacementGotten = (gottenReplacementData) => {
+        setIsGottenReplacementMapPk(gottenReplacementData);
+    };
+
+    const isReplacementDeleted = (deletedReplacementData) => {
+        console.log(deletedReplacementData)
+        setIsDeletedReplacement(deletedReplacementData);
+    };
 
     const getUserData = () => {
         try {
@@ -100,6 +128,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     useEffect(() => {
+        getInitialCollectionData();
+        getInitialPlaceData();
+        getCollectionCommentsData();
+
         setTmpData([{
             day: 1,
             places : [
@@ -110,6 +142,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 {
                     id: 2,
                     tip: '두번째 팁'
+                },
+                {
+                    id: 3,
+                    tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
+                },
+                {
+                    id: 4,
+                    tip: '네번째 팁'
                 }
             ]
         }, {
@@ -128,15 +168,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         ]);
 
         getUserData();
-
-        if(typeof data.collection_private === 'boolean') {
-            setStartDate(moment(data.startDate).format('YYYY.MM.DD'));
-            setEndDate(moment(data.endDate).format('YYYY.MM.DD'));
-        } else {
-            getInitialCollectionData();
-            getInitialPlaceData();
-            getCollectionCommentsData();
-        }
     }, [isFocused]);
 
     const getInitialCollectionData = () => {
@@ -156,11 +187,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    console.log(response.data)
                     setCollectionData(response.data);
                     setStartDate(response.data.collection_start_date.split('T')[0]);
                     setEndDate(response.data.collection_end_date.split('T')[0]);
+                    setKeywords(response.data.keywords);
 
+                    // console.log(response.data)
                     var gap = moment(response.data.collection_end_date.split('T')[0]).diff(moment(response.data.collection_start_date.split('T')[0]), 'days');
                     var newArr = [];
                     for(var i=0;i<=gap;i++) {
@@ -170,6 +203,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         });
                     }
                     setPlanDays(newArr);
+                    setFalse(newArr);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -197,7 +231,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPlaceData(response.data);
                     var exceptLength = 0;
                     for(let i = 0; i < response.data.length; i++) {
@@ -210,7 +243,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         pressed.push(false);
                     }
                     setIsPress(pressed);
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setDeletedData(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -239,7 +272,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         return;
                     }
                     setCommentsData(response.data)
-                    console.log(response.data)
+                    // console.log(response.data)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -249,8 +282,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             console.error(err);
         }
     };
-
-    const [comments, setComments] = useState('');
 
     const postCollectionCommentsData = (comment) => {
         try {
@@ -284,57 +315,38 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const checkTrue = () => {
-        // if (userData.user_pk === data.user_pk && collectionData.collection_private === 0) return false;
-        if(typeof data.collection_private === 'boolean') {
-            if(data.collection_private === true) return true;
-            else return false;
-        } else {
-            if(collectionData.collection_private === 1) return true;
-        }
-        return false;
-    };
-
-    const checkPrivate = () => {
-        // if(data.collection_private === true || data.collection_private === false) {
-        if(typeof data.collection_private === 'boolean') {
-
-            return false;
-        } else {
-            if (collectionData.is_creator) {
-                return true;
+    const checkDeletedPlace = () => {
+        for(var i=0;i<isDeletedOrigin.length;i++) {
+            if(isDeletedOrigin[i] === true) {
+                // console.log(placeData[i]);
+                deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
             }
         }
-        return false;
-    };
-
-    const checkCreated = () => {
-        if(data.collection_private === true || data.collection_private === false) {
-            return false;
-        } else {
-            if(collectionData.is_creator) return false;
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
         }
-        return true;
     };
 
-    const [isPress, setIsPress] = useState([]);
+    const checkDeletedReplacement = () => {
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
+        }
+    }
 
-    // const setFalse = () => {
-    // };
-
-    const deletePlace = (place_pk, day) => {
-        //공간 삭제
+    const deletePlace = (map_pk, day) => {
+        // 공간 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${place_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${map_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    planDay: day,
-                })
             }).then((res) => res.json())
                 .then(async (response) => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
@@ -345,6 +357,54 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
 
                     getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const checkTrue = () => {
+        if (collectionData.collection_private) return true;
+        return false;
+    };
+
+    const checkPrivate = () => {
+        if (collectionData.is_creator) return true;
+        return false;
+    };
+
+    const [isPress, setIsPress] = useState([]);
+    const setFalse = (data) => {
+        var pressed = [];
+        for (let i = 0; i < data.length; i++) {
+            pressed.push(false);
+        }
+        setIsLimited(pressed);
+    };
+    const deleteCollection = () => {
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    Alert.alert('', '삭제되었습니다.');
+                    navigation.goBack();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -415,9 +475,225 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const deleteCollection = () => {
+    const postPlaceComment = (mapPk, addedComment) => {
+        //한줄평 등록
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: addedComment,
+                })
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const putPlaceComment = (mapPk, editedComment) => {
+        //한줄평 수정
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: editedComment,
+                })
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deletePlaceComment = (cpmMapPk, deletedComment) => {
+        //한줄평 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: {
+                    comment: deletedComment
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getInitialPlaceData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getReplacement = (cpmMapPk) => {
+        console.log(cpmMapPk)
+        //대체공간 불러오기
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    setReplacementData(response.data);
+                    setDeletedReplacementData(response.data)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const setDeletedReplacementData = (data) => {
+        var newArr = [];
+        for(var i=0;i<data.length;i++) {
+            newArr.push(false);
+        }
+        setIsDeletedReplacement(newArr);
+    }
+
+    const postReplacement = (mapPk, placePk, prev) => {
+        //대체공간 추가
+        // console.log(replacementData.length+prev+1);
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    order: replacementData.length+prev+1,
+                    placeId: placePk
+                })
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    // console.log('hi')
+                    console.log(response);
+                    // getInitialPlaceData();
+                    getReplacement(mapPk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const putReplacement = (cpmMapPk, editedComment) => {
+        //대체공간 수정
+        // replacementPlaceList : 추후
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/replacement/place`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: {
+                    replacementPlaceList : replacementPlaceList
+                }
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getReplacement(cpmMapPk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deleteReplacement = (cpmMapPk, place_pk) => {
+        //대체공간 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -425,16 +701,47 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+                    console.log(response)
+                    getReplacement(cpmMapPk);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
 
-                    Alert.alert('', '삭제되었습니다.');
-                    navigation.goBack();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+    
+    const deleteAllReplacement = (cpmMapPk) => {
+        //대체공간 자체를 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async response => {
+                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                        // Alert.alert('','로그인이 필요합니다');
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    console.log(response)
+                    getReplacement(cpmMapPk);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -451,44 +758,92 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
-    const checkType = (type) => {
-        if (type === 12) {
-            return '관광지';
-        } else if (type === 14) {
-            return '문화시설';
-        } else if (type === 15) {
-            return '축제/공연/행사';
-        } else if (type === 28) {
-            return '레포츠';
-        } else if (type === 32) {
-            return '숙박';
-        } else if (type === 38) {
-            return '쇼핑';
-        } else if (type === 39) {
-            return '음식';
-        } else {
-            return '기타';
+    //공간 삭제
+    const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
+
+    //한줄평 추가 : map Pk, 코멘트
+    const [isPostedCommentMapPk, setIsPostedCommentMapPk] = useState(0);
+    const [isPostedComment, setIsPostedComment] = useState('');
+
+    //한줄평 수정 : map Pk, 코멘트
+    const [isEditedCommentMapPk, setIsEditedCommentMapPk] = useState(0);
+    const [isEditedComment, setIsEditedComment] = useState('');
+
+    //대체공간 가져오기 : map Pk
+    const [isGottenReplacementMapPk, setIsGottenReplacementMapPk] = useState(0);
+
+    //한줄평 삭제, 대체공간 삭제
+    const [isDeletedComment, setIsDeletedComment] = useState([]);
+    const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
+
+    const setDeletedData = (data) => {
+        var newArr = [];
+        for(var i=0;i<data.length;i++) {
+            newArr.push(false);
         }
-    };
+        setIsDeletedOrigin(newArr);
+        setIsDeletedComment(newArr);
+    }
 
     const SwipeList = props => {
         return (
         <SafeAreaView>
             <FlatList data={placeData}
-              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk}/>}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
+                isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+              />}
               keyExtractor={(item, idx) => {idx.toString();}}
               key={(item, idx) => {idx.toString();}}
           nestedScrollEnabled/>
+
         </SafeAreaView>
         );};
 
     const EditList = props => (
-        <View></View>
+        // <View></View>
         // <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
+        <SafeAreaView>
+            <FlatList data={placeData}
+              renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
+                isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+              />}
+            keyExtractor={(item, idx) => {idx.toString();}}
+            key={(item, idx) => {idx.toString();}}
+        nestedScrollEnabled/>
+        </SafeAreaView>
     );
 
     const ShowDays = ({item, index}) => {
         const idx = index;
+        const checkLength = () => {
+            var placeLengthInDay = 0;
+            for(var i=0;i<placeData.length;i++) {
+                if(idx === 0) {
+                    if((placeData[i].cpm_plan_day === -1 || placeData[i].cpm_plan_day === idx)&& placeData[i].place_pk != -1 && placeData[i].place_pk != -2) {
+                        placeLengthInDay += 1;
+                    }
+                }
+                else {
+                    if(placeData[i].cpm_plan_day === idx && placeData[i].place_pk != -1 && placeData[i].place_pk != -2) {
+                    // console.log(placeData[i])
+                    placeLengthInDay += 1;
+                    }
+                }
+            }
+            return placeLengthInDay;
+        }
         return (
             <>
                 <View>
@@ -502,7 +857,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </View>
                         </View>
                         <View>
-                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : item})}
+                            <TouchableOpacity onPress={()=>navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : idx, replace: false})}
                                 style={!collectionData.is_creator && {display: 'none'}}
                             >
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
@@ -514,31 +869,58 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     </View>
                 </View>
                 {!isEditPage ? <SwipeList idx={idx} key={idx}/> : <EditList idx={idx} key={idx}/>}
-
-                {/* <TouchableOpacity onPress={() => {
-                // if(isLimited) setIsLimited(false);
-                // else setIsLimited(true);
-                // console.log(isLimited)
-                }}>
+                {checkLength() > 5 && !isEditPage && <TouchableOpacity>
                     <View style={{
                         flexDirection: 'row',
+                        marginVertical: 16,
                         justifyContent: 'center',
                         alignItems: 'center'
                     }}>
-                        <AppText style={{
-                            fontSize: 14,
-                            fontWeight: '400',
-                            color: colors.gray[2]
-                        }}>전체보기</AppText>
-                        <Image source={require('../../assets/images/showWhole_forDir.png')}
-                            style={{
-                                width: 15,
-                                height: 15,
-                                marginLeft: 10,
-                                marginBottom: 5
-                            }}></Image>
+                        { !isLimited[idx] ?
+                        <TouchableOpacity onPress={()=>{
+                            var newArr = [...isLimited];
+                            newArr[idx] = true;
+                            setIsLimited(newArr);
+                        }}
+                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        >
+                            <AppText style={{
+                                fontSize: 14,
+                                fontWeight: '400',
+                                color: colors.gray[2]
+                            }}>전체보기</AppText>
+                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginLeft: 10,
+                                    marginBottom: 5
+                                }}></Image>
+                        </TouchableOpacity> :
+                        <TouchableOpacity onPress={()=>{
+                            var newArr = [...isLimited];
+                            newArr[idx] = false;
+                            setIsLimited(newArr);
+                        }}
+                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        >
+                            <AppText style={{
+                                fontSize: 14,
+                                fontWeight: '400',
+                                color: colors.gray[2]
+                            }}>닫기</AppText>
+                            <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginLeft: 10,
+                                    marginTop: 7,
+                                    transform: [{rotate: '180deg'}]
+                                }}></Image>
+                        </TouchableOpacity>
+                        }
                     </View>
-                </TouchableOpacity> */}
+                </TouchableOpacity>}
             </>
         );
     };
@@ -546,60 +928,57 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [showMenu, setShowMenu] = useState(false);
     const [deleteMenu, setDeleteMenu] = useState(false);
 
-    const deleteMode = () => {
-        setDeleteMenu(true);
-    };
-
-    const [isVisible, setIsVisible] = useState(false);
     const list = [
-        { title: '프로필 수정하기',
-        onPress: () => {
-            setIsVisible(false)
-        }},
-        { title: '공간 수정하기',
-        onPress: () => {
-            setIsVisible(false)
-        }},
-        { title: '공유하기',
-        onPress: () => {
-            setIsVisible(false)
-        }
+        { 
+            title: '공간 수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        { 
+            title: '보관함 정보수정',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        { 
+            title: '보관함 공유',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
         },
         {
-            title: '삭제하기',
-            containerStyle: { backgroundColor: colors.red[3] },
-            titleStyle: { color: colors.defaultColor },
-            onPress: () => {
-                deleteMode();
-                setIsVisible(false)
-            }
+            title: '보관함 삭제',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.red[3], fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
         },
     ];
 
-    const DeleteModal = () => (
+    const DeleteModal = props => (
         <Modal
             transparent={true}
             visible={deleteMenu}
             onRequestClose={() => {
                 setDeleteMenu(!deleteMenu);
+                props.refRBSheet.current.close();
             }}
         >
             <View style={styles.centeredView}>
                 <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제하시겠습니까?</AppText>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>보관함을 삭제할까요?</AppText>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.gray[4]}}
-                            onPress={() => setDeleteMenu(!deleteMenu)}
+                            onPress={() => {
+                                props.refRBSheet.current.close();
+                                setDeleteMenu(!deleteMenu);
+                            }}
                         >
                             <AppText style={styles.textStyle}>취소하기</AppText>
                         </Pressable>
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.mainColor}}
                             onPress={() => {
+                                props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
                                 deleteCollection();
-                                setIsVisible(true);
                             }}
                         >
                             <AppText style={styles.textStyle}>삭제하기</AppText>
@@ -611,28 +990,22 @@ const PlanCollectionScreen = ({route, navigation}) => {
     );
 
     const setDate = () => {
-        //data로 오는 거 처리
-        if(data.collection_private === true || data.collection_private === false) {
-            return `${startDate} - ${endDate}`;
-        }
-        else if(data.collection_private === 0 || data.collection_private === 1) {
-            if(Object.keys(collectionData).length === 0 && collectionData.constructor === Object) return '';
-            else {
-                //년도가 다를 경우
-                if(parseInt(startDate.split('-')[0]) !== parseInt(endDate.split('-')[0])) {
-                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('YYYY.MM.DD')}`;
-                }
-                //월이 다를 경우
-                if(parseInt(startDate.split('-')[1]) !== parseInt(endDate.split('-')[1])) {
-                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('MM.DD')}`;
-                }
-                //일이 다를 경우
-                if(parseInt(startDate.split('-')[2]) !== parseInt(endDate.split('-')[2])) {
-                    return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('DD')}`;
-                }
-                //시작일과 종료일이 같을 경우
-                else return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}`;
+        if(Object.keys(collectionData).length === 0 && collectionData.constructor === Object) return '';
+        else {
+            //년도가 다를 경우
+            if(parseInt(startDate.split('-')[0]) !== parseInt(endDate.split('-')[0])) {
+                return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('YYYY.MM.DD')}`;
             }
+            //월이 다를 경우
+            if(parseInt(startDate.split('-')[1]) !== parseInt(endDate.split('-')[1])) {
+                return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('MM.DD')}`;
+            }
+            //일이 다를 경우
+            if(parseInt(startDate.split('-')[2]) !== parseInt(endDate.split('-')[2])) {
+                return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}-${moment(endDate.split('T')[0]).format('DD')}`;
+            }
+            //시작일과 종료일이 같을 경우
+            else return `${moment(startDate.split('T')[0]).format('YYYY.MM.DD')}`;
         }
     };
 
@@ -696,65 +1069,57 @@ const PlanCollectionScreen = ({route, navigation}) => {
         )
     };
 
+    const ShowCollectionComments = () => {
+        const [comments, setComments] = useState('');
+        return (
+            <View style={{marginBottom: 143}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
+                    <AppText style={{
+                        color: colors.gray[3],
+                        fontSize: 14,
+                        marginStart: 11,
+                        marginTop: 5
+                    }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
+                </View>
+                <View style={{marginVertical: 20}}>
+                    <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
+                        <TextInput flex={1} style={{fontSize: 16}}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="보관함에 댓글을 남겨보세요!"
+                            value={comments}
+                            placeholderTextColor={colors.gray[5]}
+                            onChangeText={(text)=>setComments(text)}
+                            onSubmitEditing={()=>{
+                                setComments(comments);
+                                postCollectionCommentsData(comments);
+                                setComments('');
+                            }}
+                            />
+                        <Pressable style={{marginLeft: 5}} onPress={()=>{
+                            postCollectionCommentsData(comments);
+                            setComments('');
+                        }}>
+                            <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
+                                name={'pencil'} size={16}></Icon>
+                        </Pressable>
+                    </View>
+                </View>
+                {
+                    commentsData.length !== 0 &&
+                    <View style={{marginTop: 4}}>{
+                        commentsData.map((data, idx) => (
+                            <ShowComments data={data} key={idx} idx={idx}/>
+                        ))
+                    }</View>
+                }
+            </View>
+        )
+    }
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            {
-                showMenu && (
-                    <View style={{
-                        position: 'absolute',
-                        width: 80,
-                        // height: 80,
-                        height: 40,
-                        top: 50,
-                        right: 60,
-                        backgroundColor: '#fff',
-                        flex: 1,
-                        borderRadius: 10,
-                        zIndex: 100000000,
-    
-                        shadowColor: '#000',
-                        shadowOffset: {
-                            width: 0,
-                            height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        elevation: 5,
-    
-                        overflow: 'visible'
-                    }}>
-                        {/* <TouchableOpacity
-                            onPress={() => {
-                                setIsEditPage(true);
-                                setShowMenu(state => !state);
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>수정하기</AppText>
-                        </TouchableOpacity> */}
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                        }}></View>
-                        <TouchableOpacity
-                            onPress={async () => {
-                                await deleteMode();
-
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}><AppText>삭제하기</AppText></TouchableOpacity>
-                        <DeleteModal />
-                    </View>
-                )
-            }
-
             <View flexDirection="row" style={{
                 height: 24,
                 marginBottom: 20,
@@ -765,7 +1130,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        if(typeof data.collection_private === 'boolean') {
+                        if(data.now) {
                             navigation.pop(2);
                         }
                         else navigation.goBack();}}>
@@ -777,32 +1142,59 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         !isEditPage ?
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                    disabled={typeof data.collection_private === 'boolean'}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
-                                        // setShowMenu(state => !state)
-                                        setIsVisible(true);
+                                        refRBSheet.current.open();
                                     }}>
                                     <MoreIcon style={{color: colors.mainColor}}/>
                                 </TouchableOpacity>
-                                <BottomSheet
-                                        isVisible={isVisible}
-                                        containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-                                        >
-                                        {list.map((l, i) => (
-                                            <ListItem key={i} containerStyle={l.containerStyle} onPress={l.onPress}>
-                                            <ListItem.Content>
-                                                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-                                            </ListItem.Content>
-                                            </ListItem>
-                                        ))}
-                                </BottomSheet>
-                                <DeleteModal />
+                                <RBSheet
+                                    ref={refRBSheet}
+                                    closeOnDragDown={true}
+                                    closeOnPressMask={true}
+                                    height={250}
+                                    customStyles={{
+                                        wrapper: {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                        },
+                                        draggableIcon: {
+                                            display: 'none'
+                                        },
+                                        container: {
+                                            borderTopLeftRadius: 10,
+                                            borderTopRightRadius: 10,
+                                            backgroundColor: colors.yellow[7],
+                                            paddingTop: 10
+                                        }
+                                    }}
+                                >
+                                    {list.map((l, i) => (
+                                        <TouchableOpacity onPress={()=>{
+                                            if(i === 0) {
+                                                setIsEditPage(true);
+                                            }
+                                            if(i === 1) {
+                                                refRBSheet.current.close();
+                                                navigation.navigate('MakePlanCollection', {data: collectionData, update: true});
+                                            }
+                                            if(i === 3) {
+                                                setDeleteMenu(true);
+                                            }
+                                        }}>
+                                            <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
+                                                <AppText style={l.titleStyle}>{l.title}</AppText>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <DeleteModal refRBSheet={refRBSheet}/>
+                                </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditPage(false);
-                                        console.log(updatedData);
+                                        isDeleted(isDeletedOrigin);
+                                        isCommentDeleted(isDeletedComment);
+                                        checkDeletedPlace();
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -855,28 +1247,17 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 fontSize: 22,
                                 fontWeight: '700',
                                 color: colors.mainColor
-                            }}>{data.collection_name}</AppText>
-                            {
-                                typeof data.collection_private === 'boolean' ?
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        fontWeight: '400',
-                                        color: colors.gray[2],
-                                        lineHeight: 19.2,
-                                        marginTop: 12
-                                    }}>by. {userData.user_nickname}</AppText> :
-                                    <AppText style={{
-                                        fontSize: 12,
-                                        fontWeight: '400',
-                                        color: colors.gray[2],
-                                        lineHeight: 19.2,
-                                        marginTop: 12
-                                    }}>by. {collectionData.created_user_name}</AppText>
-                                
-                            }
+                            }}>{collectionData.collection_name}</AppText>
+                            <AppText style={{
+                                fontSize: 12,
+                                fontWeight: '400',
+                                color: colors.gray[2],
+                                lineHeight: 19.2,
+                                marginTop: 12
+                            }}>by. {collectionData.created_user_name}</AppText>
                         </View>
                         {
-                            userData.user_nickname !== data.created_user_name &&
+                            userData.user_nickname !== collectionData.created_user_name &&
                            <TouchableOpacity onPress={() => {
                                if (collectionData.like_flag) {
                                    DeleteLikedCollection();
@@ -884,7 +1265,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                    LikeCollection();
                                }
                            }}>
-                               {!(data.collection_private === false || data.collection_private === true) && <View style={{
+                               <View style={{
                                    justifyContent: 'center',
                                    alignItems: 'center',
                                    marginVertical: 5
@@ -897,15 +1278,15 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                        color: collectionData.like_flag ? colors.red[3] : colors.red_gray[3],
                                        marginTop: 2
                                    }}>{collectionData.like_cnt}</AppText>
-                               </View>}
+                               </View>
                            </TouchableOpacity>
                         }
                     </View>
                 </ScreenContainerView>
 
                 <View style={{marginTop: 20}}>
-                    <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/>
-                    {/* TODO 카카오 지도 api 가져오기
+                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
+                    
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
                                  initialRegion={{
@@ -921,12 +1302,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                  title="서울시청"
                                  description="기본값입니다"/>
                         </MapView>
-                    </View> */}
+                    </View>
                 </View>
 
                 <ScreenContainerView>
-                    {
-                        placeLength !== 0 ?
                             <View style={{marginTop: 16}}>
                                 <View style={{marginBottom: 16}}>
                                     <AppText style={{color: colors.gray[4]}}>총 <AppText
@@ -947,87 +1326,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         key={(item, index) => index.toString()}
                                         nestedScrollEnabled/>
                                 </SafeAreaView>
-                            </View> :
-                            <>
-                                <View style={{marginTop: 16}}>
-                                    <View style={{marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <View>
-                                            <AppText style={{color: colors.gray[4]}}>총 <AppText
-                                                style={{fontWeight: '700'}}>{placeLength}개</AppText> 공간</AppText>
-                                        </View>
-                                        <TouchableOpacity onPress={()=>{
-                                            if(typeof data.collection_private === 'boolean') navigation.navigate('Search');
-                                            else navigation.navigate('SearchForPlan', {pk: collectionData.collection_pk, placeData: placeData, day : data});
-                                        }} style={checkCreated() && {display: 'none'}}>
-                                            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                                                <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
-                                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
-                                            </View>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style={{
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginTop: 40,
-                                    marginBottom: 52
-                                }}>
-                                    <Image source={require('../../assets/images/empty_forDir.png')} style={{
-                                        width: 150,
-                                        height: 120,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        marginBottom: 12
-                                    }}></Image>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>보관함이 비어있네요.</AppText>
-                                    <AppText style={{fontSize: 14, color: colors.red_gray[2], fontWeight: '500', lineHeight: 22.4}}>마음에 드는 공간을 수집해보세요!</AppText>
-                                </View>
-                            </>
-                    }
-
+                            </View>
                 </ScreenContainerView>
 
                 <ScreenDivideLine style={{marginVertical: 16}}/>
 
                 <ScreenContainerView>
-                    <View style={{marginBottom: 143}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
-                            <AppText style={{
-                                color: colors.gray[3],
-                                fontSize: 14,
-                                marginStart: 11,
-                                marginTop: 5
-                            }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
-                        </View>
-                        <View style={{marginVertical: 20}}>
-                            <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
-                                <TextInput flex={1} style={{fontSize: 16}}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                    placeholder="보관함에 댓글을 남겨보세요!"
-                                    value={comments}
-                                    placeholderTextColor={colors.gray[5]}
-                                    onChangeText={(text)=>setComments(text)}
-                                    />
-                                <Pressable style={{marginLeft: 5}} onPress={()=>{
-                                    postCollectionCommentsData(comments);
-                                    setComments('');
-                                }}>
-                                    <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
-                                        name={'pencil'} size={16}></Icon>
-                                </Pressable>
-                            </View>
-                        </View>
-                        {
-                            commentsData.length !== 0 &&
-                            <View style={{marginTop: 4}}>{
-                                commentsData.map((data, idx) => (
-                                    <ShowComments data={data} key={idx} idx={idx}/>
-                                ))
-                            }</View>
-                        }
-                    </View>
+                    <ShowCollectionComments />
                 </ScreenContainerView>
             </ScrollView>
         </ScreenContainer>
