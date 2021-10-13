@@ -18,10 +18,6 @@ exports.createFreeCollection = async (user_pk, collectionData) => {
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
 
-        // 보관함 수정 권한
-        const query2 = `INSERT INTO collection_user_map (collection_pk, user_pk) 
-                        VALUES (${collection_pk}, ${user_pk})`;
-        const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
         if (collectionData.keywords.length > 0) {
@@ -69,10 +65,6 @@ exports.createPlanCollection = async (user_pk, collectionData) => {
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
-
-        // 보관함 수정 권한 추가
-        const query2 = `INSERT INTO collection_user_map (collection_pk, user_pk) VALUES (${collection_pk}, ${user_pk})`;
-        const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
         if (collectionData.keywords.length > 0) {
