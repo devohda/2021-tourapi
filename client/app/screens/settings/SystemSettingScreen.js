@@ -20,6 +20,7 @@ const SystemSettingScreen = ({navigation}) => {
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     useEffect(() => {
         getUserData();
@@ -36,8 +37,12 @@ const SystemSettingScreen = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -73,10 +78,10 @@ const SystemSettingScreen = ({navigation}) => {
         {
             index: 3,
             data: [{index: 1, name: '문의하기'}, {index: 2, name: '새로운 소식'}, {index: 3, name: '신고하기'},
-            {
-                index: 4,
-                name: '버전 정보 ' + appJson.expo.version
-            }]
+                {
+                    index: 4,
+                    name: '버전 정보 ' + appJson.expo.version
+                }]
         },
         {
             index: 4,

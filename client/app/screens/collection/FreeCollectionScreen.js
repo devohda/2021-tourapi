@@ -67,6 +67,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [update, setUpdate] = setUpdated();
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     const isDeleted = (deletedData) => {
         setIsDeletedOrigin(deletedData);
@@ -93,7 +94,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const isReplacementDeleted = (deletedReplacementData) => {
-        console.log(deletedReplacementData)
+        console.log(deletedReplacementData);
         setIsDeletedReplacement(deletedReplacementData);
     };
 
@@ -108,7 +109,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -155,7 +161,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -185,7 +196,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -195,7 +211,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setPlaceData(response.data);
                     setPlaceLength(response.data.length);
                     setFalse();
-                    setDeletedData(response.data)
+                    setDeletedData(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -217,14 +233,19 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    setCommentsData(response.data)
-                    // console.log(response.data)
+
+                    setCommentsData(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -246,14 +267,20 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     // setCommentsData(response.data)
-                    console.log(response.data)
+                    console.log(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -275,13 +302,17 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -306,13 +337,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
+
                     getCollectionCommentsData();
                 })
                 .catch((err) => {
@@ -343,7 +379,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
             }
         }
-    }
+    };
 
     const deletePlace = (map_pk, day) => {
         // 공간 삭제
@@ -357,7 +393,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -405,7 +446,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -436,7 +482,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -466,7 +517,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -486,7 +542,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const postPlaceComment = (cpmMapPk, addedComment) => {
         //한줄평 등록
-        console.log(addedComment)
+        console.log(addedComment);
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
                 method: 'POST',
@@ -500,14 +556,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -534,14 +594,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -568,14 +632,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     getInitialPlaceData();
                 })
                 .catch((err) => {
@@ -587,7 +655,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
     const getReplacement = (cpmMapPk) => {
-        console.log(cpmMapPk)
+        console.log(cpmMapPk);
         //대체공간 불러오기
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
@@ -599,16 +667,20 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     setReplacementData(response.data);
-                    setDeletedReplacementData(response.data)
+                    setDeletedReplacementData(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -625,7 +697,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             newArr.push(false);
         }
         setIsDeletedReplacement(newArr);
-    }
+    };
 
     const postReplacement = (mapPk, placePk, prev) => {
         //대체공간 추가
@@ -644,15 +716,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 })
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log('hi')
-                    console.log(response);
+
                     // getInitialPlaceData();
                     getReplacement(mapPk);
                 })
@@ -681,14 +756,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     getReplacement(cpmMapPk);
                 })
                 .catch((err) => {
@@ -712,14 +791,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     getReplacement(cpmMapPk);
                 })
                 .catch((err) => {
@@ -743,14 +826,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     getReplacement(cpmMapPk);
                 })
                 .catch((err) => {
@@ -793,7 +880,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
         setIsDeletedOrigin(newArr);
         setIsDeletedComment(newArr);
-    }
+    };
 
     const SwipeList = () => {
         //일반 페이지에서 불러오기, 추가, 수정, 삭제 모두 가능하도록
@@ -803,17 +890,17 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 <SafeAreaView>
                     <FlatList data={placeData}
                         renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
-                        isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
-                        isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
-                        isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
-                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
-                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
-                        postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+                            isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
+                            isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                            isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                            isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                            postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                            postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
                         />}
                         keyExtractor={(item, idx) => {idx.toString();}}
                         key={(item, idx) => {idx.toString();}}
-                    nestedScrollEnabled/>
+                        nestedScrollEnabled/>
                 </SafeAreaView>
             </>
         );};
@@ -900,46 +987,46 @@ const FreeCollectionScreen = ({route, navigation}) => {
         const { data, idx } = props;
         return (
             <>
-            <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
-                <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                    <DefaultProfile width={36} height={36}/>
-                </View>
-                <View>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: 8,
-                        flexWrap: 'wrap'
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
-                        <AppText style={{
-                            marginHorizontal: 8,
-                            color: colors.gray[5],
-                            fontSize: 10
-                        }}>|</AppText>
-                        <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
+                    <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
+                        <DefaultProfile width={36} height={36}/>
                     </View>
-                    <View style={{flex: 1, width: '100%'}}><AppText style={{
-                        fontSize: 12,
-                        color: colors.mainColor,
-                        lineHeight: 16,
-                        fontWeight: '700',
-                        flexWrap: 'wrap',
-                        width: windowWidth - 100
-                    }}>{data.collection_comment}
-                    </AppText></View>
+                    <View>
+                        <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginBottom: 8,
+                            flexWrap: 'wrap'
+                        }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
+                            <AppText style={{
+                                marginHorizontal: 8,
+                                color: colors.gray[5],
+                                fontSize: 10
+                            }}>|</AppText>
+                            <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                        </View>
+                        <View style={{flex: 1, width: '100%'}}><AppText style={{
+                            fontSize: 12,
+                            color: colors.mainColor,
+                            lineHeight: 16,
+                            fontWeight: '700',
+                            flexWrap: 'wrap',
+                            width: windowWidth - 100
+                        }}>{data.collection_comment}
+                        </AppText></View>
+                    </View>
                 </View>
-            </View>
 
-            <View style={{
-                width: '100%',
-                height: 1,
-                backgroundColor: colors.red_gray[6],
-                zIndex: -1000,
-                marginVertical: 12
-            }}></View>
+                <View style={{
+                    width: '100%',
+                    height: 1,
+                    backgroundColor: colors.red_gray[6],
+                    zIndex: -1000,
+                    marginVertical: 12
+                }}></View>
             </>
-        )
+        );
     };
 
     const ShowCollectionComments = () => {
@@ -969,7 +1056,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 postCollectionCommentsData(comments);
                                 setComments('');
                             }}
-                            />
+                        />
                         <Pressable style={{marginLeft: 5}} onPress={()=>{
                             postCollectionCommentsData(comments);
                             setComments('');
@@ -988,8 +1075,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     }</View>
                 }
             </View>
-        )
-    }
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -1159,18 +1246,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     
                     <View>
                         <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                                 initialRegion={{
-                                     latitude: 37.56633546113615,
-                                     longitude: 126.9779482762618,
-                                     latitudeDelta: 0.0015,
-                                     longitudeDelta: 0.0015,
-                                 }}
+                            initialRegion={{
+                                latitude: 37.56633546113615,
+                                longitude: 126.9779482762618,
+                                latitudeDelta: 0.0015,
+                                longitudeDelta: 0.0015,
+                            }}
                         ><Marker coordinate={{
-                            latitude: 37.56633546113615,
-                            longitude: 126.9779482762618
-                        }}
-                                 title="서울시청"
-                                 description="기본값입니다"/>
+                                latitude: 37.56633546113615,
+                                longitude: 126.9779482762618
+                            }}
+                            title="서울시청"
+                            description="기본값입니다"/>
                         </MapView>
                     </View>
                 </View>
@@ -1200,18 +1287,18 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                 <SwipeList /> :
                                                 // <Example />
                                                 <FlatList data={placeData}
-                                                renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
-                                                isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
-                                                isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
-                                                isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
-                                                isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
-                                                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                                                postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
-                                                postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
-                                                />}
-                                                keyExtractor={(item, idx) => {idx.toString();}}
-                                                key={(item, idx) => {idx.toString();}}
-                                            nestedScrollEnabled/>
+                                                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
+                                                        isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
+                                                        isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                                                        isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                                                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                                                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                                                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                                                        postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+                                                    />}
+                                                    keyExtractor={(item, idx) => {idx.toString();}}
+                                                    key={(item, idx) => {idx.toString();}}
+                                                    nestedScrollEnabled/>
                                             // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
                                         }
                                     </SafeAreaView>
@@ -1229,39 +1316,39 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     }}>
                                         {
                                             !isLimited ?
-                                            <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
-                                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
-                                            >
-                                                <AppText style={{
-                                                fontSize: 14,
-                                                fontWeight: '400',
-                                                color: colors.gray[2]
-                                                }}>전체보기</AppText>
-                                                <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                                    style={{
-                                                        width: 15,
-                                                        height: 15,
-                                                        marginLeft: 10,
-                                                        marginBottom: 5
-                                                }}></Image>
-                                            </TouchableOpacity> :
-                                            <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
-                                            style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
-                                            >
-                                                <AppText style={{
-                                                fontSize: 14,
-                                                fontWeight: '400',
-                                                color: colors.gray[2]
-                                                }}>닫기</AppText>
-                                                <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                                    style={{
-                                                        width: 15,
-                                                        height: 15,
-                                                        marginLeft: 10,
-                                                        marginTop: 7,
-                                                        transform: [{rotate: '180deg'}]
-                                                }}></Image>
-                                            </TouchableOpacity>
+                                                <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                                    style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                                                >
+                                                    <AppText style={{
+                                                        fontSize: 14,
+                                                        fontWeight: '400',
+                                                        color: colors.gray[2]
+                                                    }}>전체보기</AppText>
+                                                    <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                        style={{
+                                                            width: 15,
+                                                            height: 15,
+                                                            marginLeft: 10,
+                                                            marginBottom: 5
+                                                        }}></Image>
+                                                </TouchableOpacity> :
+                                                <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                                    style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                                                >
+                                                    <AppText style={{
+                                                        fontSize: 14,
+                                                        fontWeight: '400',
+                                                        color: colors.gray[2]
+                                                    }}>닫기</AppText>
+                                                    <Image source={require('../../assets/images/showWhole_forDir.png')}
+                                                        style={{
+                                                            width: 15,
+                                                            height: 15,
+                                                            marginLeft: 10,
+                                                            marginTop: 7,
+                                                            transform: [{rotate: '180deg'}]
+                                                        }}></Image>
+                                                </TouchableOpacity>
                                         }
 
                                     </View>
@@ -1400,7 +1487,6 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         color: 'white',
-        fontWeight: 'bold',
         textAlign: 'center',
         fontSize: 14,
         lineHeight: 22.4,

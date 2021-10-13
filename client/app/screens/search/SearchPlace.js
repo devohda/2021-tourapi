@@ -1,5 +1,15 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView, TouchableWithoutFeedback} from 'react-native';
+import {
+    Image,
+    TouchableOpacity,
+    View,
+    StyleSheet,
+    SafeAreaView,
+    FlatList,
+    ScrollView,
+    TouchableWithoutFeedback,
+    Alert
+} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
@@ -25,6 +35,7 @@ const SearchPlace = ({navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const [token, setToken] = useToken();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     const styles = StyleSheet.create({
         info_container: {
@@ -56,14 +67,18 @@ const SearchPlace = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response);
+
                     setSearchLength(response.data.length);
                     setPlaceList(response.data);
                     // setFalse();
@@ -89,8 +104,12 @@ const SearchPlace = ({navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -120,8 +139,12 @@ const SearchPlace = ({navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -151,15 +174,18 @@ const SearchPlace = ({navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -196,98 +222,98 @@ const SearchPlace = ({navigation}) => {
     const SelectBox = () => {
         return (
             <>
-            {
-            showMenu && <View style={{
-                position: 'absolute',
-                width: 80,
-                height: 80,
-                backgroundColor: '#fff',
-                // flex: 1,
-                borderRadius: 10,
-                zIndex: 0,
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-                overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('평점순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
-                        {currentMenu === '평점순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                    
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
+                {
+                    showMenu && <View style={{
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        backgroundColor: '#fff',
+                        // flex: 1,
+                        borderRadius: 10,
                         zIndex: 0,
-                        backgroundColor: colors.backgroundColor,
-                    }}></View>
-                    
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('인기순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+                        overflow: 'visible'
                     }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('평점순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                            {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
                     
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
-                        zIndex: 0
-                    }}></View>
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                            zIndex: 0,
+                            backgroundColor: colors.backgroundColor,
+                        }}></View>
                     
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('거리순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                        {currentMenu === '거리순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                </View>
-            }
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('인기순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                            {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
+                    
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                            zIndex: 0
+                        }}></View>
+                    
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('거리순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
+                            {currentMenu === '거리순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
+                    </View>
+                }
             </>
         );};
 
     const PlaceContainer = ({item, index}) => {
         return (
             <TouchableOpacity onPress={() => {
-                countPlaceView(item.place_pk)
+                countPlaceView(item.place_pk);
                 navigation.navigate('Place', {data: item});
             }}>
                 <View style={{
@@ -367,7 +393,7 @@ const SearchPlace = ({navigation}) => {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
                         <>
-                        {/* <View style={{position: 'relative'}}>
+                            {/* <View style={{position: 'relative'}}>
                         <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                             <View flexDirection="row" flex={1} style={{justifyContent: 'flex-end'}}>
                                 <TouchableOpacity onPress={()=>{
@@ -381,10 +407,10 @@ const SearchPlace = ({navigation}) => {
                             </View>
                         </TouchableWithoutFeedback>
                         </View> */}
-                        <SafeAreaView flex={1}>
-                            <FlatList data={placeList} renderItem={PlaceContainer}
-                                keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
-                        </SafeAreaView>
+                            <SafeAreaView flex={1}>
+                                <FlatList data={placeList} renderItem={PlaceContainer}
+                                    keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
+                            </SafeAreaView>
                         </>
                 }
             </ScrollView>

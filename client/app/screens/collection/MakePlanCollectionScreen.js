@@ -61,6 +61,9 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     });
     const [originStartDate, setOriginStartDate] = useState(new Date());
     const [originEndDate, setOriginEndDate] = useState(new Date());
+
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
+
     const i18n = {
         dayNames: {
             short: ['일', '월', '화', '수', '목', '금', '토'],
@@ -132,7 +135,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
             if(data.collection_private) {
                 setIsEnabled(true);
             }
-            console.log(range)
+            console.log(range);
             var newArr = {
                 startDate: data.collection_start_date,
                 endDate: data.collection_end_date,
@@ -189,7 +192,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
             name: collectionName,
             isPrivate: forPostEnable,
             keywords: [],
-        }
+        };
         if(datas.length === 0) {
             forPostData = {
                 name: collectionName,
@@ -197,7 +200,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 startDate: startDate,
                 endDate: endDate,
                 keywords: []
-            }
+            };
         } else {
             forPostData = {
                 name: collectionName,
@@ -205,7 +208,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 startDate: startDate,
                 endDate: endDate,
                 keywords: datas
-            }
+            };
         }
 
         let form = new FormData();
@@ -220,15 +223,18 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 },
                 body: form
             }).then(res => res.json())
-            .then(response => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async response => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
 
                     const item = {
                         'collection_pk': response.collectionId,
@@ -417,122 +423,121 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                         style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                 </TouchableOpacity>
                 <RBSheet
-                ref={refKeywordRBSheet}
-                closeOnDragDown={true}
-                closeOnPressMask={true}
-                height={475}
-                customStyles={{
-                    wrapper: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    },
-                    draggableIcon: {
-                        backgroundColor: colors.gray[4],
-                        width: 110
-                    },
-                    container: {
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
-                        backgroundColor: colors.yellow[7],
-                    }
-                }}
-            >
-                <View style={{backgroundColor: colors.backgroundColor}}>
-                    <ScreenContainerView>
-                        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 19, marginBottom: 17}}>
-                            <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함
+                    ref={refKeywordRBSheet}
+                    closeOnDragDown={true}
+                    closeOnPressMask={true}
+                    height={475}
+                    customStyles={{
+                        wrapper: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        },
+                        draggableIcon: {
+                            backgroundColor: colors.gray[4],
+                            width: 110
+                        },
+                        container: {
+                            borderTopLeftRadius: 10,
+                            borderTopRightRadius: 10,
+                            backgroundColor: colors.yellow[7],
+                        }
+                    }}
+                >
+                    <View style={{backgroundColor: colors.backgroundColor}}>
+                        <ScreenContainerView>
+                            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 19, marginBottom: 17}}>
+                                <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함
                                 해시태그</AppText>
-                            <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대 3개</AppText>
-                        </View>
-                        <View flexDirection="row" style={{...styles.search_box, borderColor: colors.mainColor}}>
-                            <TextInput flex={1} style={{fontSize: 16}}
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                                placeholder=""
-                                placeholderTextColor={colors.gray[5]}
-                                onChangeText={(text)=>setSearchKeyword(text)}
-                            />
-                            <Pressable style={{marginLeft: 5}}>
-                                <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
-                            </Pressable>
-                        </View>
-                        <><View style={{flexDirection: 'row'}}>
-                            {
-                                keywordData.map((keyword, idx) => (
-                                    <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>* 최대 3개</AppText>
+                            </View>
+                            <View flexDirection="row" style={{...styles.search_box, borderColor: colors.mainColor}}>
+                                <TextInput flex={1} style={{fontSize: 16}}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    placeholder=""
+                                    placeholderTextColor={colors.gray[5]}
+                                    onChangeText={(text)=>setSearchKeyword(text)}
+                                />
+                                <Pressable style={{marginLeft: 5}}>
+                                    <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
+                                </Pressable>
+                            </View>
+                            <><View style={{flexDirection: 'row'}}>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'0000'}/>}</>
-                                ))
-                            }
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            {
-                                keywordData.map((keyword, idx) => (
-                                    <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    ))
+                                }
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'1111'}/>}</>
-                                ))
-                            }
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            {
-                                keywordData.map((keyword, idx) => (
-                                    <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    ))
+                                }
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'2222'}/>}</>
-                                ))
-                            }
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            {
-                                keywordData.map((keyword, idx) => (
-                                    <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    ))
+                                }
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'3333'}/>}</>
-                                ))
-                            }
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            {
-                                keywordData.map((keyword, idx) => (
-                                    <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    ))
+                                }
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'4444'}/>}</>
-                                ))
-                            }
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            {
-                                keywordData.map((keyword, idx) => (
-                                    <>{18 <= idx && idx <= 19 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                    ))
+                                }
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{18 <= idx && idx <= 19 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
                                         <Keyword keyword={keyword} key={idx+'5555'}/>}</>
-                                ))
-                            }
-                        </View>
-                        </>
-                        <View style={{marginTop: 30, marginBottom: 20, bottom: 0}}>
-                            <TouchableOpacity
-                                style={{
-                                    backgroundColor: colors.mainColor,
-                                    backgroundColor: pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? colors.mainColor : colors.gray[5],
-                                    height: 48,
-                                    borderRadius: 10
-                                }}
-                                onPress={() => {
-                                    setIsPress(pressed)
-                                }}
-                                disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
-                            ><AppText
+                                    ))
+                                }
+                            </View>
+                            </>
+                            <View style={{marginTop: 30, marginBottom: 20, bottom: 0}}>
+                                <TouchableOpacity
                                     style={{
-                                        textAlign: 'center',
-                                        padding: 14,
-                                        fontSize: 16,
-                                        color: colors.defaultColor,
-                                        fontWeight: 'bold'
+                                        backgroundColor: pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? colors.mainColor : colors.gray[5],
+                                        height: 48,
+                                        borderRadius: 10
                                     }}
-                                >선택완료</AppText>
-                            </TouchableOpacity>
-                        </View>
-                    </ScreenContainerView>
-                </View>
-            </RBSheet>
-        </>
-        )
-    }
+                                    onPress={() => {
+                                        setIsPress(pressed);
+                                    }}
+                                    disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
+                                ><AppText
+                                        style={{
+                                            textAlign: 'center',
+                                            padding: 14,
+                                            fontSize: 16,
+                                            color: colors.defaultColor,
+                                            fontWeight: 'bold'
+                                        }}
+                                    >선택완료</AppText>
+                                </TouchableOpacity>
+                            </View>
+                        </ScreenContainerView>
+                    </View>
+                </RBSheet>
+            </>
+        );
+    };
 
     const SelectedKeyword = ({keyword, idx}) => {
         return (
@@ -555,16 +560,16 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <NavigationTop navigation={navigation} title={update ? "일정보관함 수정" : "일정보관함 만들기"}/>
+            <NavigationTop navigation={navigation} title={update ? '일정보관함 수정' : '일정보관함 만들기'}/>
             <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScreenContainerView>
                     <View style={{marginTop: 26}}>
                         <CustomTextInput
-                                style={{
-                                    color: colors.mainColor,
-                                    fontSize: 20,
-                                    fontWeight: 'bold'
-                                }}
+                            style={{
+                                color: colors.mainColor,
+                                fontSize: 20,
+                                fontWeight: 'bold'
+                            }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
                             onChangeText={(name) => setCollectionName(name)}
                             value={collectionName}
@@ -575,7 +580,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 <ScreenDivideLine />
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
                             <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>보관함
                                 해시태그</AppText>
                             <AppText style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>*
@@ -589,12 +594,12 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
                             <View flexDirection="row">
                                 <SelectKeyword />
-                                    {
-                                        keywordData.map((keyword, idx) => (
-                                            <>{isPress[idx] === true &&
+                                {
+                                    keywordData.map((keyword, idx) => (
+                                        <>{isPress[idx] === true &&
                                                 <SelectedKeyword keyword={keyword} key={idx+'selected'} idx={idx+'selected'}/>}</>
-                                        ))
-                                    }
+                                    ))
+                                }
                             </View>
                         </View>
                     </View>
@@ -644,7 +649,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                                     color: colors.defaultColor,
                                     fontWeight: 'bold'
                                 }}
-                            >{update ? "보관함 수정" : "보관함 만들기"}</AppText>
+                            >{update ? '보관함 수정' : '보관함 만들기'}</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>
@@ -717,9 +722,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#c4c4c4',
         width: 287,
         height: 243,
-    },
-    plusComplete: {
-        marginBottom: '5%'
     },
     bottomSheetBack: {
         backgroundColor: 'rgba(0,0,0,0.5)',
