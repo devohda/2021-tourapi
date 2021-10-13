@@ -20,11 +20,10 @@ exports.verifyToken = async (req, res, next) => {
                 res.locals.user = decodedToken;
                 return next();
             }else{
-                // 유효하지 않으면 토큰 삭제
-                await authService.deleteToken(decodedToken.user_pk);
-                return res.status(403).json({
-                    code: 403,
-                    status: 'INVALID TOKEN'
+                // 중복 로그인
+                return res.status(405).json({
+                    code: 405,
+                    status: 'DUPLICATE'
                 });
             }
         }else{

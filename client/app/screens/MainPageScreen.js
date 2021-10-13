@@ -5,7 +5,7 @@ import {
     View,
     Image,
     ScrollView,
-    ImageBackground, Platform,
+    ImageBackground, Platform, Alert,
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
@@ -29,6 +29,7 @@ export default function MainPageScreen({navigation}) {
     const [days, setDays] = useState('DAY');
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     useEffect(() => {
         getPopularCollectionData();
@@ -52,12 +53,18 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.data === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     setPopularCollection(response.data);
                 })
                 .catch((err) => {
@@ -80,13 +87,18 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.data === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log(response.data);
+
                     setPopularPlace(response.data);
                 })
                 .catch((err) => {
@@ -109,12 +121,18 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.data === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     setPopularUser(response.data);
                 })
                 .catch((err) => {
@@ -138,14 +156,18 @@ export default function MainPageScreen({navigation}) {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
+                .then(async (response) => {
+                    if (response.data === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -168,12 +190,18 @@ export default function MainPageScreen({navigation}) {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.data === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     getPopularPlaceData();
                 })
                 .catch((err) => {
@@ -197,12 +225,18 @@ export default function MainPageScreen({navigation}) {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.data === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     getPopularPlaceData();
                 })
                 .catch((err) => {
@@ -643,8 +677,8 @@ const styles = StyleSheet.create({
         shadowColor: 'rgba(132, 92, 92, 0.14)',
         marginHorizontal: 6
     },
-    defaultImageView:{
-        borderTopStartRadius : 10,
+    defaultImageView: {
+        borderTopStartRadius: 10,
         width: '100%',
         height: '100%',
         position: 'absolute'
