@@ -35,7 +35,7 @@ router.post('/authPhone', async (req, res) => {
 });
 
 // 회원가입
-router.post('/makeAccount', async (req, res, next) => {
+router.post('/account', async (req, res, next) => {
     const {userInfo} = req.body;
 
     const createSalt = () =>
@@ -55,16 +55,22 @@ router.post('/makeAccount', async (req, res, next) => {
             });
         });
 
-    const {password, salt} = await createHashedPassword(userInfo.user_password);
-    userInfo.user_password = password;
+    const {password, salt} = await createHashedPassword(userInfo.password);
+    userInfo.password = password;
     userInfo.salt = salt;
 
     const result = await authService.createUser(userInfo);
-
-    return res.status(200).json({
-        code: 200,
-        status: 'OK'
-    });
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 });
 
 // 회원가입 시 중복 확인 - 이메일
@@ -157,7 +163,7 @@ router.post('/loginJWT', async (req, res, next) => {
 
 // [DELETE]
 // 로그아웃
-router.delete('/logout', verifyToken, async (req, res, next)=> {
+router.delete('/logout', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
     await authService.deleteToken(user.user_pk);
 
