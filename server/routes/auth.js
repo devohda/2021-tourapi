@@ -10,12 +10,6 @@ const authService = require('../services/authService');
 
 const {verifyToken} = require('../middleware/jwt');
 
-/*
-* 비밀번호 찾기
-*
-*
-* */
-
 // 본인인증 - 휴대폰 인증 sms 보내기
 router.post('/authPhone', async (req, res) => {
     // TODO 인증번호 생성해서 같이 send 하기
@@ -39,13 +33,6 @@ router.post('/authPhone', async (req, res) => {
         status: 'OK'
     });
 });
-
-
-/*
-* 회원가입
-*
-*
-* */
 
 // 회원가입
 router.post('/makeAccount', async (req, res, next) => {
@@ -114,53 +101,6 @@ router.post('/sameNickname', async (req, res, next) => {
     });
 });
 
-
-/*
-* 로그인
-*
-*
-* */
-
-// router.post('/loginEmail', async (req, res, next) => {
-//     const {email, password: plainPassword} = req.body.user;
-//
-//     const userData = await authService.readUserByEmail(email);
-//     if (userData.length !== 1) {
-//         // 해당 유저 존재 X
-//         return res.status(404).json({
-//             code: 404,
-//             status: 'NOT EXIST'
-//         });
-//     }
-//
-//     const {salt, user_password, ...user} = userData[0];
-//
-//     const makePasswordHashed = (plainPassword) =>
-//         new Promise(async (resolve, reject) => {
-//             // salt를 가져오는 부분은 각자의 DB에 따라 수정
-//             crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
-//                 if (err) reject(err);
-//                 resolve(key.toString('base64'));
-//             });
-//         });
-//
-//     const password = await makePasswordHashed(plainPassword);
-//
-//     if (user_password !== password) {
-//         // 비밀번호 틀렸을 때
-//         return res.status(403).json({
-//             code: 403,
-//             state: 'NOT MATCHED'
-//         });
-//     }
-//
-//     return res.status(200).json({
-//         code: 200,
-//         status: 'OK',
-//         userData: user
-//     });
-// });
-
 // jwt 토큰을 이용한 로그인
 router.post('/loginJWT', async (req, res, next) => {
     try {
@@ -215,6 +155,8 @@ router.post('/loginJWT', async (req, res, next) => {
     }
 });
 
+// [DELETE]
+// 로그아웃
 router.delete('/logout', verifyToken, async (req, res, next)=> {
     const {user} = res.locals;
     await authService.deleteToken(user.user_pk);
@@ -225,6 +167,22 @@ router.delete('/logout', verifyToken, async (req, res, next)=> {
     });
 });
 
+// 회원 탈퇴
+router.delete('/account', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await authService.deleteUser(user.user_pk);
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 module.exports = router;
 
 
