@@ -53,7 +53,7 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.data === 405 && !alertDuplicated) {
+                    if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
@@ -87,7 +87,7 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.data === 405 && !alertDuplicated) {
+                    if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
@@ -121,7 +121,7 @@ export default function MainPageScreen({navigation}) {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.data === 405 && !alertDuplicated) {
+                    if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
@@ -157,7 +157,7 @@ export default function MainPageScreen({navigation}) {
                 res.json();
             })
                 .then(async (response) => {
-                    if (response.data === 405 && !alertDuplicated) {
+                    if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
@@ -190,7 +190,7 @@ export default function MainPageScreen({navigation}) {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.data === 405 && !alertDuplicated) {
+                    if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
@@ -225,7 +225,7 @@ export default function MainPageScreen({navigation}) {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.data === 405 && !alertDuplicated) {
+                    if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
