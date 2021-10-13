@@ -184,17 +184,17 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                           GROUP BY collection_pk
                       ) vc
                       ON vc.collection_pk = c.collection_pk
+                      WHERE
                       `
 
-        if (type === 'MY' || keyword) {
-            query1 += ' WHERE';
+        if (type === 'MY') {
+            query1 += ` c.user_pk = ${user_pk}`;
+        }else{
+            query1 += ` c.collection_private = 0`;
+        }
 
-            if (keyword) {
-                query1 += ` collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
-            }
-            if (type === 'MY') {
-                query1 += ` c.user_pk = ${user_pk}`;
-            }
+        if (keyword) {
+            query1 += ` AND collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
         }
 
         switch (sort) {
