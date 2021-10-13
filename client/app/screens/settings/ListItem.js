@@ -88,8 +88,8 @@ const ListItem = props => {
                     }}
                 />
             </View>
-        )
-    }
+        );
+    };
 
     const ReportModal = () => (
         <Modal
@@ -335,7 +335,6 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         color: 'white',
-        fontWeight: 'bold',
         textAlign: 'center',
         fontSize: 14,
         lineHeight: 22.4,

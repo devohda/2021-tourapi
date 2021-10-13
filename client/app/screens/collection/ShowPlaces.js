@@ -3,7 +3,7 @@ import {
     TouchableOpacity,
     View,
     Image,
-    TouchableHighlight
+    TouchableHighlight, Alert
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
@@ -35,6 +35,8 @@ const ShowPlaces = props => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const [isLiked, setIsLiked] = useState(item.like_flag);
+
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -80,8 +82,12 @@ const ShowPlaces = props => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -113,8 +119,12 @@ const ShowPlaces = props => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -144,8 +154,12 @@ const ShowPlaces = props => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -175,15 +189,18 @@ const ShowPlaces = props => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -214,43 +231,43 @@ const ShowPlaces = props => {
             if(originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) length += 1;
         }
         return idx - length;
-    }
+    };
 
     const checkLimit = () => {
         if(!isEditPage && !isLimited && checkCurrentDay() > 5) {
             if(checkCurrentIndex(index) <= 4) return false;
             else return true;
         } else return false;
-    }
+    };
     return (
         <View style={checkLimit() && {display: 'none'}}>
             { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
                         <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                                    <TouchableOpacity onPress={()=>{
-                                        let newArr = [...isDeletedOrigin];
-                                        console.log(newArr)
-                                        newArr[index] = true;
-                                        // setIsDeletedOrigin(newArr);
-                                        isDeleted(newArr);
-                                    }} style={!isEditPage && {display: 'none'}}>
-                                        <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
-                                            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                                <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity>
-                                    <View style={[{justifyContent: 'center', alignItems: 'center', marginEnd: 12}, isEditPage && {display: 'none'}]}>
-                                        <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                                {checkIndex()}    
-                                            </AppText>
-                                        </View>
+                            <TouchableOpacity onPress={()=>{
+                                let newArr = [...isDeletedOrigin];
+                                console.log(newArr);
+                                newArr[index] = true;
+                                // setIsDeletedOrigin(newArr);
+                                isDeleted(newArr);
+                            }} style={!isEditPage && {display: 'none'}}>
+                                <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
+                                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                        <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                     </View>
+                                </View>
+                            </TouchableOpacity>
+                            <View style={[{justifyContent: 'center', alignItems: 'center', marginEnd: 12}, isEditPage && {display: 'none'}]}>
+                                <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
+                                    <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
+                                        {checkIndex()}    
+                                    </AppText>
+                                </View>
+                            </View>
                             <TouchableOpacity onPress={() => {
                                 countPlaceView(item.place_pk);
-                                props.navigation.navigate('Place', {data: item})
+                                props.navigation.navigate('Place', {data: item});
                             }} disabled={isEditPage && true}>
                                 <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '88%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
                                     <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
@@ -370,7 +387,7 @@ const ShowPlaces = props => {
                                 isDeleted(newArr);
                             }}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                    <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
+                                    <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                 </View>
                             </TouchableOpacity>
                         }

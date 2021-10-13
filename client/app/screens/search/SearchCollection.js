@@ -31,6 +31,7 @@ const SearchCollection = (props, {navigation}) => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     useEffect(() => {
         getResults();
@@ -47,8 +48,12 @@ const SearchCollection = (props, {navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -79,15 +84,18 @@ const SearchCollection = (props, {navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -113,69 +121,84 @@ const SearchCollection = (props, {navigation}) => {
     const SelectBox = () => {
         return (
             <>
-            {
-            showMenu && <View style={{
-                position: 'absolute',
-                width: 80,
-                height: 80,
-                backgroundColor: '#fff',
-                // flex: 1,
-                borderRadius: 10,
-                zIndex: 0,
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-                overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('최신순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평최신순점순</AppText>
-                        {currentMenu === '최신순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                    
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
+                {
+                    showMenu && <View style={{
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        backgroundColor: '#fff',
+                        // flex: 1,
+                        borderRadius: 10,
                         zIndex: 0,
-                        backgroundColor: colors.backgroundColor,
-                    }}></View>
-                    
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('인기순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+                        overflow: 'visible'
                     }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                </View>
-            }
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('최신순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{
+                                color: colors.mainColor,
+                                fontSize: 14,
+                                lineHeight: 16.8,
+                                fontWeight: '400'
+                            }}>평최신순점순</AppText>
+                            {currentMenu === '최신순' &&
+                            <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
+
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                            zIndex: 0,
+                            backgroundColor: colors.backgroundColor,
+                        }}></View>
+
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('인기순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{
+                                color: colors.mainColor,
+                                fontSize: 14,
+                                lineHeight: 16.8,
+                                fontWeight: '400'
+                            }}>인기순</AppText>
+                            {currentMenu === '인기순' &&
+                            <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
+                    </View>
+                }
             </>
-    );};
+        );
+    };
 
     const CollectionContainer = ({item}) => {
         const collectionMargin = (Dimensions.get('screen').width - 162 * 2) / 9;
@@ -236,7 +259,11 @@ const SearchCollection = (props, {navigation}) => {
                         <View flexDirection="row"
                             style={{position: 'absolute', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[4]}}>by {item.created_user_name}</AppText>
+                                <AppText style={{
+                                    fontSize: 8,
+                                    width: '68%',
+                                    color: colors.gray[4]
+                                }}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
@@ -270,9 +297,9 @@ const SearchCollection = (props, {navigation}) => {
             marginBottom: 8,
             alignItems: 'center',
             marginTop: 22,
-            width: '100%'
-        }, collectionList.length === 0 && {justifyContent: 'center'}
-        }>
+            width: '100%',
+            justifyContent: collectionList.length === 0 && 'center'
+        }}>
             {
                 collectionList.length === 0 ?
                     <ShowEmpty/> :

@@ -20,6 +20,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
     const { colors } = useTheme();
     
     const [token, setToken] = useToken();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [userData, setUserData] = useState({});
     const [userNickname, setUserNickname] = useState('');
@@ -45,8 +46,12 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
