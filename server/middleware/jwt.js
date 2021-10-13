@@ -28,7 +28,6 @@ exports.verifyToken = async (req, res, next) => {
             }
         }else{
             // 유효하지 않으면 토큰 삭제
-            await authService.deleteToken(decodedToken.user_pk);
             return res.status(403).json({
                 code: 403,
                 status: 'INVALID TOKEN'
@@ -43,6 +42,7 @@ exports.verifyToken = async (req, res, next) => {
             });
         }
 
+        // 유효하지 않으면 토큰 삭제
         return res.status(403).json({
             code: 403,
             status: 'INVALID TOKEN'
