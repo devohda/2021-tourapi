@@ -11,7 +11,6 @@ const authService = require('../services/authService');
 const {verifyToken} = require('../middleware/jwt');
 
 const NodeCache = require('node-cache');
-const {sa} = require("yarn/lib/cli");
 const cache = new NodeCache({ stdTTL: 60 });
 
 //[GET]
@@ -55,9 +54,9 @@ router.post('/authPhone', async (req, res) => {
         verifyCode += parseInt(Math.random() * 10);
     };
 
+    // 캐시에 저장
     cache.set(phoneNumber, verifyCode);
 
-    // TODO 인증번호 생성해서 같이 send 하기
     const result = await client.messages
         .create({
             body: `[히든쥬얼] 본인 확인을 위한 인증번호는 ${verifyCode} 입니다.`,
