@@ -118,15 +118,25 @@ exports.readPlace = async (user_pk, place_pk) => {
                     ON fp.facility_pk = f.facility_pk`
 //                     WHERE cnt >= 2` 나중에 활성화 시키기
 
+    // 리뷰 언제 마지막으로 했는지
+    const query4 = `SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS recent_review_flag
+                    FROM place_reviews
+                    WHERE user_pk = ${user_pk} 
+                    AND place_pk = ${place_pk}
+                    AND review_create_time BETWEEN DATE_ADD(NOW(), INTERVAL -7 DAY ) AND NOW()
+                    `
+
     const result1 = await db.query(query1);
     const result2 = await db.query(query2);
     const result3 = await db.query(query3);
+    const result4 = await db.query(query4);
     const facility = result3.map(facility => facility.facility_name);
 
     const result = {
         placeData : result1[0],
         review : {
             ...result2[0],
+            ...result4[0],
             facility
         }
     }
