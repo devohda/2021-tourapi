@@ -188,7 +188,7 @@ router.post('/loginJWT', async (req, res, next) => {
         }
 
         // jwt 토큰 발급.
-        const accessToken = await authService.createToken({user_pk : user.user_pk});
+        const accessToken = await authService.createToken(user);
 
         return res.status(200).json({
             code: 200,

@@ -19,22 +19,42 @@ exports.createLikeCollection = async (user_pk, collection_pk) => {
     return result ? true : false;
 }
 
-exports.readLikePlace = async (user_pk) => {
+exports.readLikePlace = async (user_pk, sort) => {
     // TODO 나중에 별점 추가
 
-    const query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, IFNULL(review_score, -1) AS review_score 
-                   FROM places p
-                   INNER JOIN like_place lp
-                   ON lp.user_pk = ${user_pk}
-                   AND lp.place_pk = p.place_pk
-                   LEFT OUTER JOIN (
-                       SELECT place_pk, AVG(review_score) AS review_score
-                       FROM place_reviews
-                       GROUP BY place_pk
-                   ) pr
-                   ON pr.place_pk = p.place_pk
-                   ORDER BY lp.like_pk DESC
-                   `
+    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, 
+                 IFNULL(review_score, -1) AS review_score, IFNULL(like_cnt, 0) AS like_cnt
+                 FROM places p
+                 INNER JOIN like_place lp
+                 ON lp.user_pk = ${user_pk}
+                 AND lp.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, AVG(review_score) AS review_score
+                     FROM place_reviews
+                     GROUP BY place_pk
+                 ) pr
+                 ON pr.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, COUNT(*) AS like_cnt 
+                     FROM like_place GROUP BY place_pk
+                 ) llp
+                 ON llp.place_pk = p.place_pk
+                 `
+
+    switch (sort){
+        case 'RESENT' :
+            query += ' ORDER BY lp.like_pk DESC';
+            break;
+        case 'SCORE' :
+            query += ' ORDER BY review_score DESC, p.place_pk DESC'
+            break;
+        case 'LIKE':
+            query += ' ORDER BY like_cnt DESC, p.place_pk DESC';
+            break;
+        default:
+            query += ' ORDER BY lp.like_pk DESC';
+    }
+
     const result = await db.query(query);
     return result;
 }

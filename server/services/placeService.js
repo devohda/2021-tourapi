@@ -27,7 +27,10 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
                  LEFT OUTER JOIN like_place lp
                  ON lp.place_pk = p.place_pk
                  AND lp.user_pk = ${user_pk}
-                 LEFT OUTER JOIN (SELECT place_pk, COUNT(*) AS like_cnt FROM like_place GROUP BY place_pk) llp
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, COUNT(*) AS like_cnt 
+                     FROM like_place GROUP BY place_pk
+                 ) llp
                  ON llp.place_pk = p.place_pk
                  LEFT OUTER JOIN (
                      SELECT place_pk, COUNT(*) AS view_cnt
