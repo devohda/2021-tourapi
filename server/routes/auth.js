@@ -10,17 +10,32 @@ const authService = require('../services/authService');
 
 const {verifyToken} = require('../middleware/jwt');
 
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 });
+
 // 본인인증 - 휴대폰 인증 sms 보내기
 router.post('/authPhone', async (req, res) => {
+    const {phoneNumber} = req.body;
+
+    // 기존에 저장되어 있던 캐시는 만료 시키기
+    cache.del(phoneNumber);
+
+    // 인증번호 생성
+    let verifyCode = "";
+    for (let i = 0; i < 6; i++) {
+        verifyCode += parseInt(Math.random() * 10);
+    };
+
+    cache.set(phoneNumber, verifyCode);
+
     // TODO 인증번호 생성해서 같이 send 하기
     const result = await client.messages
         .create({
-            body: '[히든쥬얼] 본인 확인을 위한 인증번호는 389174 입니다.',
-            from: '+18637346757',
-            to: '+821023103703'
+            body: `[히든쥬얼] 본인 확인을 위한 인증번호는 ${verifyCode} 입니다.`,
+            from: '+18453933193',
+            to: phoneNumber
         })
         .then(message => {
-            console.log(message.sid);
             return message;
         })
         .catch(error => {
@@ -33,6 +48,32 @@ router.post('/authPhone', async (req, res) => {
         status: 'OK'
     });
 });
+
+// 본인인증 - 코드 보내고 인증하기
+router.get('/authPhone', async (req, res, next) => {
+    const {phoneNumber, verifyCode} = req.body;
+    const cacheData = cache.get(phoneNumber);
+
+    if (!cacheData) {
+        return res.status(400).json({
+            code: 400,
+            status: 'INVALID'
+        });
+    }
+
+    if (cacheData != verifyCode) {
+        return res.status(400).json({
+            code: 400,
+            status: 'INVALID'
+        });
+    }
+
+    cache.del(phoneNumber);
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
+})
 
 // 회원가입
 router.post('/account', async (req, res, next) => {
