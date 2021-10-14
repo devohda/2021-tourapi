@@ -31,7 +31,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
-    const postPlace = () => {
+    const postPlace = (refRBSheet) => {
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         const placeCnt = collectionList[index].place_cnt;
@@ -47,12 +47,12 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: {
+                body: JSON.stringify({
                     planDay: day,
                     order: placeCnt+1,
                     placeId: placeId,
-                }
-            }).then((res) => res.json())
+                }),
+            }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
@@ -66,9 +66,18 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                         return;
                     }
 
-                    if(response.code === 500) Alert.alert('', '공간 저장에 실패했습니다.');
-                    else if(response.code === 200) Alert.alert('', '보관함에 공간이 저장되었습니다.');
-                    getCollectionList();
+                    if(response.code === 500) Alert.alert('', '공간 저장에 실패했습니다.', [
+                        {text : 'OK', onPress: () => {
+                            getCollectionList();
+                            setIsCollectionClicked([]);
+                            refRBSheet.current.close();
+                        }}]);
+                    else if(response.code === 200) Alert.alert('', '보관함에 공간이 저장되었습니다.', [
+                        {text : 'OK', onPress: () => {
+                            getCollectionList();
+                            setIsCollectionClicked([]);
+                            refRBSheet.current.close();
+                        }}]); 
                 })
                 .catch((err) => {
                     console.error(err);
@@ -154,9 +163,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                         }
                         }
                         onPress={() => {
-                            refRBSheet.current.close();
-                            postPlace(isCollectionClicked);
-                            setIsCollectionClicked([]);
+                            postPlace(refRBSheet);
                         }}
                     ><AppText
                             style={{
@@ -238,7 +245,7 @@ const PlaceScreen = ({route, navigation}) => {
     const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
-    const [height, setHeight] = useState(150 + 90 * collectionList.length);
+    const [height, setHeight] = useState(180 + 90 * collectionList.length);
 
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
@@ -251,8 +258,8 @@ const PlaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -309,8 +316,8 @@ const PlaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -323,8 +330,8 @@ const PlaceScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    if(response.data.length > 5) setHeight(150 + 90 * 5);
-                    else setHeight(150 + 90 * response.data.length);
+                    if(response.data.length > 5) setHeight(180 + 90 * 5);
+                    else setHeight(180 + 90 * response.data.length);
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -346,7 +353,7 @@ const PlaceScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then(res => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -419,8 +426,8 @@ const PlaceScreen = ({route, navigation}) => {
                             'Content-Type': 'application/json',
                             'x-access-token': token
                         }
-                    }).then((res) => res.json())
-                        .then(async (response) => {
+                    }).then(res => res.json())
+                        .then(async response => {
                             if (response.code === 405 && !alertDuplicated) {
                                 Alert.alert('', '다른 기기에서 로그인했습니다.');
                                 setAlertDuplicated(true);
@@ -454,8 +461,8 @@ const PlaceScreen = ({route, navigation}) => {
                             'Content-Type': 'application/json',
                             'x-access-token': token
                         }
-                    }).then((res) => res.json())
-                        .then(async (response) => {
+                    }).then(res => res.json())
+                        .then(async response => {
                             if (response.code === 405 && !alertDuplicated) {
                                 Alert.alert('', '다른 기기에서 로그인했습니다.');
                                 setAlertDuplicated(true);
@@ -766,73 +773,73 @@ const PlaceScreen = ({route, navigation}) => {
 
     const ShowComments = props => {
         const { item, index } = props;
-        console.log(item);
         return (
             <View key={index}>
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <View>
-                        { item.user_img ?
-                            <Image style={styles.reviewImage}
-                                source={require('../../assets/images/here_default.png')}></Image> :
-                            <Image style={styles.reviewImage}
-                                source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                        }
-                    </View>
-                    <View style={{marginLeft: 12, marginRight: 20}}>
-                        <View style={{
-                            backgroundColor: colors.defaultColor,
-                            height: 27,
-                            paddingVertical: 6,
-                            paddingLeft: 6,
-                            marginBottom: 6,
-                            justifyContent: 'flex-start',
-                            alignItems: 'center',
-                            flexDirection: 'row'
-                        }}>
-                            <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                            <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
-                                {item.cpc_comment}</AppText>
+                <TouchableOpacity>
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <View>
+                            { item.user_img ?
+                                <Image style={styles.reviewImage}
+                                    source={require('../../assets/images/here_default.png')}></Image> :
+                                <Image style={styles.reviewImage}
+                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
+                            }
                         </View>
-                        {/* <View><AppText
-                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                    </AppText></View> */}
-                        <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            width: 267,
-                            marginTop: 4
-                        }}>
-                            <View style={{flexDirection: 'row'}}>
-                                <AppText style={{
-                                    color: colors.gray[3],
-                                    fontWeight: 'bold',
-                                    fontSize: 12
-                                }}>by. </AppText>
-                                <AppText style={{color: colors.gray[3], fontSize: 12}}>{item.user_nickname}</AppText>
+                        <View style={{marginLeft: 12, marginRight: 20}}>
+                            <View style={{
+                                backgroundColor: colors.defaultColor,
+                                height: 27,
+                                paddingVertical: 6,
+                                paddingLeft: 6,
+                                marginBottom: 6,
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                                flexDirection: 'row'
+                            }}>
+                                <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
+                                    color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
+                                <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
+                                    {item.cpc_comment}</AppText>
                             </View>
-                            <View>
-                                <AppText
-                                    style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
+                            <View><AppText
+                            style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                            {item.collection_name}
+                        </AppText></View>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: 267,
+                                marginTop: 4
+                            }}>
+                                <View style={{flexDirection: 'row'}}>
+                                    <AppText style={{
+                                        color: colors.gray[3],
+                                        fontWeight: 'bold',
+                                        fontSize: 12
+                                    }}>by. </AppText>
+                                    <AppText style={{color: colors.gray[3], fontSize: 12}}>{item.user_nickname}</AppText>
+                                </View>
+                                <View>
+                                    <AppText
+                                        style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
+                                </View>
                             </View>
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
-                <View style={{
+                <View style={[{
                     width: '100%',
                     height: 1,
                     backgroundColor: colors.red_gray[6],
                     zIndex: -1000,
                     marginVertical: 18,
-                    display: index === commentLength-1 && 'none'
-                }}></View>
+                }, index === commentLength-1 && {display: 'none'}]}></View>
             </View>
         );
     };

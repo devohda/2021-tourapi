@@ -52,7 +52,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         return;
                     }
 
-                    Alert.alert('', '추가되었습니다.');
+                    Alert.alert('', '공간이 추가되었습니다.');
                 })
                 .catch((err) => {
                     console.error(err);
@@ -182,9 +182,11 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
                             <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
-                            <View style={{...styles.score_line, backgroundColor: colors.gray[4], display: parseInt(item.review_score) == -1 && 'none'}}></View>
-                            <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}} />
-                            <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                <View style={{...styles.score_line, backgroundColor: colors.gray[4]}}></View>
+                                <Star width={11} height={11} style={{marginTop: 2}} />
+                                <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            </View>
                         </View>
                         <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
                         <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
@@ -203,6 +205,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                             const postReplacement = props.postReplacement;
                             var prevLength = isPress.filter(element => (element === true)).length;
                             postReplacement(pk, item.place_pk, prevLength);
+                            Alert.alert('', '대체공간이 추가되었습니다.');
                         }
                         else addPlace(item.place_pk);
                     }

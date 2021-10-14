@@ -64,40 +64,4 @@ const EntireMap = ({route, navigation}) => {
     );
 };
 
-const styles = StyleSheet.create({
-    categoryBorder: {
-        borderWidth: 1,
-        borderRadius: 14,
-        height: 19,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    categoryText: {
-        fontSize: 10,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        paddingVertical: 2,
-        paddingHorizontal: 8
-    },
-    reviewImage: {
-        width: 56,
-        height: 56,
-        backgroundColor: '#c4c4c4',
-        borderRadius: 50,
-    },
-    placeName: {
-        fontSize: 22,
-        fontWeight: 'bold',
-    },
-    iconTabContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    location: {
-        fontSize: 14,
-        marginBottom: 1
-    }
-});
-
 export default EntireMap;

@@ -415,28 +415,30 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700'
                                 }}>{checkType(data.place_type)}</AppText>
-                                <AppText style={{
-                                    marginHorizontal: 8, color: colors.gray[4],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    display: parseInt(data.review_score) == -1 && 'none'
-                                }}>|</AppText>
-                                <Image source={require('../assets/images/review_star.png')}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        alignSelf: 'center',
-                                        display: parseInt(data.review_score) == -1 && 'none'
-                                    }}></Image>
-                                <AppText style={{
-                                    color: colors.gray[3],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    marginLeft: 2,
-                                    display: parseInt(data.review_score) == -1 && 'none'
-                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                { parseInt(data.review_score) !== -1 &&
+                                    <View style={{flexDirection: 'row'}}>
+                                    <AppText style={{
+                                        marginHorizontal: 4,
+                                        color: colors.gray[4],
+                                        textAlign: 'center',
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                    }}>|</AppText>
+                                    <Image source={require('../assets/images/review_star.png')}
+                                        style={{
+                                            width: 10,
+                                            height: 10,
+                                            alignSelf: 'center',
+                                        }}></Image>
+                                    <AppText style={{
+                                        color: colors.gray[3],
+                                        textAlign: 'center',
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                        marginLeft: 2,
+                                    }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                    </View>
+                                }
                             </View>
                             <AppText style={{
                                 fontSize: 16,
@@ -471,14 +473,13 @@ export default function MainPageScreen({navigation}) {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <View flexDirection="row" style={{
+            <View flexDirection="row" style={[{
                 height: 24,
                 marginBottom: 20,
-                marginTop: Platform.OS === 'android' ? 20 : 10,
                 marginHorizontal: 20,
                 alignItems: 'center',
                 justifyContent: 'center'
-            }}>
+            }, Platform.OS === 'android' ? {marginTop: 20} : {marginTop: 10}]}>
                 <View style={{position: 'absolute', left: 0}}>
                     <AppText style={{
                         color: colors.mainColor,

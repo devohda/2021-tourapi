@@ -177,11 +177,6 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     }}>
                         특수문자는 사용할 수 없어요.
                     </AppText>
-                    {/* <AppText style={{color: colors.red[2],
-                        display: isNicknameDuplicated ? 'flex' : 'none'
-                    }}>
-                        이미 사용 중인 닉네임이에요.
-                    </AppText> */}
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>

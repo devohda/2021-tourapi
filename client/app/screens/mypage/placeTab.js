@@ -343,11 +343,13 @@ const PlaceTab = ({navigation}) => {
                             fontSize: 10,
                             marginTop: 2
                         }}>{checkType(item.place_type)}</AppText>
-                        <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6, display: parseInt(item.review_score) == -1 && 'none'}}>|</AppText>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', display: parseInt(item.review_score) == -1 && 'none'}}>
-                            <Image source={require('../../assets/images/here_icon.png')}
-                                style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                            <AppText style={{color: colors.mainColor, fontSize: 10, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                        <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                            <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6}}>|</AppText>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <Image source={require('../../assets/images/here_icon.png')}
+                                    style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
+                                <AppText style={{color: colors.mainColor, fontSize: 10}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            </View>
                         </View>
                     </View>
                     <View style={{width: '100%'}}>

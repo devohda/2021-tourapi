@@ -190,13 +190,13 @@ const MakeReviewScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    Alert.alert('', '리뷰 등록이 완료되었습니다.');
-                    navigation.goBack();
+                    Alert.alert('', '리뷰 등록이 완료되었습니다.', [
+                        {text : 'OK', onPress: () => navigation.goBack()}
+                        ]);
                 })
                 .catch((err) => {
                     console.error(err);
-                    Alert.alert('', '리뷰 등록에 실패했습니다.');
-                    navigation.goBack();
+                    Alert.alert('', '리뷰 등록에 실패했습니다. 다시 시도해주세요.');
                 });
 
         } catch (err) {

@@ -114,6 +114,8 @@ const ListItem = props => {
                             style={{padding: 15, backgroundColor: colors.defaultColor, width: 295, height: 124}}
                             placeholder='기타 사유를 입력해주세요'
                             textAlignVertical={'top'}
+                            autoCapitalize="none"
+                            autoCorrect={false}
                         />
                     </SafeAreaView>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>

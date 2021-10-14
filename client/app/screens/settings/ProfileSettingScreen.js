@@ -174,6 +174,8 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                 fontWeight: '400',
                                 paddingBottom: 8
                             }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
                             placeholderTextColor={colors.mainColor}
                             value={userNickname}
                             onChangeText={(name) => setUserNickname(name)}>

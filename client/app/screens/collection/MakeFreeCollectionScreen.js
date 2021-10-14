@@ -111,14 +111,90 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         'collection_pk': response.collectionId,
                         'now': true,
                     };
-                    Alert.alert('', '자유보관함이 생성되었습니다');
-                    navigation.navigate('FreeCollection', {
-                        data: item
-                    });
+                    Alert.alert('', '자유보관함이 생성되었습니다.', [
+                        {text : 'OK', onPress: () => {
+                            navigation.navigate('FreeCollection', {data: item});
+                            navigation.setOptions({tabBarVisible: true});
+                        }}]);
                 })
                 .catch((err) => {
                     console.error(err);
-                    Alert.alert('', '자유보관함 생성에 실패했습니다');
+                    Alert.alert('', '자유보관함 생성에 실패했습니다. 다시 시도해주세요.');
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const updateCollections = () => {
+        var datas = [];
+        var showDatas = [];
+        for (let i = 0; i < keywordData.length; i++) {
+            if (isPress[i] === true) {
+                datas.push(keywordData[i].keyword_pk);
+                showDatas.push(keywordData[i].keyword_title);
+            }
+        }
+
+        var forPostEnable = 0;
+        if (isEnabled === true) forPostEnable = 1;
+
+        //사진 추가 필요
+        var forPostData = {};
+        if (datas.length === 0) {
+            forPostData = {
+                name: collectionName,
+                isPrivate: forPostEnable,
+                keywords: [],
+                img: 'default-red',
+            };
+        } else {
+            forPostData = {
+                name: collectionName,
+                isPrivate: forPostEnable,
+                keywords: datas,
+                img: 'default-red',
+            };
+        }
+
+        let form = new FormData();
+        form.append('collectionData', JSON.stringify(forPostData));
+
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/info`, {
+                method: 'PUT',
+                headers: {
+                    'x-access-token': token
+                },
+                body: form
+            }).then(res => res.json())
+                .then(async response => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    const item = {
+                        'collection_pk': data.collection_pk,
+                        'now': true,
+                    };
+                    Alert.alert('', '자유보관함이 수정되었습니다.', [
+                        {text : 'OK', onPress: () => {
+                            navigation.navigate('FreeCollection', {data: item});
+                            navigation.setOptions({tabBarVisible: true});
+                        }}]);
+                })
+                .catch((err) => {
+                    console.error(err);
+                    Alert.alert('', '자유보관함 수정에 실패했습니다. 다시 시도해주세요.');
                 });
 
         } catch (err) {
@@ -196,7 +272,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
             return pressed;
         };
 
-        const [searchKeyword, setSearchKeyword] = useState('');
         const [pressed, setPressed] = useState(setF());
 
         const Keyword = ({keyword, idx}) => {
@@ -248,7 +323,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                     ref={refRBSheet}
                     closeOnDragDown={true}
                     closeOnPressMask={true}
-                    height={475}
+                    height={450}
                     customStyles={{
                         wrapper: {
                             backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -273,22 +348,10 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                     style={{fontSize: 12, color: colors.gray[5], alignSelf: 'center', marginLeft: 9}}>*
                                     최대 3개</AppText>
                             </View>
-                            <View flexDirection="row" style={{...styles.search_box, borderColor: colors.mainColor}}>
-                                <TextInput flex={1} style={{fontSize: 16}}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                    placeholder=""
-                                    placeholderTextColor={colors.gray[5]}
-                                    onChangeText={(text) => setSearchKeyword(text)}
-                                />
-                                <Pressable style={{marginLeft: 5}}>
-                                    <SearchIcon width={26} height={26} style={{color: colors.mainColor}}/>
-                                </Pressable>
-                            </View>
                             <><View style={{flexDirection: 'row'}}>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <>{0 <= idx && idx <= 3 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <>{0 <= idx && idx <= 3 &&
                                         <Keyword keyword={keyword} key={idx + '0000'} idx={idx + '0000'}/>}</>
                                     ))
                                 }
@@ -296,7 +359,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <>{4 <= idx && idx <= 6 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <>{4 <= idx && idx <= 6 &&
                                             <Keyword keyword={keyword} key={idx + '1111'} idx={idx + '1111'}/>}</>
                                     ))
                                 }
@@ -304,7 +367,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <>{7 <= idx && idx <= 10 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <>{7 <= idx && idx <= 10 &&
                                             <Keyword keyword={keyword} key={idx + '2222'} idx={idx + '2222'}/>}</>
                                     ))
                                 }
@@ -312,7 +375,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <>{11 <= idx && idx <= 13 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <>{11 <= idx && idx <= 13 &&
                                             <Keyword keyword={keyword} key={idx + '3333'} idx={idx + '3333'}/>}</>
                                     ))
                                 }
@@ -320,7 +383,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <>{14 <= idx && idx <= 17 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <>{14 <= idx && idx <= 17 &&
                                             <Keyword keyword={keyword} key={idx + '4444'} idx={idx + '4444'}/>}</>
                                     ))
                                 }
@@ -328,7 +391,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             <View style={{flexDirection: 'row'}}>
                                 {
                                     keywordData.map((keyword, idx) => (
-                                        <>{18 <= idx && idx <= 19 && keyword.keyword_title.indexOf(searchKeyword) !== -1 &&
+                                        <>{18 <= idx && idx <= 19 &&
                                             <Keyword keyword={keyword} key={idx + '5555'} idx={idx + '5555'}/>}</>
                                     ))
                                 }
@@ -457,9 +520,8 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                 borderRadius: 10
                             }}
                             onPress={() => {
-                                postCollections();
-                                navigation.setOptions({tabBarVisible: true});
-                                navigation.goBack(null);
+                                if(update) updateCollections();
+                                else postCollections();
                             }}
                             disabled={DATA.collection_name.length < 2 ? true : false}
                         ><AppText

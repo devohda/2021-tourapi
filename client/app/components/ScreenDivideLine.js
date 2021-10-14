@@ -6,11 +6,10 @@ const ScreenDivideLine = (props) => {
     const {colors} = useTheme();
 
     return (
-        <View style={{
+        <View style={[{
             height: 8,
             backgroundColor: colors.red_gray[6],
-            marginVertical: props.style && props.style.marginVertical ? props.style.marginVertical : 20
-        }}></View>
+        }, props.style && props.style.marginVertical ? {marginVertical: props.style.marginVertical} : {marginVertical: 20}]}></View>
     )
 }
 

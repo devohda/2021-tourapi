@@ -440,8 +440,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    Alert.alert('', '삭제되었습니다.');
-                    navigation.goBack();
+                    Alert.alert('', '삭제되었습니다.', [
+                        {text : 'OK', onPress: () => navigation.goBack()}
+                        ]);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -624,6 +625,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
 
                     getInitialPlaceData();
+                    
                 })
                 .catch((err) => {
                     console.error(err);
@@ -860,13 +862,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
         setIsDeletedOrigin(newArr);
         setIsDeletedComment(newArr);
+        console.log(newArr+'여기여기')
     };
 
     const SwipeList = props => {
         return (
             <SafeAreaView>
                 <FlatList data={placeData}
-                    renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                    renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} comment={item.comment} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
                         isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
                         isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
                         isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
@@ -887,7 +890,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         // <DragAndDropList data={placeData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx}/>
         <SafeAreaView>
             <FlatList data={placeData}
-                renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} comment={item.comment} navigation={navigation} length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
                     isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
                     isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
                     isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
@@ -1175,6 +1178,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             }}
                         />
                         <Pressable style={{marginLeft: 5}} onPress={()=>{
+                            setComments(comments);
                             postCollectionCommentsData(comments);
                             setComments('');
                         }}>
@@ -1208,9 +1212,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
                         if(data.now) {
-                            navigation.pop(2);
+                            if(isEditPage) setIsEditPage(false);
+                            else navigation.pop(2);
                         }
-                        else navigation.goBack();}}>
+                        else {
+                            if(isEditPage) setIsEditPage(false);
+                            else navigation.goBack();
+                        }}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
