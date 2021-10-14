@@ -76,7 +76,8 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
 
 // 공간 조회
 exports.readPlace = async (user_pk, place_pk) => {
-    const query1 = `SELECT p.place_pk, place_name, place_addr, place_type, place_img, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
+    const query1 = `SELECT p.place_pk, place_name, place_addr, place_type, place_img, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag,
+                           place_mapy AS place_latitude, place_mapx AS place_longitude
                     FROM places p
                     LEFT OUTER JOIN like_place lp
                     ON lp.place_pk = p.place_pk
