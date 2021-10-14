@@ -420,14 +420,14 @@ export default function MainPageScreen({navigation}) {
                                     textAlign: 'center',
                                     fontSize: 10,
                                     fontWeight: '700',
-                                    display: parseInt(data.review_score) == -1 && 'none'
+                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
                                 }}>|</AppText>
                                 <Image source={require('../assets/images/review_star.png')}
                                     style={{
                                         width: 10,
                                         height: 10,
                                         alignSelf: 'center',
-                                        display: parseInt(data.review_score) == -1 && 'none'
+                                        display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
                                     }}></Image>
                                 <AppText style={{
                                     color: colors.gray[3],
@@ -435,7 +435,7 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700',
                                     marginLeft: 2,
-                                    display: parseInt(data.review_score) == -1 && 'none'
+                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
                                 }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                             </View>
                             <AppText style={{
