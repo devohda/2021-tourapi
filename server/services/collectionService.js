@@ -170,7 +170,12 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                       FROM collections c
                       INNER JOIN users u
                       ON u.user_pk = c.user_pk
-                      LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
+                      LEFT OUTER JOIN (
+                          SELECT collection_pk, COUNT(*) AS place_cnt 
+                          FROM collection_place_map
+                          WHERE place_pk > 0
+                          GROUP BY collection_pk
+                      ) cpm
                       ON cpm.collection_pk = c.collection_pk
                       LEFT OUTER JOIN (
                           SELECT collection_pk, COUNT(*) AS like_cnt 
@@ -308,7 +313,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query1 = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
+    const query1 = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, place_mapy AS place_latitude, place_mapx AS place_longitude, cpm_order, 
                            CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
                            cpc_comment AS comment, IFNULL(review_score, -1) AS review_score
                     FROM collection_place_map cpm
@@ -348,12 +353,11 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
     for (const data of result2) {
         if (mapData[data.cpm_plan_day]) {
             mapData[data.cpm_plan_day].push({place_latitude: data.place_latitude, place_longitude: data.place_longitude})
-            console.log()
         } else {
             mapData[data.cpm_plan_day] = [{place_latitude: data.place_latitude, place_longitude: data.place_longitude}]
         }
     }
-    console.log(mapData);
+
     const result = {
         placeList : result1,
         mapData
