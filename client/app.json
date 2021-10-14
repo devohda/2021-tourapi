@@ -28,7 +28,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.8"
+      "buildNumber": "0.0.9"
     },
     "android": {
       "adaptiveIcon": {
