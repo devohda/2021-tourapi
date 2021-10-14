@@ -24,6 +24,7 @@ const bucket = storage.bucket('here-bucket');
 // 자유 보관함 생성
 router.post('/free', verifyToken, multer.single('img'), async (req, res, next) => {
     const {user} = res.locals;
+    console.log(`file: ${req.file}`);
 
     if (!req.file) {
         const {collectionData} = req.body;
