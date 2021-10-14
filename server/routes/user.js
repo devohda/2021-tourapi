@@ -20,15 +20,16 @@ const multer = Multer({
 
 const bucket = storage.bucket('here-bucket');
 
-router.get('/', verifyToken, (req, res, next) => {
-    const {user_email, user_img, user_nickname} = res.locals.user;
-    const userData = {user_email, user_img, user_nickname}
+// 유저 정보
+router.get('/', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await userService.readUser(user.user_pk);
     return res.status(200).json({
         code: 200,
         status: 'OK',
-        data: userData
+        data: result
     });
-})
+});
 
 router.get('/list', async (req, res) => {
     let result;
@@ -102,4 +103,5 @@ router.put('/info', verifyToken, multer.single('img'), async (req, res, next) =>
 
     blobStream.end(req.file.buffer);
 })
+
 module.exports = router;
