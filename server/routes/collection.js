@@ -12,10 +12,7 @@ const keyFilename = 'here-327421-e0bed35f44b5.json'
 const storage = new Storage({projectId, keyFilename});
 
 const multer = Multer({
-    storage: Multer.memoryStorage(),
-    limits: {
-        fileSize: 5 * 1024 * 1024, // no larger than 5mb, you can change as needed.
-    }
+    storage: Multer.memoryStorage()
 });
 
 const bucket = storage.bucket('here-bucket');
