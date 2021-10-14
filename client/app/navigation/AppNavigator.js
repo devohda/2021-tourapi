@@ -31,7 +31,7 @@ const AppNavigator = () => {
     const getTokenAndLogin = async () => {
         const accessToken = await SecureStore.getItemAsync('accessToken');
         // TODO 자동로그인 끄려면 밑의 주석 해제 하세요.
-        await SecureStore.deleteItemAsync('accessToken');
+        // await SecureStore.deleteItemAsync('accessToken');
         if(accessToken){
             // 토큰 불러와서 전역 context 에 저장하기.
             setToken(accessToken);
