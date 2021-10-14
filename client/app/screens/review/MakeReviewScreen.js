@@ -26,6 +26,7 @@ const MakeReviewScreen = ({route, navigation}) => {
     const [ratedAccessibilityScore, setRatedAccessibilityScore] = useState(0);
     const [ratedMarketScore, setRatedMarketScore] = useState(0);
 
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
         {
@@ -66,8 +67,12 @@ const MakeReviewScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -96,14 +101,17 @@ const MakeReviewScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
 
                     setFacilityData(response.data);
                 })
@@ -123,14 +131,14 @@ const MakeReviewScreen = ({route, navigation}) => {
         for (let i = 0; i < busyTimeData.length; i++) {
             if (isBusyTimePress[i] === true) {
                 postBusyTime[i] = 1;
-            };
-        };
+            }
+        }
 
         for (let i = 0; i < facilityData.length; i++) {
             if (isFacilityPress[i] === true) {
                 postFacility.push(facilityData[i].facility_pk);
-            };
-        };
+            }
+        }
 
         // 선택사항이 많으므로 하나 하나 조건 필요
         var DATA = {
@@ -169,8 +177,19 @@ const MakeReviewScreen = ({route, navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     Alert.alert('', '리뷰 등록이 완료되었습니다.');
                     navigation.goBack();
                 })
@@ -359,7 +378,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                             />
                         
                             {ratedScore !== 0 ? <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText> :
-                            <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
+                                <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
                         </View>
                     </View>
                 </ScreenContainerView>

@@ -38,6 +38,7 @@ const ShowPlacesForFree = props => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isLiked, setIsLiked] = useState(item.like_flag);
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -56,7 +57,7 @@ const ShowPlacesForFree = props => {
             return '음식';
         } else {
             return '기타';
-        };
+        }
     };
 
     const getInitialPlaceData = () => {
@@ -70,8 +71,12 @@ const ShowPlacesForFree = props => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -103,8 +108,12 @@ const ShowPlacesForFree = props => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -134,8 +143,12 @@ const ShowPlacesForFree = props => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -165,15 +178,18 @@ const ShowPlacesForFree = props => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -189,7 +205,7 @@ const ShowPlacesForFree = props => {
             if(index <= 4) return false;
             else return true;
         }
-    }
+    };
     return (
         <View style={checkLimit() && {display: 'none'}}>
             {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
@@ -204,20 +220,20 @@ const ShowPlacesForFree = props => {
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            props.navigation.navigate('Place', {data: item})
+                            props.navigation.navigate('Place', {data: item});
 
                         }} disabled={isEditPage && true}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
                                     <TouchableOpacity onPress={()=>{
                                         let newArr = [...isDeletedOrigin];
-                                        console.log(newArr)
+                                        console.log(newArr);
                                         newArr[index] = true;
                                         // setIsDeletedOrigin(newArr);
                                         isDeleted(newArr);
                                     }}>
                                         <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                            <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
+                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                         </View>
                                     </TouchableOpacity>
                                 }
@@ -321,10 +337,10 @@ const ShowPlacesForFree = props => {
                         </View>
                     </View>
                     <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
-                            isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
-                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
-                            replacementData={replacementData}
-                        />
+                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
+                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                        replacementData={replacementData}
+                    />
                     <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                 </View>
             </TouchableHighlight>

@@ -27,7 +27,10 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
                  LEFT OUTER JOIN like_place lp
                  ON lp.place_pk = p.place_pk
                  AND lp.user_pk = ${user_pk}
-                 LEFT OUTER JOIN (SELECT place_pk, COUNT(*) AS like_cnt FROM like_place GROUP BY place_pk) llp
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, COUNT(*) AS like_cnt 
+                     FROM like_place GROUP BY place_pk
+                 ) llp
                  ON llp.place_pk = p.place_pk
                  LEFT OUTER JOIN (
                      SELECT place_pk, COUNT(*) AS view_cnt
@@ -73,7 +76,8 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
 
 // 공간 조회
 exports.readPlace = async (user_pk, place_pk) => {
-    const query1 = `SELECT p.place_pk, place_name, place_addr, place_type, place_img, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag 
+    const query1 = `SELECT p.place_pk, place_name, place_addr, place_type, place_img, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag,
+                           place_mapy AS place_latitude, place_mapx AS place_longitude
                     FROM places p
                     LEFT OUTER JOIN like_place lp
                     ON lp.place_pk = p.place_pk
@@ -118,15 +122,25 @@ exports.readPlace = async (user_pk, place_pk) => {
                     ON fp.facility_pk = f.facility_pk`
 //                     WHERE cnt >= 2` 나중에 활성화 시키기
 
+    // 리뷰 언제 마지막으로 했는지
+    const query4 = `SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS recent_review_flag
+                    FROM place_reviews
+                    WHERE user_pk = ${user_pk} 
+                    AND place_pk = ${place_pk}
+                    AND review_create_time BETWEEN DATE_ADD(NOW(), INTERVAL -7 DAY ) AND NOW()
+                    `
+
     const result1 = await db.query(query1);
     const result2 = await db.query(query2);
     const result3 = await db.query(query3);
+    const result4 = await db.query(query4);
     const facility = result3.map(facility => facility.facility_name);
 
     const result = {
         placeData : result1[0],
         review : {
             ...result2[0],
+            ...result4[0],
             facility
         }
     }
@@ -135,7 +149,7 @@ exports.readPlace = async (user_pk, place_pk) => {
 
 // 공간 한줄팁 조회
 exports.readPlaceCommentList = async (place_pk) => {
-    const query = `SELECT cpm.collection_pk, cpc_create_time, cpc_comment, collection_name, c.user_pk, user_nickname, user_img                 
+    const query = `SELECT cpm.collection_pk, collection_type, cpc_create_time, cpc_comment, collection_name, c.user_pk, user_nickname, user_img                 
                    FROM collection_place_comment cpc 
                    INNER JOIN collection_place_map cpm 
                    ON cpm.cpm_map_pk = cpc.cpm_map_pk

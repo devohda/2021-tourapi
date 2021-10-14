@@ -10,23 +10,60 @@ const authService = require('../services/authService');
 
 const {verifyToken} = require('../middleware/jwt');
 
-/*
-* 비밀번호 찾기
-*
-*
-* */
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 });
 
+//[GET]
+// 본인인증 - 코드 보내고 인증하기
+router.get('/authPhone', async (req, res, next) => {
+    const {phoneNumber, verifyCode} = req.body;
+    const cacheData = cache.get(phoneNumber);
+
+    if (!cacheData) {
+        return res.status(400).json({
+            code: 400,
+            status: 'INVALID'
+        });
+    }
+
+    if (cacheData != verifyCode) {
+        return res.status(400).json({
+            code: 400,
+            status: 'INVALID'
+        });
+    }
+
+    cache.del(phoneNumber);
+    return res.status(200).json({
+        code: 200,
+        status: 'OK'
+    });
+})
+
+// [POST]
 // 본인인증 - 휴대폰 인증 sms 보내기
 router.post('/authPhone', async (req, res) => {
-    // TODO 인증번호 생성해서 같이 send 하기
+    const {phoneNumber} = req.body;
+
+    // 기존에 저장되어 있던 캐시는 만료 시키기
+    cache.del(phoneNumber);
+
+    // 인증번호 생성
+    let verifyCode = "";
+    for (let i = 0; i < 6; i++) {
+        verifyCode += parseInt(Math.random() * 10);
+    };
+
+    // 캐시에 저장
+    cache.set(phoneNumber, verifyCode);
+
     const result = await client.messages
         .create({
-            body: '[히든쥬얼] 본인 확인을 위한 인증번호는 389174 입니다.',
-            from: '+18637346757',
-            to: '+821023103703'
+            body: `[히든쥬얼] 본인 확인을 위한 인증번호는 ${verifyCode} 입니다.`,
+            from: '+18453933193',
+            to: phoneNumber
         })
         .then(message => {
-            console.log(message.sid);
             return message;
         })
         .catch(error => {
@@ -40,15 +77,8 @@ router.post('/authPhone', async (req, res) => {
     });
 });
 
-
-/*
-* 회원가입
-*
-*
-* */
-
 // 회원가입
-router.post('/makeAccount', async (req, res, next) => {
+router.post('/account', async (req, res, next) => {
     const {userInfo} = req.body;
 
     const createSalt = () =>
@@ -68,16 +98,22 @@ router.post('/makeAccount', async (req, res, next) => {
             });
         });
 
-    const {password, salt} = await createHashedPassword(userInfo.user_password);
-    userInfo.user_password = password;
+    const {password, salt} = await createHashedPassword(userInfo.password);
+    userInfo.password = password;
     userInfo.salt = salt;
 
     const result = await authService.createUser(userInfo);
-
-    return res.status(200).json({
-        code: 200,
-        status: 'OK'
-    });
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
 });
 
 // 회원가입 시 중복 확인 - 이메일
@@ -113,53 +149,6 @@ router.post('/sameNickname', async (req, res, next) => {
         data: {isDuplicated}
     });
 });
-
-
-/*
-* 로그인
-*
-*
-* */
-
-// router.post('/loginEmail', async (req, res, next) => {
-//     const {email, password: plainPassword} = req.body.user;
-//
-//     const userData = await authService.readUserByEmail(email);
-//     if (userData.length !== 1) {
-//         // 해당 유저 존재 X
-//         return res.status(404).json({
-//             code: 404,
-//             status: 'NOT EXIST'
-//         });
-//     }
-//
-//     const {salt, user_password, ...user} = userData[0];
-//
-//     const makePasswordHashed = (plainPassword) =>
-//         new Promise(async (resolve, reject) => {
-//             // salt를 가져오는 부분은 각자의 DB에 따라 수정
-//             crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
-//                 if (err) reject(err);
-//                 resolve(key.toString('base64'));
-//             });
-//         });
-//
-//     const password = await makePasswordHashed(plainPassword);
-//
-//     if (user_password !== password) {
-//         // 비밀번호 틀렸을 때
-//         return res.status(403).json({
-//             code: 403,
-//             state: 'NOT MATCHED'
-//         });
-//     }
-//
-//     return res.status(200).json({
-//         code: 200,
-//         status: 'OK',
-//         userData: user
-//     });
-// });
 
 // jwt 토큰을 이용한 로그인
 router.post('/loginJWT', async (req, res, next) => {
@@ -215,7 +204,47 @@ router.post('/loginJWT', async (req, res, next) => {
     }
 });
 
-router.delete('/logout', verifyToken, async (req, res, next)=> {
+// [PUT]
+// 비밀번호 재설정
+router.put('/password', async (req, res, next) => {
+    const {email, password : plainPassword} = req.body;
+
+    const createSalt = () =>
+        new Promise((resolve, reject) => {
+            crypto.randomBytes(64, (err, buf) => {
+                if (err) reject(err);
+                resolve(buf.toString('base64'));
+            });
+        });
+
+    const createHashedPassword = (plainPassword) =>
+        new Promise(async (resolve, reject) => {
+            const salt = await createSalt();
+            crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+                if (err) reject(err);
+                resolve({password: key.toString('base64'), salt});
+            });
+        });
+
+    const {password, salt} = await createHashedPassword(plainPassword);
+
+    const result = await authService.updatePassword(email, password, salt);
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
+// [DELETE]
+// 로그아웃
+router.delete('/logout', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
     await authService.deleteToken(user.user_pk);
 
@@ -224,6 +253,23 @@ router.delete('/logout', verifyToken, async (req, res, next)=> {
         status: 'OK'
     });
 });
+
+// 회원 탈퇴
+router.delete('/account', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await authService.deleteUser(user.user_pk);
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 
 module.exports = router;
 

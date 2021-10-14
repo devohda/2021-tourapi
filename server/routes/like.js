@@ -27,7 +27,8 @@ router.post('/place/:placeId', verifyToken, async (req, res, next) => {
 // 장소 좋아요 조회
 router.get('/placeList', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
-    const result = await likeService.readLikePlace(user.user_pk);
+    const {sort} = req.query;
+    const result = await likeService.readLikePlace(user.user_pk, sort);
 
     if (result) {
         return res.status(200).json({
@@ -85,7 +86,8 @@ router.post('/collection/:collectionId', verifyToken, async (req, res, next) => 
 // 보관함 좋아요 조회
 router.get('/collectionList', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
-    const result = await likeService.readLikeCollection(user.user_pk);
+    const {sort} = req.query;
+    const result = await likeService.readLikeCollection(user.user_pk, sort);
 
     if (result) {
         return res.status(200).json({

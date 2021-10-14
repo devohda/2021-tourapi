@@ -25,6 +25,7 @@ const ShowPlacesForReplace = props => {
     const [update, setUpdate] = setUpdated();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -43,7 +44,7 @@ const ShowPlacesForReplace = props => {
             return '음식';
         } else {
             return '기타';
-        };
+        }
     };
 
     const LikePlace = (pk) => {
@@ -58,13 +59,18 @@ const ShowPlacesForReplace = props => {
                 }
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     getInitialReplacementData();
                     getInitialData();
                 })
@@ -89,13 +95,18 @@ const ShowPlacesForReplace = props => {
                 }
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     getInitialReplacementData();
                     getInitialData();
                 })
@@ -120,15 +131,18 @@ const ShowPlacesForReplace = props => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -144,7 +158,7 @@ const ShowPlacesForReplace = props => {
             if(index <= 4) return false;
             else return true;
         }
-    }
+    };
     return (
         <View style={isDeletedReplacement[index] && {display: 'none'}}>
             {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
@@ -159,7 +173,7 @@ const ShowPlacesForReplace = props => {
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            navigation.navigate('Place', {data: item})
+                            navigation.navigate('Place', {data: item});
                         }} disabled={isEditPage && true}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
@@ -167,10 +181,10 @@ const ShowPlacesForReplace = props => {
                                         let newArr = [...isDeletedReplacement];
                                         newArr[index] = true;
                                         isReplacementDeleted(newArr);
-                                        console.log(newArr)
+                                        console.log(newArr);
                                     }}>
                                         <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                            <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
+                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                         </View>
                                     </TouchableOpacity>
                                 }

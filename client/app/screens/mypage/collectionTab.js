@@ -28,6 +28,8 @@ const CollectionTab = ({navigation}) => {
     const [token, setToken] = useToken();
     const isFocused = useIsFocused();
     const [collectionList, setCollectionList] = useState({});
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
     const [directoryType, setDirectoryType] = useState([
         {
             name: '전체',
@@ -60,7 +62,7 @@ const CollectionTab = ({navigation}) => {
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = () => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MY`, {
+            fetch('http://34.64.185.40/collection/list?type=MY', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -68,14 +70,18 @@ const CollectionTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
 
                     setCollectionList(response.data);
                 })
@@ -98,15 +104,18 @@ const CollectionTab = ({navigation}) => {
                     'x-access-token': token
                 },
             }).then(res => res.json())
-            .then(response => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async response => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -244,91 +253,91 @@ const CollectionTab = ({navigation}) => {
     const SelectBox = () => {
         return (
             <>
-            {
-            showMenu && <View style={{
-                position: 'absolute',
-                width: 80,
-                height: 80,
-                backgroundColor: '#fff',
-                // flex: 1,
-                borderRadius: 10,
-                zIndex: 0,
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-                overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('최근 추가순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
-                        {currentMenu === '최근 추가순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                    
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
+                {
+                    showMenu && <View style={{
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        backgroundColor: '#fff',
+                        // flex: 1,
+                        borderRadius: 10,
                         zIndex: 0,
-                        backgroundColor: colors.backgroundColor,
-                    }}></View>
-                    
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('인기순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+                        overflow: 'visible'
                     }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('최근 추가순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                            {currentMenu === '최근 추가순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
                     
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
-                        zIndex: 0
-                    }}></View>
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                            zIndex: 0,
+                            backgroundColor: colors.backgroundColor,
+                        }}></View>
                     
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('리뷰순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                        {currentMenu === '리뷰순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                </View>
-            }
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('인기순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                            {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
+                    
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                            zIndex: 0
+                        }}></View>
+                    
+                        <TouchableOpacity
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('리뷰순');
+                            }}
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5
+                            }}>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
+                            {currentMenu === '리뷰순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                        </TouchableOpacity>
+                    </View>
+                }
             </>
         );};
 

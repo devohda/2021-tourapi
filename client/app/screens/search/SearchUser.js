@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Dimensions} from 'react-native';
+import {View, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Dimensions, Alert} from 'react-native';
 import AppText from '../../components/AppText';
 import {useTheme} from '@react-navigation/native';
 import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
@@ -20,6 +20,7 @@ const SearchUser = () => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
+    const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     useEffect(() => {
         getResults();
@@ -36,14 +37,18 @@ const SearchUser = () => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log(response.data)
+
                     setSearchLength(response.data.length);
                     setUserList(response.data);
                 })
@@ -96,7 +101,13 @@ const SearchUser = () => {
                         padding: 2,
                         justifyContent: 'center',
                         alignItems: 'center'
-                    }}><AppText style={{color: colors.defaultColor, textAlign: 'center', fontSize: 12, fontWeight: '500', lineHeight: 19.2}}>{item.madeCollectionCnt}</AppText></View>
+                    }}><AppText style={{
+                            color: colors.defaultColor,
+                            textAlign: 'center',
+                            fontSize: 12,
+                            fontWeight: '500',
+                            lineHeight: 19.2
+                        }}>{item.madeCollectionCnt}</AppText></View>
                 </View>
                 <AppText style={{
                     fontSize: 16,
@@ -118,9 +129,9 @@ const SearchUser = () => {
     };
 
     return (
-        <View flexDirection="row" style={{marginBottom: 8, alignItems: 'center', marginTop: 22}
-        , userList.length === 0 && {justifyContent: 'center'}
-        }>
+        <View flexDirection="row" style={{
+            marginBottom: 8, alignItems: 'center', marginTop: 22, justifyContent: userList.length === 0 && 'center'
+        }}>
             {
                 userList.length === 0 ?
                     <ShowEmpty/> :
