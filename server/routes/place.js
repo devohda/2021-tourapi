@@ -94,15 +94,15 @@ router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req,
     const place_pk = req.params.placeId
     const {user} = res.locals;
     const {review_facility, ...reviewData2} = reviewData;
+    const review = {
+        user_pk : user.user_pk,
+        place_pk : place_pk,
+        ...reviewData2
+    }
 
+    console.log(req.files);
     if (!req.files) {
-        const review = {
-            user_pk : user.user_pk,
-            place_pk : place_pk,
-            ...reviewData2
-        }
-
-        const result = await reviewService.createReview(review, review_facility);
+        const result = await reviewService.createReview(review, review_facility, null);
 
         if(result){
             return res.status(200).json({
@@ -117,41 +117,35 @@ router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req,
         }
     }
 
-    for(const file of req.files){
+    //  Create a new blob in the bucket and upload the file data.
+    const imgArr = []
+    req.files.forEach((fil) => {
         const blob = bucket.file(Date.now() + req.file.originalname);
         const blobStream = blob.createWriteStream();
+
+
+        blobStream.on('finish', () => {
+            // The public URL can be used to directly access the file via HTTP.
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+            imgArr.push(publicUrl);
+        });
+
+        blobStream.end(req.files.buffer);
+    });
+
+
+    const result = await reviewService.createReview(review, review_facility, imgArr);
+    if(result){
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    }else{
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
     }
-
-    blobStream.on('error', err => {
-        next(err);
-    });
-
-    blobStream.on('finish', async () => {
-        // The public URL can be used to directly access the file via HTTP.
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-
-        const {collectionData: stringedCollectionData} = req.body;
-        const collectionData = {
-            ...JSON.parse(stringedCollectionData),
-            img: publicUrl
-        }
-        const result = await collectionService.createFreeCollection(user.user_pk, collectionData)
-
-        if (result.collection_pk) {
-            return res.status(200).json({
-                code: 200,
-                status: 'OK',
-                collectionId: result.collection_pk
-            });
-        } else {
-            return res.status(500).json({
-                code: 500,
-                status: 'SERVER ERROR'
-            });
-        }
-    });
-
-    blobStream.end(req.file.buffer);
 });
 
 module.exports = router;

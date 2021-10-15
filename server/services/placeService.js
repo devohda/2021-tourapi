@@ -29,7 +29,9 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
                  AND lp.user_pk = ${user_pk}
                  LEFT OUTER JOIN (
                      SELECT place_pk, COUNT(*) AS like_cnt 
-                     FROM like_place GROUP BY place_pk
+                     FROM like_place
+                     WHERE (like_time > DATE_SUB(now(), INTERVAL ${day} DAY))
+                     GROUP BY place_pk
                  ) llp
                  ON llp.place_pk = p.place_pk
                  LEFT OUTER JOIN (
