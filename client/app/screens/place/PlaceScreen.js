@@ -240,6 +240,11 @@ const PlaceScreen = ({route, navigation}) => {
     const [afternoonCongestion, setAfternoonCongestion] = useState(0);
     const [eveningCongestion, setEveningCongestion] = useState(0);
     const [nightCongestion, setNightCongestion] = useState(0);
+    const [reviewAccess, setReviewAccess] = useState(0);
+
+    const [placeLat, setPlaceLat] = useState(0);
+    const [placeLng, setPlaceLng] = useState(0);
+    const [placeTitle, setPlaceTitle] = useState('');
 
     const [token, setToken] = useToken();
     const [placeScore, setPlaceScore] = useState(0);
@@ -271,7 +276,6 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
@@ -280,6 +284,11 @@ const PlaceScreen = ({route, navigation}) => {
                     setEveningCongestion(response.data.review.review_congestion_evening);
                     setNightCongestion(response.data.review.review_congestion_night);
                     setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2));
+                    setReviewAccess(response.data.review.recent_review_flag);
+
+                    setPlaceLat(parseFloat(response.data.placeData.place_latitude).toFixed(5));
+                    setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(5));
+                    setPlaceTitle(response.data.placeData.place_name);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -752,7 +761,6 @@ const PlaceScreen = ({route, navigation}) => {
         const { id, coordinate } = event.nativeEvent;
         // console.log(coordinate)
         const newRegion = { ...region };
-    
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;
     
@@ -775,18 +783,28 @@ const PlaceScreen = ({route, navigation}) => {
         const { item, index } = props;
         return (
             <View key={index}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>{
+                    const data = {
+                        'collection_pk': item.collection_pk,
+                        'now': false,
+                    };
+                    if(item.collection_type === 1) {
+                        navigation.navigate('PlanCollection', {data: data});
+                    } else {
+                        navigation.navigate('FreeCollection', {data: data});
+                    }
+                }}>
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}>
                         <View>
-                            { item.user_img ?
+                            { item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
                                 <Image style={styles.reviewImage}
                                     source={require('../../assets/images/here_default.png')}></Image> :
                                 <Image style={styles.reviewImage}
-                                    source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
+                                source={{ uri: item.user_img }}></Image>
                             }
                         </View>
                         <View style={{marginLeft: 12, marginRight: 20}}>
@@ -800,8 +818,6 @@ const PlaceScreen = ({route, navigation}) => {
                                 alignItems: 'center',
                                 flexDirection: 'row'
                             }}>
-                                <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                    color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
                                 <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
                                     {item.cpc_comment}</AppText>
                             </View>
@@ -923,17 +939,17 @@ const PlaceScreen = ({route, navigation}) => {
                         </View>
 
                         {/* TODO 만약 해당 장소에 리뷰를 남겼다면 뜨지 않도록 하기 */}
-                        <TouchableOpacity style={{
+                        <TouchableOpacity style={[{
                             width: '100%',
                             flexDirection: 'row',
-                            backgroundColor: colors.red[3],
                             height: 38,
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRadius: 10,
                             paddingVertical: 6
-                        }}
+                        }, !reviewAccess ? {backgroundColor: colors.red[3]} : {backgroundColor: colors.gray[6]}]}
                         onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name, place_pk: placeData.place_pk})}
+                        disabled={!reviewAccess ? false : true}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
                                 source={require('../../assets/images/write_review_icon.png')}></Image>

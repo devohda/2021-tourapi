@@ -17,9 +17,6 @@ const TipsList = props => {
     const [changedTip, setChangedTip] = useState('');
     const [tmpData, setTmpData] = tipsList();
     const isFree = (typeof props.day === 'undefined');
-    const [defaultValue, setDefaultValue] = useState(
-        isFree? tmpData[0].tip : tmpData[0].places[0].tip
-    );
 
     const AddModal = () => {
         const [changed, setChanged] = useState('');
@@ -40,7 +37,7 @@ const TipsList = props => {
                         <AppText style={{color: colors.gray[3], fontSize: 12, fontWeight: '500', lineHeight: 19.2, textAlign: 'center'}}>{data.place_name}을 위한 팁을 공유해주세요!</AppText>
                     </View>
                     <View style={{marginTop: 14}}>
-                        <TextInput defaultValue={data.tip} onChangeText={(text)=>{
+                        <TextInput onChangeText={(text)=>{
                             setChanged(text);
                             
                             }}
@@ -218,7 +215,6 @@ const TipsList = props => {
                 <TouchableOpacity onPress={() => {
                     if(comment) {
                         if(props.private) setEditVisible(true);
-                        setChangedTip(defaultValue);
                     }
                     else {
                         if(props.private) setAddVisible(true);

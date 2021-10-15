@@ -30,6 +30,38 @@ export default function MainPageScreen({navigation}) {
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [defaultProfileList, setDefaultProfileList] = useState([
+        {
+            id: 1,
+            name: 'default-red',
+            color: colors.red[3]
+        },
+        {
+            id: 2,
+            name: 'default-yellow',
+            color: '#FFC36A'
+        },
+        {
+            id: 3,
+            name: 'default-green',
+            color: '#639A94'
+        },
+        {
+            id: 4,
+            name: 'default-blue',
+            color: '#637DA9'
+        },
+        {
+            id: 5,
+            name: 'default-purple',
+            color: '#8F6DA4'
+        },
+        {
+            id: 6,
+            name: 'selected-photo',
+            color: colors.defaultColor
+        },
+    ]);
 
     useEffect(() => {
         getPopularCollectionData();
@@ -40,7 +72,7 @@ export default function MainPageScreen({navigation}) {
             setPopularPlace([]);
             setPopularUser([]);
         };
-    }, []);
+    }, [isFocused]);
 
     const getPopularCollectionData = (day) => {
         try {
@@ -64,7 +96,6 @@ export default function MainPageScreen({navigation}) {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPopularCollection(response.data);
                 })
                 .catch((err) => {
@@ -248,8 +279,33 @@ export default function MainPageScreen({navigation}) {
         }
     };
 
+    const setBGColor = (thumbnail) => {
+        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
+        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
+        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
+        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
+        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
+        else return defaultProfileList[5].color;
+    };
+
+    const ShowThumbnail = props => {
+        const { thumbnail } = props;
+        if(thumbnail.startsWith('default')) {
+            return (
+                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                    <DefaultProfile width={127} height={90.38}/>
+                </View>
+            )
+        } else {
+            return (
+                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
+            )
+        }
+    };
+
     const ShowPopularCollection = props => {
-        const {item} = props;
+        const {item, idx} = props;
+
         return (
             <TouchableOpacity style={[{
                 ...styles.directoryContainer,
@@ -283,8 +339,10 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                         <View style={styles.defaultImageView}>
-                            {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/> */}
-                            <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
+                            { item.collection_thumbnail ?
+                                <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                                <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
+                            }
                         </View>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
@@ -317,31 +375,31 @@ export default function MainPageScreen({navigation}) {
         );
     };
 
-    const [backgroundColor, setBackgroundColor] = useState(colors.red[3]);
-
-    const setBGColor = (idx) => {
-        if (idx === 0 || idx === 2) {
-            return colors.red[3];
-        } else if (idx === 1 || idx === 6) {
-            return '#FFC36A';
-        } else if (idx === 3 || idx === 8) {
-            return '#639A94';
-        } else if (idx === 4 || idx === 5) {
-            return colors.blue[2];
-        } else {
-            return '#8F6DA4';
-        }
-    };
-
     const ShowPopularUser = props => {
-        const {user_nickname} = props.data;
+        const {user_nickname, user_img} = props.data;
         const {keyword, idx} = props;
-
         return (
             <View style={{alignItems: 'center'}}>
-                <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                    <DefaultProfile width={70} height={70}/>
-                </View>
+                {
+                    user_img === '' || user_img === 'default-user' || user_img.startsWith('../') || user_img === 'default-img' ?
+                    <View style={{...styles.authorImage}}>
+                        <Image
+                        style={{
+                            width: 88,
+                            height: 88,
+                            borderRadius: 50,
+                            backgroundColor: colors.defaultColor,
+                        }}
+                        source={require('../assets/images/here_default.png')}
+                        /></View> :
+                    <View style={{...styles.authorImage}}>
+                        <Image source={{ uri: user_img }} style={{
+                                width: 88,
+                                height: 88,
+                                borderRadius: 50,
+                                backgroundColor: colors.defaultColor,
+                            }} /></View>
+                }
                 <AppText style={{
                     fontSize: 14,
                     fontWeight: '700',
@@ -407,7 +465,7 @@ export default function MainPageScreen({navigation}) {
                                 <Image source={require('../assets/images/here_default.png')}
                                     style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/>
                         }
-                        <View style={{marginLeft: 8, width: '60%'}}>
+                        <View style={{marginLeft: 8, width: '70%'}}>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     color: colors.gray[3],
@@ -694,9 +752,6 @@ const styles = StyleSheet.create({
         fontWeight: '700'
     },
     authorImage: {
-        width: 88,
-        height: 88,
-        borderRadius: 50,
         marginTop: 20,
         justifyContent: 'center',
         alignItems: 'center',
@@ -767,6 +822,16 @@ const styles = StyleSheet.create({
     dirPlanText: {
         fontSize: 12,
         fontWeight: 'bold'
-    }
+    },
+
+    //profile
+    thumbnailImage: {
+        width: 108,
+        height: 108,
+        borderRadius: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 

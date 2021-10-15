@@ -14,6 +14,7 @@ import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
+import DefaultProfile from '../../assets/images/profile_default.svg';
 
 const PlaceTab = ({navigation}) => {
     const {colors} = useTheme();
@@ -372,16 +373,72 @@ const PlaceTab = ({navigation}) => {
         </TouchableOpacity>
     );
 
-    const CollectionContainer = ({item}) => {
+    const [defaultProfileList, setDefaultProfileList] = useState([
+        {
+            id: 1,
+            name: 'default-red',
+            color: colors.red[3]
+        },
+        {
+            id: 2,
+            name: 'default-yellow',
+            color: '#FFC36A'
+        },
+        {
+            id: 3,
+            name: 'default-green',
+            color: '#639A94'
+        },
+        {
+            id: 4,
+            name: 'default-blue',
+            color: '#637DA9'
+        },
+        {
+            id: 5,
+            name: 'default-purple',
+            color: '#8F6DA4'
+        },
+        {
+            id: 6,
+            name: 'selected-photo',
+            color: colors.defaultColor
+        },
+    ]);
+
+    const setBGColor = (thumbnail) => {
+        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
+        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
+        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
+        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
+        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
+        else return defaultProfileList[5].color;
+    };
+
+    const ShowThumbnail = props => {
+        const { thumbnail } = props;
+        if(thumbnail.startsWith('default')) {
+            return (
+                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                    <DefaultProfile width={97} height={70.38}/>
+                </View>
+            )
+        } else {
+            return (
+                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
+            )
+        }
+    };
+
+    const CollectionContainer = ({item, index}) => {
         return (
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
                 countCollectionView(item.collection_pk);
                 if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : item});
                 else navigation.navigate('FreeCollection', {data : item});
             }}>
-                <View style={{overflow: 'hidden', borderRadius: 10}}>
-                    <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
-                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 163, position: 'absolute'}}>
+                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
+                    <View style={{height: '68%'}}> 
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                             <View style={[styles.dirType, {
                                 borderColor: colors.backgroundColor,
@@ -405,9 +462,12 @@ const PlaceTab = ({navigation}) => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../../assets/images/here_default.png')}/> */}
+                        { item.collection_thumbnail ?
+                            <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                            <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
+                        }
                     </View>
-                    <View style={{marginLeft: 10, marginTop: 8, height: 86}}>
+                    <View flex={1} style={{marginLeft: 10, marginTop: 8, height: 86}}>
                         <AppText style={{
                             fontSize: 14,
                             fontWeight: '400',
@@ -559,7 +619,7 @@ const PlaceTab = ({navigation}) => {
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
-                                // setShowMenu(!showMenu);
+                                setShowMenu(!showMenu);
                             }} style={{flexDirection: 'row'}}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
@@ -632,6 +692,9 @@ const styles = StyleSheet.create({
     defaultImage: {
         width: '100%',
         height: 163,
+        position: 'absolute',
+        justifyContent: 'center',
+        alignContent: 'center'
     },
     defaultPlaceImage: {
         width: '100%',
@@ -682,6 +745,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 2,
+    },
+
+    //profile
+    thumbnailImage: {
+        width: 108,
+        height: 108,
+        borderRadius: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

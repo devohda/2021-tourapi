@@ -99,6 +99,7 @@ const GetEmailTab = ({navigation}) => {
                     <View style={{...styles.progress, ...styles.progress_active}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
+                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>
                     <AppText>

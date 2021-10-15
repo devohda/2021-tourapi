@@ -8,14 +8,12 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    Pressable,
-    TextInput,
-    SafeAreaView,
+    FlatList,
     ScrollView,
-    TouchableOpacityBase
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import {useTheme} from '@react-navigation/native';
-import {BottomSheet} from 'react-native-elements';
+import {Icon} from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import ScreenContainer from '../../components/ScreenContainer';
@@ -27,7 +25,7 @@ import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-import SearchIcon from '../../assets/images/search-icon.svg';
+import DefaultProfile from '../../assets/images/profile_default.svg';
 import * as SecureStore from 'expo-secure-store';
 
 export const navigationRef = React.createRef();
@@ -53,6 +51,39 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isVisible, setIsVisible] = useState(false);
     const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [defaultProfileList, setDefaultProfileList] = useState([
+        {
+            id: 1,
+            name: 'default-red',
+            color: colors.red[3]
+        },
+        {
+            id: 2,
+            name: 'default-yellow',
+            color: '#FFC36A'
+        },
+        {
+            id: 3,
+            name: 'default-green',
+            color: '#639A94'
+        },
+        {
+            id: 4,
+            name: 'default-blue',
+            color: '#637DA9'
+        },
+        {
+            id: 5,
+            name: 'default-purple',
+            color: '#8F6DA4'
+        },
+        {
+            id: 6,
+            name: 'selected-photo',
+            color: colors.defaultColor
+        },
+    ]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
     const postCollections = () => {
         var datas = [];
@@ -66,30 +97,37 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
 
         var forPostEnable = 0;
         if (isEnabled === true) forPostEnable = 1;
-
+        let form = new FormData();
         var forPostData = {};
-        if (datas.length === 0) {
-            forPostData = {
-                name: collectionName,
-                isPrivate: forPostEnable,
-                keywords: [],
-            };
-        } else {
+
+        if(image) {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 keywords: datas,
             };
+            let file = {
+                uri: image,
+                type: 'multipart/form-data',
+                name: 'image.jpg',
+            }
+            form.append('img', file);
+             
+        } else {
+            forPostData = {
+                name: collectionName,
+                isPrivate: forPostEnable,
+                keywords: datas,
+                img: defaultProfileList[selectedIndex].name,
+            };
         }
-
-        let form = new FormData();
         form.append('collectionData', JSON.stringify(forPostData));
-        form.append('img', 'default-red');
 
         try {
             fetch('http://34.64.185.40/collection/free', {
                 method: 'POST',
                 headers: {
+                    "Content-Type": "multipart/form-data",
                     'x-access-token': token
                 },
                 body: form
@@ -106,16 +144,20 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    console.log(form)
                     const item = {
                         'collection_pk': response.collectionId,
                         'now': true,
                     };
-                    Alert.alert('', '자유보관함이 생성되었습니다.', [
+                    if(response.code === 200) {
+                        Alert.alert('', '자유보관함이 생성되었습니다.', [
                         {text : 'OK', onPress: () => {
                             navigation.navigate('FreeCollection', {data: item});
                             navigation.setOptions({tabBarVisible: true});
                         }}]);
+                    } else {
+                        Alert.alert('', '자유보관함 생성에 실패했습니다. 다시 시도해주세요.');
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -140,25 +182,30 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         var forPostEnable = 0;
         if (isEnabled === true) forPostEnable = 1;
 
-        //사진 추가 필요
+        let form = new FormData();
         var forPostData = {};
-        if (datas.length === 0) {
+
+        if(image) {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
-                keywords: [],
-                img: 'default-red',
+                keywords: datas,
             };
+            let file = {
+                uri: image,
+                type: 'multipart/form-data',
+                name: 'image.jpg',
+            }
+            form.append('img', file);
+             
         } else {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 keywords: datas,
-                img: 'default-red',
+                img: defaultProfileList[selectedIndex].name,
             };
         }
-
-        let form = new FormData();
         form.append('collectionData', JSON.stringify(forPostData));
 
         try {
@@ -217,7 +264,19 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
             if (data.collection_private) {
                 setIsEnabled(true);
             }
-        }
+
+            if(data.collection_thumbnail === defaultProfileList[0].name) setSelectedIndex(0);
+            else if(data.collection_thumbnail === defaultProfileList[1].name) setSelectedIndex(1);
+            else if(data.collection_thumbnail === defaultProfileList[2].name) setSelectedIndex(2);
+            else if(data.collection_thumbnail === defaultProfileList[3].name) setSelectedIndex(3);
+            else if(data.collection_thumbnail === defaultProfileList[4].name) setSelectedIndex(4);
+            else {
+                var newArr =[...defaultProfileList];
+                newArr[5].name = data.collection_thumbnail;
+                setDefaultProfileList(newArr);
+                setImage(data.collection_thumbnail);
+            }
+        };
     }, []);
 
     const getKeywords = useCallback(() => {
@@ -448,26 +507,101 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const setBGColor = (idx) => {
+        return defaultProfileList[idx].color
+    };
+
+    const [image, setImage] = useState(null);
+    const [imageInfo, setImageInfo] = useState({});
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.cancelled) {
+          setImage(result.uri);
+          setImageInfo(result);
+        }
+
+        var newArr =[...defaultProfileList];
+        newArr[5].name = result.uri;
+        setDefaultProfileList(newArr);
+    };
+
+    const SelectProfile = () => {
+        return (
+            <View style={{alignItems: 'center'}}>
+                {image ?
+                <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
+                <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
+                    <DefaultProfile width={83} height={60.2}/>
+                </View>
+                }
+                <FlatList data={defaultProfileList} horizontal
+                    renderItem={({item, index}) =>
+                    <TouchableOpacity onPress={()=>{
+                        if(index === 5) {
+                            (async () => {
+                                if (Platform.OS !== 'web') {
+                                  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                                  if (status !== 'granted') {
+                                    alert('Sorry, we need camera roll permissions to make this work!');
+                                  }
+                                }
+                              })();
+                            pickImage();
+                        } else {
+                            setImage('');
+                        }
+                        setSelectedIndex(index);
+                    }}>
+                        <View style={{backgroundColor: item.color, width: 28, height: 28, borderRadius: 10, marginHorizontal: 5, marginTop: 17}}>
+                            <Icon type="ionicon" name={"camera"} style={[index !== 5 && {display: 'none'}, {
+                                shadowOffset: {
+                                    width: 2,
+                                    height: 2
+                                },
+                                shadowOpacity: 0.25,
+                                elevation: 1,
+                                shadowColor: 'rgba(0, 0, 0, 0.25)',
+                                }]} color={colors.gray[6]}></Icon>
+                        </View>
+                    </TouchableOpacity>
+                }
+                    keyExtractor={(item, idx) => {idx.toString();}}
+                    key={(item, idx) => {idx.toString();}}
+                    nestedScrollEnabled/>
+            </View>
+        );
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title={update ? '자유보관함 수정' : '자유보관함 만들기'}/>
-            <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <ScreenContainerView>
-                    <View style={{marginTop: 26}}>
+            <ScrollView>
+                <ScreenContainerView flex={1}>
+                    <SelectProfile />
+                    <View style={{marginTop: 25}}>
                         <CustomTextInput
                             style={{
                                 color: colors.mainColor,
                                 fontSize: 20,
-                                fontWeight: 'bold'
+                                fontWeight: '700'
                             }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
+                            placeholderTextColor={colors.gray[5]}
                             onChangeText={(name) => setCollectionName(name)}
                             value={collectionName}
                         >
                         </CustomTextInput>
                     </View>
                 </ScreenContainerView>
-                <ScreenDivideLine/>
+                <ScreenDivideLine />
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -483,15 +617,12 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         }}>
 
                             <View flexDirection="row">
-                                <SelectKeyword/>
+                                <SelectKeyword />
                                 {
-                                    keywordData.map((keyword, idx) => {
-                                        // console.log(isPress)
-                                        return (
-                                            <>{isPress[idx] === true &&
-                                            <SelectedKeyword keyword={keyword} key={idx + 'selected'}/>}</>
-                                        );
-                                    })
+                                    keywordData.map((keyword, idx) => (
+                                        <>{isPress[idx] === true &&
+                                                <SelectedKeyword keyword={keyword} key={idx+'selected'} idx={idx+'selected'}/>}</>
+                                    ))
                                 }
                             </View>
                         </View>
@@ -511,8 +642,12 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             value={isEnabled}
                         />
                     </View>
-                    <View flex={1} style={{marginBottom: 20, justifyContent: 'flex-end'}}>
-                        <TouchableOpacity
+                    </ScreenContainerView>
+                </ScrollView>
+                <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <ScreenContainerView flex={1}>
+                        <View flex={1} style={{bottom: 20, justifyContent: 'flex-end'}}>
+                            <TouchableOpacity
                             testID="completed"
                             style={{
                                 backgroundColor: DATA.collection_name.length >= 2 ? colors.mainColor : colors.gray[5],
@@ -614,6 +749,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 18
+    },
+
+    //profile
+    selectedImage: {
+        width: 108,
+        height: 108,
+        borderRadius: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

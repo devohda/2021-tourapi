@@ -31,6 +31,7 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 const AlternativeSpaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const { data, day, postReplacement, pk, getReplacement } = route.params;
+    console.log(data)
     const [placeData, setPlaceData] = useState({});
     const [replacementData, setReplacementData] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
@@ -68,7 +69,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             setPlaceData({});
         };
     }, [isFocused]);
-
     const getInitialData = () => {
         try {
             fetch(`http://34.64.185.40/place/${data.place_pk}`, {
@@ -388,7 +388,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 <>
                     {
                         !isEditSpace ?
-                            <View style={[{position: 'absolute', right: 0}, !props.private && {display: 'none'}]}>
+                            <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
                                         refRBSheet.current.open();
@@ -432,14 +432,12 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                     <DeleteModal refRBSheet={refRBSheet}/>
                                 </RBSheet>
                             </View> :
-                            <View style={[{position: 'absolute', right: 0}, !props.private && {display: 'none'}]}>
+                            <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditSpace(false);
-                                        // console.log('나 맞아용!!!!!!')
                                         isReplacementDeleted(isDeletedReplacement);
                                         checkDeletedReplacement();
-                                        //완료를 눌렀을 경우에만 수정 삭제가 되도록...
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -543,7 +541,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         </View>
                         <TouchableOpacity onPress={()=>{
                             navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
-                        }} style={!props.private && {display: 'none'}}>
+                        }} style={!route.params.private && {display: 'none'}}>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

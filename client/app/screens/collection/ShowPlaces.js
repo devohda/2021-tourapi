@@ -394,7 +394,7 @@ const ShowPlaces = props => {
                             isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
                         />
-                        {/* <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/> */}
+                        <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                     </View>
                 </TouchableHighlight> :
                 item.cpm_plan_day === day && length > 0 &&
@@ -402,7 +402,7 @@ const ShowPlaces = props => {
                     <View flex={1} style={[{flexDirection: 'row', justifyContent: 'space-between'}, isDeletedOrigin[index] && {display: 'none'}]}>
                         <TouchableOpacity onPress={()=>{
                             setDeleteVisible(true);
-                        }} style={!isEditPage && {display: 'none'}}>
+                        }} style={{display: 'none'}}>
                             <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                 <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                             </View>
@@ -420,7 +420,7 @@ const ShowPlaces = props => {
                             backgroundColor: colors.backgroundColor
                         }}>
                             <View style={{
-                                width: !isEditPage ? '90%' : '70%',
+                                width: !isEditPage ? '90%' : '84%',
                                 borderStyle: 'dotted',
                                 borderRadius: 1,
                                 borderWidth: 1,

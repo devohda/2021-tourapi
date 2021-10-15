@@ -6,6 +6,7 @@ const ScreenContainer = props => {
         <SafeAreaView style={[{
             flex: 1,
             backgroundColor: props.backgroundColor,
+            ...props.style,
         }, Platform.OS === 'android' ? {paddingTop: 25} : {paddingTop: 0}]}>
             {props.children}
         </SafeAreaView>

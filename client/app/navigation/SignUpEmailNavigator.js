@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import GetEmailTab from "../screens/auth/signUpEmail/GetEmailTab";
 import GetPasswordTab from "../screens/auth/signUpEmail/GetPasswordTab";
 import GetNicknameTab from "../screens/auth/signUpEmail/GetNicknameTab";
+import GetKeywordTab from "../screens/auth/signUpEmail/GetKeywordTab";
 import {useTheme} from "@react-navigation/native";
 
 const Stack = createStackNavigator();
@@ -19,10 +20,11 @@ const SignUpEmailNavigator = ({navigation: authNavigation}) => {
             }}>
             <Stack.Screen name="emailTab" component={GetEmailTab}/>
             <Stack.Screen name="passwordTab" component={GetPasswordTab}/>
-            <Stack.Screen name="nicknameTab"
-                          children={
+            <Stack.Screen name="nicknameTab" component={GetNicknameTab}/>
+            <Stack.Screen name="keywordTab"
+                        children={
                               ({route}) =>
-                                  <GetNicknameTab route={route} authNavigation={authNavigation}/>
+                                  <GetKeywordTab route={route} authNavigation={authNavigation}/>
                           }
             />
         </Stack.Navigator>

@@ -25,8 +25,9 @@ import Jewel from '../../assets/images/jewel.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-const SearchPlace = ({navigation}) => {
+const SearchPlace = props => {
     const {colors} = useTheme();
+    const { countPlace, navigation } = props;
     const [placeList, setPlaceList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
@@ -54,7 +55,7 @@ const SearchPlace = ({navigation}) => {
 
     useEffect(() => {
         getResults();
-    }, [searchKeyword, isFocused]);
+    }, [searchKeyword]);
 
     const getResults = () => {
         try {
@@ -79,9 +80,8 @@ const SearchPlace = ({navigation}) => {
                         return;
                     }
 
-                    setSearchLength(response.data.length);
+                    countPlace(response.data.length);
                     setPlaceList(response.data);
-                    // setFalse();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -310,7 +310,7 @@ const SearchPlace = ({navigation}) => {
             </>
         );};
 
-    const PlaceContainer = ({item, index}) => {
+    const PlaceContainer = ({item}) => {
         return (
             <TouchableOpacity onPress={() => {
                 countPlaceView(item.place_pk);

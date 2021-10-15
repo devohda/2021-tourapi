@@ -9,12 +9,11 @@ import {
     KeyboardAvoidingView,
     Platform,
     FlatList,
-    Pressable,
-    TextInput,
-    SafeAreaView,
     ScrollView,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import {useTheme} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
 import { Layout, NativeDateService, RangeCalendar } from '@ui-kitten/components';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import moment from 'moment';
@@ -27,6 +26,7 @@ import CustomTextInput from '../../components/CustomTextInput';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
+import DefaultProfile from '../../assets/images/profile_default.svg';
 
 import CalendarTexts from './CalendarTexts';
 import * as SecureStore from 'expo-secure-store';
@@ -63,7 +63,39 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const [originEndDate, setOriginEndDate] = useState(new Date());
 
     const [alertDuplicated, setAlertDuplicated] = useState(false);
-
+    const [defaultProfileList, setDefaultProfileList] = useState([
+        {
+            id: 1,
+            name: 'default-red',
+            color: colors.red[3]
+        },
+        {
+            id: 2,
+            name: 'default-yellow',
+            color: '#FFC36A'
+        },
+        {
+            id: 3,
+            name: 'default-green',
+            color: '#639A94'
+        },
+        {
+            id: 4,
+            name: 'default-blue',
+            color: '#637DA9'
+        },
+        {
+            id: 5,
+            name: 'default-purple',
+            color: '#8F6DA4'
+        },
+        {
+            id: 6,
+            name: 'selected-photo',
+            color: colors.defaultColor
+        },
+    ]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const i18n = {
         dayNames: {
             short: ['일', '월', '화', '수', '목', '금', '토'],
@@ -89,37 +121,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     };
     const formatDateService = new NativeDateService('ko', {i18n, format: 'YY. MM. DD'});
 
-    const Keyword = ({keyword, idx}) => {
-        return (
-            <View key={idx}
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
-
-            >
-                {/* <TouchableOpacity style={styles.selectType} onPress={pressFunc}> */}
-                <TouchableOpacity onPress={() => {
-                    let newArr = [...isPress];
-                    if (isPress[keyword.keyword_pk - 1]) {
-                        newArr[keyword.keyword_pk - 1] = false;
-                        setIsPress(newArr);
-                    } else {
-                        newArr[keyword.keyword_pk - 1] = true;
-                        setIsPress(newArr);
-                    }
-                }} style={isPress[keyword.keyword_pk - 1] ? [styles.selectTypeClicked, {
-                    borderColor: colors.mainColor,
-                    backgroundColor: colors.mainColor,
-                    shadowColor: colors.red[8]
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
-                    <AppText
-                        style={isPress[keyword.keyword_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.keyword_title}</AppText>
-                </TouchableOpacity>
-            </View>
-        );
-    };
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const DATA = {
         collection_name: collectionName,
@@ -130,20 +131,24 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
     useEffect(() => {
         getKeywords();
-        if(update) {
+        if (update) {
             setCollectionName(data.collection_name);
-            if(data.collection_private) {
+            if (data.collection_private) {
                 setIsEnabled(true);
             }
-            console.log(range);
-            var newArr = {
-                startDate: data.collection_start_date,
-                endDate: data.collection_end_date,
-            };
-            // newArr.startDate = data.collection_start_date;
-            // newArr.endDate = data.collection_end_date;
-            setRange(newArr);
-        }
+
+            if(data.collection_thumbnail === defaultProfileList[0].name) setSelectedIndex(0);
+            else if(data.collection_thumbnail === defaultProfileList[1].name) setSelectedIndex(1);
+            else if(data.collection_thumbnail === defaultProfileList[2].name) setSelectedIndex(2);
+            else if(data.collection_thumbnail === defaultProfileList[3].name) setSelectedIndex(3);
+            else if(data.collection_thumbnail === defaultProfileList[4].name) setSelectedIndex(4);
+            else {
+                var newArr =[...defaultProfileList];
+                newArr[5].name = data.collection_thumbnail;
+                setDefaultProfileList(newArr);
+                setImage(data.collection_thumbnail);
+            }
+        };
     }, []);
 
     const getKeywords = useCallback(() => {
@@ -187,34 +192,41 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
         var forPostEnable = 0;
         if (isEnabled === true) forPostEnable = 1;
-
+        let form = new FormData();
         var forPostData = {};
 
-        if(datas.length === 0) {
+        if(image) {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 startDate: startDate,
                 endDate: endDate,
-                keywords: []
+                keywords: datas,
             };
+            let file = {
+                uri: image,
+                type: 'multipart/form-data',
+                name: 'image.jpg',
+            }
+            form.append('img', file);
+             
         } else {
             forPostData = {
                 name: collectionName,
-                isPrivate : forPostEnable,
+                isPrivate: forPostEnable,
+                keywords: datas,
                 startDate: startDate,
                 endDate: endDate,
-                keywords: datas
+                img: defaultProfileList[selectedIndex].name,
             };
         }
-
-        let form = new FormData();
         form.append('collectionData', JSON.stringify(forPostData));
-        form.append('img', 'default-red');
+
         try {
             fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
                 headers: {
+                    "Content-Type": "multipart/form-data",
                     'x-access-token': token
                 },
                 body: form
@@ -234,15 +246,17 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
                     const item = {
                         'collection_pk': response.collectionId,
-                        'now': true
+                        'now': true,
                     };
-                    Alert.alert('', '일정보관함이 생성되었습니다', [
+                    if(response.code === 200) {
+                        Alert.alert('', '일정보관함이 생성되었습니다', [
                         {text : 'OK', onPress: () => {
-                            navigation.navigate('PlanCollection', {
-                                data: item
-                            });
+                            navigation.navigate('PlanCollection', {data: item});
                             navigation.setOptions({tabBarVisible: true});
-                        }}]);   
+                        }}]);             
+                    } else {
+                        Alert.alert('', '일정보관함 생성에 실패했습니다. 다시 시도해주세요.');
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -270,29 +284,30 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
         if (isEnabled === true) forPostEnable = 1;
 
         var forPostData = {};
+        let form = new FormData();
+        var forPostData = {};
 
-        //사진 추가 필요
-        if(datas.length === 0) {
+        if(image) {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
-                startDate: startDate,
-                endDate: endDate,
-                keywords: [],
-                img: 'default-red',
+                keywords: datas,
             };
+            let file = {
+                uri: image,
+                type: 'multipart/form-data',
+                name: 'image.jpg',
+            }
+            form.append('img', file);
+             
         } else {
             forPostData = {
                 name: collectionName,
-                isPrivate : forPostEnable,
-                startDate: startDate,
-                endDate: endDate,
+                isPrivate: forPostEnable,
                 keywords: datas,
-                img: 'default-red',
+                img: defaultProfileList[selectedIndex].name,
             };
         }
-
-        let form = new FormData();
         form.append('collectionData', JSON.stringify(forPostData));
 
         try {
@@ -318,7 +333,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
                     const item = {
                         'collection_pk': data.collection_pk,
-                        'now': true
+                        'now': true,
                     };
                     Alert.alert('', '일정보관함이 수정되었습니다', [
                         {text : 'OK', onPress: () => {
@@ -619,19 +634,92 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const setBGColor = (idx) => {
+        return defaultProfileList[idx].color
+    };
+
+    const [image, setImage] = useState(null);
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.cancelled) {
+          setImage(result.uri);
+        }
+
+        var newArr =[...defaultProfileList];
+        newArr[5].name = result.uri;
+        setDefaultProfileList(newArr);
+      };
+
+    const SelectProfile = () => {
+        return (
+            <View style={{alignItems: 'center'}}>
+                {image ?
+                <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
+                <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
+                    <DefaultProfile width={83} height={60.2}/>
+                </View>
+                }
+                <FlatList data={defaultProfileList} horizontal
+                    renderItem={({item, index}) =>
+                    <TouchableOpacity onPress={()=>{
+                        if(index === 5) {
+                            (async () => {
+                                if (Platform.OS !== 'web') {
+                                  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                                  if (status !== 'granted') {
+                                    alert('Sorry, we need camera roll permissions to make this work!');
+                                  }
+                                }
+                              })();
+                            pickImage();
+                        } else {
+                            setImage('');
+                        }
+                        setSelectedIndex(index);
+                    }}>
+                        <View style={{backgroundColor: item.color, width: 28, height: 28, borderRadius: 10, marginHorizontal: 5, marginTop: 17}}>
+                            <Icon type="ionicon" name={"camera"} style={[index !== 5 && {display: 'none'}, {
+                                shadowOffset: {
+                                    width: 2,
+                                    height: 2
+                                },
+                                shadowOpacity: 0.25,
+                                elevation: 1,
+                                shadowColor: 'rgba(0, 0, 0, 0.25)',
+                            }]} color={colors.gray[6]}></Icon>
+                        </View>
+                    </TouchableOpacity>
+                }
+                    keyExtractor={(item, idx) => {idx.toString();}}
+                    key={(item, idx) => {idx.toString();}}
+                    nestedScrollEnabled/>
+            </View>
+        );
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title={update ? '일정보관함 수정' : '일정보관함 만들기'}/>
-            <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <ScreenContainerView>
-                    <View style={{marginTop: 26}}>
+            <ScrollView>
+                <ScreenContainerView flex={1}>
+                    <SelectProfile />
+                    <View style={{marginTop: 25}}>
                         <CustomTextInput
                             style={{
                                 color: colors.mainColor,
                                 fontSize: 20,
-                                fontWeight: 'bold'
+                                fontWeight: '700'
                             }}
                             placeholder={'보관함 이름을 입력해주세요 (2~25자)'}
+                            placeholderTextColor={colors.gray[5]}
                             onChangeText={(name) => setCollectionName(name)}
                             value={collectionName}
                         >
@@ -688,7 +776,11 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                         <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
                         <ShowCalendar />
                     </View>
-                    <View flex={1} style={{marginBottom: 20, justifyContent: 'flex-end'}}>
+                </ScreenContainerView>
+            </ScrollView>
+            <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScreenContainerView flex={1}>
+                    <View flex={1} style={{bottom: 20, justifyContent: 'flex-end'}}>
                         <TouchableOpacity
                             testID="completed"
                             style={{
@@ -791,6 +883,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 18
+    },
+    
+    //profile
+    selectedImage: {
+        width: 108,
+        height: 108,
+        borderRadius: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

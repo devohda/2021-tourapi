@@ -11,7 +11,8 @@ import {
     Pressable,
     FlatList,
     Modal,
-    Alert
+    Alert,
+    KeyboardAvoidingView
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
@@ -234,8 +235,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -248,12 +249,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    setPlaceData(response.data);
+                    setPlaceData(response.data.placeList);
                     var exceptLength = 0;
-                    for(let i = 0; i < response.data.length; i++) {
-                        if(response.data[i].place_pk === -1 || response.data[i].place_pk === -2) exceptLength += 1;
+                    for(let i = 0; i < response.data.placeList.length; i++) {
+                        if(response.data.placeList[i].place_pk === -1 || response.data.placeList[i].place_pk === -2) exceptLength += 1;
                     }
-                    setPlaceLength(response.data.length - exceptLength);
+                    setPlaceLength(response.data.placeList.length - exceptLength);
 
                     var pressed = [];
                     for (let i = 0; i < placeLength; i++) {
@@ -417,7 +418,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
         setIsLimited(pressed);
     };
-    const deleteCollection = () => {
+    const deleteCollection = (refRBSheet) => {
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'DELETE',
@@ -441,8 +442,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
 
                     Alert.alert('', '삭제되었습니다.', [
-                        {text : 'OK', onPress: () => navigation.goBack()}
-                        ]);
+                        {text : 'OK', onPress: () => {
+                            navigation.goBack();
+                            refRBSheet.current.close();
+                        }}]);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -660,7 +663,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+console.log(response.data)
                     setReplacementData(response.data);
                     setDeletedReplacementData(response.data);
                 })
@@ -862,7 +865,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
         setIsDeletedOrigin(newArr);
         setIsDeletedComment(newArr);
-        console.log(newArr+'여기여기')
     };
 
     const SwipeList = props => {
@@ -1056,9 +1058,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.mainColor}}
                             onPress={() => {
-                                props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
-                                deleteCollection();
+                                deleteCollection(props.refRBSheet);
                             }}
                         >
                             <AppText style={styles.textStyle}>삭제하기</AppText>
@@ -1152,49 +1153,34 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const ShowCollectionComments = () => {
         const [comments, setComments] = useState('');
         return (
-            <View style={{marginBottom: 143}}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
-                    <AppText style={{
-                        color: colors.gray[3],
-                        fontSize: 14,
-                        marginStart: 11,
-                        marginTop: 5
-                    }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
-                </View>
-                <View style={{marginVertical: 20}}>
-                    <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
-                        <TextInput flex={1} style={{fontSize: 16}}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            placeholder="보관함에 댓글을 남겨보세요!"
-                            value={comments}
-                            placeholderTextColor={colors.gray[5]}
-                            onChangeText={(text)=>setComments(text)}
-                            onSubmitEditing={()=>{
+            <View flex={1} style={{marginVertical: 20, justifyContent: 'flex-end'}}>
+                <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
+                    <TextInput flex={1} style={{fontSize: 16}}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        placeholder="보관함에 댓글을 남겨보세요!"
+                        value={comments}
+                        placeholderTextColor={colors.gray[5]}
+                        onChangeText={(text)=>setComments(text)}
+                        onSubmitEditing={()=>{
+                            if(comments !== '') {
                                 setComments(comments);
                                 postCollectionCommentsData(comments);
-                                setComments('');
-                            }}
-                        />
-                        <Pressable style={{marginLeft: 5}} onPress={()=>{
+                            }
+                            setComments('');
+                        }}
+                    />
+                    <Pressable style={{marginLeft: 5}} onPress={()=>{
+                        if(comments !== '') {
                             setComments(comments);
                             postCollectionCommentsData(comments);
-                            setComments('');
-                        }}>
-                            <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
-                                name={'pencil'} size={16}></Icon>
-                        </Pressable>
-                    </View>
+                        }
+                        setComments('');
+                    }}>
+                        <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
+                            name={'pencil'} size={16}></Icon>
+                    </Pressable>
                 </View>
-                {
-                    commentsData.length !== 0 &&
-                    <View style={{marginTop: 4}}>{
-                        commentsData.map((data, idx) => (
-                            <ShowComments data={data} key={idx} idx={idx}/>
-                        ))
-                    }</View>
-                }
             </View>
         );
     };
@@ -1416,9 +1402,31 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
                 <ScreenDivideLine style={{marginVertical: 16}}/>
 
-                <ScreenContainerView>
-                    <ShowCollectionComments />
+                <ScreenContainerView flex={1}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
+                        <AppText style={{
+                            color: colors.gray[3],
+                            fontSize: 14,
+                            marginStart: 11,
+                            marginTop: 5
+                        }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
+                    </View>
                 </ScreenContainerView>
+
+                <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <ScreenContainerView flex={1}>
+                        <ShowCollectionComments />
+                        {
+                            commentsData.length !== 0 &&
+                            <View style={{marginTop: 4}}>{
+                                commentsData.map((data, idx) => (
+                                    <ShowComments data={data} key={idx} idx={idx}/>
+                                ))
+                            }</View>
+                        }
+                    </ScreenContainerView>
+                </KeyboardAvoidingView>
             </ScrollView>
         </ScreenContainer>
     );

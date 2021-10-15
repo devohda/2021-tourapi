@@ -141,12 +141,20 @@ const MakeReviewScreen = ({route, navigation}) => {
         }
 
         // 선택사항이 많으므로 하나 하나 조건 필요
-        var DATA = {
-            review_congestion_morning: postBusyTime[0],
-            review_congestion_afternoon: postBusyTime[1],
-            review_congestion_evening: postBusyTime[2],
-            review_congestion_night: postBusyTime[3],
-        };
+        var DATA = {};
+
+        if(postBusyTime[0]) {
+            DATA.review_congestion_morning = postBusyTime[0];
+        }
+        if(postBusyTime[1]) {
+            DATA.review_congestion_afternoon = postBusyTime[1];
+        }
+        if(postBusyTime[2]) {
+            DATA.review_congestion_evening = postBusyTime[2];
+        }
+        if(postBusyTime[3]) {
+            DATA.review_congestion_night = postBusyTime[3];
+        }
         if(ratedScore) {
             DATA.review_score = ratedScore;
         }
@@ -162,7 +170,7 @@ const MakeReviewScreen = ({route, navigation}) => {
         if(postFacility.length !== 0) {
             DATA.review_facility = postFacility;
         }
-
+console.log(DATA)
         try {
             fetch(`http://34.64.185.40/place/${place_pk}/review`, {
                 method: 'POST',
@@ -174,22 +182,22 @@ const MakeReviewScreen = ({route, navigation}) => {
                 body: JSON.stringify({
                     reviewData: DATA,
                 })
-            }).then((res) => {
+            }).then(res => {
                 res.json();
             })
                 .then(async (response) => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
-                        setAlertDuplicated(true);
-                    }
+                    // if (response.code === 405 && !alertDuplicated) {
+                    //     Alert.alert('', '다른 기기에서 로그인했습니다.');
+                    //     setAlertDuplicated(true);
+                    // }
 
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
+                    // if (parseInt(response.code / 100) === 4) {
+                    //     await SecureStore.deleteItemAsync('accessToken');
+                    //     setToken(null);
+                    //     setIsSignedIn(false);
+                    //     return;
+                    // }
+console.log(response)
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
                         {text : 'OK', onPress: () => navigation.goBack()}
                         ]);
@@ -361,9 +369,8 @@ const MakeReviewScreen = ({route, navigation}) => {
                             <View style={{marginBottom: 37}}>
                                 <View style={{flexDirection: 'row'}}>
                                     <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '700'}}>{placeName}</AppText>
-                                    <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'}</AppText>
                                 </View>
-                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>어떤 공간이었나요?</AppText>
+                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'} 어떤 공간이었나요?</AppText>
                             </View>
                             <Rating
                                 type='custom'

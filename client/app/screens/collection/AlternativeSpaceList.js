@@ -38,7 +38,7 @@ const AlternativeSpaceList = props => {
             else return true;
         }
     }
-
+    
     return(
         <TouchableOpacity onPress={()=>{
             if(data.replacement_cnt) {

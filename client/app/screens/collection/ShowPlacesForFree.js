@@ -83,7 +83,7 @@ const ShowPlacesForFree = props => {
                         return;
                     }
 
-                    setIsLiked(response.data[index].like_flag);
+                    setIsLiked(response.data.placeList[index].like_flag);
                     // console.log(response.data)
                     // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
                 })
