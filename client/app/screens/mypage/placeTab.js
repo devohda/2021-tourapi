@@ -38,13 +38,15 @@ const PlaceTab = ({navigation}) => {
     const [currentRendering, setCurrentRendering] = useState(0);
 
     useEffect(() => {
-        getLikedPlace();
-        getLikedCollection();
+        getLikedPlace('RESENT');
+        getLikedCollection('RESENT');
+        setShowMenu(false);
+        setCurrentMenu('최근 추가순');
     }, [isFocused]);
     
-    const getLikedPlace = () => {
+    const getLikedPlace = (NOW) => {
         try {
-            fetch('http://34.64.185.40/like/placeList', {
+            fetch(`http://34.64.185.40/like/placeList?sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -76,9 +78,9 @@ const PlaceTab = ({navigation}) => {
         }
     };
 
-    const getLikedCollection = () => {
+    const getLikedCollection = (NOW) => {
         try {
-            fetch('http://34.64.185.40/like/collectionList', {
+            fetch(`http://34.64.185.40/like/collectionList?sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -301,25 +303,28 @@ const PlaceTab = ({navigation}) => {
     };
 
     const SetRendering = () => {
-        if(currentRendering === 0) return (
-            <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
-                showsVerticalScrollIndicator={false}
-                data={placeList} renderItem={PlaceContainer}
-                keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
-        );
-        else return (
+        if(currentRendering) return (
             <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
                 showsVerticalScrollIndicator={false}
                 style={{zIndex: 0}}
                 data={collectionList} renderItem={CollectionContainer}
                 keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled />
         );
+        else return (
+            <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
+                showsVerticalScrollIndicator={false}
+                data={placeList} renderItem={PlaceContainer}
+                keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
+        );
     };
 
     const PlaceContainer = ({item}) => (
         <TouchableOpacity style={{...styles.placeContainer, shadowColor: colors.red_gray[6], backgroundColor: colors.backgroundColor}} onPress={() => {
             countPlaceView(item.place_pk);
-            navigation.navigate('Place', {data : item});
+            const data = {
+                'place_pk': item.place_pk,
+            };
+            navigation.navigate('Place', {data : data});
         }}>
             <View style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
                 {
@@ -434,11 +439,19 @@ const PlaceTab = ({navigation}) => {
         return (
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6]}} onPress={() => {
                 countCollectionView(item.collection_pk);
-                if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : item});
-                else navigation.navigate('FreeCollection', {data : item});
+                const data = {
+                    'collection_pk': item.collection_pk,
+                    'now': false,
+                };
+                if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : data});
+                else navigation.navigate('FreeCollection', {data : data});
             }}>
-                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
-                    <View style={{height: '68%'}}> 
+                <View style={{overflow: 'hidden', borderRadius: 10}}>
+                    { item.collection_thumbnail ?
+                        <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                        <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
+                    }
+                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 163, position: 'absolute'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                             <View style={[styles.dirType, {
                                 borderColor: colors.backgroundColor,
@@ -448,10 +461,10 @@ const PlaceTab = ({navigation}) => {
                                     style={item.collection_type === 1 ? {...styles.dirPlanText, color: colors.red[3]} : {...styles.dirFreeText, color: colors.mainColor}}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
                             </View>
                             {item.collection_private === 1 &&
-                        <View style={{marginRight: 9, marginTop: 8}}>
-                            <Image style={{width: 20, height: 20}}
-                                source={require('../../assets/images/lock_outline.png')}></Image>
-                        </View>
+                                <View style={{marginRight: 9, marginTop: 8}}>
+                                    <Image style={{width: 20, height: 20}}
+                                        source={require('../../assets/images/lock_outline.png')}></Image>
+                                </View>
                             }
                             <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                                 <TouchableOpacity onPress={() => {
@@ -462,12 +475,8 @@ const PlaceTab = ({navigation}) => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        { item.collection_thumbnail ?
-                            <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
-                            <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
-                        }
                     </View>
-                    <View flex={1} style={{marginLeft: 10, marginTop: 8, height: 86}}>
+                    <View style={{marginLeft: 10, marginTop: 8, height: 86}}>
                         <AppText style={{
                             fontSize: 14,
                             fontWeight: '400',
@@ -519,10 +528,10 @@ const PlaceTab = ({navigation}) => {
                 {
                     showMenu && <View style={{
                         position: 'absolute',
-                        width: 80,
+                        width: 100,
                         height: 80,
                         backgroundColor: '#fff',
-                        // flex: 1,
+                        flex: 1,
                         borderRadius: 10,
                         zIndex: 0,
                         shadowColor: '#000',
@@ -539,6 +548,8 @@ const PlaceTab = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('최근 추가순');
+                                if(currentRendering) getLikedCollection('RESENT');
+                                else getLikedPlace('RESENT');
                             }}
                             style={{
                                 flex: 1,
@@ -547,7 +558,7 @@ const PlaceTab = ({navigation}) => {
                                 flexDirection: 'row',
                                 paddingLeft: 8.5
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>최근 추가순</AppText>
                             {currentMenu === '최근 추가순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
                     
@@ -564,6 +575,8 @@ const PlaceTab = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
+                                if(currentRendering) getLikedCollection('LIKE');
+                                else getLikedPlace('LIKE');
                             }}
                             style={{
                                 flex: 1,
@@ -587,7 +600,9 @@ const PlaceTab = ({navigation}) => {
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
-                                setCurrentMenu('리뷰순');
+                                setCurrentMenu('평점순');
+                                if(currentRendering) getLikedCollection('SCORE');
+                                else getLikedPlace('SCORE');
                             }}
                             style={{
                                 flex: 1,
@@ -596,8 +611,8 @@ const PlaceTab = ({navigation}) => {
                                 flexDirection: 'row',
                                 paddingLeft: 8.5
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                            {currentMenu === '리뷰순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                            {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
                     </View>
                 }
@@ -671,13 +686,11 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         paddingHorizontal: 8,
         borderRadius: 14,
-        elevation: 1,
         width: 43,
         height: 22,
         marginLeft: 9,
         marginTop: 8,
         flexDirection: 'row',
-        zIndex: 10000,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -692,9 +705,6 @@ const styles = StyleSheet.create({
     defaultImage: {
         width: '100%',
         height: 163,
-        position: 'absolute',
-        justifyContent: 'center',
-        alignContent: 'center'
     },
     defaultPlaceImage: {
         width: '100%',

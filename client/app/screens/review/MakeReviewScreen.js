@@ -3,6 +3,7 @@ import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Di
 import {useTheme} from '@react-navigation/native';
 import {Icon, AirbnbRating, Rating} from 'react-native-elements';
 import {useToken} from '../../contexts/TokenContextProvider';
+import * as ImagePicker from 'expo-image-picker';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -167,25 +168,48 @@ const MakeReviewScreen = ({route, navigation}) => {
         if(ratedMarketScore) {
             DATA.review_market = ratedMarketScore;
         }
-        if(postFacility.length !== 0) {
-            DATA.review_facility = postFacility;
+        DATA.review_facility = postFacility;
+
+        let form = new FormData();
+        if(image.length) {
+            if(image.length === 1) {
+                let file = {
+                    uri: image[0],
+                    type: 'multipart/form-data',
+                    name: 'image.jpg',
+                }
+                form.append('img', file);
+            } else {
+                var newArr = [];
+                for(var i=0;i<image.length;i++) {
+                    newArr.push({
+                        uri: image[i],
+                        type: 'multipart/form-data',
+                        name: `image${i+1}.jpg`,
+                    });
+                }
+                // form.append('img', newArr)
+                // for(var i=0;i<image.length;i++) {
+                //     form.append('img[]', newArr[i]);
+                // }
+                for(var i=0;i<image.length;i++) {
+                    form.append('img', newArr[i]);
+                }
+            }
         }
-console.log(DATA)
+        form.append('reviewData', JSON.stringify(DATA));
         try {
             fetch(`http://34.64.185.40/place/${place_pk}/review`, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    "Content-Type": "multipart/form-data",
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    reviewData: DATA,
-                })
+                body: form,
             }).then(res => {
                 res.json();
             })
-                .then(async (response) => {
+                .then(async response => {
                     // if (response.code === 405 && !alertDuplicated) {
                     //     Alert.alert('', '다른 기기에서 로그인했습니다.');
                     //     setAlertDuplicated(true);
@@ -359,10 +383,76 @@ console.log(response)
         </View>
     );
 
+    const [image, setImage] = useState([]);
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.cancelled) {
+            var newArr = [...image];
+            newArr.push(result.uri)
+            setImage(newArr);
+        }
+    };
+
+    const SelectReviewImage = () => {
+        return (
+            <View style={{marginBottom: 26}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
+                    <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
+                    <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
+                </View>
+                <ScrollView horizontal nestedScrollEnabled showsHorizontalScrollIndicator={false}>
+
+                <View style={{flexDirection: 'row'}}>
+                    <TouchableOpacity onPress={()=>{
+                        if(image.length === 5) {
+                            Alert.alert('', '사진은 최대 5개까지 가능합니다.');
+                        } else {
+                            pickImage();
+                        }
+                    }}>
+                        <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
+                            <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
+                        </View>
+                    </TouchableOpacity>
+                    <FlatList data={image} horizontal scrollEnabled={false}
+                        renderItem={({item, index}) =>
+                        <>
+                            <Image style={{...styles.addedPictures}} source={{ uri: item }}>
+                            </Image>
+                            <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', position: 'absolute', ...styles.removeContainer}}>
+                                <TouchableOpacity onPress={()=>{
+                                    var newArr = [...image];
+                                    newArr.splice(index, 1);
+                                    setImage(newArr);
+                                }}>
+                                    <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                        }
+                        keyExtractor={(item, idx) => {idx.toString();}}
+                        key={(item, idx) => {idx.toString();}}
+                        nestedScrollEnabled/>
+                </View>
+                </ScrollView>
+
+            </View>
+        );
+    };
+
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
-            <ScrollView>
+            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
                     <View style={{marginTop: 18}}>
                         <View style={{justifyContent: 'space-between', marginBottom: 8}}>
@@ -477,7 +567,6 @@ console.log(response)
                                 <AppText style={{...styles.rateStandard, color: colors.mainColor}}>혼잡한 시간대</AppText>
                                 <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
                             </View>
-                            {/* TODO 아이콘 추가 */}
                             <View style={{flexDirection: 'row', marginTop: 6}}>
                                 {
                                     busyTimeData.map((keyword, idx) => (
@@ -516,17 +605,7 @@ console.log(response)
                         </View>
                     </View>
 
-                    <View style={{marginBottom: 26}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
-                            <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
-                        </View>
-                        <TouchableOpacity>
-                            <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
-                                <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                    <SelectReviewImage />
                 </ScreenContainerView>
             </ScrollView>
             
@@ -674,12 +753,29 @@ const styles = StyleSheet.create({
         width: 128,
         height: 128,
         borderRadius: 10,
+        marginRight: 4,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
         shadowOffset: {width: 1, height: 2},
         shadowOpacity: 1,
         elevation: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    addedPictures: {
+        width: 128,
+        height: 128,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 4
+    },
+    removeContainer: {
+        width: 128,
+        height: 128,
+        borderRadius: 10,
+        alignItems: 'flex-end',
+        marginHorizontal: 4,
+        justifyContent: 'flex-start'
     }
 });
 

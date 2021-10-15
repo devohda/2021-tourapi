@@ -173,7 +173,10 @@ const ShowPlacesForReplace = props => {
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            navigation.navigate('Place', {data: item});
+                            const data = {
+                                'place_pk': item.place_pk,
+                            };
+                            navigation.navigate('Place', {data: data});
                         }} disabled={isEditPage && true}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&

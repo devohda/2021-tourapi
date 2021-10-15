@@ -37,12 +37,14 @@ const SearchCollection = (props, {navigation}) => {
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     useEffect(() => {
-        getResults();
+        getResults('LIKE');
+        setShowMenu(false);
+        setCurrentMenu('인기순');
     }, [searchKeyword]);
 
-    const getResults = () => {
+    const getResults = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?keyword=${decodeURIComponent(searchKeyword)}`, {
+            fetch(`http://34.64.185.40/collection/list?keyword=${decodeURIComponent(searchKeyword)}&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -119,7 +121,7 @@ const SearchCollection = (props, {navigation}) => {
     };
 
     const [showMenu, setShowMenu] = useState(false);
-    const [currentMenu, setCurrentMenu] = useState('최신순');
+    const [currentMenu, setCurrentMenu] = useState('인기순');
 
     const SelectBox = () => {
         return (
@@ -128,9 +130,8 @@ const SearchCollection = (props, {navigation}) => {
                     showMenu && <View style={{
                         position: 'absolute',
                         width: 80,
-                        height: 80,
+                        height: 60,
                         backgroundColor: '#fff',
-                        // flex: 1,
                         borderRadius: 10,
                         zIndex: 0,
                         shadowColor: '#000',
@@ -146,7 +147,8 @@ const SearchCollection = (props, {navigation}) => {
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
-                                setCurrentMenu('최신순');
+                                setCurrentMenu('인기순');
+                                getResults('LIKE');
                             }}
                             style={{
                                 flex: 1,
@@ -160,8 +162,8 @@ const SearchCollection = (props, {navigation}) => {
                                 fontSize: 14,
                                 lineHeight: 16.8,
                                 fontWeight: '400'
-                            }}>최신순</AppText>
-                            {currentMenu === '최신순' &&
+                            }}>인기순</AppText>
+                            {currentMenu === '인기순' &&
                             <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
                                 style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
@@ -178,7 +180,8 @@ const SearchCollection = (props, {navigation}) => {
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
-                                setCurrentMenu('인기순');
+                                setCurrentMenu('최신순');
+                                getResults('RESENT');
                             }}
                             style={{
                                 flex: 1,
@@ -192,8 +195,8 @@ const SearchCollection = (props, {navigation}) => {
                                 fontSize: 14,
                                 lineHeight: 16.8,
                                 fontWeight: '400'
-                            }}>인기순</AppText>
-                            {currentMenu === '인기순' &&
+                            }}>최신순</AppText>
+                            {currentMenu === '최신순' &&
                             <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
                                 style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
@@ -265,12 +268,16 @@ const SearchCollection = (props, {navigation}) => {
             <TouchableOpacity style={[{
                 ...styles.directoryContainer,
                 shadowColor: colors.red_gray[6]
-            }, collectionList.length === 1 ? {width: 172} : {width: '48%'}]} onPress={() => {
+            }, collectionList.length % 2 !== 0 ? {width: 163} : {width: '48%'}]} onPress={() => {
                 countCollectionView(item.collection_pk);
+                const data = {
+                    'collection_pk': item.collection_pk,
+                    'now': false,
+                };
                 item.collection_type === 1 ?
-                    props.navigation.navigate('PlanCollection', {data: item}) : props.navigation.navigate('FreeCollection', {data: item});
+                    props.navigation.navigate('PlanCollection', {data: data}) : props.navigation.navigate('FreeCollection', {data: data});
             }}>
-                <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
+                <View flex={1} style={{overflow: 'hidden', borderRadius: 10, justifyContent: 'space-between'}}>
                     <View style={{height: '68%'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                             <View style={[styles.dirType, {
@@ -354,16 +361,14 @@ const SearchCollection = (props, {navigation}) => {
         <View flexDirection="row" style={[{
             marginBottom: 8,
             alignItems: 'center',
-            marginTop: 22,
-            width: '100%'
         }, collectionList.length === 0 && {justifyContent: 'center'}]}>
             {
                 collectionList.length === 0 ?
                     <ShowEmpty/> :
                     <View>
-                        {/* <View style={{position: 'relative'}}>
+                        <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, marginBottom: 8, position: 'relative', zIndex: 1}}>
                         <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
-                            <View flexDirection="row" flex={1} style={{justifyContent: 'flex-end'}}>
+                            <View flexDirection="row" flex={1}>
                                 <TouchableOpacity onPress={()=>{
                                     setShowMenu(!showMenu);
                                 }} style={{flexDirection: 'row'}}>
@@ -374,9 +379,9 @@ const SearchCollection = (props, {navigation}) => {
                                 <SelectBox />
                             </View>
                         </TouchableWithoutFeedback>
-                        </View> */}
+                        </View>
                         <SafeAreaView flex={1}>
-                            <FlatList contentContainerStyle={{justifyContent: 'space-between', alignItems: 'center'}} numColumns={2}
+                            <FlatList contentContainerStyle={{justifyContent: 'space-between', alignItems: 'flex-start'}} numColumns={2}
                                 data={collectionList} renderItem={CollectionContainer}
                                 key={(item) => item.collection_pk.toString()}
                                 keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
@@ -390,7 +395,7 @@ const SearchCollection = (props, {navigation}) => {
 
 const styles = StyleSheet.create({
     directoryContainer: {
-        // width: '48%',
+        width: '48%',
         height: 249,
         borderRadius: 10,
         backgroundColor: '#fff',
@@ -402,11 +407,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 6,
         elevation: 5,
-        marginHorizontal: 4
-    },
-    likesContainer: {
-        width: Dimensions.get('screen').width / 2.25,
-        marginTop: 16,
+        marginHorizontal: 4,
+        marginTop: 5
     },
     dirType: {
         borderWidth: 1,

@@ -24,6 +24,9 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useToken} from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
+import moment from 'moment';
+import 'moment/locale/ko';
+
 const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height, getCollectionList}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
@@ -779,11 +782,46 @@ const PlaceScreen = ({route, navigation}) => {
         );
     };
 
+    const countCollectionView = (collection_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const ShowComments = props => {
         const { item, index } = props;
         return (
             <View key={index}>
                 <TouchableOpacity onPress={()=>{
+                    countCollectionView(item.collection_pk);
                     const data = {
                         'collection_pk': item.collection_pk,
                         'now': false,
@@ -842,7 +880,7 @@ const PlaceScreen = ({route, navigation}) => {
                                 </View>
                                 <View>
                                     <AppText
-                                        style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
+                                        style={{color: colors.gray[3], fontSize: 12}}>{moment(item.cc_create_time).format('YY.MM.DD')}</AppText>
                                 </View>
                             </View>
                         </View>
@@ -938,7 +976,6 @@ const PlaceScreen = ({route, navigation}) => {
                             </Score>
                         </View>
 
-                        {/* TODO 만약 해당 장소에 리뷰를 남겼다면 뜨지 않도록 하기 */}
                         <TouchableOpacity style={[{
                             width: '100%',
                             flexDirection: 'row',

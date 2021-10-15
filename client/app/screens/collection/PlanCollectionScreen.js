@@ -53,7 +53,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [tmpData, setTmpData] = tipsList();
     const [updatedData, setUpdatedData] = updatedList();
     const [isEditPage, setIsEditPage] = useState(false);
     const [startDate, setStartDate] = useState('');
@@ -88,6 +87,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const isCommentDeleted = (deletedCommentData) => {
+        console.log('여기여기'); console.log(deletedCommentData)
         setIsDeletedComment(deletedCommentData);
     };
 
@@ -138,42 +138,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         getInitialCollectionData();
         getInitialPlaceData();
         getCollectionCommentsData();
-
-        setTmpData([{
-            day: 1,
-            places : [
-                {
-                    id: 1,
-                    tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
-                },
-                {
-                    id: 2,
-                    tip: '두번째 팁'
-                },
-                {
-                    id: 3,
-                    tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
-                },
-                {
-                    id: 4,
-                    tip: '네번째 팁'
-                }
-            ]
-        }, {
-            day: 2,
-            places: [
-                {
-                    id: 1,
-                    tip: '와웅',
-                },
-                {
-                    id: 2,
-                    tip: '두번째 팁'
-                }  
-            ]
-        }
-        ]);
-
         getUserData();
     }, [isFocused]);
 
@@ -344,14 +308,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
+        console.log(isDeletedComment)
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
-                // console.log(placeData[i]);
                 deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
             }
         }
         for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
+            if(isDeletedComment[i] === true) {
                 deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
             }
         }
@@ -552,6 +516,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    
+                    getInitialPlaceData();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -628,7 +594,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
 
                     getInitialPlaceData();
-                    
                 })
                 .catch((err) => {
                     console.error(err);
@@ -859,12 +824,15 @@ console.log(response.data)
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
 
     const setDeletedData = (data) => {
-        var newArr = [];
+        var newArr = []; var newComment = [];
         for(var i=0;i<data.length;i++) {
+            if(data[i].comment) newComment.push(true);
+            else newComment.push(false);
+
             newArr.push(false);
         }
         setIsDeletedOrigin(newArr);
-        setIsDeletedComment(newArr);
+        setIsDeletedComment(newComment);
     };
 
     const SwipeList = props => {
@@ -1275,8 +1243,8 @@ console.log(response.data)
                     }</>}
             </View>
 
-            <ScrollView>
-                <ScreenContainerView>
+            <ScrollView flex={1}>
+                <ScreenContainerView flex={1}>
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -1355,7 +1323,7 @@ console.log(response.data)
                     </View>
                 </ScreenContainerView>
 
-                <View style={{marginTop: 20}}>
+                <View style={{marginTop: 20}} flex={1}>
                     {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
                     
                     <View>
@@ -1436,7 +1404,6 @@ console.log(response.data)
 const styles = StyleSheet.create({
     titles: {
         fontSize: 20,
-        // marginLeft: '5%',
         fontWeight: 'bold'
     },
     dirType: {

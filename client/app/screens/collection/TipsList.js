@@ -16,7 +16,7 @@ const TipsList = props => {
     const [deleteVisible, setDeleteVisible] = useState(false);
     const [changedTip, setChangedTip] = useState('');
     const [tmpData, setTmpData] = tipsList();
-    const isFree = (typeof props.day === 'undefined');
+    const isFree = (day === -1);
 
     const AddModal = () => {
         const [changed, setChanged] = useState('');
@@ -162,6 +162,7 @@ const TipsList = props => {
                             <TouchableOpacity onPress={() => {
                                 let newArr = [...isDeletedComment];
                                 newArr[idx] = true;
+                                console.log(newArr)
                                 isCommentDeleted(newArr);
                                 setDeleteVisible(false);
                             }}>
@@ -178,6 +179,9 @@ const TipsList = props => {
 
     const checkNone = () => {
         //내가 만든거일때
+        console.log(comment)
+        console.log(isDeletedComment[idx])
+        console.log(props.private)
         if(props.private === 1) {
             //수정페이지에서 이미 완성된 한줄평일때만
             if(isEditPage) {
@@ -211,7 +215,10 @@ const TipsList = props => {
                 </View>
             </TouchableOpacity>
             }
-            <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: comment || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: comment && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
+            <View style={[isFree ? 
+                {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: comment || !isEditPage ? 8 : 36} :
+                {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: comment && isEditPage ? 8 : 36},
+                checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
                 <TouchableOpacity onPress={() => {
                     if(comment) {
                         if(props.private) setEditVisible(true);

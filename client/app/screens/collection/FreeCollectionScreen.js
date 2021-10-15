@@ -53,9 +53,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [collectionData, setCollectionData] = useState({});
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
-    const [commentsLength, setCommentsLength] = useState(0);
-    const [isCreator, setIsCreator] = useState(1);
-    const [isPrivate, setIsPrivate] = useState(0);
     const [placeLength, setPlaceLength] = useState(0);
     const [tmpData, setTmpData] = tipsList();
     const [isEditPage, setIsEditPage] = useState(false);
@@ -90,6 +87,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const isCommentDeleted = (deletedCommentData) => {
+        console.log('여기여기'); console.log(deletedCommentData)
         setIsDeletedComment(deletedCommentData);
     };
 
@@ -168,8 +166,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                     setCollectionData(response.data);
                     setKeywords(response.data.keywords);
-                    setIsCreator(response.data.is_creator);
-                    setIsPrivate(response.data.collection_private);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -189,8 +185,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -205,7 +201,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                     setPlaceData(response.data.placeList);
                     setPlaceLength(response.data.placeList.length);
-                    setFalse();
+                    setFalse(response.data.placeList);
                     setDeletedData(response.data.placeList);
                 })
                 .catch((err) => {
@@ -240,7 +236,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         return;
                     }
                     setCommentsData(response.data);
-                    setCommentsLength(response.data.length);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -289,13 +284,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
+        console.log(isDeletedComment)
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
                 deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
             }
         }
         for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
+            if(isDeletedComment[i] === true) {
                 deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
             }
         }
@@ -345,19 +341,19 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkTrue = () => {
-        if (isPrivate) return true;
+        if (collectionData.collection_private) return true;
         return false;
     };
 
     const checkPrivate = () => {
-        if (isCreator) return true;
+        if (collectionData.is_creator) return true;
         return false;
     };
 
     const [isPress, setIsPress] = useState([]);
-    const setFalse = () => {
+    const setFalse = (data) => {
         var pressed = [];
-        for (let i = 0; i < placeLength; i++) {
+        for (let i = 0; i < data.length; i++) {
             pressed.push(false);
         }
         setIsPress(pressed);
@@ -585,6 +581,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             console.error(err);
         }
     };
+
     const getReplacement = (cpmMapPk) => {
         console.log(cpmMapPk);
         //대체공간 불러오기
@@ -814,13 +811,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const SwipeList = () => {
-        //일반 페이지에서 불러오기, 추가, 수정, 삭제 모두 가능하도록
-        // getPlaceCommentsData();
         return (
             <>
                 <SafeAreaView>
                     <FlatList data={placeData}
-                        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={isCreator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
+                        renderItem={({item, index}) => <ShowPlacesForFree day={-1} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
                             isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
                             isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
                             isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
@@ -1193,7 +1188,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                     <TouchableOpacity onPress={()=>{
                                         navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1, replace: false});
-                                    }} style={!isCreator && {display: 'none'}}>
+                                    }} style={!collectionData.is_creator && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -1202,12 +1197,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 </View>
                                 <SafeAreaView>
                                     <SafeAreaView>
-                                        {
+                                    <SwipeList />
+                                        {/* {
                                             !isEditPage ?
                                                 <SwipeList /> :
                                                 // <Example />
                                                 <FlatList data={placeData}
-                                                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={isCreator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
+                                                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
                                                         isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
                                                         isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
                                                         isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
@@ -1220,7 +1216,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                     key={(item, idx) => {idx.toString();}}
                                                     nestedScrollEnabled/>
                                             // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
-                                        }
+                                        } */}
                                     </SafeAreaView>
                                 </SafeAreaView>
                                 {placeLength > 5 && !isEditPage && <TouchableOpacity onPress={() => {
@@ -1236,7 +1232,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     }}>
                                         {
                                             !isLimited ?
-                                                <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                                <TouchableOpacity onPress={()=>setIsLimited(true)}
                                                     style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
                                                 >
                                                     <AppText style={{
@@ -1252,7 +1248,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                             marginBottom: 5
                                                         }}></Image>
                                                 </TouchableOpacity> :
-                                                <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                                <TouchableOpacity onPress={()=>setIsLimited(false)}
                                                     style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
                                                 >
                                                     <AppText style={{

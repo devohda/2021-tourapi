@@ -512,7 +512,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     };
 
     const [image, setImage] = useState(null);
-    const [imageInfo, setImageInfo] = useState({});
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -525,7 +524,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     
         if (!result.cancelled) {
           setImage(result.uri);
-          setImageInfo(result);
         }
 
         var newArr =[...defaultProfileList];

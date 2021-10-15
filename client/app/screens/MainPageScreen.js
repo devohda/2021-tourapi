@@ -64,7 +64,7 @@ export default function MainPageScreen({navigation}) {
     ]);
 
     useEffect(() => {
-        getPopularCollectionData();
+        getPopularCollectionData('DAY');
         getPopularPlaceData();
         getPopularUserData();
         () => {
@@ -76,7 +76,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularCollectionData = (day) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${decodeURIComponent(day)}`, {
+            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${day}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -312,8 +312,12 @@ export default function MainPageScreen({navigation}) {
                 shadowColor: colors.red_gray[6]
             }]} onPress={() => {
                 countCollectionView(item.collection_pk);
+                const data = {
+                    'collection_pk': item.collection_pk,
+                    'now': false,
+                };
                 item.collection_type === 1 ?
-                    navigation.navigate('PlanCollection', {data: item}) : navigation.navigate('FreeCollection', {data: item});
+                    navigation.navigate('PlanCollection', {data: data}) : navigation.navigate('FreeCollection', {data: data});
             }}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}>
@@ -452,10 +456,51 @@ export default function MainPageScreen({navigation}) {
         }
     };
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const ShowPopularPlace = props => {
         const {data} = props;
+        const item = {
+            'place_pk': data.place_pk,
+        };
+
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: data})}>
+            <TouchableOpacity onPress={() => {
+                countPlaceView(data.place_pk);
+                navigation.navigate('Place', {data: item})
+            }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         {
@@ -763,7 +808,6 @@ const styles = StyleSheet.create({
     keywordHashTagView: {
         borderWidth: 1,
         borderRadius: 27,
-        paddingHorizontal: 7,
         marginHorizontal: 2.5,
     },
     keywordHashTag: {

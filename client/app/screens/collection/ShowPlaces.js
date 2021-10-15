@@ -39,7 +39,6 @@ const ShowPlaces = props => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const [isLiked, setIsLiked] = useState(item.like_flag);
-
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
     const checkType = (type) => {
@@ -98,9 +97,7 @@ const ShowPlaces = props => {
                         return;
                     }
 
-                    setIsLiked(response.data[index].like_flag);
-                    // console.log(response.data)
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setIsLiked(response.data.placeList[index].like_flag);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -310,7 +307,10 @@ const ShowPlaces = props => {
                             </View>
                             <TouchableOpacity onPress={() => {
                                 countPlaceView(item.place_pk);
-                                props.navigation.navigate('Place', {data: item});
+                                const data = {
+                                    'place_pk': item.place_pk,
+                                };
+                                props.navigation.navigate('Place', {data: data});
                             }} disabled={isEditPage && true}>
                                 <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '88%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
                                     <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
@@ -374,19 +374,26 @@ const ShowPlaces = props => {
                                 </View>
                             </TouchableOpacity>
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                <TouchableOpacity onPress={() => {
-                                    if (isLiked) {
-                                        DeleteLikedPlace(item.place_pk);
-                                    } else {
-                                        LikePlace(item.place_pk);
-                                    }
-                                }} style={isEditPage && {display: 'none'}}>
-                                    <Jewel width={26} height={21}
-                                        style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={!isEditPage && {display: 'none'}}>
-                                    <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
-                                </TouchableOpacity>
+                            {
+                                !isEditPage ?
+                                // <TouchableOpacity onPress={() => {
+                                //     console.log(item.place_pk)
+                                //     console.log(item)
+                                // }}>
+                                    <TouchableOpacity onPress={() => {
+                                        if (isLiked) {
+                                            DeleteLikedPlace(item.place_pk);
+                                        } else {
+                                            LikePlace(item.place_pk);
+                                        }
+                                    }}>
+                                        <Jewel width={26} height={21}
+                                            style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
+                                    </TouchableOpacity> :
+                                    <TouchableOpacity>
+                                        <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
+                                    </TouchableOpacity>
+                            }
                             </View>
                         </View>
                         <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}

@@ -181,8 +181,9 @@ const styles = StyleSheet.create({
     keywordHashTagView: {
         borderWidth: 1,
         borderRadius: 27,
-        paddingHorizontal: 7,
         marginHorizontal: 2.5,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     keywordHashTag: {
         elevation: 1,

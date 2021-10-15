@@ -31,7 +31,6 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 const AlternativeSpaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const { data, day, postReplacement, pk, getReplacement } = route.params;
-    console.log(data)
     const [placeData, setPlaceData] = useState({});
     const [replacementData, setReplacementData] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
@@ -363,6 +362,40 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         </Modal>
     );
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -449,7 +482,13 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             <ScreenContainerView>
                 <View>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                        <TouchableOpacity onPress={()=>navigation.navigate('Place', {data: placeData})}>
+                        <TouchableOpacity onPress={()=>{
+                            countPlaceView(data.place_pk);
+                            const item = {
+                                'place_pk': data.place_pk,
+                            };
+                            navigation.navigate('Place', {data: item});
+                        }}>
                             <View style={{flexDirection: 'row', width: '100%'}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>

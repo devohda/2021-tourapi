@@ -9,7 +9,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    View
+    View,
+    SafeAreaView
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import { Button, IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
@@ -54,15 +55,17 @@ const CollectionTab = ({navigation}) => {
     ]);
 
     useEffect(() => {
-        getCollectionsFromUsers();
+        getCollectionsFromUsers('RESENT');
+        setShowMenu(false);
+        setCurrentMenu('최근 추가순');
     },[isFocused]);
 
     const {colors} = useTheme();
 
     // 보관함 데이터 가져오는 함수
-    const getCollectionsFromUsers = () => {
+    const getCollectionsFromUsers = (NOW) => {
         try {
-            fetch('http://34.64.185.40/collection/list?type=MY', {
+            fetch(`http://34.64.185.40/collection/list?type=MY&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -82,7 +85,6 @@ const CollectionTab = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -186,8 +188,12 @@ const CollectionTab = ({navigation}) => {
         return (
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 8000}} onPress={() => {
                 countCollectionView(item.collection_pk);
+                const data = {
+                    'collection_pk': item.collection_pk,
+                    'now': false,
+                };
                 item.collection_type === 1 ?
-                    navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
+                    navigation.navigate('PlanCollection', {data : data}) : navigation.navigate('FreeCollection', {data : data});
             }}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}> 
@@ -255,7 +261,7 @@ const CollectionTab = ({navigation}) => {
         );};
 
     const [showMenu, setShowMenu] = useState(false);
-    const [currentMenu, setCurrentMenu] = useState('최근 추가순');
+    const [currentMenu, setCurrentMenu] = useState('인기순');
 
     const SelectBox = () => {
         return (
@@ -263,8 +269,8 @@ const CollectionTab = ({navigation}) => {
                 {
                     showMenu && <View style={{
                         position: 'absolute',
-                        width: 80,
-                        height: 80,
+                        width: 100,
+                        height: 60,
                         backgroundColor: '#fff',
                         flex: 1,
                         borderRadius: 10,
@@ -283,6 +289,7 @@ const CollectionTab = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('최근 추가순');
+                                getCollectionsFromUsers('RESENT');
                             }}
                             style={{
                                 flex: 1,
@@ -291,10 +298,10 @@ const CollectionTab = ({navigation}) => {
                                 flexDirection: 'row',
                                 paddingLeft: 8.5
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>최근 추가순</AppText>
                             {currentMenu === '최근 추가순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
-                    
+
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
@@ -303,11 +310,12 @@ const CollectionTab = ({navigation}) => {
                             // zIndex: 0,
                             backgroundColor: colors.backgroundColor,
                         }}></View>
-
+                        
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
+                                getCollectionsFromUsers('LIKE');
                             }} style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -318,30 +326,6 @@ const CollectionTab = ({navigation}) => {
                             >
                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
                             {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                        </TouchableOpacity>
-                    
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                            zIndex: 0
-                        }}></View>
-                    
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('리뷰순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                flexDirection: 'row',
-                                paddingLeft: 8.5
-                            }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                            {currentMenu === '리뷰순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
                     </View>
                 }
@@ -373,12 +357,13 @@ const CollectionTab = ({navigation}) => {
                         </View>
                     </View>
                 </View>
-                <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-                    showsVerticalScrollIndicator={false}
-                    style={{zIndex: 1}}
-                    data={collectionList} renderItem={CollectionContainer}
-                    keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
-                />
+                <SafeAreaView flex={1}>
+                    <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
+                        showsVerticalScrollIndicator={false}
+                        data={collectionList} renderItem={CollectionContainer}
+                        keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
+                    />
+                </SafeAreaView>
             </ScreenContainerView>
         </View>
     );
@@ -408,13 +393,11 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         paddingHorizontal: 8,
         borderRadius: 14,
-        elevation: 1,
         width: 43,
         height: 22,
         marginLeft: 9,
         marginTop: 8,
         flexDirection: 'row',
-        zIndex: 10000,
         justifyContent: 'center',
         alignItems: 'center',
     },

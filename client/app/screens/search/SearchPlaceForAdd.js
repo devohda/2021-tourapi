@@ -168,7 +168,10 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
     const PlaceContainer = ({item, index}) => ( 
         <TouchableOpacity onPress={()=>{
             countPlaceView(item.place_pk);
-            props.navigation.navigate('Place', {data : item});
+            const data = {
+                'place_pk': item.place_pk,
+            };
+            props.navigation.navigate('Place', {data : data});
         }}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', width: '85%'}}>
