@@ -24,6 +24,9 @@ import ScreenDivideLine from '../../components/ScreenDivideLine';
 import {useToken} from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
+import moment from 'moment';
+import 'moment/locale/ko';
+
 const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height, getCollectionList}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
@@ -31,7 +34,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
-    const postPlace = () => {
+    const postPlace = (refRBSheet) => {
         const index = isCollectionClicked.findIndex((element) => element === true);
         const collectionId = collectionList[index].collection_pk;
         const placeCnt = collectionList[index].place_cnt;
@@ -47,12 +50,12 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-                body: {
+                body: JSON.stringify({
                     planDay: day,
                     order: placeCnt+1,
                     placeId: placeId,
-                }
-            }).then((res) => res.json())
+                }),
+            }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
@@ -66,9 +69,18 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                         return;
                     }
 
-                    if(response.code === 500) Alert.alert('', '공간 저장에 실패했습니다.');
-                    else if(response.code === 200) Alert.alert('', '보관함에 공간이 저장되었습니다.');
-                    getCollectionList();
+                    if(response.code === 500) Alert.alert('', '공간 저장에 실패했습니다.', [
+                        {text : 'OK', onPress: () => {
+                            getCollectionList();
+                            setIsCollectionClicked([]);
+                            refRBSheet.current.close();
+                        }}]);
+                    else if(response.code === 200) Alert.alert('', '보관함에 공간이 저장되었습니다.', [
+                        {text : 'OK', onPress: () => {
+                            getCollectionList();
+                            setIsCollectionClicked([]);
+                            refRBSheet.current.close();
+                        }}]); 
                 })
                 .catch((err) => {
                     console.error(err);
@@ -154,9 +166,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                         }
                         }
                         onPress={() => {
-                            refRBSheet.current.close();
-                            postPlace(isCollectionClicked);
-                            setIsCollectionClicked([]);
+                            postPlace(refRBSheet);
                         }}
                     ><AppText
                             style={{
@@ -233,12 +243,17 @@ const PlaceScreen = ({route, navigation}) => {
     const [afternoonCongestion, setAfternoonCongestion] = useState(0);
     const [eveningCongestion, setEveningCongestion] = useState(0);
     const [nightCongestion, setNightCongestion] = useState(0);
+    const [reviewAccess, setReviewAccess] = useState(0);
+
+    const [placeLat, setPlaceLat] = useState(0);
+    const [placeLng, setPlaceLng] = useState(0);
+    const [placeTitle, setPlaceTitle] = useState('');
 
     const [token, setToken] = useToken();
     const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
-    const [height, setHeight] = useState(150 + 90 * collectionList.length);
+    const [height, setHeight] = useState(180 + 90 * collectionList.length);
 
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
@@ -251,8 +266,8 @@ const PlaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -264,7 +279,6 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
@@ -273,6 +287,11 @@ const PlaceScreen = ({route, navigation}) => {
                     setEveningCongestion(response.data.review.review_congestion_evening);
                     setNightCongestion(response.data.review.review_congestion_night);
                     setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2));
+                    setReviewAccess(response.data.review.recent_review_flag);
+
+                    setPlaceLat(parseFloat(response.data.placeData.place_latitude).toFixed(5));
+                    setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(5));
+                    setPlaceTitle(response.data.placeData.place_name);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -309,8 +328,8 @@ const PlaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -323,8 +342,8 @@ const PlaceScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    if(response.data.length > 5) setHeight(150 + 90 * 5);
-                    else setHeight(150 + 90 * response.data.length);
+                    if(response.data.length > 5) setHeight(180 + 90 * 5);
+                    else setHeight(180 + 90 * response.data.length);
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -346,7 +365,7 @@ const PlaceScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then(res => res.json())
-                .then(async (response) => {
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -419,8 +438,8 @@ const PlaceScreen = ({route, navigation}) => {
                             'Content-Type': 'application/json',
                             'x-access-token': token
                         }
-                    }).then((res) => res.json())
-                        .then(async (response) => {
+                    }).then(res => res.json())
+                        .then(async response => {
                             if (response.code === 405 && !alertDuplicated) {
                                 Alert.alert('', '다른 기기에서 로그인했습니다.');
                                 setAlertDuplicated(true);
@@ -454,8 +473,8 @@ const PlaceScreen = ({route, navigation}) => {
                             'Content-Type': 'application/json',
                             'x-access-token': token
                         }
-                    }).then((res) => res.json())
-                        .then(async (response) => {
+                    }).then(res => res.json())
+                        .then(async response => {
                             if (response.code === 405 && !alertDuplicated) {
                                 Alert.alert('', '다른 기기에서 로그인했습니다.');
                                 setAlertDuplicated(true);
@@ -745,7 +764,6 @@ const PlaceScreen = ({route, navigation}) => {
         const { id, coordinate } = event.nativeEvent;
         // console.log(coordinate)
         const newRegion = { ...region };
-    
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;
     
@@ -764,75 +782,118 @@ const PlaceScreen = ({route, navigation}) => {
         );
     };
 
+    const countCollectionView = (collection_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const ShowComments = props => {
         const { item, index } = props;
-        console.log(item);
         return (
             <View key={index}>
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
+                <TouchableOpacity onPress={()=>{
+                    countCollectionView(item.collection_pk);
+                    const data = {
+                        'collection_pk': item.collection_pk,
+                        'now': false,
+                    };
+                    if(item.collection_type === 1) {
+                        navigation.navigate('PlanCollection', {data: data});
+                    } else {
+                        navigation.navigate('FreeCollection', {data: data});
+                    }
                 }}>
-                    <View>
-                        { item.user_img ?
-                            <Image style={styles.reviewImage}
-                                source={require('../../assets/images/here_default.png')}></Image> :
-                            <Image style={styles.reviewImage}
-                                source={{uri: 'https://via.placeholder.com/150/92c952'}}></Image>
-                        }
-                    </View>
-                    <View style={{marginLeft: 12, marginRight: 20}}>
-                        <View style={{
-                            backgroundColor: colors.defaultColor,
-                            height: 27,
-                            paddingVertical: 6,
-                            paddingLeft: 6,
-                            marginBottom: 6,
-                            justifyContent: 'flex-start',
-                            alignItems: 'center',
-                            flexDirection: 'row'
-                        }}>
-                            <Icon type="ionicon" name={'chatbox-ellipses-outline'} size={12}
-                                color={colors.blue[1]} style={{paddingTop: 2}}></Icon>
-                            <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
-                                {item.cpc_comment}</AppText>
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <View>
+                            { item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
+                                <Image style={styles.reviewImage}
+                                    source={require('../../assets/images/here_default.png')}></Image> :
+                                <Image style={styles.reviewImage}
+                                source={{ uri: item.user_img }}></Image>
+                            }
                         </View>
-                        {/* <View><AppText
-                        style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                        종로 25년 토박종로 25년 토박이가 알려주는 종로 사진스팟
-                    </AppText></View> */}
-                        <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            width: 267,
-                            marginTop: 4
-                        }}>
-                            <View style={{flexDirection: 'row'}}>
-                                <AppText style={{
-                                    color: colors.gray[3],
-                                    fontWeight: 'bold',
-                                    fontSize: 12
-                                }}>by. </AppText>
-                                <AppText style={{color: colors.gray[3], fontSize: 12}}>{item.user_nickname}</AppText>
+                        <View style={{marginLeft: 12, marginRight: 20}}>
+                            <View style={{
+                                backgroundColor: colors.defaultColor,
+                                height: 27,
+                                paddingVertical: 6,
+                                paddingLeft: 6,
+                                marginBottom: 6,
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                                flexDirection: 'row'
+                            }}>
+                                <AppText style={{color: colors.blue[1], paddingLeft: 4, fontSize: 12}}>
+                                    {item.cpc_comment}</AppText>
                             </View>
-                            <View>
-                                <AppText
-                                    style={{color: colors.gray[3], fontSize: 12}}>21.06.24</AppText>
+                            <View><AppText
+                            style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                            {item.collection_name}
+                        </AppText></View>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: 267,
+                                marginTop: 4
+                            }}>
+                                <View style={{flexDirection: 'row'}}>
+                                    <AppText style={{
+                                        color: colors.gray[3],
+                                        fontWeight: 'bold',
+                                        fontSize: 12
+                                    }}>by. </AppText>
+                                    <AppText style={{color: colors.gray[3], fontSize: 12}}>{item.user_nickname}</AppText>
+                                </View>
+                                <View>
+                                    <AppText
+                                        style={{color: colors.gray[3], fontSize: 12}}>{moment(item.cc_create_time).format('YY.MM.DD')}</AppText>
+                                </View>
                             </View>
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
-                <View style={{
+                <View style={[{
                     width: '100%',
                     height: 1,
                     backgroundColor: colors.red_gray[6],
                     zIndex: -1000,
                     marginVertical: 18,
-                    display: index === commentLength-1 && 'none'
-                }}></View>
+                }, index === commentLength-1 && {display: 'none'}]}></View>
             </View>
         );
     };
@@ -915,18 +976,17 @@ const PlaceScreen = ({route, navigation}) => {
                             </Score>
                         </View>
 
-                        {/* TODO 만약 해당 장소에 리뷰를 남겼다면 뜨지 않도록 하기 */}
-                        <TouchableOpacity style={{
+                        <TouchableOpacity style={[{
                             width: '100%',
                             flexDirection: 'row',
-                            backgroundColor: colors.red[3],
                             height: 38,
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRadius: 10,
                             paddingVertical: 6
-                        }}
+                        }, !reviewAccess ? {backgroundColor: colors.red[3]} : {backgroundColor: colors.gray[6]}]}
                         onPress={()=>navigation.navigate('MakeReview', { placeName: placeData.place_name, place_pk: placeData.place_pk})}
+                        disabled={!reviewAccess ? false : true}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
                                 source={require('../../assets/images/write_review_icon.png')}></Image>

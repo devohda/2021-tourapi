@@ -24,38 +24,7 @@ const InputBox = styled(TextInput)`
   paddingBottom: 11px;
 `;
 
-const signUp = async (user_email, user_password, user_nickname) => {
-    try {
-        let url = 'http://34.64.185.40/auth/makeAccount';
-        let options = {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({
-                userInfo: {
-                    user_email,
-                    user_password,
-                    user_nickname
-                }
-            })
-        };
-        const result = await fetch(url, options)
-            .then(res => res.json())
-            .then(response => {
-                return response.code === 200;
-            })
-            .catch(error => console.log(error));
-
-        return result;
-    } catch (e) {
-        console.log(e.toString());
-    }
-};
-
-const GetNicknameTab = ({route, authNavigation}) => {
+const GetNicknameTab = ({route, navigation}) => {
     const {email, password} = route.params;
     const [isValid, setIsValid] = useState(false);
     const [nickname, setNickname] = useState('');
@@ -89,10 +58,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
         if(isNicknameDuplicated) {
             Alert.alert('', '이미 사용 중인 닉네임이에요.');
         } else {
-            const result = await signUp(email, password, nickname);
-            if (result) {
-                authNavigation.navigate('SignInEmail');
-            }
+            navigation.navigate('keywordTab', {email, password, nickname})
         }
     };
 
@@ -132,6 +98,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                     <View style={{...styles.progress, ...styles.progress_active}}></View>
+                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>
                     <View>
@@ -177,11 +144,6 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     }}>
                         특수문자는 사용할 수 없어요.
                     </AppText>
-                    {/* <AppText style={{color: colors.red[2],
-                        display: isNicknameDuplicated ? 'flex' : 'none'
-                    }}>
-                        이미 사용 중인 닉네임이에요.
-                    </AppText> */}
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
@@ -190,7 +152,7 @@ const GetNicknameTab = ({route, authNavigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={nickname && nickname.length <= 12 && !patterns.test(nickname) ? false : true}
                 >
-                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>시작하기</AppText>
+                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>
             </View>
         </>

@@ -68,7 +68,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             setPlaceData({});
         };
     }, [isFocused]);
-
     const getInitialData = () => {
         try {
             fetch(`http://34.64.185.40/place/${data.place_pk}`, {
@@ -334,7 +333,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         >
             <View style={styles.centeredView}>
                 <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <View style={{marginTop: 55}}>
+                    <View style={{marginTop: 35}}>
                         <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
                     </View>
                     <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
@@ -363,6 +362,40 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         </Modal>
     );
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -375,7 +408,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        navigation.goBack();}}>
+                        if(isEditSpace) setIsEditPage(false);
+                        else navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -435,10 +469,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
                                     onPress={() => {
                                         setIsEditSpace(false);
-                                        // console.log('나 맞아용!!!!!!')
                                         isReplacementDeleted(isDeletedReplacement);
                                         checkDeletedReplacement();
-                                        //완료를 눌렀을 경우에만 수정 삭제가 되도록...
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -450,7 +482,13 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             <ScreenContainerView>
                 <View>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                        <TouchableOpacity onPress={()=>navigation.navigate('Place', {data: placeData})}>
+                        <TouchableOpacity onPress={()=>{
+                            countPlaceView(data.place_pk);
+                            const item = {
+                                'place_pk': data.place_pk,
+                            };
+                            navigation.navigate('Place', {data: item});
+                        }}>
                             <View style={{flexDirection: 'row', width: '100%'}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
@@ -478,12 +516,12 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
                                             }}>{checkType(data.place_type)}</AppText>
+                                            <View style={[{flexDirection: 'row'}, parseInt(data.review_score) == -1 && {display: 'none'}]}>
                                             <AppText style={{
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
-                                                display: parseInt(data.review_score) == -1 && 'none'
                                             }}>|</AppText>
                                             <Image source={require('../../assets/images/review_star.png')}
                                                 style={{
@@ -491,7 +529,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                                     height: 10,
                                                     alignSelf: 'center',
                                                     marginTop: '1%',
-                                                    display: parseInt(data.review_score) == -1 && 'none'
                                                 }}></Image>
                                             <AppText style={{
                                                 color: colors.gray[3],
@@ -499,8 +536,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
                                                 marginLeft: 2,
-                                                display: parseInt(data.review_score) == -1 && 'none'
                                             }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                            </View>
                                         </View>
                                         <View style={{width: '100%'}}>
                                             <AppText style={{
@@ -553,7 +590,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     <SafeAreaView>
                         <SafeAreaView>
                             <FlatList data={replacementData}
-                                renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} private={0} pk={pk} likeFlag={item.like_flag} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                                renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} isCreator={0} pk={pk} likeFlag={item.like_flag} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
                                     isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
                                 />}
                                 keyExtractor={(item, idx) => {idx.toString();}}

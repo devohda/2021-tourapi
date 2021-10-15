@@ -16,7 +16,7 @@ const AlternativeSpaceList = props => {
     const {colors} = useTheme();
     const [visible, setVisible] = useState(false);
     const [changedTip, setChangedTip] = useState('');
-    const isFree = (typeof props.day === 'undefined');
+    const isFree = (day === -1);
 
     const checkNone = () => {
         //내가 만든거일때
@@ -38,7 +38,7 @@ const AlternativeSpaceList = props => {
             else return true;
         }
     }
-
+    
     return(
         <TouchableOpacity onPress={()=>{
             if(data.replacement_cnt) {

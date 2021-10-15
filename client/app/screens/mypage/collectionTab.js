@@ -9,7 +9,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    View
+    View,
+    SafeAreaView
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import { Button, IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
@@ -54,15 +55,17 @@ const CollectionTab = ({navigation}) => {
     ]);
 
     useEffect(() => {
-        getCollectionsFromUsers();
+        getCollectionsFromUsers('RESENT');
+        setShowMenu(false);
+        setCurrentMenu('최근 추가순');
     },[isFocused]);
 
     const {colors} = useTheme();
 
     // 보관함 데이터 가져오는 함수
-    const getCollectionsFromUsers = () => {
+    const getCollectionsFromUsers = (NOW) => {
         try {
-            fetch('http://34.64.185.40/collection/list?type=MY', {
+            fetch(`http://34.64.185.40/collection/list?type=MY&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -82,7 +85,6 @@ const CollectionTab = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setCollectionList(response.data);
                 })
                 .catch((err) => {
@@ -125,31 +127,73 @@ const CollectionTab = ({navigation}) => {
             console.error(err);
         }
     };
+    const [defaultProfileList, setDefaultProfileList] = useState([
+        {
+            id: 1,
+            name: 'default-red',
+            color: colors.red[3]
+        },
+        {
+            id: 2,
+            name: 'default-yellow',
+            color: '#FFC36A'
+        },
+        {
+            id: 3,
+            name: 'default-green',
+            color: '#639A94'
+        },
+        {
+            id: 4,
+            name: 'default-blue',
+            color: '#637DA9'
+        },
+        {
+            id: 5,
+            name: 'default-purple',
+            color: '#8F6DA4'
+        },
+        {
+            id: 6,
+            name: 'selected-photo',
+            color: colors.defaultColor
+        },
+    ]);
 
-    const setBGColor = (type) => {
-        // if (idx === 0 || idx === 2) {
-        //     return colors.red[3];
-        // } else if (idx === 1 || idx === 6) {
-        //     return '#FFC36A';
-        // } else if (idx === 3 || idx === 8) {
-        //     return '#639A94';
-        // } else if (idx === 4 || idx === 5) {
-        //     return colors.blue[2];
-        // } else {
-        //     return '#8F6DA4';
-        // }
-        if(type === 'default-red') return colors.red[3];
-        else return colors.blue[2];
+    const setBGColor = (thumbnail) => {
+        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
+        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
+        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
+        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
+        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
+        else return defaultProfileList[5].color;
     };
 
+    const ShowThumbnail = props => {
+        const { thumbnail } = props;
+        if(thumbnail.startsWith('default')) {
+            return (
+                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                    <DefaultProfile width={97} height={70.38}/>
+                </View>
+            )
+        } else {
+            return (
+                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
+            )
+        }
+    };
 
     const CollectionContainer = ({item, index}) => {
-        // console.log(item)
         return (
             <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 8000}} onPress={() => {
                 countCollectionView(item.collection_pk);
+                const data = {
+                    'collection_pk': item.collection_pk,
+                    'now': false,
+                };
                 item.collection_type === 1 ?
-                    navigation.navigate('PlanCollection', {data : item}) : navigation.navigate('FreeCollection', {data : item});
+                    navigation.navigate('PlanCollection', {data : data}) : navigation.navigate('FreeCollection', {data : data});
             }}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}> 
@@ -168,12 +212,10 @@ const CollectionTab = ({navigation}) => {
                         </View>
                             }
                         </View>
-                        {/* { item.collection_thumbnail ?
-                        <View style={{...styles.defaultImage, backgroundColor: setBGColor(item.collection_thumbnail)}}>
-                            <DefaultProfile width={70} height={70}/>
-                        </View> : */}
-                        <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
-                        {/* } */}
+                        { item.collection_thumbnail ?
+                            <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                            <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
+                        }
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
                         <AppText style={{
@@ -218,37 +260,8 @@ const CollectionTab = ({navigation}) => {
             </TouchableOpacity>
         );};
 
-    const Keyword = ({type, idx}) => {
-        return (
-            <View style={styles.keyword}>
-                <TouchableOpacity
-                    style={type.isClicked ?
-                        {...styles.selectTypeClicked, borderColor: colors.mainColor,
-                            backgroundColor: colors.mainColor,
-                            shadowColor: colors.red[7]} :
-                        {...styles.selectType, borderColor: colors.defaultColor,
-                            backgroundColor: colors.defaultColor,
-                            shadowColor: colors.red[7]}}
-                    onPress={() => {
-                        // 클릭하면 색 바꾸기
-                        setDirectoryType(dirType => dirType.map(
-                            (val, i) =>
-                                i === idx ? {name: val.name, isClicked: true} : {
-                                    name: val.name,
-                                    isClicked: false
-                                })
-                        );
-                    }}
-                >
-                    <AppText
-                        style={type.isClicked ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.subColor}}>{type.name}</AppText>
-                </TouchableOpacity>
-            </View>
-        );
-    };
-
     const [showMenu, setShowMenu] = useState(false);
-    const [currentMenu, setCurrentMenu] = useState('최근 추가순');
+    const [currentMenu, setCurrentMenu] = useState('인기순');
 
     const SelectBox = () => {
         return (
@@ -256,10 +269,10 @@ const CollectionTab = ({navigation}) => {
                 {
                     showMenu && <View style={{
                         position: 'absolute',
-                        width: 80,
-                        height: 80,
+                        width: 100,
+                        height: 60,
                         backgroundColor: '#fff',
-                        // flex: 1,
+                        flex: 1,
                         borderRadius: 10,
                         zIndex: 0,
                         shadowColor: '#000',
@@ -276,6 +289,7 @@ const CollectionTab = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('최근 추가순');
+                                getCollectionsFromUsers('RESENT');
                             }}
                             style={{
                                 flex: 1,
@@ -284,57 +298,34 @@ const CollectionTab = ({navigation}) => {
                                 flexDirection: 'row',
                                 paddingLeft: 8.5
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>최근 추가순</AppText>
                             {currentMenu === '최근 추가순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
-                    
+
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
                             borderWidth: 0.4,
                             borderRadius: 1,
-                            zIndex: 0,
+                            // zIndex: 0,
                             backgroundColor: colors.backgroundColor,
                         }}></View>
-                    
+                        
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
-                            }}
-                            style={{
+                                getCollectionsFromUsers('LIKE');
+                            }} style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 flexDirection: 'row',
                                 paddingLeft: 8.5
-                            }}>
+                            }}
+                            >
                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
                             {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                        </TouchableOpacity>
-                    
-                        <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                            zIndex: 0
-                        }}></View>
-                    
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('리뷰순');
-                            }}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                flexDirection: 'row',
-                                paddingLeft: 8.5
-                            }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                            {currentMenu === '리뷰순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                         </TouchableOpacity>
                     </View>
                 }
@@ -344,28 +335,20 @@ const CollectionTab = ({navigation}) => {
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1}}>
             <ScreenContainerView flex={1}>
-                {/* 키워드 선택 */}
-                {/* <View flexDirection="row" style={{alignItems: 'center', justifyContent: 'center', marginVertical: 4}}>
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                        {directoryType.map(
-                            (type, idx) => <Keyword type={type} key={idx} idx={idx}/>
-                        )}
-                    </ScrollView>
-                </View> */}
-
                 <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 6, marginBottom: 8, position: 'relative', zIndex: 1}}>
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
-                                // setShowMenu(!showMenu);
+                                setShowMenu(!showMenu);
                             }} style={{flexDirection: 'row'}}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
                                     name={'chevron-down-outline'} size={16}></Icon>
                             </TouchableOpacity>
-                            <SelectBox />
                         </View>
                     </TouchableWithoutFeedback>
+                    <SelectBox />
+
                     <View flexDirection="row" style={{marginRight: 8}}>
                         <View flexDirection="row">
                             <Icon style={{marginTop: Platform.OS === 'android' ? 3 : 1, marginRight: 2}} type="ionicon"
@@ -374,12 +357,13 @@ const CollectionTab = ({navigation}) => {
                         </View>
                     </View>
                 </View>
-                <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-                    showsVerticalScrollIndicator={false}
-                    style={{zIndex: 0}}
-                    data={collectionList} renderItem={CollectionContainer}
-                    keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
-                />
+                <SafeAreaView flex={1}>
+                    <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
+                        showsVerticalScrollIndicator={false}
+                        data={collectionList} renderItem={CollectionContainer}
+                        keyExtractor={(item) => item.collection_pk} nestedScrollEnabled
+                    />
+                </SafeAreaView>
             </ScreenContainerView>
         </View>
     );
@@ -409,13 +393,11 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         paddingHorizontal: 8,
         borderRadius: 14,
-        elevation: 1,
         width: 43,
         height: 22,
         marginLeft: 9,
         marginTop: 8,
         flexDirection: 'row',
-        zIndex: 10000,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -477,6 +459,16 @@ const styles = StyleSheet.create({
     keyword: {
         justifyContent: 'center',
         alignItems: 'center'
+    },
+
+    //profile
+    thumbnailImage: {
+        width: 108,
+        height: 108,
+        borderRadius: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

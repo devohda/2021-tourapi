@@ -8,6 +8,7 @@ const CustomTextInput = (props) => {
     return (
         <TextInput style={props.style}
                    placeholder={props.placeholder}
+                   placeholderTextColor={props.placeholderTextColor}
                    onChangeText={props.onChangeText}
                    autoCapitalize="none"
                    autoCorrect={false}

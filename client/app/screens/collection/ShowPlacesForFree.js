@@ -3,11 +3,13 @@ import {
     TouchableOpacity,
     View,
     Image,
-    TouchableHighlight, Alert,
+    TouchableHighlight,
+    Alert,
+    StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
-
+import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import TipsList from './TipsList';
@@ -24,6 +26,7 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
     const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
+        placeCommentData,
         isCommentPosted, isPostedCommentMapPk, isPostedComment,
         isCommentEdited, isEditedCommentMapPk, isEditedComment,
         isCommentDeleted, isDeletedComment,
@@ -32,8 +35,7 @@ const ShowPlacesForFree = props => {
         postPlaceComment, putPlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
-    // console.log(item)
-    const isFree = (typeof day === 'undefined');
+    const isFree = (day === -1);
     const [update, setUpdate] = setUpdated();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
@@ -83,9 +85,7 @@ const ShowPlacesForFree = props => {
                         return;
                     }
 
-                    setIsLiked(response.data[index].like_flag);
-                    // console.log(response.data)
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setIsLiked(response.data.placeList[index].like_flag);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -204,24 +204,19 @@ const ShowPlacesForFree = props => {
         if(!isEditPage && !isLimited) {
             if(index <= 4) return false;
             else return true;
-        }
+        } else return false;
     };
     return (
         <View style={checkLimit() && {display: 'none'}}>
-            {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
-                width: '100%',
-                height: 1,
-                backgroundColor: colors.red_gray[6],
-                zIndex: -1000,
-                marginVertical: 13
-            }}></View>} */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            props.navigation.navigate('Place', {data: item});
-
+                            const data = {
+                                'place_pk': item.place_pk,
+                            };
+                            props.navigation.navigate('Place', {data: data});
                         }} disabled={isEditPage && true}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
@@ -258,12 +253,12 @@ const ShowPlacesForFree = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
                                             }}>{checkType(item.place_type)}</AppText>
+                                            <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
                                             <AppText style={{
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
-                                                display: parseInt(item.review_score) == -1 && 'none'
                                             }}>|</AppText>
                                             <Image source={require('../../assets/images/review_star.png')}
                                                 style={{
@@ -271,7 +266,6 @@ const ShowPlacesForFree = props => {
                                                     height: 10,
                                                     alignSelf: 'center',
                                                     marginTop: '1%',
-                                                    display: parseInt(item.review_score) == -1 && 'none'
                                                 }}></Image>
                                             <AppText style={{
                                                 color: colors.gray[3],
@@ -279,8 +273,8 @@ const ShowPlacesForFree = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
                                                 marginLeft: 2,
-                                                display: parseInt(item.review_score) == -1 && 'none'
                                             }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                            </View>
                                         </View>
                                         <View style={{width: '100%'}}>
                                             <AppText style={{

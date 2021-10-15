@@ -30,9 +30,41 @@ export default function MainPageScreen({navigation}) {
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [defaultProfileList, setDefaultProfileList] = useState([
+        {
+            id: 1,
+            name: 'default-red',
+            color: colors.red[3]
+        },
+        {
+            id: 2,
+            name: 'default-yellow',
+            color: '#FFC36A'
+        },
+        {
+            id: 3,
+            name: 'default-green',
+            color: '#639A94'
+        },
+        {
+            id: 4,
+            name: 'default-blue',
+            color: '#637DA9'
+        },
+        {
+            id: 5,
+            name: 'default-purple',
+            color: '#8F6DA4'
+        },
+        {
+            id: 6,
+            name: 'selected-photo',
+            color: colors.defaultColor
+        },
+    ]);
 
     useEffect(() => {
-        getPopularCollectionData();
+        getPopularCollectionData('DAY');
         getPopularPlaceData();
         getPopularUserData();
         () => {
@@ -40,11 +72,11 @@ export default function MainPageScreen({navigation}) {
             setPopularPlace([]);
             setPopularUser([]);
         };
-    }, []);
+    }, [isFocused]);
 
     const getPopularCollectionData = (day) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${decodeURIComponent(day)}`, {
+            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${day}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -64,7 +96,6 @@ export default function MainPageScreen({navigation}) {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setPopularCollection(response.data);
                 })
                 .catch((err) => {
@@ -248,16 +279,45 @@ export default function MainPageScreen({navigation}) {
         }
     };
 
+    const setBGColor = (thumbnail) => {
+        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
+        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
+        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
+        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
+        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
+        else return defaultProfileList[5].color;
+    };
+
+    const ShowThumbnail = props => {
+        const { thumbnail } = props;
+        if(thumbnail.startsWith('default')) {
+            return (
+                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                    <DefaultProfile width={127} height={90.38}/>
+                </View>
+            )
+        } else {
+            return (
+                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
+            )
+        }
+    };
+
     const ShowPopularCollection = props => {
-        const {item} = props;
+        const {item, idx} = props;
+
         return (
             <TouchableOpacity style={[{
                 ...styles.directoryContainer,
                 shadowColor: colors.red_gray[6]
             }]} onPress={() => {
                 countCollectionView(item.collection_pk);
+                const data = {
+                    'collection_pk': item.collection_pk,
+                    'now': false,
+                };
                 item.collection_type === 1 ?
-                    navigation.navigate('PlanCollection', {data: item}) : navigation.navigate('FreeCollection', {data: item});
+                    navigation.navigate('PlanCollection', {data: data}) : navigation.navigate('FreeCollection', {data: data});
             }}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}>
@@ -283,8 +343,10 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                         <View style={styles.defaultImageView}>
-                            {/* <Image style={styles.defaultImage} source={item.collection_thumbnail ? {uri: item.collection_thumbnail} : require('../assets/images/here_default.png')}/> */}
-                            <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
+                            { item.collection_thumbnail ?
+                                <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                                <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
+                            }
                         </View>
                     </View>
                     <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
@@ -317,31 +379,31 @@ export default function MainPageScreen({navigation}) {
         );
     };
 
-    const [backgroundColor, setBackgroundColor] = useState(colors.red[3]);
-
-    const setBGColor = (idx) => {
-        if (idx === 0 || idx === 2) {
-            return colors.red[3];
-        } else if (idx === 1 || idx === 6) {
-            return '#FFC36A';
-        } else if (idx === 3 || idx === 8) {
-            return '#639A94';
-        } else if (idx === 4 || idx === 5) {
-            return colors.blue[2];
-        } else {
-            return '#8F6DA4';
-        }
-    };
-
     const ShowPopularUser = props => {
-        const {user_nickname} = props.data;
+        const {user_nickname, user_img} = props.data;
         const {keyword, idx} = props;
-
         return (
             <View style={{alignItems: 'center'}}>
-                <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                    <DefaultProfile width={70} height={70}/>
-                </View>
+                {
+                    user_img === '' || user_img === 'default-user' || user_img.startsWith('../') || user_img === 'default-img' ?
+                    <View style={{...styles.authorImage}}>
+                        <Image
+                        style={{
+                            width: 88,
+                            height: 88,
+                            borderRadius: 50,
+                            backgroundColor: colors.defaultColor,
+                        }}
+                        source={require('../assets/images/here_default.png')}
+                        /></View> :
+                    <View style={{...styles.authorImage}}>
+                        <Image source={{ uri: user_img }} style={{
+                                width: 88,
+                                height: 88,
+                                borderRadius: 50,
+                                backgroundColor: colors.defaultColor,
+                            }} /></View>
+                }
                 <AppText style={{
                     fontSize: 14,
                     fontWeight: '700',
@@ -394,10 +456,51 @@ export default function MainPageScreen({navigation}) {
         }
     };
 
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const ShowPopularPlace = props => {
         const {data} = props;
+        const item = {
+            'place_pk': data.place_pk,
+        };
+
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('Place', {data: data})}>
+            <TouchableOpacity onPress={() => {
+                countPlaceView(data.place_pk);
+                navigation.navigate('Place', {data: item})
+            }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         {
@@ -407,7 +510,7 @@ export default function MainPageScreen({navigation}) {
                                 <Image source={require('../assets/images/here_default.png')}
                                     style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/>
                         }
-                        <View style={{marginLeft: 8, width: '60%'}}>
+                        <View style={{marginLeft: 8, width: '70%'}}>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     color: colors.gray[3],
@@ -415,28 +518,30 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700'
                                 }}>{checkType(data.place_type)}</AppText>
-                                <AppText style={{
-                                    marginHorizontal: 8, color: colors.gray[4],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    display: parseInt(data.review_score) == -1 && 'none'
-                                }}>|</AppText>
-                                <Image source={require('../assets/images/review_star.png')}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        alignSelf: 'center',
-                                        display: parseInt(data.review_score) == -1 && 'none'
-                                    }}></Image>
-                                <AppText style={{
-                                    color: colors.gray[3],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    marginLeft: 2,
-                                    display: parseInt(data.review_score) == -1 && 'none'
-                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                { parseInt(data.review_score) !== -1 &&
+                                    <View style={{flexDirection: 'row'}}>
+                                    <AppText style={{
+                                        marginHorizontal: 4,
+                                        color: colors.gray[4],
+                                        textAlign: 'center',
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                    }}>|</AppText>
+                                    <Image source={require('../assets/images/review_star.png')}
+                                        style={{
+                                            width: 10,
+                                            height: 10,
+                                            alignSelf: 'center',
+                                        }}></Image>
+                                    <AppText style={{
+                                        color: colors.gray[3],
+                                        textAlign: 'center',
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                        marginLeft: 2,
+                                    }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                    </View>
+                                }
                             </View>
                             <AppText style={{
                                 fontSize: 16,
@@ -471,14 +576,13 @@ export default function MainPageScreen({navigation}) {
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
-            <View flexDirection="row" style={{
+            <View flexDirection="row" style={[{
                 height: 24,
                 marginBottom: 20,
-                marginTop: Platform.OS === 'android' ? 20 : 10,
                 marginHorizontal: 20,
                 alignItems: 'center',
                 justifyContent: 'center'
-            }}>
+            }, Platform.OS === 'android' ? {marginTop: 20} : {marginTop: 10}]}>
                 <View style={{position: 'absolute', left: 0}}>
                     <AppText style={{
                         color: colors.mainColor,
@@ -693,9 +797,6 @@ const styles = StyleSheet.create({
         fontWeight: '700'
     },
     authorImage: {
-        width: 88,
-        height: 88,
-        borderRadius: 50,
         marginTop: 20,
         justifyContent: 'center',
         alignItems: 'center',
@@ -707,7 +808,6 @@ const styles = StyleSheet.create({
     keywordHashTagView: {
         borderWidth: 1,
         borderRadius: 27,
-        paddingHorizontal: 7,
         marginHorizontal: 2.5,
     },
     keywordHashTag: {
@@ -766,6 +866,16 @@ const styles = StyleSheet.create({
     dirPlanText: {
         fontSize: 12,
         fontWeight: 'bold'
-    }
+    },
+
+    //profile
+    thumbnailImage: {
+        width: 108,
+        height: 108,
+        borderRadius: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 

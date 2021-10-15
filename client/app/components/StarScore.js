@@ -7,9 +7,6 @@ const StarScore = (props) => {
 
     return (
         <View flexDirection="row" style={{alignItems : 'center', justifyContent : 'center'}}>
-            {/* <View style={styles.score_container}>
-                <AppText style={styles.score_text}>{props.score}</AppText>
-            </View> */}
             <Star score={props.score} starSize={props.starSize} />
         </View>
     )

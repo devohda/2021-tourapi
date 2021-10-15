@@ -11,11 +11,11 @@ const ProgressBar = styled(View)`
   width: 100%;
   justify-content: flex-end;
   height: 8px;
-`
+`;
 
 const Form = styled(View)`
   margin-top: 63px;
-`
+`;
 
 const InputBox = styled(TextInput)`
   fontSize: 16px;
@@ -23,8 +23,7 @@ const InputBox = styled(TextInput)`
   borderBottomColor: #C5C5C5;
   marginBottom: 27px;
   paddingBottom: 11px;
-`
-
+`;
 
 const GetPasswordTab = ({route, navigation}) => {
     const {email} = route.params
@@ -99,6 +98,7 @@ const GetPasswordTab = ({route, navigation}) => {
                 <ProgressBar>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                     <View style={{...styles.progress, ...styles.progress_active}}></View>
+                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                     <View style={{...styles.progress, ...styles.progress_inactive}}></View>
                 </ProgressBar>
                 <Form>

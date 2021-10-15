@@ -21,7 +21,7 @@ import { Icon } from 'react-native-elements';
 
 const ShowPlacesForReplace = props => {
     const { colors } = useTheme();
-    const { index, isEditPage, item, navigation, likeFlag, isLimited, getInitialReplacementData, getInitialData, isReplacementDeleted, isDeletedReplacement} = props;
+    const { data, index, isEditPage, item, navigation, likeFlag, isLimited, getInitialReplacementData, getInitialData, isReplacementDeleted, isDeletedReplacement} = props;
     const [update, setUpdate] = setUpdated();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
@@ -173,7 +173,10 @@ const ShowPlacesForReplace = props => {
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            navigation.navigate('Place', {data: item});
+                            const data = {
+                                'place_pk': item.place_pk,
+                            };
+                            navigation.navigate('Place', {data: data});
                         }} disabled={isEditPage && true}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
@@ -248,29 +251,8 @@ const ShowPlacesForReplace = props => {
                             </View>
                         </TouchableOpacity>
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            {/* {item.like_flag === 0 ?  */}
-                            {/* <TouchableOpacity onPress={() => {
-                            let newArr = [...isPress];
-                            if (newArr[index]) {
-                                newArr[index] = false;
-                                setIsPress(newArr);
-                                deletePlace(item.place_pk);
-                            } else {
-                                // for(let i=0;i<newArr.length;i++) {
-                                //     if(i == index) continue;
-                                //     else newArr[i] = false;
-                                // }
-                                newArr[index] = true;
-                                setIsPress(newArr);
-                                likePlace(item.place_pk);
-                            }
-                        }}> */}
                             {
                                 !isEditPage ?
-                                // <TouchableOpacity onPress={() => {
-                                //     console.log(item.place_pk)
-                                //     console.log(item)
-                                // }}>
                                     <TouchableOpacity onPress={() => {
                                         if (likeFlag) {
                                             DeleteLikedPlace(item.place_pk);

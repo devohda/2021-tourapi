@@ -16,6 +16,7 @@ import Star from '../../assets/images/search/star.svg';
 const SearchScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+
     useEffect(() => {setSearchKeyword('')}, []);
 
     const styles = StyleSheet.create({
