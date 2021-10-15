@@ -93,15 +93,16 @@ router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req,
     const {reviewData} = req.body;
     const place_pk = req.params.placeId
     const {user} = res.locals;
-    const {review_facility, ...reviewData2} = reviewData;
-    const review = {
-        user_pk : user.user_pk,
-        place_pk : place_pk,
-        ...reviewData2
-    }
 
     console.log(req.files);
     if (req.files.length === 0) {
+        const {review_facility, ...reviewData2} = JSON.parse(reviewData);
+        const review = {
+            user_pk : user.user_pk,
+            place_pk : place_pk,
+            ...reviewData2
+        }
+
         const result = await reviewService.createReview(review, review_facility, null);
 
         if(result){
@@ -118,6 +119,12 @@ router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req,
     }
 
     //  Create a new blob in the bucket and upload the file data.
+    const {review_facility, ...reviewData2} = reviewData;
+    const review = {
+        user_pk : user.user_pk,
+        place_pk : place_pk,
+        ...reviewData2
+    }
     const imgArr = []
     req.files.forEach((fil) => {
         const blob = bucket.file(Date.now() + req.file.originalname);
