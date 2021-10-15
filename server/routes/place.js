@@ -89,7 +89,7 @@ router.get('/:placeId/comments', async (req, res, next) => {
 
 //[CREATE]
 // 장소 리뷰 생성
-router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req, res, next) => {
+router.post('/:placeId/review', verifyToken, multer.any(), async (req, res, next) => {
     const {reviewData} = req.body;
     const place_pk = req.params.placeId
     const {user} = res.locals;
