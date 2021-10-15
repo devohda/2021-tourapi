@@ -96,6 +96,14 @@ exports.readUserTokenByUserPk = async (user_pk) => {
     return tokens;
 };
 
+exports.updatePassword = async (email, password, salt) => {
+    const query = `UPDATE users
+                   SET user_password = ${mysql.escape(password)}, salt = ${mysql.escape(salt)}
+                   WHERE user_email = ${mysql.escape(email)}`;
+    const result = await db.query(query);
+    return result;
+};
+
 exports.deleteToken = async (user_pk) => {
     const query = `DELETE FROM user_token WHERE user_pk = ${user_pk}`;
     const result = await db.query(query);

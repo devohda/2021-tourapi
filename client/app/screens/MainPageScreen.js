@@ -518,6 +518,7 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700'
                                 }}>{checkType(data.place_type)}</AppText>
+<<<<<<< HEAD
                                 { parseInt(data.review_score) !== -1 &&
                                     <View style={{flexDirection: 'row'}}>
                                     <AppText style={{
@@ -542,6 +543,30 @@ export default function MainPageScreen({navigation}) {
                                     }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                                     </View>
                                 }
+=======
+                                <AppText style={{
+                                    marginHorizontal: 8, color: colors.gray[4],
+                                    textAlign: 'center',
+                                    fontSize: 10,
+                                    fontWeight: '700',
+                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
+                                }}>|</AppText>
+                                <Image source={require('../assets/images/review_star.png')}
+                                    style={{
+                                        width: 10,
+                                        height: 10,
+                                        alignSelf: 'center',
+                                        display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
+                                    }}></Image>
+                                <AppText style={{
+                                    color: colors.gray[3],
+                                    textAlign: 'center',
+                                    fontSize: 10,
+                                    fontWeight: '700',
+                                    marginLeft: 2,
+                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
+                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+>>>>>>> 3d1b489c0608509abb0f1c20fa88d648f4b3f621
                             </View>
                             <AppText style={{
                                 fontSize: 16,

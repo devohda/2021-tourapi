@@ -28,12 +28,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.8"
+      "buildNumber": "0.0.10"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/appicon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#FFF8F8"
       },
       "package": "com.ohda.Here",
       "versionCode": 6,

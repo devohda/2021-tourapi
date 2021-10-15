@@ -12,23 +12,21 @@ const keyFilename = 'here-327421-e0bed35f44b5.json'
 const storage = new Storage({projectId, keyFilename});
 
 const multer = Multer({
-    storage: Multer.memoryStorage(),
-    limits: {
-        fileSize: 5 * 1024 * 1024, // no larger than 5mb, you can change as needed.
-    }
+    storage: Multer.memoryStorage()
 });
 
 const bucket = storage.bucket('here-bucket');
 
-router.get('/', verifyToken, (req, res, next) => {
-    const {user_email, user_img, user_nickname} = res.locals.user;
-    const userData = {user_email, user_img, user_nickname}
+// 유저 정보
+router.get('/', verifyToken, async (req, res, next) => {
+    const {user} = res.locals;
+    const result = await userService.readUser(user.user_pk);
     return res.status(200).json({
         code: 200,
         status: 'OK',
-        data: userData
+        data: result
     });
-})
+});
 
 router.get('/list', async (req, res) => {
     let result;
@@ -102,4 +100,5 @@ router.put('/info', verifyToken, multer.single('img'), async (req, res, next) =>
 
     blobStream.end(req.file.buffer);
 })
+
 module.exports = router;
