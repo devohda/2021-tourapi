@@ -101,7 +101,7 @@ router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req,
     }
 
     console.log(req.files);
-    if (!req.files) {
+    if (req.files.length === 0) {
         const result = await reviewService.createReview(review, review_facility, null);
 
         if(result){
