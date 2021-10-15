@@ -13,6 +13,7 @@ import AppleLogo from '../../assets/images/login/apple.svg';
 import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg';
 
 import * as SecureStore from 'expo-secure-store';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
@@ -60,8 +61,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         >
                             <View flexDirection="row" style={{alignItems: 'center'}}>
                                 <KakaotalkLogo/>
-                                <AppText style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로
-                                    계속하기</AppText>
+                                <AppText style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로 계속하기</AppText>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -75,6 +75,29 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                                 <AppleLogo/>
                                 <AppText style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</AppText>
                             </View>
+                            {/*<AppleAuthentication.AppleAuthenticationButton*/}
+                            {/*    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}*/}
+                            {/*    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}*/}
+                            {/*    cornerRadius={5}*/}
+                            {/*    style={{ width: 200, height: 44 }}*/}
+                            {/*    onPress={async () => {*/}
+                            {/*        try {*/}
+                            {/*            const credential = await AppleAuthentication.signInAsync({*/}
+                            {/*                requestedScopes: [*/}
+                            {/*                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,*/}
+                            {/*                    AppleAuthentication.AppleAuthenticationScope.EMAIL,*/}
+                            {/*                ],*/}
+                            {/*            });*/}
+                            {/*            // signed in*/}
+                            {/*        } catch (e) {*/}
+                            {/*            if (e.code === 'ERR_CANCELED') {*/}
+                            {/*                // handle that the user canceled the sign-in flow*/}
+                            {/*            } else {*/}
+                            {/*                // handle other errors*/}
+                            {/*            }*/}
+                            {/*        }*/}
+                            {/*    }}*/}
+                            {/*/>*/}
                         </TouchableOpacity>
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
