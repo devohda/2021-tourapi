@@ -280,26 +280,31 @@ export default function MainPageScreen({navigation}) {
     };
 
     const setBGColor = (thumbnail) => {
-        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
-        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
-        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
-        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
-        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
+        if (thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
+        else if (thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
+        else if (thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color;
+        else if (thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
+        else if (thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
         else return defaultProfileList[5].color;
     };
 
     const ShowThumbnail = props => {
-        const { thumbnail } = props;
-        if(thumbnail.startsWith('default')) {
+        const {thumbnail} = props;
+        if (thumbnail.startsWith('default')) {
             return (
-                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                <View style={{
+                    ...styles.defaultImage,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: setBGColor(thumbnail)
+                }}>
                     <DefaultProfile width={127} height={90.38}/>
                 </View>
-            )
+            );
         } else {
             return (
-                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
-            )
+                <Image source={{uri: thumbnail}} style={{...styles.defaultImage}}/>
+            );
         }
     };
 
@@ -343,9 +348,10 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                         <View style={styles.defaultImageView}>
-                            { item.collection_thumbnail ?
-                                <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
-                                <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
+                            {item.collection_thumbnail ?
+                                <ShowThumbnail thumbnail={item.collection_thumbnail}/> :
+                                <Image style={styles.defaultImage}
+                                    source={require('../assets/images/here_default.png')}/>
                             }
                         </View>
                     </View>
@@ -386,23 +392,23 @@ export default function MainPageScreen({navigation}) {
             <View style={{alignItems: 'center'}}>
                 {
                     user_img === '' || user_img === 'default-user' || user_img.startsWith('../') || user_img === 'default-img' ?
-                    <View style={{...styles.authorImage}}>
-                        <Image
-                        style={{
-                            width: 88,
-                            height: 88,
-                            borderRadius: 50,
-                            backgroundColor: colors.defaultColor,
-                        }}
-                        source={require('../assets/images/here_default.png')}
-                        /></View> :
-                    <View style={{...styles.authorImage}}>
-                        <Image source={{ uri: user_img }} style={{
+                        <View style={{...styles.authorImage}}>
+                            <Image
+                                style={{
+                                    width: 88,
+                                    height: 88,
+                                    borderRadius: 50,
+                                    backgroundColor: colors.defaultColor,
+                                }}
+                                source={require('../assets/images/here_default.png')}
+                            /></View> :
+                        <View style={{...styles.authorImage}}>
+                            <Image source={{uri: user_img}} style={{
                                 width: 88,
                                 height: 88,
                                 borderRadius: 50,
                                 backgroundColor: colors.defaultColor,
-                            }} /></View>
+                            }}/></View>
                 }
                 <AppText style={{
                     fontSize: 14,
@@ -499,7 +505,7 @@ export default function MainPageScreen({navigation}) {
         return (
             <TouchableOpacity onPress={() => {
                 countPlaceView(data.place_pk);
-                navigation.navigate('Place', {data: item})
+                navigation.navigate('Place', {data: item});
             }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -518,55 +524,30 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700'
                                 }}>{checkType(data.place_type)}</AppText>
-<<<<<<< HEAD
-                                { parseInt(data.review_score) !== -1 &&
+                                {parseInt(data.review_score) !== -1 &&
                                     <View style={{flexDirection: 'row'}}>
-                                    <AppText style={{
-                                        marginHorizontal: 4,
-                                        color: colors.gray[4],
-                                        textAlign: 'center',
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                    }}>|</AppText>
-                                    <Image source={require('../assets/images/review_star.png')}
-                                        style={{
-                                            width: 10,
-                                            height: 10,
-                                            alignSelf: 'center',
-                                        }}></Image>
-                                    <AppText style={{
-                                        color: colors.gray[3],
-                                        textAlign: 'center',
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                        marginLeft: 2,
-                                    }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                        <AppText style={{
+                                            marginHorizontal: 4,
+                                            color: colors.gray[4],
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: '700',
+                                        }}>|</AppText>
+                                        <Image source={require('../assets/images/review_star.png')}
+                                            style={{
+                                                width: 10,
+                                                height: 10,
+                                                alignSelf: 'center',
+                                            }}></Image>
+                                        <AppText style={{
+                                            color: colors.gray[3],
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: '700',
+                                            marginLeft: 2,
+                                        }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                                     </View>
                                 }
-=======
-                                <AppText style={{
-                                    marginHorizontal: 8, color: colors.gray[4],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
-                                }}>|</AppText>
-                                <Image source={require('../assets/images/review_star.png')}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        alignSelf: 'center',
-                                        display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
-                                    }}></Image>
-                                <AppText style={{
-                                    color: colors.gray[3],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    marginLeft: 2,
-                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
-                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
->>>>>>> 3d1b489c0608509abb0f1c20fa88d648f4b3f621
                             </View>
                             <AppText style={{
                                 fontSize: 16,
