@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
- 
+
 const placeService = require('../services/placeService');
 const reviewService = require('../services/reviewService');
 const {verifyToken} = require("../middleware/jwt");
@@ -27,9 +27,9 @@ router.get('/list', verifyToken, async (req, res, next) => {
     const {user} = res.locals;
 
     let data;
-    try{
+    try {
         data = await readPlaceList(user.user_pk, keyword, sort, type);
-    }catch (err) {
+    } catch (err) {
         return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'
@@ -39,7 +39,7 @@ router.get('/list', verifyToken, async (req, res, next) => {
     return res.status(200).json({
         code: 200,
         status: 'OK',
-        data : data
+        data: data
     });
 })
 
@@ -61,7 +61,7 @@ router.get('/:placeId', verifyToken, async (req, res, next) => {
     return res.status(200).json({
         code: 200,
         status: 'OK',
-        data : data
+        data: data
     });
 });
 
@@ -82,7 +82,7 @@ router.get('/:placeId/comments', async (req, res, next) => {
     return res.status(200).json({
         code: 200,
         status: 'OK',
-        data : result
+        data: result
     });
 
 })
@@ -94,60 +94,44 @@ router.post('/:placeId/review', verifyToken, multer.array('img', 5), async (req,
     const place_pk = req.params.placeId
     const {user} = res.locals;
 
-    console.log(req.files);
-    if (req.files.length === 0) {
-        const {review_facility, ...reviewData2} = JSON.parse(reviewData);
-        const review = {
-            user_pk : user.user_pk,
-            place_pk : place_pk,
-            ...reviewData2
-        }
-
-        const result = await reviewService.createReview(review, review_facility, null);
-
-        if(result){
-            return res.status(200).json({
-                code: 200,
-                status: 'OK'
-            });
-        }else{
-            return res.status(500).json({
-                code: 500,
-                status: 'SERVER ERROR'
-            });
-        }
-    }
-
-    //  Create a new blob in the bucket and upload the file data.
-    const {review_facility, ...reviewData2} = reviewData;
+    const {review_facility, ...reviewData2} = JSON.parse(reviewData);
     const review = {
-        user_pk : user.user_pk,
-        place_pk : place_pk,
+        user_pk: user.user_pk,
+        place_pk: place_pk,
         ...reviewData2
     }
-    const imgArr = []
-    req.files.forEach((fil) => {
-        const blob = bucket.file(Date.now() + req.file.originalname);
-        const blobStream = blob.createWriteStream();
 
+    const review_pk = await reviewService.createReview(review, review_facility);
+    let result = true;
 
-        blobStream.on('finish', () => {
-            // The public URL can be used to directly access the file via HTTP.
-            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-            imgArr.push(publicUrl);
-        });
+    if (req.files.length !== 0) {
+        result = false;
 
-        blobStream.end(req.files.buffer);
-    });
+        for (const fil of req.files){
+            const blob = bucket.file(Date.now() + fil.originalname);
+            const blobStream = blob.createWriteStream();
+            blobStream.on('error', err => {
+                next(err);
+            });
 
+            blobStream.on('finish', async () => {
+                // The public URL can be used to directly access the file via HTTP.
+                const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+                await reviewService.createReviewImg(place_pk, user.user_pk, review_pk, publicUrl);
+            });
 
-    const result = await reviewService.createReview(review, review_facility, imgArr);
-    if(result){
+            blobStream.end(fil.buffer);
+        }
+
+        result = true;
+    }
+
+    if (result) {
         return res.status(200).json({
             code: 200,
             status: 'OK'
         });
-    }else{
+    } else {
         return res.status(500).json({
             code: 500,
             status: 'SERVER ERROR'

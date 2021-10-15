@@ -1,7 +1,7 @@
 const db = require('../database/database');
 const mysql = require('mysql2');
 
-exports.createReview = async (reviewData, review_facility, imgArr) => {
+exports.createReview = async (reviewData, review_facility) => {
     const conn = await db.pool.getConnection();
     let result = false;
 
@@ -17,15 +17,7 @@ exports.createReview = async (reviewData, review_facility, imgArr) => {
             const [result2] = await conn.query(query2)
         }
 
-        if (imgArr) {
-            for (const review_img of imgArr) {
-                const query3 = `INSERT INTO place_review_img (place_pk, user_pk, pri_review_img)
-                                VALUES (${reviewData.place_pk}, ${reviewData.user_pk}, ${review_img})`
-                const result3 = await db.query(query3);
-            }
-        }
-
-        result = true;
+        result = result1.insertId;
         await conn.commit()
     } catch (err) {
         await conn.rollback();
@@ -34,4 +26,11 @@ exports.createReview = async (reviewData, review_facility, imgArr) => {
         conn.release();
         return result;
     }
+}
+
+exports.createReviewImg = async (place_pk, user_pk, review_pk, review_img) => {
+    const query3 = `INSERT INTO place_review_img (place_pk, user_pk, review_pk, pri_review_img)
+                    VALUES (${place_pk}, ${user_pk}, ${review_pk}, ${mysql.escape(review_img)})`
+    const result = await db.query(query3);
+    return result;
 }
