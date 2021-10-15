@@ -19,7 +19,7 @@ exports.createReview = async (reviewData, review_facility, imgArr) => {
 
         if (imgArr) {
             for (const review_img of imgArr) {
-                const query3 = `INSERT INTO place_review_img (place_pk, user_pk, review_img)
+                const query3 = `INSERT INTO place_review_img (place_pk, user_pk, pri_review_img)
                                 VALUES (${reviewData.place_pk}, ${reviewData.user_pk}, ${review_img})`
                 const result3 = await db.query(query3);
             }
