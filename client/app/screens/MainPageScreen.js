@@ -17,7 +17,7 @@ import {useToken} from '../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 
 import Jewel from '../assets/images/jewel.svg';
-import DefaultProfile from '../assets/images/profile_default.svg';
+import DefaultThumbnail from '../assets/images/profile_default.svg';
 import * as SecureStore from 'expo-secure-store';
 
 export default function MainPageScreen({navigation}) {
@@ -30,7 +30,7 @@ export default function MainPageScreen({navigation}) {
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
-    const [defaultProfileList, setDefaultProfileList] = useState([
+    const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
             name: 'default-red',
@@ -280,12 +280,12 @@ export default function MainPageScreen({navigation}) {
     };
 
     const setBGColor = (thumbnail) => {
-        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
-        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
-        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
-        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
-        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
-        else return defaultProfileList[5].color;
+        if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
+        else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
+        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color
+        else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
+        else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
+        else return defaultThumbnailList[5].color;
     };
 
     const ShowThumbnail = props => {
@@ -293,7 +293,7 @@ export default function MainPageScreen({navigation}) {
         if(thumbnail.startsWith('default')) {
             return (
                 <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
-                    <DefaultProfile width={127} height={90.38}/>
+                    <DefaultThumbnail width={127} height={90.38}/>
                 </View>
             )
         } else {
@@ -394,7 +394,7 @@ export default function MainPageScreen({navigation}) {
                             borderRadius: 50,
                             backgroundColor: colors.defaultColor,
                         }}
-                        source={require('../assets/images/here_default.png')}
+                        source={require('../assets/images/default-profile.png')}
                         /></View> :
                     <View style={{...styles.authorImage}}>
                         <Image source={{ uri: user_img }} style={{
@@ -410,14 +410,16 @@ export default function MainPageScreen({navigation}) {
                     color: colors.mainColor,
                     marginTop: 8
                 }}>{user_nickname}</AppText>
+                <View style={{justifyContent: 'center'}}>
                 {
                     keyword.length !== 0 &&
-                    <View style={{flexDirection: 'row', marginTop: 4}}>{
+                    <View style={{flexDirection: 'row', marginTop: 4, width: '95%', flexWrap: 'wrap', alignItems: 'flex-start'}}>{
                         keyword.map((data, idx) => (
                             <UserKeyword data={data} key={idx + 'user'}/>
                         ))
                     }</View>
                 }
+                </View>
             </View>
         );
     };
@@ -518,55 +520,30 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700'
                                 }}>{checkType(data.place_type)}</AppText>
-<<<<<<< HEAD
                                 { parseInt(data.review_score) !== -1 &&
                                     <View style={{flexDirection: 'row'}}>
-                                    <AppText style={{
-                                        marginHorizontal: 4,
-                                        color: colors.gray[4],
-                                        textAlign: 'center',
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                    }}>|</AppText>
-                                    <Image source={require('../assets/images/review_star.png')}
-                                        style={{
-                                            width: 10,
-                                            height: 10,
-                                            alignSelf: 'center',
-                                        }}></Image>
-                                    <AppText style={{
-                                        color: colors.gray[3],
-                                        textAlign: 'center',
-                                        fontSize: 10,
-                                        fontWeight: '700',
-                                        marginLeft: 2,
-                                    }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                        <AppText style={{
+                                            marginHorizontal: 4,
+                                            color: colors.gray[4],
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: '700',
+                                        }}>|</AppText>
+                                        <Image source={require('../assets/images/review_star.png')}
+                                            style={{
+                                                width: 10,
+                                                height: 10,
+                                                alignSelf: 'center',
+                                            }}></Image>
+                                        <AppText style={{
+                                            color: colors.gray[3],
+                                            textAlign: 'center',
+                                            fontSize: 10,
+                                            fontWeight: '700',
+                                            marginLeft: 2,
+                                        }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                                     </View>
                                 }
-=======
-                                <AppText style={{
-                                    marginHorizontal: 8, color: colors.gray[4],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
-                                }}>|</AppText>
-                                <Image source={require('../assets/images/review_star.png')}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        alignSelf: 'center',
-                                        display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
-                                    }}></Image>
-                                <AppText style={{
-                                    color: colors.gray[3],
-                                    textAlign: 'center',
-                                    fontSize: 10,
-                                    fontWeight: '700',
-                                    marginLeft: 2,
-                                    display: parseInt(data.review_score) == -1 ? 'none' : 'flex'
-                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
->>>>>>> 3d1b489c0608509abb0f1c20fa88d648f4b3f621
                             </View>
                             <AppText style={{
                                 fontSize: 16,

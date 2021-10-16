@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Image,
-  StatusBar,
   useWindowDimensions,
-  View,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity
 } from 'react-native';
 import {
   SafeAreaProvider,
@@ -16,7 +10,6 @@ import {
 import Animated, {
   cancelAnimation,
   runOnJS,
-  scrollTo,
   useAnimatedGestureHandler,
   useAnimatedReaction,
   useAnimatedRef,
@@ -25,30 +18,17 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-import { SwipeListView } from 'react-native-swipe-list-view';
-import { useTheme } from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
 
-import AppText from '../../components/AppText';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import { BlurView } from 'expo-blur';
+
 import ShowPlaces from './ShowPlaces';
 
 function clamp(value, lowerBound, upperBound) {
   'worklet';
   return Math.max(lowerBound, Math.min(value, upperBound));
-}
-
-function shuffle(array) {
-  let counter = array.length;
-
-  while (counter > 0) {
-    let index = Math.floor(Math.random() * counter);
-    counter--;
-    let temp = array[counter];
-    array[counter] = array[index];
-    array[index] = temp;
-  }
-
-  return array;
 }
 
 function objectMove(object, from, to) {
@@ -64,49 +44,47 @@ function objectMove(object, from, to) {
       newObject[id] = from;
     }
   }
-
   return newObject;
+};
+
+function setDatas(isEdited, data, day) {
+  'worklet';
+  runOnJS(isEdited)(data, day)
+  return data;
 }
 
 function listToObject(list) {
   const values = Object.values(list);
   const object = {};
-
-  // console.log(values)
-
   for (let i = 0; i < values.length; i++) {
-    object[values[i].place_name] = i;
+      object[values[i].cpm_order] = i;
   }
-  // console.log(object)
-
   return object;
 }
 
-//해당 height 가져오는 방법 구상
-const CONTAINER_HEIGHT = 160;
-const SCROLL_HEIGHT_THRESHOLD = CONTAINER_HEIGHT;
-
-function ListAnimation({
+function EditPlaces({
+  id,
+  day,
   index,
   data,
   positions,
   scrollY,
-  songsCount,
-  isEditPage,
-  isPress,
-  navigation
+  dataCount,
+  props,
+  dataHeight,
+  isEdited
 }) {
   const dimensions = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [moving, setMoving] = useState(false);
-  const top = useSharedValue(positions.value[data.place_name] * CONTAINER_HEIGHT);
+  const top = useSharedValue(positions.value[id] * dataHeight);
 
   useAnimatedReaction(
-    () => positions.value[data.place_name],
+    () => positions.value[id],
     (currentPosition, previousPosition) => {
       if (currentPosition !== previousPosition) {
         if (!moving) {
-          top.value = currentPosition * CONTAINER_HEIGHT;
+          top.value = currentPosition * dataHeight;
         }
       }
     },
@@ -120,15 +98,15 @@ function ListAnimation({
     onActive(event) {
       const positionY = event.absoluteY + scrollY.value;
 
-      if (positionY <= scrollY.value + SCROLL_HEIGHT_THRESHOLD) {
+      if (positionY <= scrollY.value + dataHeight) {
         // Scroll up
         scrollY.value = withTiming(0, { duration: 1500 });
       } else if (
         positionY >=
-        scrollY.value + dimensions.height - SCROLL_HEIGHT_THRESHOLD
+        scrollY.value + dimensions.height - dataHeight
       ) {
         // Scroll down
-        const contentHeight = songsCount * CONTAINER_HEIGHT;
+        const contentHeight = dataCount * dataHeight;
         const containerHeight =
           dimensions.height - insets.top - insets.bottom;
         const maxScroll = contentHeight - containerHeight;
@@ -137,27 +115,28 @@ function ListAnimation({
         cancelAnimation(scrollY);
       }
 
-      top.value = withTiming(positionY - CONTAINER_HEIGHT, {
+      top.value = withTiming(positionY - dataHeight, {
         duration: 16,
       });
 
       const newPosition = clamp(
-        Math.floor(positionY / CONTAINER_HEIGHT),
+        Math.floor(positionY / dataHeight),
         0,
-        songsCount - 1
+        dataCount - 1
       );
 
-      if (newPosition !== positions.value[data.place_name]) {
+      if (newPosition !== positions.value[id]) {
         positions.value = objectMove(
           positions.value,
-          positions.value[data.place_name],
-          newPosition
+          positions.value[id],
+          newPosition,
         );
       }
     },
     onFinish() {
-      top.value = positions.value[data.place_name] * CONTAINER_HEIGHT;
+      top.value = positions.value[id] * dataHeight;
       runOnJS(setMoving)(false);
+      setDatas(isEdited, positions.value, 0)
     },
   });
 
@@ -168,45 +147,43 @@ function ListAnimation({
       right: 0,
       top: top.value,
       zIndex: moving ? 1 : 0,
-      shadowColor: 'black',
-      shadowOffset: {
-        height: 0,
-        width: 0,
-      },
       shadowRadius: 10,
     };
   }, [moving]);
 
   return (
     <Animated.View style={animatedStyle}>
+      <BlurView intensity={moving ? 100 : 0} tint="light">
         <PanGestureHandler onGestureEvent={gestureHandler}>
-          <Animated.View>
-            <ShowPlaces item={data} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={data.length} navigation={navigation}/>
+          <Animated.View style={[{ maxWidth: '100%'}]}>
+              <ShowPlaces day={day} item={data} index={index} key={index} isEditPage={props.isEditPage} navigation={props.navigation} length={props.length} private={props.private} pk={props.pk} originData={props.originData} isDeleted={props.isDeleted} isDeletedOrigin={props.isDeletedOrigin} isLimited={true}
+                isCommentDeleted={props.isCommentDeleted} isDeletedComment={props.isDeletedComment} curLength={props.curLength}
+                isReplacementGotten={props.isReplacementGotten} isGottenReplacementMapPk={props.isGottenReplacementMapPk}
+                isReplacementDeleted={props.isReplacementDeleted} isDeletedReplacement={props.isDeletedReplacement} checkDeletedReplacement={props.checkDeletedReplacement} setDeletedReplacementData={props.setDeletedReplacementData}
+                postPlaceComment={props.postPlaceComment} putPlaceComment={props.putPlaceComment}
+                postReplacement={props.postReplacement} getReplacement={props.getReplacement} getInitialPlaceData={props.getInitialPlaceData} replacementData={props.replacementData}
+            />
           </Animated.View>
         </PanGestureHandler>
+      </BlurView>
     </Animated.View>
   );
 }
 
-const DragAndDropListForFree = props => {
+const DragAndDropList = props => {
+  const {colors} = useTheme();
   const Data = props.data;
+  const { isEdited } = props;
   const positions = useSharedValue(listToObject(Data));
   const scrollY = useSharedValue(0);
   const scrollViewRef = useAnimatedRef();
-  const { colors } = useTheme();
-
-  useAnimatedReaction(
-    () => scrollY.value,
-    (scrolling) => scrollTo(scrollViewRef, 0, scrolling, true)
-  );
 
   const handleScroll = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
   });
-
+  
   return (
     <>
-      <StatusBar barStyle="dark-content" />
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1 }}>
           <Animated.ScrollView
@@ -219,51 +196,30 @@ const DragAndDropListForFree = props => {
               backgroundColor: colors.backgroundColor,
             }}
             contentContainerStyle={{
-              height: Data.length * CONTAINER_HEIGHT,
+              height: props.curLength ? Data.length * 100 : 0
             }}
           >
-            {Data.map((data, index) => (
-              <ListAnimation
-                key={data.place_pk}
+            {Data.map((data, index) => {
+              return (
+              <EditPlaces
+                day={data.cpm_plan_day}
                 index={index}
                 data={data}
+                key={data.cpm_order}
+                id={data.cpm_order}
                 positions={positions}
                 scrollY={scrollY}
-                songsCount={Data.length}
-                isEditPage={props.isEditPage}
-                isPress={props.isPress}
-                navigation={props.navigation}
+                dataCount={Data.length}
+                props={props}
+                dataHeight={100}
+                isEdited={isEdited}
               />
-            ))}
+            )})}
           </Animated.ScrollView>
         </SafeAreaView>
       </SafeAreaProvider>
     </>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  //swipe style
-  rowBack: {
-      alignItems: 'center',
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingLeft: 15,
-  },
-  backRightBtn: {
-      alignItems: 'center',
-      bottom: 0,
-      justifyContent: 'center',
-      position: 'absolute',
-      top: 0,
-      width: 75,
-      marginTop: 13
-  },
-  backRightBtnRight: {
-      backgroundColor: 'red',
-      right: 0,
-  },
-});
-
-export default DragAndDropListForFree;
+export default DragAndDropList;

@@ -24,10 +24,7 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 const ShowPlaces = props => {
     const { colors } = useTheme();
 
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
-        placeCommentData,
-        isCommentPosted, isPostedCommentMapPk, isPostedComment,
-        isCommentEdited, isEditedCommentMapPk, isEditedComment,
+    const { day, index, isEditPage, item, length, curLength, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
         isCommentDeleted, isDeletedComment,
         isReplacementGotten, isGottenReplacementMapPk,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
@@ -211,7 +208,6 @@ const ShowPlaces = props => {
             console.error(err);
         }
     };
-
     const checkCurrentDay = () => {
         var length = 0;
         for(var i=0;i<originData.length;i++) {
@@ -287,7 +283,7 @@ const ShowPlaces = props => {
             { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
-                        <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{flexDirection: 'row', marginVertical: 6, justifyContent: 'center', alignItems: 'center'}}>
                             <TouchableOpacity onPress={()=>{
                                 setDeleteVisible(true);
                             }} style={!isEditPage && {display: 'none'}}>
@@ -298,7 +294,7 @@ const ShowPlaces = props => {
                                 </View>
                             </TouchableOpacity>
                             <DeleteModal />
-                            <View style={[{justifyContent: 'center', alignItems: 'center', marginEnd: 12}, isEditPage && {display: 'none'}]}>
+                            <View style={[{justifyContent: 'center', alignItems: 'center', marginRight: 12}, isEditPage && {display: 'none'}]}>
                                 <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                     <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
                                         {checkIndex()}    
@@ -376,10 +372,6 @@ const ShowPlaces = props => {
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                             {
                                 !isEditPage ?
-                                // <TouchableOpacity onPress={() => {
-                                //     console.log(item.place_pk)
-                                //     console.log(item)
-                                // }}>
                                     <TouchableOpacity onPress={() => {
                                         if (isLiked) {
                                             DeleteLikedPlace(item.place_pk);
@@ -396,15 +388,15 @@ const ShowPlaces = props => {
                             }
                             </View>
                         </View>
-                        <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
-                            isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
-                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                        {!isEditPage && <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} private={props.private} navigation={navigation} pk={pk}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement}
+                            postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
-                        />
+                        />}
                         <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                     </View>
                 </TouchableHighlight> :
-                item.cpm_plan_day === day && length > 0 &&
+                item.cpm_plan_day === day && curLength > 0 &&
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={[{flexDirection: 'row', justifyContent: 'space-between'}, isDeletedOrigin[index] && {display: 'none'}]}>
                         <TouchableOpacity onPress={()=>{
@@ -419,8 +411,6 @@ const ShowPlaces = props => {
                             height: 30,
                             paddingVertical: 6,
                             paddingRight: 15,
-                            paddingBottom: 6,
-                            paddingTop: 4,
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             alignItems: 'center',

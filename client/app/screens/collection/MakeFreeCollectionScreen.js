@@ -25,7 +25,7 @@ import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-import DefaultProfile from '../../assets/images/profile_default.svg';
+import DefaultThumbnail from '../../assets/images/profile_default.svg';
 import * as SecureStore from 'expo-secure-store';
 
 export const navigationRef = React.createRef();
@@ -51,7 +51,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isVisible, setIsVisible] = useState(false);
     const [alertDuplicated, setAlertDuplicated] = useState(false);
-    const [defaultProfileList, setDefaultProfileList] = useState([
+    const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
             name: 'default-red',
@@ -118,7 +118,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 keywords: datas,
-                img: defaultProfileList[selectedIndex].name,
+                img: defaultThumbnailList[selectedIndex].name,
             };
         }
         form.append('collectionData', JSON.stringify(forPostData));
@@ -203,7 +203,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 keywords: datas,
-                img: defaultProfileList[selectedIndex].name,
+                img: defaultThumbnailList[selectedIndex].name,
             };
         }
         form.append('collectionData', JSON.stringify(forPostData));
@@ -265,15 +265,15 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 setIsEnabled(true);
             }
 
-            if(data.collection_thumbnail === defaultProfileList[0].name) setSelectedIndex(0);
-            else if(data.collection_thumbnail === defaultProfileList[1].name) setSelectedIndex(1);
-            else if(data.collection_thumbnail === defaultProfileList[2].name) setSelectedIndex(2);
-            else if(data.collection_thumbnail === defaultProfileList[3].name) setSelectedIndex(3);
-            else if(data.collection_thumbnail === defaultProfileList[4].name) setSelectedIndex(4);
+            if(data.collection_thumbnail === defaultThumbnailList[0].name) setSelectedIndex(0);
+            else if(data.collection_thumbnail === defaultThumbnailList[1].name) setSelectedIndex(1);
+            else if(data.collection_thumbnail === defaultThumbnailList[2].name) setSelectedIndex(2);
+            else if(data.collection_thumbnail === defaultThumbnailList[3].name) setSelectedIndex(3);
+            else if(data.collection_thumbnail === defaultThumbnailList[4].name) setSelectedIndex(4);
             else {
-                var newArr =[...defaultProfileList];
+                var newArr =[...defaultThumbnailList];
                 newArr[5].name = data.collection_thumbnail;
-                setDefaultProfileList(newArr);
+                setDefaultThumbnailList(newArr);
                 setImage(data.collection_thumbnail);
             }
         };
@@ -508,7 +508,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     };
 
     const setBGColor = (idx) => {
-        return defaultProfileList[idx].color
+        return defaultThumbnailList[idx].color
     };
 
     const [image, setImage] = useState(null);
@@ -526,9 +526,9 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
           setImage(result.uri);
         }
 
-        var newArr =[...defaultProfileList];
+        var newArr =[...defaultThumbnailList];
         newArr[5].name = result.uri;
-        setDefaultProfileList(newArr);
+        setDefaultThumbnailList(newArr);
     };
 
     const SelectProfile = () => {
@@ -537,10 +537,10 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 {image ?
                 <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
                 <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
-                    <DefaultProfile width={83} height={60.2}/>
+                    <DefaultThumbnail width={83} height={60.2}/>
                 </View>
                 }
-                <FlatList data={defaultProfileList} horizontal
+                <FlatList data={defaultThumbnailList} horizontal
                     renderItem={({item, index}) =>
                     <TouchableOpacity onPress={()=>{
                         if(index === 5) {

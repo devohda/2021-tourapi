@@ -92,7 +92,7 @@ const SearchUser = (props) => {
                     {item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
                         <Image
                         style={styles.authorImage}
-                        source={require('../../assets/images/here_default.png')}
+                        source={require('../../assets/images/default-profile.png')}
                         /> :
                         <Image source={{ uri: item.user_img }} style={styles.authorImage} />
                     }

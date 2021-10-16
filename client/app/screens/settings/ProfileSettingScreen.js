@@ -429,7 +429,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                 borderRadius: 60,
                                 backgroundColor: colors.defaultColor,
                             }}
-                            source={require('../../assets/images/here_default.png')}
+                            source={require('../../assets/images/default-profile.png')}
                             /> :
                             <Image source={{ uri: image }} style={{
                                 width: 90,

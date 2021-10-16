@@ -6,11 +6,13 @@ import {
     Image,
     Modal,
     SafeAreaView,
-    FlatList, Alert
+    FlatList,
+    Alert
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { useSharedValue } from 'react-native-reanimated';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -19,18 +21,19 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import {useToken} from '../../contexts/TokenContextProvider';
 import ShowPlacesForReplace from '../collection/ShowPlacesForReplace';
 
+import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import Jewel from '../../assets/images/jewel.svg';
 
-import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import 'moment/locale/ko';
+import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import DragAndDropListForReplace from './DragAndDropListForReplace';
 
 const AlternativeSpaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const { data, day, postReplacement, pk, getReplacement } = route.params;
+    const { data, day, pk, getReplacement } = route.params;
     const [placeData, setPlaceData] = useState({});
     const [replacementData, setReplacementData] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
@@ -54,12 +57,34 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     };
 
     const checkDeletedReplacement = () => {
+        var forDeleteData = [];
         for(var i=0;i<isDeletedReplacement.length;i++) {
-            if(isDeletedReplacement[i] !== false) {
+            if(isDeletedReplacement[i] === true) {
                 deleteReplacement(data.cpm_map_pk, replacementData[i].place_pk);
+                forDeleteData.push(data.cpm_map_pk);
             }
         }
+
+        return forDeleteData;
     };
+
+    // const checkDeletedPlace = () => {
+    //     console.log(isDeletedComment)
+    //     var forDeleteData = [];
+    //     for(var i=0;i<isDeletedOrigin.length;i++) {
+    //         if(isDeletedOrigin[i] === true) {
+    //             // deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
+    //             forDeleteData.push(placeData[i].cpm_map_pk);
+    //         }
+    //     }
+    //     for(var i=0;i<isDeletedComment.length;i++) {
+    //         if(isDeletedComment[i] === true) {
+    //             deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
+    //         }
+    //     }
+        
+    //     return forDeleteData;
+    // };
 
     useEffect(() => {
         getInitialData();
@@ -68,6 +93,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             setPlaceData({});
         };
     }, [isFocused]);
+
     const getInitialData = () => {
         try {
             fetch(`http://34.64.185.40/place/${data.place_pk}`, {
@@ -125,10 +151,10 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setReplacementData(response.data);
                     setDeletedData(response.data);
-                    // getReplacement(data.cpm_map_pk);
+                    setObjects();
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -136,6 +162,69 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const updateReplacementData = (updatedData) => {
+        // 공간 수정
+        var putData = []; var isEmpty = 0;
+        console.log(updatedData)
+        //빈 객체일때는 원래 순서 그대로 넣어주기
+        for(var j=0;j<replacementData.length;j++) {
+            var forPutObj = {};
+            if(Object.keys(updatedData[0]).length === 0) {
+                isEmpty += 1;
+                forPutObj = {
+                    cpm_map_pk: data.cpm_map_pk,
+                    placeId: replacementData[j].place_pk,
+                    order: replacementData[j].cpr_order
+                }
+            } else {
+                forPutObj = {
+                    cpm_map_pk: data.cpm_map_pk,
+                    placeId: replacementData[j].place_pk,
+                    order: Object.values(updatedData[0])[j]
+                }
+            };
+            putData.push(forPutObj)
+        }
+
+        var DATA = {};
+        DATA.replacementPlaceList = putData;
+        console.log(DATA);
+
+        if(isEmpty !== placeData.length || deletedData.length !== 0) {
+            try {
+                fetch(`http://34.64.185.40/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'x-access-token': token
+                    },
+                    body: JSON.stringify(DATA),
+                }).then(res => res.json())
+                    .then(async response => {
+                        if (response.code === 405 && !alertDuplicated) {
+                            Alert.alert('', '다른 기기에서 로그인했습니다.');
+                            setAlertDuplicated(true);
+                        }
+    
+                        if (parseInt(response.code / 100) === 4) {
+                            await SecureStore.deleteItemAsync('accessToken');
+                            setToken(null);
+                            setIsSignedIn(false);
+                            return;
+                        }
+                        console.log(response);
+                        await getInitialReplacementData();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 
@@ -150,7 +239,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
+            }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
@@ -163,7 +252,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     getInitialReplacementData();
                 })
                 .catch((err) => {
@@ -235,8 +323,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     }
 
                     getInitialData();
-                    getInitialReplacementData();
-                    getReplacement(data.cpm_map_pk);
                     console.log(response);
                 })
                 .catch((err) => {
@@ -273,9 +359,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     }
 
                     getInitialData();
-                    getInitialReplacementData();
                     console.log(response);
-                    getReplacement(data.cpm_map_pk);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -306,6 +390,45 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         }
     };
 
+    
+    const GeneralPage = () => {
+        return (
+            <>
+                <SafeAreaView>
+                    <FlatList data={replacementData}
+                        renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} likeFlag={item.like_flag} navigation={navigation} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
+                        />}
+                        keyExtractor={(item, idx) => {idx.toString();}}
+                        key={(item, idx) => {idx.toString();}}
+                        nestedScrollEnabled/>
+                </SafeAreaView>
+            </>
+        );};
+
+    const setObjects = () => {
+        var newArr = [{}];
+        editData.value = newArr;
+    }
+    const editData = useSharedValue([]);
+
+    const isEdited = (data) => {
+        var newObject = [...editData.value];
+        newObject[0] = data;
+        editData.value = newObject;
+        return data;
+    };
+    
+    const EditPage = () => {
+        return (
+                <DragAndDropListForReplace
+                    data={replacementData} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} likeFlag={item.like_flag} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
+                    isEdited={isEdited}
+                />
+        )
+    };
+    
     const [deleteMenu, setDeleteMenu] = useState(false);
 
     const list = [
@@ -408,7 +531,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        if(isEditSpace) setIsEditPage(false);
+                        if(isEditSpace) setIsEditSpace(false);
                         else navigation.goBack();}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
@@ -467,10 +590,11 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                             </View> :
                             <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
-                                    onPress={() => {
+                                    onPress={async () => {
                                         setIsEditSpace(false);
                                         isReplacementDeleted(isDeletedReplacement);
                                         checkDeletedReplacement();
+                                        await updateReplacementData(editData.value);
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -579,8 +703,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 style={{fontWeight: '700'}}>{replacementData.length}개</AppText> 대체공간</AppText>
                         </View>
                         <TouchableOpacity onPress={()=>{
-                            navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
-                        }} style={!route.params.private && {display: 'none'}}>
+                            navigation.navigate('SearchForAdd', {pk: pk, placeData: data, day : day, replace: true});
+                        }} style={(!route.params.private || isEditSpace) && {display: 'none'}}>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -589,13 +713,11 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     </View>
                     <SafeAreaView>
                         <SafeAreaView>
-                            <FlatList data={replacementData}
-                                renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} isCreator={0} pk={pk} likeFlag={item.like_flag} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
-                                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
-                                />}
-                                keyExtractor={(item, idx) => {idx.toString();}}
-                                key={(item, idx) => {idx.toString();}}
-                                nestedScrollEnabled/>
+                            {
+                                !isEditSpace ?
+                                    <GeneralPage /> :
+                                    <EditPage />
+                            }
                         </SafeAreaView>
                     </SafeAreaView>
                 </View>
@@ -603,7 +725,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         </ScreenContainer>
     );
 };
-
 
 const styles = StyleSheet.create({
     titles: {

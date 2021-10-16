@@ -26,7 +26,7 @@ import CustomTextInput from '../../components/CustomTextInput';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import AppText from '../../components/AppText';
 import {useToken} from '../../contexts/TokenContextProvider';
-import DefaultProfile from '../../assets/images/profile_default.svg';
+import DefaultThumbnail from '../../assets/images/profile_default.svg';
 
 import CalendarTexts from './CalendarTexts';
 import * as SecureStore from 'expo-secure-store';
@@ -44,7 +44,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const refCalendarRBSheet = useRef();
     const refKeywordRBSheet = useRef();
     const { data, update } = route.params;
-
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
         console.log('완료');
@@ -63,7 +62,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const [originEndDate, setOriginEndDate] = useState(new Date());
 
     const [alertDuplicated, setAlertDuplicated] = useState(false);
-    const [defaultProfileList, setDefaultProfileList] = useState([
+    const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
             name: 'default-red',
@@ -137,15 +136,15 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 setIsEnabled(true);
             }
 
-            if(data.collection_thumbnail === defaultProfileList[0].name) setSelectedIndex(0);
-            else if(data.collection_thumbnail === defaultProfileList[1].name) setSelectedIndex(1);
-            else if(data.collection_thumbnail === defaultProfileList[2].name) setSelectedIndex(2);
-            else if(data.collection_thumbnail === defaultProfileList[3].name) setSelectedIndex(3);
-            else if(data.collection_thumbnail === defaultProfileList[4].name) setSelectedIndex(4);
+            if(data.collection_thumbnail === defaultThumbnailList[0].name) setSelectedIndex(0);
+            else if(data.collection_thumbnail === defaultThumbnailList[1].name) setSelectedIndex(1);
+            else if(data.collection_thumbnail === defaultThumbnailList[2].name) setSelectedIndex(2);
+            else if(data.collection_thumbnail === defaultThumbnailList[3].name) setSelectedIndex(3);
+            else if(data.collection_thumbnail === defaultThumbnailList[4].name) setSelectedIndex(4);
             else {
-                var newArr =[...defaultProfileList];
+                var newArr =[...defaultThumbnailList];
                 newArr[5].name = data.collection_thumbnail;
-                setDefaultProfileList(newArr);
+                setDefaultThumbnailList(newArr);
                 setImage(data.collection_thumbnail);
             }
         };
@@ -217,7 +216,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 keywords: datas,
                 startDate: startDate,
                 endDate: endDate,
-                img: defaultProfileList[selectedIndex].name,
+                img: defaultThumbnailList[selectedIndex].name,
             };
         }
         form.append('collectionData', JSON.stringify(forPostData));
@@ -292,6 +291,8 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 keywords: datas,
+                startDate: startDate,
+                endDate: endDate,
             };
             let file = {
                 uri: image,
@@ -305,7 +306,9 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 name: collectionName,
                 isPrivate: forPostEnable,
                 keywords: datas,
-                img: defaultProfileList[selectedIndex].name,
+                startDate: startDate,
+                endDate: endDate,
+                img: defaultThumbnailList[selectedIndex].name,
             };
         }
         form.append('collectionData', JSON.stringify(forPostData));
@@ -635,7 +638,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     };
 
     const setBGColor = (idx) => {
-        return defaultProfileList[idx].color
+        return defaultThumbnailList[idx].color
     };
 
     const [image, setImage] = useState(null);
@@ -653,9 +656,9 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
           setImage(result.uri);
         }
 
-        var newArr =[...defaultProfileList];
+        var newArr =[...defaultThumbnailList];
         newArr[5].name = result.uri;
-        setDefaultProfileList(newArr);
+        setDefaultThumbnailList(newArr);
       };
 
     const SelectProfile = () => {
@@ -664,10 +667,10 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 {image ?
                 <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
                 <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
-                    <DefaultProfile width={83} height={60.2}/>
+                    <DefaultThumbnail width={83} height={60.2}/>
                 </View>
                 }
-                <FlatList data={defaultProfileList} horizontal
+                <FlatList data={defaultThumbnailList} horizontal
                     renderItem={({item, index}) =>
                     <TouchableOpacity onPress={()=>{
                         if(index === 5) {
@@ -767,12 +770,12 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                             value={isEnabled}
                         />
                     </View>
-                    <View style={{
+                    <View style={[{
                         marginTop: 24,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between'
-                    }}>
+                    }, update && {display: 'none'}]}>
                         <AppText style={{fontSize: 16, fontWeight: '500', color: colors.mainColor}}>날짜 선택</AppText>
                         <ShowCalendar />
                     </View>

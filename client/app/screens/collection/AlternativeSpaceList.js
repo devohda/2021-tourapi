@@ -6,11 +6,11 @@ import AppText from '../../components/AppText';
 import {Modal, Card} from '@ui-kitten/components';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import BackIcon from '../../assets/images/back-icon.svg';
+import AlternativeSpaceScreen from './AlternativeSpaceScreen';
 
 const AlternativeSpaceList = props => {
-    const { data, idx, day, length, isEditPage, navigation, pk,
-        isReplacementGotten, isGottenReplacementMapPk,
-        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
+    const { data, idx, day, isEditPage, navigation, pk,
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement,
         postReplacement, getReplacement, getInitialPlaceData, replacementData
     } = props;
     const {colors} = useTheme();
@@ -37,16 +37,16 @@ const AlternativeSpaceList = props => {
             if(data.replacement_cnt) return false;
             else return true;
         }
-    }
+    };
+
     
     return(
         <TouchableOpacity onPress={()=>{
             if(data.replacement_cnt) {
-                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, postReplacement: postReplacement, pk: pk, getReplacement: getReplacement, getInitialPlaceData: getInitialPlaceData, replacementData: replacementData,
-                    isReplacementDeleted: isReplacementDeleted, checkDeletedReplacement: checkDeletedReplacement, isDeletedReplacement: isDeletedReplacement});
+                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, pk: pk});
                 getReplacement(data.cpm_map_pk);
             }
-            else navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
+            else navigation.navigate('SearchForAdd', {pk: pk, placeData: data, day : day, replace: true});
         }}>
             <View flex={1} style={{flexDirection: 'row'}}>
                 <View style={[{
