@@ -289,17 +289,17 @@ export default function MainPageScreen({navigation}) {
     };
 
     const ShowThumbnail = props => {
-        const { thumbnail } = props;
-        if(thumbnail.startsWith('default')) {
+        const {thumbnail} = props;
+        if (thumbnail.startsWith('default')) {
             return (
                 <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
                     <DefaultThumbnail width={127} height={90.38}/>
                 </View>
-            )
+            );
         } else {
             return (
-                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
-            )
+                <Image source={{uri: thumbnail}} style={{...styles.defaultImage}}/>
+            );
         }
     };
 
@@ -343,9 +343,10 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                         <View style={styles.defaultImageView}>
-                            { item.collection_thumbnail ?
-                                <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
-                                <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
+                            {item.collection_thumbnail ?
+                                <ShowThumbnail thumbnail={item.collection_thumbnail}/> :
+                                <Image style={styles.defaultImage}
+                                    source={require('../assets/images/here_default.png')}/>
                             }
                         </View>
                     </View>
@@ -402,7 +403,7 @@ export default function MainPageScreen({navigation}) {
                                 height: 88,
                                 borderRadius: 50,
                                 backgroundColor: colors.defaultColor,
-                            }} /></View>
+                            }}/></View>
                 }
                 <AppText style={{
                     fontSize: 14,
@@ -501,7 +502,7 @@ export default function MainPageScreen({navigation}) {
         return (
             <TouchableOpacity onPress={() => {
                 countPlaceView(data.place_pk);
-                navigation.navigate('Place', {data: item})
+                navigation.navigate('Place', {data: item});
             }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
