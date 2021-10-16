@@ -25,10 +25,7 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
-        placeCommentData,
-        isCommentPosted, isPostedCommentMapPk, isPostedComment,
-        isCommentEdited, isEditedCommentMapPk, isEditedComment,
+    const { day, index, isEditPage, item, length, curLength, navigation, pk, isDeleted, isDeletedOrigin, isLimited,
         isCommentDeleted, isDeletedComment,
         isReplacementGotten, isGottenReplacementMapPk,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
@@ -206,11 +203,62 @@ const ShowPlacesForFree = props => {
             else return true;
         } else return false;
     };
+
+    
+    const [deleteVisible, setDeleteVisible] = useState(false);
+
+    const DeleteModal = () => {
+        return (
+            <Modal
+                visible={deleteVisible}
+                backdropStyle={styles.backdrop}
+                style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
+                onBackdropPress={() => setDeleteVisible(false)}>
+                <Card disabled={true}
+                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+                >
+                    <View style={{marginTop: 35}}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>공간을 삭제할까요?</AppText>
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                let newArr = [...isDeletedOrigin];
+                                newArr[index] = true;
+                                isDeleted(newArr);
+                                setDeleteVisible(false);
+                            }}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Card>
+            </Modal>
+        )
+    };
+
     return (
         <View style={checkLimit() && {display: 'none'}}>
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
-                    <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={{flexDirection: 'row', marginVertical: 6, justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableOpacity onPress={()=>{
+                                setDeleteVisible(true);
+                            }} style={!isEditPage && {display: 'none'}}>
+                                <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
+                                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                        <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                            <DeleteModal />
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
                             const data = {
@@ -218,32 +266,20 @@ const ShowPlacesForFree = props => {
                             };
                             props.navigation.navigate('Place', {data: data});
                         }} disabled={isEditPage && true}>
-                            <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
-                                { isEditPage &&
-                                    <TouchableOpacity onPress={()=>{
-                                        let newArr = [...isDeletedOrigin];
-                                        console.log(newArr);
-                                        newArr[index] = true;
-                                        // setIsDeletedOrigin(newArr);
-                                        isDeleted(newArr);
-                                    }}>
-                                        <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
-                                        </View>
-                                    </TouchableOpacity>
-                                }
+                            <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '100%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
+                                <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
                                 {
                                     item.place_img ?
                                         <Image source={{uri: item.place_img}}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
                                         <Image source={require('../../assets/images/here_default.png')}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/>
                                 }
                                 <View style={{
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     flexDirection: 'row',
-                                    width: '67%'
+                                    width: '80%'
                                 }}>
                                     <View style={{marginLeft: 8, marginTop: '2%'}}>
                                         <View style={{flexDirection: 'row'}}>
@@ -289,31 +325,11 @@ const ShowPlacesForFree = props => {
                                     </View>
                                 </View>
                             </View>
+                        </View>
                         </TouchableOpacity>
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            {/* {item.like_flag === 0 ?  */}
-                            {/* <TouchableOpacity onPress={() => {
-                            let newArr = [...isPress];
-                            if (newArr[index]) {
-                                newArr[index] = false;
-                                setIsPress(newArr);
-                                deletePlace(item.place_pk);
-                            } else {
-                                // for(let i=0;i<newArr.length;i++) {
-                                //     if(i == index) continue;
-                                //     else newArr[i] = false;
-                                // }
-                                newArr[index] = true;
-                                setIsPress(newArr);
-                                likePlace(item.place_pk);
-                            }
-                        }}> */}
                             {
                                 !isEditPage ?
-                                // <TouchableOpacity onPress={() => {
-                                //     console.log(item.place_pk)
-                                //     console.log(item)
-                                // }}>
                                     <TouchableOpacity onPress={() => {
                                         if (isLiked) {
                                             DeleteLikedPlace(item.place_pk);
@@ -330,16 +346,31 @@ const ShowPlacesForFree = props => {
                             }
                         </View>
                     </View>
-                    <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
-                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
-                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
-                        replacementData={replacementData}
-                    />
+                    {!isEditPage && <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} private={props.private} navigation={navigation} pk={pk}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement}
+                            postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                            replacementData={replacementData}
+                        />}
                     <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
                 </View>
             </TouchableHighlight>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    backdrop: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    shadowOption: {
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        elevation: 1,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+    }
+});
 
 export default ShowPlacesForFree;

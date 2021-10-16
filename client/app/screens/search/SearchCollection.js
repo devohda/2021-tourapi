@@ -21,7 +21,7 @@ import {searchCollectionResult} from '../../contexts/search/SearchCollectionCont
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-import DefaultProfile from '../../assets/images/profile_default.svg';
+import DefaultThumbnail from '../../assets/images/profile_default.svg';
 
 const SearchCollection = (props, {navigation}) => {
     const {colors} = useTheme();
@@ -40,7 +40,7 @@ const SearchCollection = (props, {navigation}) => {
         getResults('LIKE');
         setShowMenu(false);
         setCurrentMenu('인기순');
-    }, [searchKeyword]);
+    }, [searchKeyword, isFocused]);
 
     const getResults = (NOW) => {
         try {
@@ -125,13 +125,16 @@ const SearchCollection = (props, {navigation}) => {
 
     const SelectBox = () => {
         return (
-            <>
+            <View style={{
+                position: 'absolute',
+                zIndex: 9000
+            }} flex={1}>
                 {
                     showMenu && <View style={{
-                        position: 'absolute',
                         width: 80,
                         height: 60,
                         backgroundColor: '#fff',
+                        flex: 1,
                         borderRadius: 10,
                         zIndex: 0,
                         shadowColor: '#000',
@@ -152,20 +155,26 @@ const SearchCollection = (props, {navigation}) => {
                             }}
                             style={{
                                 flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
+                                flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 flexDirection: 'row',
-                                paddingLeft: 8.5
+                                paddingLeft: 8.5,
+                                width: '100%'
                             }}>
-                            <AppText style={{
-                                color: colors.mainColor,
-                                fontSize: 14,
-                                lineHeight: 16.8,
-                                fontWeight: '400'
-                            }}>인기순</AppText>
-                            {currentMenu === '인기순' &&
-                            <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
-                                style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>인기순</AppText>
+                                {currentMenu === '인기순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                    style={{marginLeft: 10}}></Icon>}
+                            </View>
                         </TouchableOpacity>
 
                         <View style={{
@@ -182,31 +191,36 @@ const SearchCollection = (props, {navigation}) => {
                                 setShowMenu(false);
                                 setCurrentMenu('최신순');
                                 getResults('RESENT');
-                            }}
-                            style={{
+                            }} style={{
+                                flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 flexDirection: 'row',
-                                paddingLeft: 8.5
+                                paddingLeft: 8.5,
+                                width: '100%',
                             }}>
-                            <AppText style={{
-                                color: colors.mainColor,
-                                fontSize: 14,
-                                lineHeight: 16.8,
-                                fontWeight: '400'
-                            }}>최신순</AppText>
-                            {currentMenu === '최신순' &&
-                            <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
-                                style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>최신순</AppText>
+                                {currentMenu === '최신순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                    style={{marginLeft: 10}}></Icon>}
+                            </View>
                         </TouchableOpacity>
                     </View>
                 }
-            </>
+            </View>
         );
     };
 
-    const [defaultProfileList, setDefaultProfileList] = useState([
+    const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
             name: 'default-red',
@@ -240,12 +254,12 @@ const SearchCollection = (props, {navigation}) => {
     ]);
     
     const setBGColor = (thumbnail) => {
-        if(thumbnail === defaultProfileList[0].name) return defaultProfileList[0].color;
-        else if(thumbnail === defaultProfileList[1].name) return defaultProfileList[1].color;
-        else if(thumbnail === defaultProfileList[2].name) return defaultProfileList[2].color
-        else if(thumbnail === defaultProfileList[3].name) return defaultProfileList[3].color;
-        else if(thumbnail === defaultProfileList[4].name) return defaultProfileList[4].color;
-        else return defaultProfileList[5].color;
+        if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
+        else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
+        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color
+        else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
+        else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
+        else return defaultThumbnailList[5].color;
     };
 
     const ShowThumbnail = props => {
@@ -253,7 +267,7 @@ const SearchCollection = (props, {navigation}) => {
         if(thumbnail.startsWith('default')) {
             return (
                 <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
-                    <DefaultProfile width={97} height={70.38}/>
+                    <DefaultThumbnail width={97} height={70.38}/>
                 </View>
             )
         } else {
@@ -267,7 +281,8 @@ const SearchCollection = (props, {navigation}) => {
         return (
             <TouchableOpacity style={[{
                 ...styles.directoryContainer,
-                shadowColor: colors.red_gray[6]
+                shadowColor: colors.red_gray[6],
+                zIndex: 9999
             }, collectionList.length % 2 !== 0 ? {width: 163} : {width: '48%'}]} onPress={() => {
                 countCollectionView(item.collection_pk);
                 const data = {
@@ -365,20 +380,20 @@ const SearchCollection = (props, {navigation}) => {
             {
                 collectionList.length === 0 ?
                     <ShowEmpty/> :
-                    <View>
-                        <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, marginBottom: 8, position: 'relative', zIndex: 1}}>
-                        <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
-                            <View flexDirection="row" flex={1}>
-                                <TouchableOpacity onPress={()=>{
-                                    setShowMenu(!showMenu);
-                                }} style={{flexDirection: 'row'}}>
-                                    <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
-                                    <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                                        name={'chevron-down-outline'} size={16}></Icon>
-                                </TouchableOpacity>
-                                <SelectBox />
-                            </View>
-                        </TouchableWithoutFeedback>
+                    <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
+                        <SelectBox />
+                        <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, marginBottom: 8, position: 'relative', zIndex: 50}} flex={1}>
+                            <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                                <View flexDirection="row" flex={1}>
+                                    <TouchableOpacity onPress={()=>{
+                                        setShowMenu(!showMenu);
+                                    }} style={{flexDirection: 'row'}}>
+                                        <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                        <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                            name={'chevron-down-outline'} size={16}></Icon>
+                                    </TouchableOpacity>
+                                </View>
+                            </TouchableWithoutFeedback>
                         </View>
                         <SafeAreaView flex={1}>
                             <FlatList contentContainerStyle={{justifyContent: 'space-between', alignItems: 'flex-start'}} numColumns={2}
@@ -387,7 +402,6 @@ const SearchCollection = (props, {navigation}) => {
                                 keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
                         </SafeAreaView>
                     </View>
-
             }
         </View>
     );

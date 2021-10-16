@@ -16,15 +16,15 @@ import {
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
-import { SwipeListView } from 'react-native-swipe-list-view';
 import RBSheet from 'react-native-raw-bottom-sheet';
-
+import { useSharedValue } from 'react-native-reanimated';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import { tipsList } from '../../contexts/TipsListContextProvider';
+
 import {useToken} from '../../contexts/TokenContextProvider';
 
 import DragAndDropListForFree from './DragAndDropListForFree';
@@ -33,16 +33,12 @@ import ShowPlacesForFree from './ShowPlacesForFree';
 import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import DefaultProfile from '../../assets/images/profile_default.svg';
+import DefaultThumbnail from '../../assets/images/profile_default.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
-// import Example from './App2';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-
-
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -54,7 +50,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [tmpData, setTmpData] = tipsList();
     const [isEditPage, setIsEditPage] = useState(false);
     
     const [keywords, setKeywords] = useState([]);
@@ -65,7 +60,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [update, setUpdate] = setUpdated();
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
     const [alertDuplicated, setAlertDuplicated] = useState(false);
@@ -74,20 +68,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         setIsDeletedOrigin(deletedData);
     };
 
-    const isCommentPosted = (postedCommentMapPk, postedComment) => {
-        //map pk랑 comment
-        setIsPostedCommentMapPk(postedCommentMapPk);
-        setIsPostedComment(postedComment);
-    };
-
-    const isCommentEdited = (editedCommentMapPk, editedComment) => {
-        //map pk랑 comment
-        setIsEditedCommentMapPk(editedCommentMapPk);
-        setIsEditedComment(editedCommentMapPk);
-    };
-
     const isCommentDeleted = (deletedCommentData) => {
-        console.log('여기여기'); console.log(deletedCommentData)
         setIsDeletedComment(deletedCommentData);
     };
 
@@ -96,7 +77,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const isReplacementDeleted = (deletedReplacementData) => {
-        console.log(deletedReplacementData);
         setIsDeletedReplacement(deletedReplacementData);
     };
 
@@ -166,6 +146,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                     setCollectionData(response.data);
                     setKeywords(response.data.keywords);
+                    setObjects();
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -213,6 +195,88 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const updatePlaceData = (updatedData, deletedData) => {
+        // 공간 수정
+        var putData = []; var isEmpty = 0;
+        console.log(updatedData)
+        //빈 객체일때는 원래 순서 그대로 넣어주기
+        for(var j=0;j<placeData.length;j++) {
+            var forPutObj = {};
+            if(Object.keys(updatedData[0]).length === 0) {
+                isEmpty += 1;
+                forPutObj = {
+                    cpm_map_pk: placeData[j].cpm_map_pk,
+                    planDay: -1,
+                    order: placeData[j].cpm_order
+                }
+            } else {
+                forPutObj = {
+                    cpm_map_pk: placeData[j].cpm_map_pk,
+                    planDay: -1,
+                    order: Object.values(updatedData[0])[j]
+                }
+            };
+            putData.push(forPutObj)
+        }
+
+        var DATA = {};
+        DATA.placeList = putData;
+        DATA.deletePlaceList = deletedData;
+        console.log(putData); console.log(deletedData);
+        console.log(isEmpty)
+        if(isEmpty !== placeData.length || deletedData.length !== 0) {
+            try {
+                fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'x-access-token': token
+                    },
+                    body: JSON.stringify(DATA),
+                }).then(res => res.json())
+                    .then(async response => {
+                        if (response.code === 405 && !alertDuplicated) {
+                            Alert.alert('', '다른 기기에서 로그인했습니다.');
+                            setAlertDuplicated(true);
+                        }
+    
+                        if (parseInt(response.code / 100) === 4) {
+                            await SecureStore.deleteItemAsync('accessToken');
+                            setToken(null);
+                            setIsSignedIn(false);
+                            return;
+                        }
+                        console.log(response);
+                        await getInitialPlaceData();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const checkDeletedPlace = () => {
+        console.log(isDeletedComment)
+        var forDeleteData = [];
+        for(var i=0;i<isDeletedOrigin.length;i++) {
+            if(isDeletedOrigin[i] === true) {
+                // deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
+                forDeleteData.push(placeData[i].cpm_map_pk);
+            }
+        }
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] === true) {
+                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
+        }
+        
+        return forDeleteData;
+    };
+
     const getCollectionCommentsData = () => {
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
@@ -235,6 +299,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    
                     setCommentsData(response.data);
                 })
                 .catch((err) => {
@@ -283,63 +348,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const checkDeletedPlace = () => {
-        console.log(isDeletedComment)
-        for(var i=0;i<isDeletedOrigin.length;i++) {
-            if(isDeletedOrigin[i] === true) {
-                deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
-            }
-        }
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] === true) {
-                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
-            }
-        }
-    };
-
-    const checkDeletedReplacement = () => {
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
-                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
-            }
-        }
-    };
-
-    const deletePlace = (map_pk, day) => {
-        // 공간 삭제
-        try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${map_pk}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-            }).then((res) => res.json())
-                .then(async (response) => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    getInitialPlaceData();
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const checkTrue = () => {
         if (collectionData.collection_private) return true;
         return false;
@@ -361,7 +369,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const deleteCollection = (refRBSheet) => {
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -384,7 +392,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                     Alert.alert('', '삭제되었습니다.', [
                         {text : 'OK', onPress: () => {
-                            navigation.goBack();
+                            if(data.now) navigation.pop(2);
+                            else navigation.goBack();
                             refRBSheet.current.close();
                         }}]);
                 })
@@ -583,7 +592,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const getReplacement = (cpmMapPk) => {
-        console.log(cpmMapPk);
         //대체공간 불러오기
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
@@ -606,7 +614,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setReplacementData(response.data);
                     setDeletedReplacementData(response.data);
                 })
@@ -707,6 +714,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const checkDeletedReplacement = () => {
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
+        }
+    };
+
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
         try {
@@ -786,14 +801,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     //공간 삭제
     const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
 
-    //한줄평 추가 : map Pk, 코멘트
-    const [isPostedCommentMapPk, setIsPostedCommentMapPk] = useState(0);
-    const [isPostedComment, setIsPostedComment] = useState('');
-
-    //한줄평 수정 : map Pk, 코멘트
-    const [isEditedCommentMapPk, setIsEditedCommentMapPk] = useState(0);
-    const [isEditedComment, setIsEditedComment] = useState('');
-
     //대체공간 가져오기 : map Pk
     const [isGottenReplacementMapPk, setIsGottenReplacementMapPk] = useState(0);
 
@@ -810,14 +817,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
         setIsDeletedComment(newArr);
     };
 
-    const SwipeList = () => {
+    const GeneralPage = () => {
         return (
             <>
                 <SafeAreaView>
                     <FlatList data={placeData}
-                        renderItem={({item, index}) => <ShowPlacesForFree day={-1} item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
-                            isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
-                            isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
+                        renderItem={({item, index}) => <ShowPlacesForFree day={-1} item={item} index={index} key={index} isEditPage={isEditPage} navigation={navigation} length={placeLength} curLength={placeLength}
+                            private={collectionData.is_creator} pk={collectionData.collection_pk} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
                             isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
                             isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                             isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
@@ -830,8 +836,37 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 </SafeAreaView>
             </>
         );};
+
+    const setObjects = () => {
+        var newArr = [{}];
+        editData.value = newArr;
+    }
+    const editData = useSharedValue([]);
+
+    const isEdited = (data, day) => {
+        var newObject = [...editData.value];
+        newObject[0] = data;
+        editData.value = newObject;
+        return data;
+    };
     
-    const [showMenu, setShowMenu] = useState(false);
+    const EditPage = () => {
+        return (
+            <SafeAreaView>
+                <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress}
+                    navigation={navigation} length={placeLength} curLength={placeLength}
+                    private={collectionData.is_creator} pk={collectionData.collection_pk} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
+                    isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                    isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                    postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                    postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+                    isEdited={isEdited}
+                />
+            </SafeAreaView>
+        )
+    };
+    
     const [deleteMenu, setDeleteMenu] = useState(false);
 
     const list = [
@@ -880,7 +915,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             <AppText style={styles.textStyle}>취소하기</AppText>
                         </Pressable>
                         <Pressable
-                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            style={{...styles.button, backgroundColor: colors.red[3]}}
                             onPress={() => {
                                 setDeleteMenu(!deleteMenu);
                                 deleteCollection(props.refRBSheet);
@@ -914,7 +949,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             <>
                 <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
                     <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                        <DefaultProfile width={36} height={36}/>
+                        <DefaultThumbnail width={36} height={36}/>
                     </View>
                     <View>
                         <View style={{
@@ -1065,11 +1100,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
-                                    onPress={() => {
+                                    onPress={async () => {
                                         setIsEditPage(false);
                                         isDeleted(isDeletedOrigin);
                                         isCommentDeleted(isDeletedComment);
-                                        checkDeletedPlace();
+                                        await updatePlaceData(editData.value, checkDeletedPlace());
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -1188,7 +1223,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                     <TouchableOpacity onPress={()=>{
                                         navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1, replace: false});
-                                    }} style={!collectionData.is_creator && {display: 'none'}}>
+                                    }} style={(!collectionData.is_creator || isEditPage) && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -1197,33 +1232,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 </View>
                                 <SafeAreaView>
                                     <SafeAreaView>
-                                    <SwipeList />
-                                        {/* {
+                                        {
                                             !isEditPage ?
-                                                <SwipeList /> :
-                                                // <Example />
-                                                <FlatList data={placeData}
-                                                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
-                                                        isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
-                                                        isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
-                                                        isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
-                                                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
-                                                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                                                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
-                                                        postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
-                                                    />}
-                                                    keyExtractor={(item, idx) => {idx.toString();}}
-                                                    key={(item, idx) => {idx.toString();}}
-                                                    nestedScrollEnabled/>
-                                            // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
-                                        } */}
+                                                <GeneralPage /> :
+                                                <EditPage />
+                                        }
                                     </SafeAreaView>
                                 </SafeAreaView>
-                                {placeLength > 5 && !isEditPage && <TouchableOpacity onPress={() => {
-                                    // if(isLimited) setIsLimited(false);
-                                    // else setIsLimited(true);
-                                    // console.log(isLimited)
-                                }}>
+                                {placeLength > 5 && !isEditPage && <TouchableOpacity>
                                     <View style={{
                                         flexDirection: 'row',
                                         marginVertical: 16,

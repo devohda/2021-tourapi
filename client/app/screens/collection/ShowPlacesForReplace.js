@@ -3,9 +3,12 @@ import {
     TouchableOpacity,
     View,
     Image,
-    TouchableHighlight, Alert,
+    TouchableHighlight,
+    Alert,
+    StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import AlternativeSpaceList from './AlternativeSpaceList';
@@ -21,8 +24,7 @@ import { Icon } from 'react-native-elements';
 
 const ShowPlacesForReplace = props => {
     const { colors } = useTheme();
-    const { data, index, isEditPage, item, navigation, likeFlag, isLimited, getInitialReplacementData, getInitialData, isReplacementDeleted, isDeletedReplacement} = props;
-    const [update, setUpdate] = setUpdated();
+    const { item, index, isEditPage, navigation, likeFlag, getInitialReplacementData, getInitialData, isReplacementDeleted, isDeletedReplacement} = props;
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
@@ -153,23 +155,49 @@ const ShowPlacesForReplace = props => {
         }
     };
 
-    const checkLimit = () => {
-        if(!isEditPage && !isLimited) {
-            if(index <= 4) return false;
-            else return true;
-        }
-    };
+    const [deleteMenu, setDeleteMenu] = useState(false);
+
+    const DeleteModal = props => (
+        <Modal
+        visible={deleteMenu}
+        backdropStyle={styles.backdrop}
+        style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
+        onBackdropPress={() => setDeleteMenu(false)}>
+        <Card disabled={true}
+            style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+        >
+            <View style={{marginTop: 55}}>
+                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
+            </View>
+            <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                    <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
+                        <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                            <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                                let newArr = [...isDeletedReplacement];
+                                newArr[index] = true;
+                                isReplacementDeleted(newArr);
+                                console.log(newArr);
+                                setDeleteMenu(false);
+                            }}>
+                        <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                            <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Card>
+    </Modal>
+    );
+
     return (
         <View style={isDeletedReplacement[index] && {display: 'none'}}>
-            {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
-                width: '100%',
-                height: 1,
-                backgroundColor: colors.red_gray[6],
-                zIndex: -1000,
-                marginVertical: 13
-            }}></View>} */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1}>
+                    <DeleteModal />
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
@@ -177,14 +205,11 @@ const ShowPlacesForReplace = props => {
                                 'place_pk': item.place_pk,
                             };
                             navigation.navigate('Place', {data: data});
-                        }} disabled={isEditPage && true}>
+                        }} disabled={isEditPage ? true : false}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
                                     <TouchableOpacity onPress={()=>{
-                                        let newArr = [...isDeletedReplacement];
-                                        newArr[index] = true;
-                                        isReplacementDeleted(newArr);
-                                        console.log(newArr);
+                                        setDeleteMenu(true);
                                     }}>
                                         <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                             <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
@@ -212,12 +237,12 @@ const ShowPlacesForReplace = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
                                             }}>{checkType(item.place_type)}</AppText>
+                                            <View style={[parseInt(item.review_score) == -1 && {display: 'none'}, {flexDirection: 'row'}]}>
                                             <AppText style={{
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
-                                                display: parseInt(item.review_score) == -1 && 'none'
                                             }}>|</AppText>
                                             <Image source={require('../../assets/images/review_star.png')}
                                                 style={{
@@ -225,7 +250,6 @@ const ShowPlacesForReplace = props => {
                                                     height: 10,
                                                     alignSelf: 'center',
                                                     marginTop: '1%',
-                                                    display: parseInt(item.review_score) == -1 && 'none'
                                                 }}></Image>
                                             <AppText style={{
                                                 color: colors.gray[3],
@@ -233,8 +257,8 @@ const ShowPlacesForReplace = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
                                                 marginLeft: 2,
-                                                display: parseInt(item.review_score) == -1 && 'none'
                                             }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                            </View>
                                         </View>
                                         <View style={{width: '100%'}}>
                                             <AppText style={{
@@ -274,5 +298,46 @@ const ShowPlacesForReplace = props => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    backdrop: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    planContainer : {
+        height: 30,
+        paddingVertical: 6,
+        paddingLeft: 6,
+        paddingRight: 5,
+        marginBottom: 6,
+        marginRight: 4,
+        marginTop: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '88%'
+    },
+    freeContainer: {
+        height: 30,
+        paddingVertical: 6,
+        paddingLeft: 6,
+        paddingRight: 5,
+        marginBottom: 6,
+        marginRight: 4,
+        marginTop: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '88%'
+    },
+    shadowOption: {
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        elevation: 1,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+    }
+});
 
 export default ShowPlacesForReplace;

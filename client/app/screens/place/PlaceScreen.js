@@ -840,7 +840,7 @@ const PlaceScreen = ({route, navigation}) => {
                         <View>
                             { item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
                                 <Image style={styles.reviewImage}
-                                    source={require('../../assets/images/here_default.png')}></Image> :
+                                    source={require('../../assets/images/default-profile.png')}></Image> :
                                 <Image style={styles.reviewImage}
                                 source={{ uri: item.user_img }}></Image>
                             }

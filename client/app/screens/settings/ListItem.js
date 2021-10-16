@@ -17,6 +17,7 @@ const ListItem = props => {
     const {colors} = useTheme();
     const [isEnabled, setIsEnabled] = useState(false);
     const [isLogout, setIsLogout] = useState(false);
+    const [isWithdraw, setIsWithdraw] = useState(false);
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
@@ -26,6 +27,7 @@ const ListItem = props => {
 
     const [reportMenu, setReportMenu] = useState(false);
     const [confirmMenu, setConfirmMenu] = useState(false);
+    const [withdrawConfirmMenu, setWithdrawConfirmMenu] = useState(false);
 
     const reportReasons = [
         {
@@ -180,6 +182,147 @@ const ListItem = props => {
         </Modal>
     );
 
+    const LogoutModal = () => {
+        return (
+            <Modal
+                transparent={true}
+                visible={isLogout}
+                onRequestClose={() => {
+                    setIsLogout(!isLogout);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View
+                        style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>로그아웃
+                            하시겠습니까?</AppText>
+                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.gray[4]}}
+                                onPress={() => setIsLogout(!isLogout)}
+                            >
+                                <AppText style={styles.textStyle}>취소하기</AppText>
+                            </Pressable>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.mainColor}}
+                                onPress={() => {
+                                    fetch('http://34.64.185.40/auth/logout', {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'Content-Type': 'application/json',
+                                            'x-access-token': token
+                                        },
+                                    }).then((res) => res.json())
+                                        .then(async (response) => {
+                                            setIsLogout(!isLogout);
+                                            setToken(null);
+                                            setIsSignedIn(false);
+                                            await SecureStore.deleteItemAsync('accessToken');
+                                        })
+                                        .catch((err) => {
+                                            console.error(err);
+                                        });
+                                }}
+                            >
+                                <AppText style={styles.textStyle}>로그아웃</AppText>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        )
+    };
+
+    const WithdrawModal = () => {
+        return (
+            <Modal
+                transparent={true}
+                visible={isWithdraw}
+                onRequestClose={() => {
+                    setIsWithdraw(!isWithdraw);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View
+                        style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: 200}}>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>회원을 탈퇴하시겠습니까?</AppText>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>해당 계정 관련 데이터가 모두 사라집니다.</AppText>
+                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.gray[4]}}
+                                onPress={() => setIsWithdraw(!isWithdraw)}
+                            >
+                                <AppText style={styles.textStyle}>취소하기</AppText>
+                            </Pressable>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.red[3]}}
+                                onPress={() => {
+                                    setIsWithdraw(!isWithdraw);
+                                    setWithdrawConfirmMenu(!withdrawConfirmMenu);
+                                }}
+                            >
+                                <AppText style={styles.textStyle}>탈퇴하기</AppText>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        )
+    };
+
+
+    const WithdrawConfirmModal = () => (
+        <Modal
+            transparent={true}
+            visible={withdrawConfirmMenu}
+            onRequestClose={() => {
+                setWithdrawConfirmMenu(!withdrawConfirmMenu);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: 200}}>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>탈퇴가 완료되었습니다.</AppText>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>히든쥬얼을 이용해주셔서 감사합니다.</AppText>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            onPress={() => {
+                                fetch('http://34.64.185.40/auth/account', {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'Content-Type': 'application/json',
+                                            'x-access-token': token
+                                    },
+                                }).then((res) => res.json())
+                                    .then(async (response) => {
+                                        setWithdrawConfirmMenu(!withdrawConfirmMenu);
+                                        setToken(null);
+                                        setIsSignedIn(false);
+                                        await SecureStore.deleteItemAsync('accessToken');
+                                })
+                                .catch((err) => {
+                                    console.error(err);
+                                });
+                            }}
+                        >
+                            <AppText style={styles.textStyle}>확인</AppText>
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    );
+
     return (
         <>
             {
@@ -203,6 +346,7 @@ const ListItem = props => {
                                 <>
                                     <TouchableOpacity onPress={() => {
                                         props.data === '로그아웃' && setIsLogout(true);
+                                        props.data === '회원 탈퇴하기' && setIsWithdraw(true);
                                     }}>
                                         <AppText style={{
                                             color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3],
@@ -210,57 +354,9 @@ const ListItem = props => {
                                             lineHeight: 20
                                         }}>{props.data}</AppText>
                                     </TouchableOpacity>
-                                    <Modal
-                                        transparent={true}
-                                        visible={isLogout}
-                                        onRequestClose={() => {
-                                            setIsLogout(!isLogout);
-                                        }}
-                                    >
-                                        <View style={styles.centeredView}>
-                                            <View
-                                                style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                                                <AppText style={{...styles.modalText, color: colors.blue[1]}}>로그아웃
-                                                    하시겠습니까?</AppText>
-                                                <View style={{
-                                                    flexDirection: 'row',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center'
-                                                }}>
-                                                    <Pressable
-                                                        style={{...styles.button, backgroundColor: colors.gray[4]}}
-                                                        onPress={() => setIsLogout(!isLogout)}
-                                                    >
-                                                        <AppText style={styles.textStyle}>취소하기</AppText>
-                                                    </Pressable>
-                                                    <Pressable
-                                                        style={{...styles.button, backgroundColor: colors.mainColor}}
-                                                        onPress={() => {
-                                                            fetch('http://34.64.185.40/auth/logout', {
-                                                                method: 'DELETE',
-                                                                headers: {
-                                                                    'Accept': 'application/json',
-                                                                    'Content-Type': 'application/json',
-                                                                    'x-access-token': token
-                                                                },
-                                                            }).then((res) => res.json())
-                                                                .then(async (response) => {
-                                                                    setIsLogout(!isLogout);
-                                                                    setToken(null);
-                                                                    setIsSignedIn(false);
-                                                                    await SecureStore.deleteItemAsync('accessToken');
-                                                                })
-                                                                .catch((err) => {
-                                                                    console.error(err);
-                                                                });
-                                                        }}
-                                                    >
-                                                        <AppText style={styles.textStyle}>로그아웃</AppText>
-                                                    </Pressable>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </Modal>
+                                    <LogoutModal />
+                                    <WithdrawModal />
+                                    <WithdrawConfirmModal />
                                 </> :
                                 <>
                                     <TouchableOpacity disabled={props.data !== '신고하기' ? true: false} onPress={()=>setReportMenu(true)}>

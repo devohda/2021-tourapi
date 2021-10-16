@@ -63,6 +63,47 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
         }
     };
 
+    const postReplacement = (placePk, prev) => {
+        //대체공간 추가
+        // console.log(replacementData.length+prev+1);
+        console.log(props)
+        try {
+            fetch(`http://34.64.185.40/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    order: placeData.replacement_cnt+prev+1,
+                    placeId: placePk
+                })
+            }).then(res => res.json())
+                .then(async response => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+                    console.log(response)
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }      
+                    if(response.code === 200) Alert.alert('', '대체공간이 추가되었습니다.');
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const countPlaceView = (place_pk) => {
         try {
             fetch(`http://34.64.185.40/view/place/${place_pk}`, {
@@ -205,10 +246,8 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         newArr[index] = true;
                         setIsPress(newArr);
                         if(replace) {
-                            const postReplacement = props.postReplacement;
                             var prevLength = isPress.filter(element => (element === true)).length;
-                            postReplacement(pk, item.place_pk, prevLength);
-                            Alert.alert('', '대체공간이 추가되었습니다.');
+                            postReplacement(item.place_pk, prevLength);
                         }
                         else addPlace(item.place_pk);
                     }

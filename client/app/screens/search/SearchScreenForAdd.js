@@ -141,14 +141,9 @@ const SearchScreenForAdd = ({route, navigation}) => {
             <NavigationTop title="검색" navigation={navigation}/>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
-                <SearchBar />
-                    {searchKeyword !== '' && <View>
-                        {replace ?
-                            <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace}
-                            postReplacement={route.params.postReplacement}
-                            /> :
-                        <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace} />}
-                    </View>}
+                    <SearchBar />
+                    {searchKeyword !== '' && 
+                    <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace} />}
                 </ScreenContainerView>
 
                 {searchKeyword !== '' && <ScreenDivideLine/>}
