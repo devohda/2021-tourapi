@@ -10,38 +10,42 @@ import AppText from '../../../components/AppText';
 import styled from "styled-components/native";
 import CustomTextInput from "../../../components/CustomTextInput";
 
-const ProgressBar = styled(View)`
-  flexDirection: row;
-  width: 100%;
-  justify-content: flex-end;
-  height: 8px;
-`;
-
 const Form = styled(View)`
   margin-top: 63px;
 `;
 
-const ChangePasswordTab = ({route, navigation}) => {
-    const [email, setEmail] = useState(null);
-    const [phoneNumber, setPhoneNumber] = useState(null);
+const changePw = async (e, pw) => {
+    try {
 
-    const sendSMS = () => {
-        try {
-            fetch('http://34.64.185.40/auth/authPhone', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: {}
-            }).then(res => res.json())
-                .then(response => console.log('Success:', JSON.stringify(response)))
-                .catch(error => console.error('Error:', error));
-        } catch (err) {
-            console.error(err);
-        }
-    };
+        let url = 'http://34.64.185.40/auth/password';
+        let options = {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                email: e,
+                password: pw,
+            })
+        };
+        const result = await fetch(url, options)
+            .then(res => res.json())
+            .then(response => {
+                console.log(response)
+                return response.code === 200;
+            })
+            .catch(error => console.log(error));
 
+        return result;
+    } catch (e) {
+        console.log(e.toString());
+    }
+};
+
+const ChangePasswordTab = ({route, authNavigation}) => {
+    const {email} = route.params;
     const [password, setPassword] = useState("");
     const { colors } = useTheme();
     const [color, setColor] = useState(colors.gray[5]);
@@ -55,19 +59,17 @@ const ChangePasswordTab = ({route, navigation}) => {
 
         if(!pattern1.test(pw) || !pattern2.test(pw) || !pattern3.test(pw)) {
             setIsPasswordValid(false);
-            // setColor(colors.gray[5]);
         }
         else {
             setIsPasswordValid(true);
-            // setColor(colors.red[2]);
         }
     }
 
     const checkIsValid = async () => {
-        if(!isPasswordValid) {
-            setColor(colors.red[2]);
+        const result = await changePw(email, password);
+        if (result) {
+            authNavigation.navigate('SignInEmail');
         }
-        navigation.navigate('nicknameTab', {email, password})
     }
 
     const styles = StyleSheet.create({
@@ -86,9 +88,9 @@ const ChangePasswordTab = ({route, navigation}) => {
             backgroundColor: colors.gray[5]
         },
         title_text: {
-            fontSize: 30,
+            fontSize: 16,
             color: colors.mainColor,
-            lineHeight: 44,
+            lineHeight: 23.68
         },
         continue_btn: {
             backgroundColor: password.length >= 8 && isPasswordValid ? colors.mainColor : colors.gray[6],
@@ -102,27 +104,18 @@ const ChangePasswordTab = ({route, navigation}) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingBottom: 11,
-            marginTop: 40,
+            marginTop: 16,
             marginBottom: 6
         },
     })
 
     return (
         <>
-            <View flex={1}>
-                <ProgressBar>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                    <View style={{...styles.progress, ...styles.progress_active}}></View>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                </ProgressBar>
+            <View flex={1} style={{marginTop: 10}}>
                 <Form>
-                    <AppText>
-                        <View>
-                            <AppText style={styles.title_text}><AppText
-                                style={{fontWeight: 'bold'}}>비밀번호</AppText><AppText>를</AppText></AppText>
-                            <AppText style={styles.title_text}>설정해주세요</AppText>
-                        </View>
+                    <AppText style={styles.title_text}><AppText
+                        style={{fontWeight: 'bold'}}>비밀번호</AppText>
+                        <AppText>를 입력해주세요</AppText>
                     </AppText>
                     <View flexDirection="row" style={{...styles.password_box, borderColor: color}}>
                         <CustomTextInput
@@ -132,6 +125,7 @@ const ChangePasswordTab = ({route, navigation}) => {
                             secureTextEntry={showPassword}
                             style={{
                                 fontSize: 16,
+                                color : colors.mainColor
                             }}
                             flex={1}
                             onChangeText={async (text) => {
@@ -177,10 +171,10 @@ const ChangePasswordTab = ({route, navigation}) => {
                                 {
                                     showPassword ?
                                     <Icon style={{marginTop: 3, marginRight: 5}} name={'eye'} type="ionicon"
-                                    size={18} color={colors.gray[9]}></Icon>
+                                    size={18} color={password ? colors.mainColor : colors.gray[9]}></Icon>
                                     :
                                     <Icon style={{marginTop: 3, marginRight: 5}} name={'eye-off'} type="ionicon"
-                                    size={18} color={colors.gray[9]}></Icon>
+                                    size={18} color={password ? colors.mainColor : colors.gray[9]}></Icon>
                                 }
                         </Pressable>
                     </View>
@@ -202,30 +196,10 @@ const ChangePasswordTab = ({route, navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={password.length >= 8 && isPasswordValid ? false : true}
                 >
-                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
+                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>비밀번호 재설정하기</AppText>
                 </TouchableOpacity>
             </View>
         </>
-        // <ScreenContainer>
-        //     <View>
-        //         <AppText>이메일을 입력하세요.</AppText>
-        //         <TextInput autoCapitalize="none" onChangeText={(text) => setEmail(email)}/>
-        //         <Button title="확인 코드 입력" onPress={() => {
-        //         }}/>
-        //         <AppText>전화번호를 입력하세요.</AppText>
-        //         <TextInput autoCapitalize="none" onChangeText={(text) => setEmail(email)}/>
-        //         <PhoneInput
-        //             defaultCode="KR"
-        //             layout="first"
-        //             onChangeText={(text) => {
-        //                 setPhoneNumber(text);
-        //             }}
-        //         />
-        //         <Button title="sms 전송" onPress={() => {
-        //             sendSMS();
-        //         }}/>
-        //     </View>
-        // </ScreenContainer>
     );
 };
 

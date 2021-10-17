@@ -21,7 +21,7 @@ const AlternativeSpaceList = props => {
     const checkNone = () => {
         //내가 만든거일때
         if(props.private === 1) {
-            //수정페이지에서 이미 완성된 한줄평일때만
+            //수정페이지에서 이미 완성된 대체공간일때만
             if(isEditPage) {
                 if(data.replacement_cnt) return false;
                 else return true;
@@ -33,12 +33,11 @@ const AlternativeSpaceList = props => {
         }
         //내가 만든게 아닐때
         else {
-            //이미 완성된 한줄평일때만
+            //이미 완성된 대체공간일때만
             if(data.replacement_cnt) return false;
             else return true;
         }
     };
-
     
     return(
         <TouchableOpacity onPress={()=>{

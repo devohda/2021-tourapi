@@ -66,7 +66,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
     const postReplacement = (placePk, prev) => {
         //대체공간 추가
         // console.log(replacementData.length+prev+1);
-        console.log(props)
+        // console.log(props)
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
                 method: 'POST',
@@ -215,7 +215,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
             props.navigation.navigate('Place', {data : data});
         }}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View style={{flexDirection: 'row', width: '85%'}}>
+                <View style={{flexDirection: 'row', width: '82%'}}>
                     {
                         item.place_img ?
                             <Image source={{uri: item.place_img}}

@@ -12,7 +12,8 @@ import {
     FlatList,
     Modal,
     Alert,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    Share
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
@@ -65,6 +66,26 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
     const [alertDuplicated, setAlertDuplicated] = useState(false);
+
+    const onShare = async () => {
+        try {
+            const result = await Share.share({
+                message:
+                `[히든쥬얼] ${collectionData.collection_name}`
+            });
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // shared with activity type of result.activityType
+                } else {
+                    // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
+        } catch (error) {
+            Alert.alert('', error.message);
+        }
+    };
 
     const isDeleted = (deletedData) => {
         setIsDeletedOrigin(deletedData);
@@ -207,7 +228,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         pressed.push(false);
                     }
                     setIsPress(pressed);
-                    setDeletedData(response.data);
+                    setDeletedData(response.data.placeList);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -222,9 +243,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
         //빈 객체일때는 원래 순서 그대로 넣어주기
+        var cur = 0;
         for(var i=0;i<planDays.length;i++) {
             for(var j=0;j<placeData.length;j++) {
                 if(placeData[j].cpm_plan_day === i) {
+                    cur += 1
                     var forPutObj = {};
                     if(Object.keys(updatedData[i]).length === 0) {
                         isEmpty += 1;
@@ -234,22 +257,25 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             order: placeData[j].cpm_order
                         }
                     } else {
+                        console.log(cur)
+                        console.log('이번엔 여기!')
+                        // console.log(Object.values(updatedData[i])[j])
                         forPutObj = {
                             cpm_map_pk: placeData[j].cpm_map_pk,
                             planDay: i,
-                            order: Object.values(updatedData[i])[j]
+                            order: Object.values(updatedData[i])[cur-1]
                         }
                     };
                     putData.push(forPutObj)
-                }
+                } else cur = 0;
+                console.log(cur)
 
             }
         }
-
         var DATA = {};
         DATA.placeList = putData;
         DATA.deletePlaceList = deletedData;
-        console.log(isEmpty)
+        console.log(DATA)
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
@@ -286,17 +312,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
-        console.log(isDeletedComment)
         var forDeleteData = [];
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
                 // deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
                 forDeleteData.push(placeData[i].cpm_map_pk);
-            }
-        }
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] === true) {
-                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
             }
         }
         
@@ -740,9 +760,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedReplacement = () => {
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
-                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
+        for(var i=0;i<isDeletedReplacement.length;i++) {
+            if(isDeletedReplacement[i] !== false) {
+                deleteReplacement(placeData[i].cpm_map_pk, isDeletedReplacement[i]);
             }
         }
     };
@@ -833,16 +853,21 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [isDeletedComment, setIsDeletedComment] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
 
-    const setDeletedData = (data) => {
-        var newArr = []; var newComment = [];
-        for(var i=0;i<data.length;i++) {
-            if(data[i].comment) newComment.push(true);
-            else newComment.push(false);
+    //삭제된 게 어느 Day인지 (수정하기 페이지에서 사용하기 위함)
+    const [deletedLengthByDays, setDeletedLengthByDays] = useState([]);
 
+    const setDeletedData = (data) => {
+        var newArr = []; var newDays = [];
+        for(var i=0;i<data.length;i++) {
+            // days.push(data[i].cpm_plan_day);
             newArr.push(false);
-        }
+            newDays.push({
+                day: data[i].cpm_plan_day,
+                isDeleted: false,
+            });
+        };
+        setDeletedLengthByDays(newDays);
         setIsDeletedOrigin(newArr);
-        setIsDeletedComment(newComment);
     };
 
     const GeneralPage = props => {
@@ -859,10 +884,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 <FlatList data={placeData}
                     renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} navigation={navigation} curLength={cnt}
                     length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
-                        isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
                         isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                         isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}
                         postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
                     />}
                     keyExtractor={(item, idx) => {idx.toString();}}
@@ -883,7 +907,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const isEdited = (data, day) => {
         var newObject = [...editData.value];
         newObject[day] = data;
+        // console.log(day)
+        // console.log(newObject)
         editData.value = newObject;
+        // console.log(editData.value)
         return data;
     };
 
@@ -899,11 +926,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
 
         return (
-            <SafeAreaView style={!isEditPage && {display: 'none'}}>
-                <DragAndDropList data={editedData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx+editedData[props.idx].toString()} curLength={cnt}
-                    navigation={navigation} length={placeLength}
+            <SafeAreaView>
+                <DragAndDropList data={editedData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={`${props.idx}+${editedData[props.idx]}`} curLength={cnt}
+                    navigation={navigation} length={placeLength} day={props.idx}
                     private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
-                    isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                    isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment} deletedLengthByDays={deletedLengthByDays}
                     isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                     isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
                     postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
@@ -957,8 +984,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </View>
                     </View>
                 </View>
-                    <GeneralPage idx={idx} key={idx+'general'}/> 
-                    <EditPage idx={idx} key={idx+'edit'}/>
+                <GeneralPage idx={idx} key={idx+'general'}/> 
+                <EditPage idx={idx} key={idx+'edit'}/>
                 {checkLength() > 5 && !isEditPage && <TouchableOpacity>
                     <View style={{
                         flexDirection: 'row',
@@ -1254,6 +1281,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                             if(i === 1) {
                                                 refRBSheet.current.close();
                                                 navigation.navigate('MakePlanCollection', {data: collectionData, update: true, placeLength: placeLength});
+                                            }
+                                            if(i === 2) {
+                                                onShare();
                                             }
                                             if(i === 3) {
                                                 setDeleteMenu(true);

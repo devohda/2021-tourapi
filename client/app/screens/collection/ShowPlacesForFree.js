@@ -26,10 +26,8 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
     const { day, index, isEditPage, item, length, curLength, navigation, pk, isDeleted, isDeletedOrigin, isLimited,
-        isCommentDeleted, isDeletedComment,
-        isReplacementGotten, isGottenReplacementMapPk,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
-        postPlaceComment, putPlaceComment,
+        postPlaceComment, putPlaceComment, deletePlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
     const isFree = (day === -1);
@@ -351,7 +349,7 @@ const ShowPlacesForFree = props => {
                             postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
                         />}
-                    <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
+                    {!isEditPage && <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
                 </View>
             </TouchableHighlight>
         </View>

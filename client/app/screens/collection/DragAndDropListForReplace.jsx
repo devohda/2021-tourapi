@@ -185,7 +185,7 @@ const DragAndDropListForReplace = props => {
                 scrollY={scrollY}
                 dataCount={Data.length}
                 props={props}
-                dataHeight={100}
+                dataHeight={120}
                 isEdited={isEdited}
                 likeFlag={data.like_flag}
                 />

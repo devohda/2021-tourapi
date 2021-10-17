@@ -25,10 +25,8 @@ const ShowPlaces = props => {
     const { colors } = useTheme();
 
     const { day, index, isEditPage, item, length, curLength, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
-        isCommentDeleted, isDeletedComment,
-        isReplacementGotten, isGottenReplacementMapPk,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
-        postPlaceComment, putPlaceComment,
+        postPlaceComment, putPlaceComment, deletePlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
     const isFree = (typeof day === 'undefined');
@@ -218,6 +216,7 @@ const ShowPlaces = props => {
                 if(originData[i].cpm_plan_day === day) length += 1;
             }
         }
+        // console.log(length)
         return length;
     };
     
@@ -393,44 +392,44 @@ const ShowPlaces = props => {
                             postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
                         />}
-                        <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
+                        {!isEditPage && <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
                     </View>
                 </TouchableHighlight> :
                 item.cpm_plan_day === day && curLength > 0 &&
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={[{flexDirection: 'row', justifyContent: 'space-between'}, isDeletedOrigin[index] && {display: 'none'}]}>
-                        <TouchableOpacity onPress={()=>{
+                        {/* <TouchableOpacity onPress={()=>{
                             setDeleteVisible(true);
                         }} style={{display: 'none'}}>
                             <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                 <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                             </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <DeleteModal />
                         <View style={{
                             height: 30,
                             paddingVertical: 6,
-                            paddingRight: 15,
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            backgroundColor: colors.backgroundColor
+                            backgroundColor: colors.backgroundColor,
                         }}>
                             <View style={{
-                                width: !isEditPage ? '90%' : '84%',
+                                width: !isEditPage ? '88%' : '80.5%',
                                 borderStyle: 'dotted',
                                 borderRadius: 1,
                                 borderWidth: 1,
                                 borderColor: colors.gray[4],
                                 zIndex: -1000,
-                                    
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}></View>
-                            <View style={{marginStart: 6}}>
+                            <View style={{marginHorizontal: '2%'}}>
                                 <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>
                                     {item.place_pk === -1 ? '12PM' : '18PM'}
                                 </AppText>
                             </View>
-                            <TouchableOpacity style={{marginStart: 12}} style={!isEditPage && {display: 'none'}}>
+                            <TouchableOpacity style={!isEditPage && {display: 'none'}}>
                                 <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
                             </TouchableOpacity>
                         </View>

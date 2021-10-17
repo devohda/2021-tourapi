@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform} from 'react-native';
+import {View, TextInput, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform, FlatList, TouchableOpacity} from 'react-native';
 import {useTheme} from '@react-navigation/native';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import NavigationTop from '../../components/NavigationTop';
@@ -12,12 +13,17 @@ import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvid
 
 import SearchIcon from '../../assets/images/search-icon.svg';
 import Star from '../../assets/images/search/star.svg';
+import ShowRecommendPlace from '../../components/ShowRecommendPlace';
+import ShowRecommendCollection from '../../components/ShowRecommendCollection';
 
 const SearchScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
+    const [token, setToken] = useToken();
 
-    useEffect(() => {setSearchKeyword('')}, []);
+    useEffect(() => {
+        setSearchKeyword('');
+    }, []);
 
     const styles = StyleSheet.create({
         search_box: {
@@ -63,25 +69,6 @@ const SearchScreen = ({route, navigation}) => {
             textAlign: 'center',
         },
     });
-
-    const RecommendedPlace = ({name, address}) => {
-        return (
-            <View style={{marginRight: 8}}>
-                <Image source={require('../../assets/images/here_default.png')}
-                    style={{width: 141, height: 101, borderRadius: 10}}/>
-                <View style={{height: 62, justifyContent: 'space-between', marginVertical: 8}}>
-                    <View flexDirection="row" style={{alignItems: 'center'}}>
-                        <AppText style={{fontSize: 10, color: colors.mainColor}}>음식점</AppText>
-                        <View style={styles.score_line}></View>
-                        <Star width={14} height={14}/>
-                        <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>4.84</AppText>
-                    </View>
-                    <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{name}</AppText>
-                    <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{address}</AppText>
-                </View>
-            </View>
-        );
-    };
 
     const RecommendedCollection = () => {
         return (
@@ -160,30 +147,13 @@ const SearchScreen = ({route, navigation}) => {
                                 <AppText style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</AppText>
                             </View> */}
                         </View>
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                        </ScrollView>
+                        <ShowRecommendPlace navigation={navigation}/>
                     </View>
                     <View style={{marginVertical: 12}}>
                         <View flexDirection="row" style={{alignItems: 'center', marginBottom: 12}}>
                             <AppText style={{color: colors.mainColor, fontSize: 20, fontWeight: '700'}}>추천하는 보관함</AppText>
                         </View>
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                            <RecommendedCollection/>
-                        </ScrollView>
+                        <ShowRecommendCollection navigation={navigation}/>
                     </View>
                 </ScreenContainerView>
             </ScrollView>
