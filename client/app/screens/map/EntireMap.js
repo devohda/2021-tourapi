@@ -3,27 +3,56 @@ import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Di
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon, Rating} from 'react-native-elements';
 import MapView, {Marker, UrlTile, PROVIDER_GOOGLE} from 'react-native-maps';
-import NavigationTop from '../../components/NavigationTop';
-import AppText from '../../components/AppText';
+import * as Location from 'expo-location';
+import Constants from 'expo-constants';
 
-import CustomMarker from '../../assets/images/place/map-marker.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
+import CustomMyMarker from '../../assets/images/map/map-mylocation-marker.svg';
 import Jewel from '../../assets/images/jewel.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
+import NavigationTop from '../../components/NavigationTop';
+import AppText from '../../components/AppText';
+
+import { myLocation } from '../../contexts/LocationContextProvider';
 
 const EntireMap = ({route, navigation}) => {
     const {colors} = useTheme();
     const { title, placeData } = route.params;
+    const [myLocations, setMyLocations] = myLocation();
     const [region, setRegion] = useState({
         latitude: 37.56633546113615,
         longitude: 126.9779482762618-parseFloat(1/100000000),
-        latitudeDelta: 0.0007,
-        longitudeDelta: 0.0007,
+        latitudeDelta: 0.015,
+        longitudeDelta: 0.015,
     });
     const [visible, setVisible] = useState(false);
+    const [myLocationVisible, setMyLocationVisible] = useState(false);
     const [curPlacePk, setCurPlacePk] = useState(0);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    useEffect(() => {
+      (async () => {
+        if(!myLocations) {
+            if (Platform.OS === 'android' && !Constants.isDevice) {
+                setErrorMsg(
+                  'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+                );
+                return;
+            }
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+            }
     
+            let loc = await Location.getCurrentPositionAsync({});
+            setMyLocations(loc);
+        }
+      })();
+    }, [myLocations]);
+
     const countPlaceView = (place_pk) => {
         try {
             fetch(`http://34.64.185.40/view/place/${place_pk}`, {
@@ -75,7 +104,9 @@ const EntireMap = ({route, navigation}) => {
         //   if (marker) {
         //     this.props.onMarkerPress(marker);
         //   }
-        setVisible(true);
+        if(myLocations !== null) {
+            if(!(newRegion.latitude === myLocations.coords.latitude && newRegion.longitude === myLocations.coords.longitude)) setVisible(true);
+        } else setVisible(true);
     };
 
     const [currentData, setCurrentData] = useState({});
@@ -121,6 +152,19 @@ const EntireMap = ({route, navigation}) => {
                             </AppText>
                         </View>
                     </View>
+                </View>
+            </Marker>
+        )
+    };
+
+    const ShowMyMarkers = () => {
+        return (
+            <Marker coordinate={{
+                latitude: myLocations.coords.latitude,
+                longitude: myLocations.coords.longitude
+            }} style={{width: 100, height: 100}}>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <CustomMyMarker />
                 </View>
             </Marker>
         )
@@ -355,7 +399,27 @@ const EntireMap = ({route, navigation}) => {
                 </View>
             </View>
         )
-    }
+    };
+
+    console.log(region)
+    const GetMyLocationButton = () => {
+        return (
+            <View style={{position: 'absolute', right: 10, bottom: 10}}>
+                <TouchableOpacity onPress={()=>{
+
+                    setMyLocationVisible(!myLocationVisible);
+                    const newRegion = { ...region };
+    
+                    newRegion.latitude = myLocations.coords.latitude;
+                    newRegion.longitude = myLocations.coords.longitude;
+                
+                    setRegion(newRegion);
+                }}>
+                    <Image source={require('../../assets/images/map/search-location-button.png')} style={{width: 40, height: 40}}/>
+                </TouchableOpacity>
+            </View>
+        );
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -385,7 +449,13 @@ const EntireMap = ({route, navigation}) => {
                         <ShowMarkers data={data} idx={idx} key={idx}/>
                     ))
                 }
+                { myLocations !== null &&
+                    <ShowMyMarkers />
+                }
             </MapView>
+            { myLocations !== null &&
+                <GetMyLocationButton />
+            }
             <ShowInfos />
         </ScreenContainer>
     );

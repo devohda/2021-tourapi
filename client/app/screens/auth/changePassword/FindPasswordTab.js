@@ -69,27 +69,34 @@ const FindPasswordTab = ({route, navigation}) => {
     const sendSMS = (pn) => {
         const phoneNum = `+82${phoneNumber.slice(1)}`;
         console.log(phoneNum)
-        if(pn.length !== 11 || pn.startsWith('010')) {
+        if(pn.length !== 11 || !pn.startsWith('010')) {
             Alert.alert('', '정확한 전화번호를 입력해주세요.');
-            return;
-        };
-        setNumVisible(true);
-        // try {
-        //     fetch('http://34.64.185.40/auth/authPhone', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Accept': 'application/json',
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: {
-        //             phoneNumber: pn,
-        //         }
-        //     }).then(res => res.json())
-        //         .then(response => console.log('Success:', JSON.stringify(response)))
-        //         .catch(error => console.error('Error:', error));
-        // } catch (err) {
-        //     console.error(err);
-        // }
+        } else {
+            try {
+                fetch('http://34.64.185.40/auth/authPhone', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: {
+                        phoneNumber: pn,
+                    }
+                }).then(res => res.json())
+                    .then(async response => {
+                        console.log('Success:', JSON.stringify(response));
+                        Alert.alert('', '인증번호가 전송되었습니다. 주어진 시간내에 입력해주세요.', [
+                            {text : 'OK', onPress: async () => {
+                                setNumVisible(true);
+                                await countdown();
+                            }}]);
+                    })
+                    .catch(error => console.error('Error:', error));
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
     };
 
     const getInfo = async () => {
@@ -154,7 +161,7 @@ const FindPasswordTab = ({route, navigation}) => {
             justifyContent: 'center'
         },
         certificate_btn: {
-            backgroundColor: email && phoneNumber ? colors.mainColor : colors.gray[6],
+            backgroundColor: phoneNumber ? colors.mainColor : colors.gray[6],
             width: 88,
             height: 40,
             marginTop: 14,
@@ -187,6 +194,7 @@ const FindPasswordTab = ({route, navigation}) => {
                 <Form>
                     <View flexDirection="row" style={{...styles.input_box, borderColor: emailColor, marginTop: 0}}>
                         <CustomTextInput
+
                             placeholder="이메일 주소를 입력해주세요"
                             autoCapitalize="none"
                             style={{
@@ -218,14 +226,14 @@ const FindPasswordTab = ({route, navigation}) => {
                                     else setPhoneNumColor(colors.gray[5]);
                                     setPhoneNumber(text);
                                 }}
-                                keyboardType={'number-pad'}
                             />
                         </View>
                         <View>
                             <TouchableOpacity
                                 style={styles.certificate_btn}
-                                onPress={() => sendSMS(phoneNumber)}
-                                disabled={isCorrect('send')}
+                                onPress={() => {
+                                    sendSMS(phoneNumber);
+                                }}
                             >
                                 <AppText style={{color: colors.defaultColor, fontSize: 14, fontWeight: 'bold'}}>인증요청</AppText>
                             </TouchableOpacity>
@@ -240,14 +248,20 @@ const FindPasswordTab = ({route, navigation}) => {
                                 color: colors.mainColor
                             }}
                             flex={1}
-                            onChangeText={async (text) => {
+                            onChangeText={(text) => {
                                 if(text.length) setCertNumColor(colors.mainColor);
                                 else setCertNumColor(colors.gray[5]);
                                 setCertificateNumber(text);
                             }}
-                            keyboardType={'number-pad'}
                         />
-                        <Timer mm={minutes} ss={seconds} style={!numVisible && {display: 'none'}}/>
+                        <View style={[{flexDirection: 'row'}, !numVisible && {display: 'none'}]}>
+                            <AppText style={{marginRight: 1, color: colors.red[3], fontSize: 14}}>
+                                남은시간
+                            </AppText>
+                            <AppText style={{color: colors.red[3], fontSize: 14}}>
+                                {minutes} : { seconds < 10 ? `0${seconds}` : seconds}
+                            </AppText>
+                        </View>
                     </View>
                 </Form>
             </View>

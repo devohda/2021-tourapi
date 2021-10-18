@@ -17,7 +17,6 @@ import { useToken } from '../../contexts/TokenContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import AlternativeSpaceList from './AlternativeSpaceList';
@@ -31,7 +30,6 @@ const ShowPlacesForFree = props => {
         postReplacement, getReplacement, replacementData
     } = props;
     const isFree = (day === -1);
-    const [update, setUpdate] = setUpdated();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isLiked, setIsLiked] = useState(item.like_flag);

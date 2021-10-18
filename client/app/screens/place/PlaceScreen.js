@@ -14,7 +14,7 @@ import Facility from '../../components/Facility';
 import AppText from '../../components/AppText';
 
 import Jewel from '../../assets/images/jewel.svg';
-import CustomMarker from '../../assets/images/place/map-marker.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -233,6 +233,7 @@ const PlaceScreen = ({route, navigation}) => {
     const { data } = route.params;
     const [placeData, setPlaceData] = useState({});
     const [reviewData, setReviewData] = useState({});
+    const [imageList, setImageList] = useState([]);
     const [collectionList, setCollectionList] = useState([]);
     const [commentList, setCommentList] = useState([]);
     const [commentLength, setCommentLength] = useState(0);
@@ -293,6 +294,8 @@ const PlaceScreen = ({route, navigation}) => {
                     setPlaceLat(parseFloat(response.data.placeData.place_latitude).toFixed(5));
                     setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(5));
                     setPlaceTitle(response.data.placeData.place_name);
+
+                    setImages(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -302,6 +305,13 @@ const PlaceScreen = ({route, navigation}) => {
             console.error(err);
         }
     };
+
+    const setImages = (data) => {
+        var newArr = [];
+        if(data.placeData.place_img !== null) newArr.push(data.placeData.place_img);
+        if(data.review.review_img.length !== 0) newArr.push(...data.review.review_img);
+        setImageList(newArr);
+    }
 
     const getPopularPlaceData = () => {
         try {
@@ -590,27 +600,27 @@ const PlaceScreen = ({route, navigation}) => {
             <>
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
-                        source={placeData.place_img ? {uri: placeData.place_img} : require('../../assets/images/here_default.png')}
+                        source={imageList.length > 0 ? {uri: imageList[0]} : require('../../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 1 ? {uri: imageList[1]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 2 ? {uri: imageList[2]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 3 ? {uri: imageList[3]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 4 ? {uri: imageList[4]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
@@ -642,11 +652,11 @@ const PlaceScreen = ({route, navigation}) => {
                                 lineHeight: 22.4
                             }}>{placeData.place_addr}</AppText> */}
                         </PlaceInfo>
-                        <PlaceInfo icon={'globe-outline'}>
+                        {/* <PlaceInfo icon={'globe-outline'}>
                             <TouchableOpacity onPress={()=>Linking.openURL('https://www.2021tourapi.com/')}>
                                 <AppText style={{color: colors.blue[3], fontSize: 12}}>https://www.2021tourapi.com/</AppText>
                             </TouchableOpacity>
-                        </PlaceInfo>
+                        </PlaceInfo> */}
                         {/* <PlaceInfo icon={'time-outline'}>
                             <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
                         </PlaceInfo>

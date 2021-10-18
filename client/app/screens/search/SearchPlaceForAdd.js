@@ -4,7 +4,7 @@ import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import AppText from '../../components/AppText';
-import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
+import { useSearchKeyword } from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';

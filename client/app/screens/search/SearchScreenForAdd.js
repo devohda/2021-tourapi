@@ -8,7 +8,7 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import SearchPlaceForAdd from './SearchPlaceForAdd';
 import ShowRecommendPlace from '../../components/ShowRecommendPlace';
 

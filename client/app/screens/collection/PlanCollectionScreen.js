@@ -35,6 +35,7 @@ import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import DefaultThumbnail from '../../assets/images/profile_default.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -1220,6 +1221,42 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const window = Dimensions.get('window');
+    const WIDTH = window.width;
+    const HEIGHT = window.height;
+
+    const ASPECT_RATIO = WIDTH / HEIGHT;
+    const LATITUDE_DELTA = 0.35;
+    const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+    const [lnt, setLnt] = useState(126.9775482762618);
+    const [region, setRegion] = useState({
+        latitude: 37.56633546113615,
+        longitude: 126.9775482762618,
+        latitudeDelta: 0.0015,
+        longitudeDelta: 0.0015,
+    });
+
+    const onMarkerPress = (event) => {
+        const { id, coordinate } = event.nativeEvent;
+        // console.log(coordinate)
+        const newRegion = { ...region };
+        newRegion.latitude = coordinate.latitude;
+        newRegion.longitude = coordinate.longitude;
+    
+        setRegion(newRegion);
+    };
+
+    const EntireButton = () => {
+        return (
+            <View style={{position: 'absolute', right: 0, bottom: 0}}>
+                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: placeData})}>
+                    <Image source={require('../../assets/images/map/entire-button.png')} style={{width: 40, height: 40}}/>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+  
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -1313,7 +1350,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }</>}
             </View>
 
-            <ScrollView flex={1}>
+            <ScrollView flex={1} stickyHeaderIndices={[1]}>
                 <ScreenContainerView flex={1}>
                     <View style={{
                         flexDirection: 'row',
@@ -1394,27 +1431,31 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </ScreenContainerView>
 
                 <View style={{marginTop: 20}} flex={1}>
-                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
-                    
-                    <View>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                            initialRegion={{
-                                latitude: 37.56633546113615,
-                                longitude: 126.9779482762618,
-                                latitudeDelta: 0.0015,
-                                longitudeDelta: 0.0015,
-                            }}
-                        ><Marker coordinate={{
+                    <View flex={1}>
+                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1, alignItems: 'flex-end'}}
+                            region={region}
+                            moveOnMarkerPress
+                            tracksViewChanges={false}
+                            onMarkerPress={onMarkerPress}
+                        >
+                            <Marker coordinate={{
                                 latitude: 37.56633546113615,
                                 longitude: 126.9779482762618
-                            }}
-                            title="서울시청"
-                            description="기본값입니다"/>
+                            }} title={'기본'}
+                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
+                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <CustomMarker />
+                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
+                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
+                                    </View>
+                                </View>
+                            </Marker>
                         </MapView>
+                        <EntireButton />
                     </View>
                 </View>
 
-                <ScreenContainerView>
+                <ScreenContainerView flex={1}>
                     <View style={{marginTop: 16}}>
                         <View style={{marginBottom: 16}}>
                             <AppText style={{color: colors.gray[4]}}>총 <AppText

@@ -146,7 +146,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                             <AppText>회원가입</AppText>
                         </TouchableOpacity>
                         <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
-                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')} disabled={true}>
                             <AppText>비밀번호 재설정</AppText>
                         </TouchableOpacity>
                     </View>

@@ -35,7 +35,7 @@ import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import DefaultThumbnail from '../../assets/images/profile_default.svg';
-import CustomMarker from '../../assets/images/place/map-marker.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -1048,62 +1048,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const LATITUDE_DELTA = 0.35;
     const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-    const INITIAL_POSITION = {
-        latitude: 41.924447,
-        longitude: -87.687339,
-        latitudeDelta: 1,
-        longitudeDelta: 1
-    };
-
-    const COORDS = [
-        {
-            location: {
-                latitude: 42,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.1,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.2,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.3,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.4,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        }
-    ];
-
-    const renderMarker = data => {
-        console.log(data); console.log('hi');
-        return (
-            <MapView.Marker key={data.location.latitude} coordinate={data.location} />
-        );
-    };
     const [lnt, setLnt] = useState(126.9775482762618);
     const [region, setRegion] = useState({
         latitude: 37.56633546113615,
@@ -1130,40 +1074,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 </TouchableOpacity>
             </View>
         );
-    };
-
-    const countPlaceView = (place_pk) => {
-        try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-            }).then((res) => {
-                res.json();
-            })
-                .then(async (response) => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
     };
     
     return (

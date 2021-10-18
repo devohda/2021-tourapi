@@ -9,7 +9,7 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import SearchTabNavigator from '../../navigation/SearchTabNavigator';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 
 import SearchIcon from '../../assets/images/search-icon.svg';
 import Star from '../../assets/images/search/star.svg';

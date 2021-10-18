@@ -70,14 +70,14 @@ const SystemSettingScreen = ({navigation}) => {
             title: '연결된 계정',
             data: [{index: 1, name: userData.user_email}]
         },
+        // {
+        //     index: 2,
+        //     title: '서비스 설정',
+        //     // data: [{index: 1, name: '위치 서비스'}, {index: 2, name: '알림'}, {index: 3, name: '마케팅 수신 동의'}]
+        //     data: [{index: 1, name: '위치 서비스'}]
+        // },
         {
             index: 2,
-            title: '서비스 설정',
-            // data: [{index: 1, name: '위치 서비스'}, {index: 2, name: '알림'}, {index: 3, name: '마케팅 수신 동의'}]
-            data: [{index: 1, name: '위치 서비스'}]
-        },
-        {
-            index: 3,
             // data: [{index: 1, name: '문의하기'}, {index: 2, name: '새로운 소식'}, {index: 3, name: '신고하기'},
             //     {
             //         index: 4,
@@ -90,7 +90,7 @@ const SystemSettingScreen = ({navigation}) => {
             }]
         },
         {
-            index: 4,
+            index: 3,
             data: [{index: 1, name: '로그아웃'}, {index: 2, name: '회원 탈퇴하기'}]
         }
     ];

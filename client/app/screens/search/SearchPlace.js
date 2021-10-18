@@ -16,10 +16,9 @@ import { Icon } from 'react-native-elements';
 
 import AppText from '../../components/AppText';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
-import {searchPlaceResult} from '../../contexts/search/SearchPlaceContextProvider';
 
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
@@ -32,7 +31,6 @@ const SearchPlace = props => {
     const [placeList, setPlaceList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    const [searchLength, setSearchLength] = searchPlaceResult();
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 

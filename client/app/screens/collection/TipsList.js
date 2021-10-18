@@ -6,15 +6,12 @@ import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 
-import { tipsList } from '../../contexts/TipsListContextProvider';
-
 const TipsList = props => {
     const { comment, data, idx, day, isEditPage, postPlaceComment, putPlaceComment, deletePlaceComment} = props;
     const {colors} = useTheme();
     const [addVisible, setAddVisible] = useState(false);
     const [editVisible, setEditVisible] = useState(false);
     const [deleteVisible, setDeleteVisible] = useState(false);
-    const [tmpData, setTmpData] = tipsList();
     const isFree = (day === -1);
 
     const AddModal = () => {
