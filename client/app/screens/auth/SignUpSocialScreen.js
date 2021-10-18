@@ -1,6 +1,6 @@
 //전역 선언 방법 찾아보기
 import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View, Dimensions, Text} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, Dimensions, Text, onError, Alert} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
@@ -14,14 +14,104 @@ import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg';
 
 import * as SecureStore from 'expo-secure-store';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import {Cache} from 'react-native-cache';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useToken} from '../../contexts/TokenContextProvider';
+
+const cache = new Cache({
+    namespace: 'myapp',
+    policy: {
+        maxEntries: 50000
+    },
+    backend: AsyncStorage
+});
 
 const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [token, setToken] = useToken();
 
     const {colors} = useTheme();
+
+    const loginApple = async (user, email, nickname, token) => {
+        try {
+            let url = 'http://34.64.185.40/auth/accountApple';
+            let options = {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userInfo: {
+                        email,
+                        password: 'FJO4rI!@EK#WJaN!FbdK&%1&',
+                        nickname,
+                        token,
+                    }
+                })
+            };
+
+            await fetch(url, options)
+                .then(res => res.json())
+                .then(async response => {
+                    if (response.code === 200) {
+                        // 캐시 삭제하고 로그인 처리
+                        await cache.remove(user);
+                        await SecureStore.setItemAsync('accessToken', response.accessToken);
+                        setToken(response.accessToken);
+                        setIsSignedIn(true);
+                        return true;
+                    } else {
+                        Alert.alert('서버에 이상이 생겼습니다.');
+                        return false;
+                    }
+                })
+                .catch(error => console.log(error));
+        } catch (e) {
+            console.log(e.toString());
+        }
+    };
+    const loginApple = async (token) => {
+        try {
+            let url = 'http://34.64.185.40/auth/loginApple';
+            let options = {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userInfo: {
+                        token
+                    }
+                })
+            };
+
+            await fetch(url, options)
+                .then(res => res.json())
+                .then(async response => {
+                    if (response.code === 200) {
+                        // 캐시 삭제하고 로그인 처리
+                        await cache.remove(user);
+                        await SecureStore.setItemAsync('accessToken', response.accessToken);
+                        setToken(response.accessToken);
+                        setIsSignedIn(true);
+                        return true;
+                    } else {
+                        Alert.alert('서버에 이상이 생겼습니다.');
+                        return false;
+                    }
+                })
+                .catch(error => console.log(error));
+        } catch (e) {
+            console.log(e.toString());
+        }
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -52,53 +142,66 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 </View>
                 <View flex={1} style={{marginTop: 50}}>
                     <View style={{alignItems: 'center'}}>
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: colors.yellow[8],
-                                ...styles.socialLoginBtn
-                            }}
-                            onPress={() => signIn(email, password, navigation, setIsSignedIn)}
-                        >
-                            <View flexDirection="row" style={{alignItems: 'center'}}>
-                                <KakaotalkLogo/>
-                                <AppText style={{...styles.loginText, color: colors.defaultDarkColor}}>카카오로 계속하기</AppText>
+                        <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}}>
+                            <View flex={1} flexDirection="row" style={{alignItems: 'center'}}>
+                                <KakaotalkLogo width={23} height={23}/>
+                                <AppText style={{...styles.loginText}}>카카오로 계속하기</AppText>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: colors.defaultDarkColor,
-                                ...styles.socialLoginBtn
-                            }}
-                            onPress={() => signIn(email, password, navigation, setIsSignedIn)}
-                        >
-                            <View flexDirection="row" style={{alignItems: 'center'}}>
-                                <AppleLogo/>
-                                <AppText style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</AppText>
-                            </View>
-                            {/*<AppleAuthentication.AppleAuthenticationButton*/}
-                            {/*    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}*/}
-                            {/*    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}*/}
-                            {/*    cornerRadius={5}*/}
-                            {/*    style={{ width: 200, height: 44 }}*/}
-                            {/*    onPress={async () => {*/}
-                            {/*        try {*/}
-                            {/*            const credential = await AppleAuthentication.signInAsync({*/}
-                            {/*                requestedScopes: [*/}
-                            {/*                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,*/}
-                            {/*                    AppleAuthentication.AppleAuthenticationScope.EMAIL,*/}
-                            {/*                ],*/}
-                            {/*            });*/}
-                            {/*            // signed in*/}
-                            {/*        } catch (e) {*/}
-                            {/*            if (e.code === 'ERR_CANCELED') {*/}
-                            {/*                // handle that the user canceled the sign-in flow*/}
-                            {/*            } else {*/}
-                            {/*                // handle other errors*/}
-                            {/*            }*/}
-                            {/*        }*/}
-                            {/*    }}*/}
-                            {/*/>*/}
-                        </TouchableOpacity>
+                        {/*<TouchableOpacity*/}
+                        {/*    style={{*/}
+                        {/*        backgroundColor: colors.defaultDarkColor,*/}
+                        {/*        ...styles.socialLoginBtn*/}
+                        {/*    }}*/}
+                        {/*    onPress={() => signIn(email, password, navigation, setIsSignedIn)}*/}
+                        {/*>*/}
+                        {/*    <View flexDirection="row" style={{alignItems: 'center'}}>*/}
+                        {/*        <AppleLogo/>*/}
+                        {/*        <AppText style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</AppText>*/}
+                        {/*    </View>*/}
+                        {/*</TouchableOpacity>*/}
+                        <AppleAuthentication.AppleAuthenticationButton
+                            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                            cornerRadius={10}
+                            style={{width: '100%', height: 52, marginVertical: 8}}
+                            onPress={
+                                async () => {
+                                    try {
+                                        const credential = await AppleAuthentication.signInAsync({
+                                            requestedScopes: [
+                                                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                                                AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                                            ],
+                                        });
+
+                                        const cachedName = await cache.get(credential.user);
+                                        const detailsArePopulated = (!!credential.fullName && !!credential.email);
+
+                                        // 항상 토큰을 같이 보내기.
+                                        if (!detailsArePopulated && !cachedName) {
+                                            await loginApple(null, null, null, credential.identityToken);
+                                        } else if (!detailsArePopulated && cachedName) {
+                                            // 새로 계정 만드는 것.(중간에 튕겼을 때)
+                                            await loginApple(credential.user, cachedName.email, cachedName.fullName, credential.identityToken);
+                                        } else {
+                                            // 새로 계정 만드는 것.
+                                            // 캐시에 저장
+                                            await cache.set(credential.user, {
+                                                fullName: credential.fullName,
+                                                email: credential.email
+                                            });
+                                            await loginApple(credential.user, credential.email, credential.fullName, credential.identityToken);
+                                        }
+                                    } catch (error) {
+                                        if (error.code === 'ERR_CANCELED') {
+                                            onError('Continue was cancelled.');
+                                        } else {
+                                            onError(error.message);
+                                        }
+                                    }
+                                }}
+                        />
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
                         <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}}>
@@ -120,17 +223,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         padding: 14,
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '700',
         flex: 1
     },
     socialLoginBtn: {
         height: 52,
         borderRadius: 10,
-        marginVertical: 8,
-        paddingLeft: 20,
-        paddingRight: 45,
-        width: '100%',
-        // maxWidth: 650
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });
 

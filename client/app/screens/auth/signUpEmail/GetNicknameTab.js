@@ -26,7 +26,7 @@ const InputBox = styled(TextInput)`
 
 const signUp = async (user_email, user_password, user_nickname) => {
     try {
-        let url = 'http://34.64.185.40/auth/makeAccount';
+        let url = 'http://34.64.185.40/auth/account';
         let options = {
             method: 'POST',
             mode: 'cors',
