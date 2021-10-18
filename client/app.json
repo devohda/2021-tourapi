@@ -2,7 +2,7 @@
   "expo": {
     "name": "Here",
     "slug": "Here",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "scheme": "here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
@@ -29,7 +29,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.10"
+      "buildNumber": "0.0.11"
     },
     "android": {
       "adaptiveIcon": {
@@ -37,7 +37,7 @@
         "backgroundColor": "#FFF8F8"
       },
       "package": "com.ohda.Here",
-      "versionCode": 6,
+      "versionCode": 7,
       "config": { "googleMaps": { "apiKey": "AIzaSyBfbTmomxwAPk8E9vUUep3qG703s11DYdI" } }
     },
     "web": {
