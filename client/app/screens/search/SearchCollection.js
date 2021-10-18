@@ -14,10 +14,9 @@ import {
 import {useIsFocused, useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import {Icon} from 'react-native-elements';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
-import {searchCollectionResult} from '../../contexts/search/SearchCollectionContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
@@ -30,7 +29,6 @@ const SearchCollection = (props, {navigation}) => {
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
     const {user} = props;
-    const [searchLength, setSearchLength] = searchCollectionResult();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();

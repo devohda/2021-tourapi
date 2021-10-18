@@ -4,11 +4,9 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon, Rating} from 'react-native-elements';
 import MapView, {Marker, UrlTile, PROVIDER_GOOGLE} from 'react-native-maps';
-import ClusteredMapView from 'react-native-maps-super-cluster';
-import ClusterView from './ClusterView';
 import * as SecureStore from 'expo-secure-store';
+import * as Linking from 'expo-linking';
 
-import StarScore from '../../components/StarScore';
 import NavigationTop from '../../components/NavigationTop';
 import Score from '../../components/Score';
 import Time from '../../components/Time';
@@ -16,7 +14,7 @@ import Facility from '../../components/Facility';
 import AppText from '../../components/AppText';
 
 import Jewel from '../../assets/images/jewel.svg';
-import CustomMarker from '../../assets/images/place/map-marker.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -235,6 +233,7 @@ const PlaceScreen = ({route, navigation}) => {
     const { data } = route.params;
     const [placeData, setPlaceData] = useState({});
     const [reviewData, setReviewData] = useState({});
+    const [imageList, setImageList] = useState([]);
     const [collectionList, setCollectionList] = useState([]);
     const [commentList, setCommentList] = useState([]);
     const [commentLength, setCommentLength] = useState(0);
@@ -244,6 +243,8 @@ const PlaceScreen = ({route, navigation}) => {
     const [eveningCongestion, setEveningCongestion] = useState(0);
     const [nightCongestion, setNightCongestion] = useState(0);
     const [reviewAccess, setReviewAccess] = useState(0);
+
+    const [popularPlace, setPopularPlace] = useState({});
 
     const [placeLat, setPlaceLat] = useState(0);
     const [placeLng, setPlaceLng] = useState(0);
@@ -279,6 +280,7 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
+                    console.log(response.data)
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
@@ -292,6 +294,49 @@ const PlaceScreen = ({route, navigation}) => {
                     setPlaceLat(parseFloat(response.data.placeData.place_latitude).toFixed(5));
                     setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(5));
                     setPlaceTitle(response.data.placeData.place_name);
+
+                    setImages(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const setImages = (data) => {
+        var newArr = [];
+        if(data.placeData.place_img !== null) newArr.push(data.placeData.place_img);
+        if(data.review.review_img.length !== 0) newArr.push(...data.review.review_img);
+        setImageList(newArr);
+    }
+
+    const getPopularPlaceData = () => {
+        try {
+            fetch('http://34.64.185.40/place/list?type=MAIN&sort=POPULAR', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    setPopularPlace(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -306,6 +351,7 @@ const PlaceScreen = ({route, navigation}) => {
         getInitialData();
         getCollectionList();
         getCommentList();
+        getPopularPlaceData();
         () => {
             setPlaceData({});
             setReviewData({});
@@ -390,32 +436,11 @@ const PlaceScreen = ({route, navigation}) => {
         }
     };
 
-    const PlaceInfo = ({collectionList}) => {
+    const PlaceInfo = ({collectionList, checkType}) => {
         const [token, setToken] = useToken();
         const [isLiked, setIsLiked] = useState(false);
         const refRBSheet = useRef();
         const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    
-        const checkType = (type) => {
-            if (type === 12) {
-                return '관광지';
-            } else if (type === 14) {
-                return '문화시설';
-            } else if (type === 15) {
-                return '축제/공연/행사';
-            } else if (type === 28) {
-                return '레포츠';
-            } else if (type === 32) {
-                return '숙박';
-            } else if (type === 38) {
-                return '쇼핑';
-            } else if (type === 39) {
-                return '음식';
-            } else {
-                return '기타';
-            }
-        };
-    
     
         const PlaceInfo = (props) => {
             return (
@@ -503,7 +528,7 @@ const PlaceScreen = ({route, navigation}) => {
                 try {
                     const result = await Share.share({
                         message:
-                        placeData.place_name,
+                        `[히든쥬얼] ${placeData.place_name}${'\n'}${placeData.place_addr}`
                     });
                     if (result.action === Share.sharedAction) {
                         if (result.activityType) {
@@ -575,27 +600,27 @@ const PlaceScreen = ({route, navigation}) => {
             <>
                 <View style={{flexDirection: 'row'}}>
                     <Image style={{width: '50%', height: 204, marginRight: 2, marginTop: 2}}
-                        source={placeData.place_img ? {uri: placeData.place_img} : require('../../assets/images/here_default.png')}
+                        source={imageList.length > 0 ? {uri: imageList[0]} : require('../../assets/images/here_default.png')}
                         resizeMode="cover"
                     />
                     <View style={{width: '50%', height: 200}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 1 ? {uri: imageList[1]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 2 ? {uri: imageList[2]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 3 ? {uri: imageList[3]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                             <Image style={{width: '50%', height: 100, margin: 2}}
-                                source={require('../../assets/images/here_default.png')}
+                                source={imageList.length > 4 ? {uri: imageList[4]} : require('../../assets/images/here_default.png')}
                                 resizeMode="cover"
                             />
                         </View>
@@ -621,21 +646,23 @@ const PlaceScreen = ({route, navigation}) => {
     
                         <PlaceInfo icon={'location'}>
                             <AppText style={{...styles.location, color: colors.gray[1]}}>{placeData.place_addr}</AppText>
-                            <AppText style={{
+                            {/* <AppText style={{
                                 color: colors.gray[4],
                                 fontSize: 14,
                                 lineHeight: 22.4
-                            }}>{placeData.place_addr}</AppText>
+                            }}>{placeData.place_addr}</AppText> */}
                         </PlaceInfo>
-                        <PlaceInfo icon={'globe-outline'}>
-                            <AppText style={{color: colors.blue[3], fontSize: 12}}>http://childrenpark.net</AppText>
-                        </PlaceInfo>
-                        <PlaceInfo icon={'time-outline'}>
+                        {/* <PlaceInfo icon={'globe-outline'}>
+                            <TouchableOpacity onPress={()=>Linking.openURL('https://www.2021tourapi.com/')}>
+                                <AppText style={{color: colors.blue[3], fontSize: 12}}>https://www.2021tourapi.com/</AppText>
+                            </TouchableOpacity>
+                        </PlaceInfo> */}
+                        {/* <PlaceInfo icon={'time-outline'}>
                             <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
                         </PlaceInfo>
                         <PlaceInfo icon={'call'}>
                             <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
-                        </PlaceInfo>
+                        </PlaceInfo> */}
                     </View>
     
                     <IconTab />
@@ -664,30 +691,6 @@ const PlaceScreen = ({route, navigation}) => {
         );
     };
 
-    const list = [
-        {
-            id: 1,
-            data: 'hi'
-        },
-        {
-            id: 2,
-            data: 'ghgh'
-        }
-    ];
-
-    const Markers = props => {
-        var lng = props.idx===0 ? 126.9779482762618 : 126.9775482762115;
-        return (
-            <Marker coordinate={{
-                latitude: 37.56633546113615,
-                longitude: lng
-            }} title={props.data.data}
-            description="기본값입니다">
-                <Icon type="ionicon" name={'airplane-outline'}></Icon>
-            </Marker>
-        );
-    };
-
     const window = Dimensions.get('window');
     const WIDTH = window.width;
     const HEIGHT = window.height;
@@ -696,62 +699,6 @@ const PlaceScreen = ({route, navigation}) => {
     const LATITUDE_DELTA = 0.35;
     const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-    const INITIAL_POSITION = {
-        latitude: 41.924447,
-        longitude: -87.687339,
-        latitudeDelta: 1,
-        longitudeDelta: 1
-    };
-
-    const COORDS = [
-        {
-            location: {
-                latitude: 42,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.1,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.2,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.3,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        },
-        {
-            location: {
-                latitude: 42.4,
-                longitude: -87,
-                longitudeDelta: LONGITUDE_DELTA,
-                latitudeDelta: LATITUDE_DELTA
-            }
-        }
-    ];
-
-    const renderMarker = data => {
-        console.log(data); console.log('hi');
-        return (
-            <MapView.Marker key={data.location.latitude} coordinate={data.location} />
-        );
-    };
     const [lnt, setLnt] = useState(126.9775482762618);
     const [region, setRegion] = useState({
         latitude: 37.56633546113615,
@@ -770,16 +717,38 @@ const PlaceScreen = ({route, navigation}) => {
         setRegion(newRegion);
     };
 
-    const EntireButton = () => {
-        return (
-            <View style={{backgroundColor: colors.backgroundColor}}>
-                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap')}>
-                    <View style={{backgroundColor: colors.backgroundColor}}>
-                        <AppText>전체 보기</AppText>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        );
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const countCollectionView = (collection_pk) => {
@@ -838,7 +807,7 @@ const PlaceScreen = ({route, navigation}) => {
                         alignItems: 'center'
                     }}>
                         <View>
-                            { item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
+                            { item.user_img === '' || item.user_img === 'default-user' || item.user_img === 'default-img' ?
                                 <Image style={styles.reviewImage}
                                     source={require('../../assets/images/default-profile.png')}></Image> :
                                 <Image style={styles.reviewImage}
@@ -898,11 +867,85 @@ const PlaceScreen = ({route, navigation}) => {
         );
     };
 
+    const checkType = (type) => {
+        if (type === 12) {
+            return '관광지';
+        } else if (type === 14) {
+            return '문화시설';
+        } else if (type === 15) {
+            return '축제/공연/행사';
+        } else if (type === 28) {
+            return '레포츠';
+        } else if (type === 32) {
+            return '숙박';
+        } else if (type === 38) {
+            return '쇼핑';
+        } else if (type === 39) {
+            return '음식';
+        } else {
+            return '기타';
+        }
+    };
+
+    const ShowRecommends = props => {
+        const { item } = props;
+        return (
+            <TouchableOpacity onPress={()=>{
+                countPlaceView(item.place_pk);
+                const data = {
+                    'place_pk': item.place_pk,
+                };
+                navigation.push('Place', {data: data});
+            }}>
+                <View style={{marginEnd: 8, width: 141}}>
+                    <View>
+                        <Image source={item.place_img ? {uri: item.place_img} : require('../../assets/images/here_default.png')}
+                        style={{width: 141, height: 101, borderRadius: 10}}></Image>
+                    </View>
+                    <View style={{flexDirection: 'row', marginTop: 8}}>
+                        <AppText style={{color: colors.gray[3], fontSize: 10}}>{checkType(item.place_type)}</AppText>
+                        { parseInt(item.review_score) !== -1 && <>
+                            <AppText style={{
+                                color: colors.gray[3],
+                                fontSize: 10,
+                                marginHorizontal: 6
+                            }}>|</AppText>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: 2
+                            }}>
+                                <Image source={require('../../assets/images/review_star.png')}
+                                    style={{
+                                        width: 10,
+                                        height: 10,
+                                        alignSelf: 'center',
+                                    }}></Image>
+                                <AppText style={{color: colors.gray[3], fontSize: 10, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            </View></>}
+                    </View>
+                    <View style={{width: '90%'}}>
+                        <AppText style={{
+                            color: colors.blue[1],
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            lineHeight: 23.68
+                        }}>{item.place_name}</AppText>
+                    </View>
+                    <View style={{width: '90%'}}>
+                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>{item.place_addr}</AppText>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        )
+    };
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
             <ScrollView showsVerticalScrollIndicator={false}>
-                <PlaceInfo placeData={placeData} collectionList={collectionList} colors={colors} styles={styles} data={data}/>
+                <PlaceInfo placeData={placeData} collectionList={collectionList} colors={colors} styles={styles} data={data} checkType={checkType}/>
                 <ScreenDivideLine/>
                 <ScreenContainerView>
                     <View style={{alignItems: 'center'}}>
@@ -1021,10 +1064,7 @@ const PlaceScreen = ({route, navigation}) => {
                     }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
-                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
-                    
                     <View flex={1}>
-                        {/* <EntireButton /> */}
                         <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
                             region={region}
                             moveOnMarkerPress
@@ -1044,14 +1084,6 @@ const PlaceScreen = ({route, navigation}) => {
                                 </View>
                             </Marker>
                         </MapView>
-                        {/* <ClusteredMapView
-                            style={{height: 200}}
-                            accessor={m => m.location}
-                            data={COORDS}a
-                            initialRegion={INITIAL_POSITION}
-                            renderMarker={renderMarker}
-                        /> */}
-                        {/* <ClusterView /> */}
                     </View>
                 </View>
                 <View>
@@ -1090,129 +1122,14 @@ const PlaceScreen = ({route, navigation}) => {
                     }}>
                         <View style={{width: '90%', paddingTop: 24, paddingBottom: 24}}>
                             <AppText
-                                style={{fontSize: 20, fontWeight: 'bold', color: colors.mainColor, lineHeight: 28}}>근처
-                                여긴 어때요?</AppText>
+                                style={{fontSize: 20, fontWeight: 'bold', color: colors.mainColor, lineHeight: 28}}>추천하는 공간</AppText>
                         </View>
-
                         <View style={{marginBottom: 92, flexDirection: 'row', marginHorizontal: 20}}>
-                            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                                <View style={{marginEnd: 8}}>
-                                    <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 141, height: 101, borderRadius: 10}}></Image></View>
-                                    <View style={{flexDirection: 'row', marginTop: 8}}>
-                                        <AppText style={{color: colors.gray[3], fontSize: 10}}>음식점</AppText>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            fontSize: 10,
-                                            marginHorizontal: 6
-                                        }}>|</AppText>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            marginBottom: 2
-                                        }}>
-                                            <Image source={require('../../assets/images/here_icon.png')} style={{
-                                                width: 11.36,
-                                                height: 9.23,
-                                                marginTop: 2,
-                                                marginRight: 3.24
-                                            }}></Image>
-                                            <AppText style={{color: colors.gray[3], fontSize: 10}}>4.84</AppText>
-                                        </View>
-                                    </View>
-                                    <View>
-                                        <AppText style={{
-                                            color: colors.blue[1],
-                                            fontSize: 18,
-                                            fontWeight: 'bold',
-                                            lineHeight: 28.8
-                                        }}>경복궁</AppText>
-                                    </View>
-                                    <View>
-                                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시
-                                            종로구</AppText>
-                                    </View>
-                                </View>
-
-                                <View style={{marginEnd: 8}}>
-                                    <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 141, height: 101, borderRadius: 10}}></Image></View>
-                                    <View style={{flexDirection: 'row', marginTop: 8}}>
-                                        <AppText style={{color: colors.gray[3], fontSize: 10}}>음식점</AppText>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            fontSize: 10,
-                                            marginHorizontal: 6
-                                        }}>|</AppText>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            marginBottom: 2
-                                        }}>
-                                            <Image source={require('../../assets/images/here_icon.png')} style={{
-                                                width: 11.36,
-                                                height: 9.23,
-                                                marginTop: 2,
-                                                marginRight: 3.24
-                                            }}></Image>
-                                            <AppText style={{color: colors.gray[3], fontSize: 10}}>4.84</AppText>
-                                        </View>
-                                    </View>
-                                    <View>
-                                        <AppText style={{
-                                            color: colors.blue[1],
-                                            fontSize: 18,
-                                            fontWeight: 'bold',
-                                            lineHeight: 28.8
-                                        }}>경복궁</AppText>
-                                    </View>
-                                    <View>
-                                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시
-                                            종로구</AppText>
-                                    </View>
-                                </View>
-
-                                <View style={{marginEnd: 8}}>
-                                    <View><Image source={{uri: 'https://via.placeholder.com/150/56acb2'}}
-                                        style={{width: 141, height: 101, borderRadius: 10}}></Image></View>
-                                    <View style={{flexDirection: 'row', marginTop: 8}}>
-                                        <AppText style={{color: colors.gray[3], fontSize: 10}}>음식점</AppText>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            fontSize: 10,
-                                            marginHorizontal: 6
-                                        }}>|</AppText>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            marginBottom: 2
-                                        }}>
-                                            <Image source={require('../../assets/images/here_icon.png')} style={{
-                                                width: 11.36,
-                                                height: 9.23,
-                                                marginTop: 2,
-                                                marginRight: 3.24
-                                            }}></Image>
-                                            <AppText style={{color: colors.gray[3], fontSize: 10}}>4.84</AppText>
-                                        </View>
-                                    </View>
-                                    <View>
-                                        <AppText style={{
-                                            color: colors.blue[1],
-                                            fontSize: 18,
-                                            fontWeight: 'bold',
-                                            lineHeight: 28.8
-                                        }}>경복궁</AppText>
-                                    </View>
-                                    <View>
-                                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>서울시
-                                            종로구</AppText>
-                                    </View>
-                                </View>
-                            </ScrollView>
+                            <FlatList data={popularPlace}
+                                renderItem={({item, index}) => <ShowRecommends item={item} index={index} key={index} />}
+                                keyExtractor={(item, idx) => {idx.toString();}}
+                                key={(item, idx) => {idx.toString();}}
+                                nestedScrollEnabled horizontal showsHorizontalScrollIndicator={false}/>
                         </View>
                     </View>
                 </View>

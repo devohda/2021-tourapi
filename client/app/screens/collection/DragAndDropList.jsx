@@ -136,7 +136,7 @@ function EditPlaces({
     onFinish() {
       top.value = positions.value[id] * dataHeight;
       runOnJS(setMoving)(false);
-      setDatas(isEdited, positions.value, 0)
+      setDatas(isEdited, positions.value, day)
     },
   });
 
@@ -157,10 +157,10 @@ function EditPlaces({
         <PanGestureHandler onGestureEvent={gestureHandler}>
           <Animated.View style={[{ maxWidth: '100%'}]}>
               <ShowPlaces day={day} item={data} index={index} key={index} isEditPage={props.isEditPage} navigation={props.navigation} length={props.length} private={props.private} pk={props.pk} originData={props.originData} isDeleted={props.isDeleted} isDeletedOrigin={props.isDeletedOrigin} isLimited={true}
-                isCommentDeleted={props.isCommentDeleted} isDeletedComment={props.isDeletedComment} curLength={props.curLength}
+                curLength={props.curLength}
                 isReplacementGotten={props.isReplacementGotten} isGottenReplacementMapPk={props.isGottenReplacementMapPk}
                 isReplacementDeleted={props.isReplacementDeleted} isDeletedReplacement={props.isDeletedReplacement} checkDeletedReplacement={props.checkDeletedReplacement} setDeletedReplacementData={props.setDeletedReplacementData}
-                postPlaceComment={props.postPlaceComment} putPlaceComment={props.putPlaceComment}
+                postPlaceComment={props.postPlaceComment} putPlaceComment={props.putPlaceComment} deletePlaceComment={props.deletePlaceComment}
                 postReplacement={props.postReplacement} getReplacement={props.getReplacement} getInitialPlaceData={props.getInitialPlaceData} replacementData={props.replacementData}
             />
           </Animated.View>
@@ -173,7 +173,7 @@ function EditPlaces({
 const DragAndDropList = props => {
   const {colors} = useTheme();
   const Data = props.data;
-  const { isEdited } = props;
+  const { isEdited, isDeletedOrigin, deletedLengthByDays, day } = props;
   const positions = useSharedValue(listToObject(Data));
   const scrollY = useSharedValue(0);
   const scrollViewRef = useAnimatedRef();
@@ -181,11 +181,11 @@ const DragAndDropList = props => {
   const handleScroll = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
   });
-  
+
   return (
     <>
       <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={[!props.isEditPage && {display: 'none'}, { flex: 1 }]}>
           <Animated.ScrollView
             ref={scrollViewRef}
             onScroll={handleScroll}
@@ -196,7 +196,7 @@ const DragAndDropList = props => {
               backgroundColor: colors.backgroundColor,
             }}
             contentContainerStyle={{
-              height: props.curLength ? Data.length * 100 : 0
+              height: props.curLength ? Data.length * 120 : 0
             }}
           >
             {Data.map((data, index) => {
@@ -211,7 +211,7 @@ const DragAndDropList = props => {
                 scrollY={scrollY}
                 dataCount={Data.length}
                 props={props}
-                dataHeight={100}
+                dataHeight={120}
                 isEdited={isEdited}
               />
             )})}

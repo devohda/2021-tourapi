@@ -12,11 +12,9 @@ import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import AlternativeSpaceList from './AlternativeSpaceList';
-import TipsList from './TipsList';
 
 import Jewel from '../../assets/images/jewel.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import { useToken } from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';

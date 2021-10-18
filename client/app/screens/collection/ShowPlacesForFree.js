@@ -17,7 +17,6 @@ import { useToken } from '../../contexts/TokenContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import AlternativeSpaceList from './AlternativeSpaceList';
@@ -26,14 +25,11 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
     const { day, index, isEditPage, item, length, curLength, navigation, pk, isDeleted, isDeletedOrigin, isLimited,
-        isCommentDeleted, isDeletedComment,
-        isReplacementGotten, isGottenReplacementMapPk,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
-        postPlaceComment, putPlaceComment,
+        postPlaceComment, putPlaceComment, deletePlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
     const isFree = (day === -1);
-    const [update, setUpdate] = setUpdated();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isLiked, setIsLiked] = useState(item.like_flag);
@@ -351,7 +347,7 @@ const ShowPlacesForFree = props => {
                             postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
                         />}
-                    <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
+                    {!isEditPage && <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
                 </View>
             </TouchableHighlight>
         </View>

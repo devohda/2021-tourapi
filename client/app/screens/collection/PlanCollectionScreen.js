@@ -12,7 +12,8 @@ import {
     FlatList,
     Modal,
     Alert,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    Share
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
@@ -34,6 +35,7 @@ import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
 import DefaultThumbnail from '../../assets/images/profile_default.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -65,6 +67,26 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
     const [alertDuplicated, setAlertDuplicated] = useState(false);
+
+    const onShare = async () => {
+        try {
+            const result = await Share.share({
+                message:
+                `[히든쥬얼] ${collectionData.collection_name}`
+            });
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // shared with activity type of result.activityType
+                } else {
+                    // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
+        } catch (error) {
+            Alert.alert('', error.message);
+        }
+    };
 
     const isDeleted = (deletedData) => {
         setIsDeletedOrigin(deletedData);
@@ -207,7 +229,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         pressed.push(false);
                     }
                     setIsPress(pressed);
-                    setDeletedData(response.data);
+                    setDeletedData(response.data.placeList);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -222,9 +244,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
         //빈 객체일때는 원래 순서 그대로 넣어주기
+        var cur = 0;
         for(var i=0;i<planDays.length;i++) {
             for(var j=0;j<placeData.length;j++) {
                 if(placeData[j].cpm_plan_day === i) {
+                    cur += 1
                     var forPutObj = {};
                     if(Object.keys(updatedData[i]).length === 0) {
                         isEmpty += 1;
@@ -234,22 +258,25 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             order: placeData[j].cpm_order
                         }
                     } else {
+                        console.log(cur)
+                        console.log('이번엔 여기!')
+                        // console.log(Object.values(updatedData[i])[j])
                         forPutObj = {
                             cpm_map_pk: placeData[j].cpm_map_pk,
                             planDay: i,
-                            order: Object.values(updatedData[i])[j]
+                            order: Object.values(updatedData[i])[cur-1]
                         }
                     };
                     putData.push(forPutObj)
-                }
+                } else cur = 0;
+                console.log(cur)
 
             }
         }
-
         var DATA = {};
         DATA.placeList = putData;
         DATA.deletePlaceList = deletedData;
-        console.log(isEmpty)
+        console.log(DATA)
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
@@ -286,17 +313,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
-        console.log(isDeletedComment)
         var forDeleteData = [];
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
                 // deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
                 forDeleteData.push(placeData[i].cpm_map_pk);
-            }
-        }
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] === true) {
-                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
             }
         }
         
@@ -740,9 +761,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedReplacement = () => {
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
-                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
+        for(var i=0;i<isDeletedReplacement.length;i++) {
+            if(isDeletedReplacement[i] !== false) {
+                deleteReplacement(placeData[i].cpm_map_pk, isDeletedReplacement[i]);
             }
         }
     };
@@ -833,16 +854,21 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [isDeletedComment, setIsDeletedComment] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
 
-    const setDeletedData = (data) => {
-        var newArr = []; var newComment = [];
-        for(var i=0;i<data.length;i++) {
-            if(data[i].comment) newComment.push(true);
-            else newComment.push(false);
+    //삭제된 게 어느 Day인지 (수정하기 페이지에서 사용하기 위함)
+    const [deletedLengthByDays, setDeletedLengthByDays] = useState([]);
 
+    const setDeletedData = (data) => {
+        var newArr = []; var newDays = [];
+        for(var i=0;i<data.length;i++) {
+            // days.push(data[i].cpm_plan_day);
             newArr.push(false);
-        }
+            newDays.push({
+                day: data[i].cpm_plan_day,
+                isDeleted: false,
+            });
+        };
+        setDeletedLengthByDays(newDays);
         setIsDeletedOrigin(newArr);
-        setIsDeletedComment(newComment);
     };
 
     const GeneralPage = props => {
@@ -859,10 +885,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 <FlatList data={placeData}
                     renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} navigation={navigation} curLength={cnt}
                     length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
-                        isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
                         isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                         isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}
                         postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
                     />}
                     keyExtractor={(item, idx) => {idx.toString();}}
@@ -883,7 +908,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const isEdited = (data, day) => {
         var newObject = [...editData.value];
         newObject[day] = data;
+        // console.log(day)
+        // console.log(newObject)
         editData.value = newObject;
+        // console.log(editData.value)
         return data;
     };
 
@@ -899,11 +927,11 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
 
         return (
-            <SafeAreaView style={!isEditPage && {display: 'none'}}>
-                <DragAndDropList data={editedData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={props.idx+editedData[props.idx].toString()} curLength={cnt}
-                    navigation={navigation} length={placeLength}
+            <SafeAreaView>
+                <DragAndDropList data={editedData} idx={props.idx} isEditPage={isEditPage} isPress={isPress} key={`${props.idx}+${editedData[props.idx]}`} curLength={cnt}
+                    navigation={navigation} length={placeLength} day={props.idx}
                     private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
-                    isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                    isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment} deletedLengthByDays={deletedLengthByDays}
                     isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                     isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
                     postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
@@ -957,8 +985,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </View>
                     </View>
                 </View>
-                    <GeneralPage idx={idx} key={idx+'general'}/> 
-                    <EditPage idx={idx} key={idx+'edit'}/>
+                <GeneralPage idx={idx} key={idx+'general'}/> 
+                <EditPage idx={idx} key={idx+'edit'}/>
                 {checkLength() > 5 && !isEditPage && <TouchableOpacity>
                     <View style={{
                         flexDirection: 'row',
@@ -1193,6 +1221,42 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const window = Dimensions.get('window');
+    const WIDTH = window.width;
+    const HEIGHT = window.height;
+
+    const ASPECT_RATIO = WIDTH / HEIGHT;
+    const LATITUDE_DELTA = 0.35;
+    const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+    const [lnt, setLnt] = useState(126.9775482762618);
+    const [region, setRegion] = useState({
+        latitude: 37.56633546113615,
+        longitude: 126.9775482762618,
+        latitudeDelta: 0.0015,
+        longitudeDelta: 0.0015,
+    });
+
+    const onMarkerPress = (event) => {
+        const { id, coordinate } = event.nativeEvent;
+        // console.log(coordinate)
+        const newRegion = { ...region };
+        newRegion.latitude = coordinate.latitude;
+        newRegion.longitude = coordinate.longitude;
+    
+        setRegion(newRegion);
+    };
+
+    const EntireButton = () => {
+        return (
+            <View style={{position: 'absolute', right: 0, bottom: 0}}>
+                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: placeData})}>
+                    <Image source={require('../../assets/images/map/entire-button.png')} style={{width: 40, height: 40}}/>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+  
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -1255,6 +1319,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                                 refRBSheet.current.close();
                                                 navigation.navigate('MakePlanCollection', {data: collectionData, update: true, placeLength: placeLength});
                                             }
+                                            if(i === 2) {
+                                                onShare();
+                                            }
                                             if(i === 3) {
                                                 setDeleteMenu(true);
                                             }
@@ -1283,7 +1350,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }</>}
             </View>
 
-            <ScrollView flex={1}>
+            <ScrollView flex={1} stickyHeaderIndices={[1]}>
                 <ScreenContainerView flex={1}>
                     <View style={{
                         flexDirection: 'row',
@@ -1364,27 +1431,31 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </ScreenContainerView>
 
                 <View style={{marginTop: 20}} flex={1}>
-                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
-                    
-                    <View>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                            initialRegion={{
-                                latitude: 37.56633546113615,
-                                longitude: 126.9779482762618,
-                                latitudeDelta: 0.0015,
-                                longitudeDelta: 0.0015,
-                            }}
-                        ><Marker coordinate={{
+                    <View flex={1}>
+                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1, alignItems: 'flex-end'}}
+                            region={region}
+                            moveOnMarkerPress
+                            tracksViewChanges={false}
+                            onMarkerPress={onMarkerPress}
+                        >
+                            <Marker coordinate={{
                                 latitude: 37.56633546113615,
                                 longitude: 126.9779482762618
-                            }}
-                            title="서울시청"
-                            description="기본값입니다"/>
+                            }} title={'기본'}
+                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
+                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <CustomMarker />
+                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
+                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
+                                    </View>
+                                </View>
+                            </Marker>
                         </MapView>
+                        <EntireButton />
                     </View>
                 </View>
 
-                <ScreenContainerView>
+                <ScreenContainerView flex={1}>
                     <View style={{marginTop: 16}}>
                         <View style={{marginBottom: 16}}>
                             <AppText style={{color: colors.gray[4]}}>총 <AppText

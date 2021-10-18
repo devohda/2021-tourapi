@@ -16,6 +16,7 @@ const CustomTextInput = (props) => {
                    secureTextEntry={props.secureTextEntry}
                    flex={props.flex}
                    value={props.value}
+                   keyboardType={props.keyboardType}
         >
             {props.children}
         </TextInput>

@@ -60,31 +60,14 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         var forDeleteData = [];
         for(var i=0;i<isDeletedReplacement.length;i++) {
             if(isDeletedReplacement[i] === true) {
-                deleteReplacement(data.cpm_map_pk, replacementData[i].place_pk);
-                forDeleteData.push(data.cpm_map_pk);
+                // deleteReplacement(data.cpm_map_pk, replacementData[i].place_pk);
+                // 구분을 위함
+                forDeleteData.push(replacementData[i].place_pk);
             }
         }
 
         return forDeleteData;
     };
-
-    // const checkDeletedPlace = () => {
-    //     console.log(isDeletedComment)
-    //     var forDeleteData = [];
-    //     for(var i=0;i<isDeletedOrigin.length;i++) {
-    //         if(isDeletedOrigin[i] === true) {
-    //             // deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
-    //             forDeleteData.push(placeData[i].cpm_map_pk);
-    //         }
-    //     }
-    //     for(var i=0;i<isDeletedComment.length;i++) {
-    //         if(isDeletedComment[i] === true) {
-    //             deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
-    //         }
-    //     }
-        
-    //     return forDeleteData;
-    // };
 
     useEffect(() => {
         getInitialData();
@@ -165,35 +148,37 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         }
     };
 
-    const updateReplacementData = (updatedData) => {
+    const updateReplacementData = (updatedData, deletedData) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
-        console.log(updatedData)
-        //빈 객체일때는 원래 순서 그대로 넣어주기
+        // console.log(updatedData)
         for(var j=0;j<replacementData.length;j++) {
             var forPutObj = {};
-            if(Object.keys(updatedData[0]).length === 0) {
-                isEmpty += 1;
-                forPutObj = {
-                    cpm_map_pk: data.cpm_map_pk,
-                    placeId: replacementData[j].place_pk,
-                    order: replacementData[j].cpr_order
-                }
-            } else {
-                forPutObj = {
-                    cpm_map_pk: data.cpm_map_pk,
-                    placeId: replacementData[j].place_pk,
-                    order: Object.values(updatedData[0])[j]
-                }
-            };
-            putData.push(forPutObj)
+
+            //그대로면 api 안쏘도록
+            if(Object.values(updatedData[0])[j] == Object.keys(updatedData[0])[j]) isEmpty += 1;
+            if(!deletedData.filter((e)=>e === replacementData[j].place_pk).length) {
+                if(Object.keys(updatedData[0]).length === 0) {
+                    forPutObj = {
+                        cpm_map_pk: data.cpm_map_pk,
+                        placeId: replacementData[j].place_pk,
+                        order: replacementData[j].cpr_order
+                    }
+                } else {
+                    forPutObj = {
+                        cpm_map_pk: data.cpm_map_pk,
+                        placeId: replacementData[j].place_pk,
+                        order: Object.values(updatedData[0])[j]
+                    }
+                };
+                putData.push(forPutObj);
+            }
         }
 
         var DATA = {};
         DATA.replacementPlaceList = putData;
-        console.log(DATA);
-
-        if(isEmpty !== placeData.length || deletedData.length !== 0) {
+        // console.log(DATA);
+        if(isEmpty !== placeData.length) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
                     method: 'PUT',
@@ -230,7 +215,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
-        console.log(cpmMapPk); console.log(place_pk);
+        // console.log(cpmMapPk); console.log(place_pk);
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
@@ -245,7 +230,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
-
+console.log(response)
                     if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
@@ -422,7 +407,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const EditPage = () => {
         return (
                 <DragAndDropListForReplace
-                    data={replacementData} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} likeFlag={item.like_flag} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                    data={replacementData} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
                     isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
                     isEdited={isEdited}
                 />
@@ -593,8 +578,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                     onPress={async () => {
                                         setIsEditSpace(false);
                                         isReplacementDeleted(isDeletedReplacement);
-                                        checkDeletedReplacement();
-                                        await updateReplacementData(editData.value);
+                                        // await checkDeletedReplacement();
+                                        await updateReplacementData(editData.value, checkDeletedReplacement());
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>

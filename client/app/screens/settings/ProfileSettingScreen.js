@@ -32,6 +32,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
     const [isPress, setIsPress] = useState([]);
     const [keywordData, setKeywordData] = useState([]);
     const [userKeywordData, setUserKeywordData] = useState(keywords);
+    const patterns = /[~!@#$%^&*()_+|<>?:{}]/;
 
     const getKeywords = useCallback(() => {
         try {
@@ -104,7 +105,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
         var forPostData = {};
         let form = new FormData();
 
-        if(image) {
+        if(image !== 'default-user' && image) {
             forPostData = {
                 nickname: userNickname,
                 keywords: datas,
@@ -395,7 +396,10 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 </View>
                 <View style={{position: 'absolute', right: 0}}>
                     <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} onPress={() => {
-                        updateUserData();
+                        if(patterns.test(userNickname) && userNickname.length > 12) Alert.alert('', `닉네임이 너무 길어요. (영문 기준 12자 이내)${'\n'}특수문자는 사용할 수 없어요.`);
+                        else if(patterns.test(userNickname)) Alert.alert('', '특수문자는 사용할 수 없어요.');
+                        else if(userNickname.length > 12) Alert.alert('', '닉네임이 너무 길어요. (영문 기준 12자 이내)');
+                        else updateUserData();
                     }}>
                         <View>
                             <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 23.68, fontWeight: '400'}}>완료</AppText>

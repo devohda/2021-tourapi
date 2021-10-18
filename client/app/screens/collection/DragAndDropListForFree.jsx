@@ -157,10 +157,10 @@ function EditPlaces({
         <PanGestureHandler onGestureEvent={gestureHandler}>
         <Animated.View style={[{ maxWidth: '100%'}]}>
               <ShowPlacesForFree day={day} item={data} index={index} key={index} isEditPage={props.isEditPage} navigation={props.navigation} length={props.length} private={props.private} pk={props.pk} originData={props.originData} isDeleted={props.isDeleted} isDeletedOrigin={props.isDeletedOrigin} isLimited={true}
-                isCommentDeleted={props.isCommentDeleted} isDeletedComment={props.isDeletedComment} curLength={props.curLength}
+                curLength={props.curLength}
                 isReplacementGotten={props.isReplacementGotten} isGottenReplacementMapPk={props.isGottenReplacementMapPk}
                 isReplacementDeleted={props.isReplacementDeleted} isDeletedReplacement={props.isDeletedReplacement} checkDeletedReplacement={props.checkDeletedReplacement} setDeletedReplacementData={props.setDeletedReplacementData}
-                postPlaceComment={props.postPlaceComment} putPlaceComment={props.putPlaceComment}
+                postPlaceComment={props.postPlaceComment} putPlaceComment={props.putPlaceComment} deletePlaceComment={props.deletePlaceComment}
                 postReplacement={props.postReplacement} getReplacement={props.getReplacement} getInitialPlaceData={props.getInitialPlaceData} replacementData={props.replacementData}
               />
           </Animated.View>
@@ -196,7 +196,7 @@ const DragAndDropListForFree = props => {
               backgroundColor: colors.backgroundColor,
             }}
             contentContainerStyle={{
-              height: props.curLength ? Data.length * 100 : 0
+              height: props.curLength ? Data.length * 120 : 0
             }}
           >
             {Data.map((data, index) => {
@@ -211,7 +211,7 @@ const DragAndDropListForFree = props => {
                 scrollY={scrollY}
                 dataCount={Data.length}
                 props={props}
-                dataHeight={100}
+                dataHeight={120}
                 isEdited={isEdited}
               />
             )})}

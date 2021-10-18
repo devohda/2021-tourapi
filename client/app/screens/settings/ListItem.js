@@ -1,15 +1,19 @@
-import React, {memo, useState} from 'react';
-import {View, Image, Switch, StyleSheet, Pressable, Modal, FlatList, TextInput, Dimensions} from 'react-native';
-import {useTheme} from '@react-navigation/native';
+import React, {memo, useState, useEffect} from 'react';
+import {View, Image, Switch, StyleSheet, Pressable, Modal, FlatList, TextInput, Dimensions, Platform} from 'react-native';
+import Constants from 'expo-constants';
+import {useIsFocused, useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import { CheckBox } from 'react-native-elements';
+import * as SecureStore from 'expo-secure-store';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Location from 'expo-location';
 
-import hereIcon from '../../assets/images/appicon.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useToken} from '../../contexts/TokenContextProvider';
-import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { myLocation } from '../../contexts/LocationContextProvider';
+
+import hereIcon from '../../assets/images/appicon.png';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -20,14 +24,79 @@ const ListItem = props => {
     const [isWithdraw, setIsWithdraw] = useState(false);
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [location, setLocation] = myLocation();
+    const [errorMsg, setErrorMsg] = useState(null);
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if(location !== null) setIsEnabled(true);
+    }, [isFocused])
+    const askSearchLocation = async (type) => {
+        console.log(type)
+        if(type === true && location === null) {
+            // 안드 에뮬은 안됨
+            if (Platform.OS === 'android' && !Constants.isDevice) {
+                setErrorMsg(
+                  'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+                );
+                return;
+            };
+
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                setIsEnabled(false);
+                await (await Location.watchPositionAsync(           {
+                    accuracy: Location.Accuracy.High,
+                    distanceInterval: 1,
+                    timeInterval: 1,
+                  }, ()=>{
+                    setIsEnabled(false);
+                    setLocation(null);
+                })).remove();
+                const location = 'location';
+                Location.hasStartedLocationUpdatesAsync(location).then((value) => {
+                    if (value) {
+                        Location.stopLocationUpdatesAsync(location);
+                        setLocation(null);
+                    }
+                  });
+                return;
+            }
+    
+            let getLocation = await Location.getCurrentPositionAsync({});
+            setLocation(getLocation);
+            setIsEnabled(true);
+
+        } else {
+            await (await Location.watchPositionAsync(           {
+                accuracy: Location.Accuracy.High,
+                distanceInterval: 1,
+                timeInterval: 1,
+              }, ()=>{
+                setIsEnabled(false);
+                setLocation(null);
+            })).remove();
+            const location = 'location';
+            Location.hasStartedLocationUpdatesAsync(location).then((value) => {
+                if (value) {
+                    Location.stopLocationUpdatesAsync(location);
+                    setLocation(null);
+                }
+              });
+        }
+    }
 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
+        askSearchLocation(!isEnabled);
     };
 
     const [reportMenu, setReportMenu] = useState(false);
-    const [confirmMenu, setConfirmMenu] = useState(false);
+    const [reportConfirmMenu, setReportConfirmMenu] = useState(false);
     const [withdrawConfirmMenu, setWithdrawConfirmMenu] = useState(false);
+    const [askMenu, setAskMenu] = useState(false);
+    const [askConfirmMenu, setAskConfirmMenu] = useState(false);
 
     const reportReasons = [
         {
@@ -106,18 +175,20 @@ const ListItem = props => {
                     <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고사유</AppText>
                     <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
                         showsVerticalScrollIndicator={false}
-                        style={{marginTop: 10, marginBottom: 10}}
-                        contentContainerStyle={{height: 120}}
+                        style={{marginTop: 10}}
+                        contentContainerStyle={{height: 120, marginBottom: -20}}
                         data={reportReasons} renderItem={({item, index}) => <ShowReportReasons item={item} index={index} key={index}/>}
                         keyExtractor={(item) => item.index} nestedScrollEnabled
                     />
                     <SafeAreaView>
                         <TextInput
-                            style={{padding: 15, backgroundColor: colors.defaultColor, width: 295, height: 124}}
-                            placeholder='기타 사유를 입력해주세요'
+                            style={{padding: 15, backgroundColor: colors.defaultColor, color: colors.mainColor, width: 295, height: 124}}
+                            placeholder='기타 사유를 입력해주세요.'
+                            placeholderTextColor={colors.gray[5]}
                             textAlignVertical={'top'}
                             autoCapitalize="none"
                             autoCorrect={false}
+                            multiline
                         />
                     </SafeAreaView>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
@@ -145,7 +216,7 @@ const ListItem = props => {
                                 elevation: 1}}
                             onPress={() => {
                                 setReportMenu(!reportMenu);
-                                setConfirmMenu(true);
+                                setReportConfirmMenu(true);
                             }}
                         >
                             <AppText style={styles.textStyle}>신고하기</AppText>
@@ -156,12 +227,12 @@ const ListItem = props => {
         </Modal>
     );
 
-    const ConfirmModal = () => (
+    const ReportConfirmModal = () => (
         <Modal
             transparent={true}
-            visible={confirmMenu}
+            visible={reportConfirmMenu}
             onRequestClose={() => {
-                setConfirmMenu(!confirmMenu);
+                setReportConfirmMenu(!reportConfirmMenu);
             }}
         >
             <View style={styles.centeredView}>
@@ -171,7 +242,92 @@ const ListItem = props => {
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.mainColor}}
                             onPress={() => {
-                                setConfirmMenu(!confirmMenu);
+                                setReportConfirmMenu(!reportConfirmMenu);
+                            }}
+                        >
+                            <AppText style={styles.textStyle}>확인</AppText>
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    );
+
+    const AskModal = () => (
+        <Modal
+            transparent={true}
+            visible={askMenu}
+            onRequestClose={() => {
+                setAskMenu(!askMenu);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: windowHeight/2.9}}>
+                    <AppText style={{...styles.modalText, color: colors.blue[1], marginBottom: 10}}>문의하기</AppText>
+                    <SafeAreaView>
+                        <TextInput
+                            style={{padding: 15, backgroundColor: colors.defaultColor, color: colors.mainColor, width: 295, height: 124}}
+                            placeholder='문의할 내용을 입력해주세요.'
+                            placeholderTextColor={colors.gray[5]}
+                            textAlignVertical={'top'}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            multiline
+                        />
+                    </SafeAreaView>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.defaultColor, width: 108,
+                                shadowColor: 'rgba(203, 180, 180, 0.3)',
+                                shadowOffset: {
+                                    width: 3,
+                                    height: 6
+                                },
+                                shadowOpacity: 0.25,
+                                elevation: 1}}
+                            onPress={() => setAskMenu(!askMenu)}
+                        >
+                            <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
+                        </Pressable>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.mainColor, width: 108,
+                                shadowColor: 'rgba(203, 180, 180, 0.3)',
+                                shadowOffset: {
+                                    width: 3,
+                                    height: 6
+                                },
+                                shadowOpacity: 0.25,
+                                elevation: 1}}
+                                onPress={() => {
+                                setAskMenu(!askMenu);
+                                setAskConfirmMenu(true);
+                            }}
+                        >
+                            <AppText style={styles.textStyle}>문의하기</AppText>
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    );
+
+    const AskConfirmModal = () => (
+        <Modal
+            transparent={true}
+            visible={askConfirmMenu}
+            onRequestClose={() => {
+                setAskConfirmMenu(!askConfirmMenu);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: 200}}>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>문의가 완료되었습니다.</AppText>
+                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>빠른 시일 내에 반영하도록 노력하겠습니다.</AppText>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <Pressable
+                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            onPress={() => {
+                                setAskConfirmMenu(!askConfirmMenu);
                             }}
                         >
                             <AppText style={styles.textStyle}>확인</AppText>
@@ -326,23 +482,24 @@ const ListItem = props => {
     return (
         <>
             {
-                props.index === 1 || props.index === 2 ?
+                props.index === 1 ?
                     <View
-                        style={props.index === 1 ? {...styles.list_style, ...styles.list_style_version1} : {...styles.list_style, ...styles.list_style_version2}}>
+                        style={props.index === 1 ? {...styles.list_style_version1} : {...styles.list_style_version2}}>
                         {props.index === 1 &&
                         <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
-                        {props.index === 2 && <Switch
+                        {/* {props.index === 2 && <Switch
                             trackColor={{false: colors.gray[6], true: colors.mainColor}}
                             thumbColor={colors.defaultColor}
                             ios_backgroundColor={colors.gray[6]}
                             onChange={toggleSwitch}
                             value={isEnabled}
-                        />}
+                            style={{ transform: [{ scaleX: .8 }, { scaleY: .8 }] }}
+                        />} */}
                     </View> :
                     <View style={{...styles.list_style}}>
                         {
-                            props.index === 4 ?
+                            props.index === 3 ?
                                 <>
                                     <TouchableOpacity onPress={() => {
                                         props.data === '로그아웃' && setIsLogout(true);
@@ -359,7 +516,10 @@ const ListItem = props => {
                                     <WithdrawConfirmModal />
                                 </> :
                                 <>
-                                    <TouchableOpacity disabled={props.data !== '신고하기' ? true: false} onPress={()=>setReportMenu(true)}>
+                                    <TouchableOpacity disabled={props.data.startsWith('버전 정보') ? true: false} onPress={()=>{
+                                        if(props.data === '신고하기') setReportMenu(true);
+                                        else setAskMenu(true);
+                                    }}>
                                         <AppText style={{
                                             color: colors.mainColor,
                                             fontSize: 16,
@@ -367,7 +527,9 @@ const ListItem = props => {
                                         }}>{props.data}</AppText>
                                     </TouchableOpacity>
                                     <ReportModal />
-                                    <ConfirmModal />
+                                    <ReportConfirmModal />
+                                    <AskModal />
+                                    <AskConfirmModal />
                                 </>
                         }
                     </View>
@@ -398,12 +560,14 @@ const styles = StyleSheet.create({
     },
     list_style_version1: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: 20
     },
     list_style_version2: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginBottom: 20
     },
 
     //modal example

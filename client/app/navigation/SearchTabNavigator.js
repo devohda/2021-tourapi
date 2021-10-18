@@ -11,9 +11,6 @@ import SearchCollection from '../screens/search/SearchCollection';
 import SearchUser from '../screens/search/SearchUser';
 
 import { useToken } from '../contexts/TokenContextProvider';
-import { searchPlaceResult } from '../contexts/search/SearchPlaceContextProvider';
-import { searchCollectionResult } from '../contexts/search/SearchCollectionContextProvider';
-import { searchUserResult } from '../contexts/search/SearchUserContextProvider';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 import * as SecureStore from 'expo-secure-store';
 
