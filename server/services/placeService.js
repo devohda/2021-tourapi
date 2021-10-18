@@ -131,19 +131,25 @@ exports.readPlace = async (user_pk, place_pk) => {
                     AND place_pk = ${place_pk}
                     AND review_create_time BETWEEN DATE_ADD(NOW(), INTERVAL -7 DAY ) AND NOW()
                     `
+    const query5 = `SELECT pri_review_img
+                    FROM place_review_img
+                    WHERE place_pk = ${place_pk}`
 
     const result1 = await db.query(query1);
     const result2 = await db.query(query2);
     const result3 = await db.query(query3);
     const result4 = await db.query(query4);
+    const result5 = await db.query(query5);
     const facility = result3.map(facility => facility.facility_name);
+    const review_img = result5.map(img => img.pri_review_img);
 
     const result = {
         placeData : result1[0],
         review : {
             ...result2[0],
             ...result4[0],
-            facility
+            facility,
+            review_img
         }
     }
     return result;

@@ -204,6 +204,60 @@ router.post('/loginJWT', async (req, res, next) => {
     }
 });
 
+// apple 로그인
+router.post('/loginApple', async (req, res, next) => {
+    try {
+        const {email, password: plainPassword} = req.body.user;
+
+        // 유저 정보 확인
+        const userData = await authService.readUserByEmail(email);
+
+        // [1] 해당 유저 정보 없음.
+        if (userData.length !== 1) {
+            return res.status(404).json({
+                code: 404,
+                status: 'NOT EXIST'
+            });
+        }
+
+        // 비밀번호 일치 확인
+        const {salt, user_password, ...user} = userData[0];
+        const makePasswordHashed = (plainPassword) =>
+            new Promise(async (resolve, reject) => {
+                // salt를 가져오는 부분은 각자의 DB에 따라 수정
+                crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+                    if (err) reject(err);
+                    resolve(key.toString('base64'));
+                });
+            });
+
+        const password = await makePasswordHashed(plainPassword);
+
+        // [2] 비밀번호 일치 하지 않음.
+        if (user_password !== password) {
+            return res.status(403).json({
+                code: 403,
+                status: 'NOT MATCHED'
+            });
+        }
+
+        // jwt 토큰 발급.
+        const accessToken = await authService.createToken(user);
+
+        return res.status(200).json({
+            code: 200,
+            status: 'OK',
+            accessToken: accessToken
+        });
+    } catch (err) {
+        console.log(err)
+        return res.status(501).json({
+            code: 501,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
 // [PUT]
 // 비밀번호 재설정
 router.put('/password', async (req, res, next) => {
