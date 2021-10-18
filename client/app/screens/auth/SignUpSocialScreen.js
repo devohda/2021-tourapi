@@ -37,7 +37,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
     const loginApple = async (user, email, nickname, token) => {
         try {
-            let url = 'http://34.64.185.40/auth/accountApple';
+            let url = 'http://34.64.185.40/auth/loginApple';
             let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -51,43 +51,6 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         password: 'FJO4rI!@EK#WJaN!FbdK&%1&',
                         nickname,
                         token,
-                    }
-                })
-            };
-
-            await fetch(url, options)
-                .then(res => res.json())
-                .then(async response => {
-                    if (response.code === 200) {
-                        // 캐시 삭제하고 로그인 처리
-                        await cache.remove(user);
-                        await SecureStore.setItemAsync('accessToken', response.accessToken);
-                        setToken(response.accessToken);
-                        setIsSignedIn(true);
-                        return true;
-                    } else {
-                        Alert.alert('서버에 이상이 생겼습니다.');
-                        return false;
-                    }
-                })
-                .catch(error => console.log(error));
-        } catch (e) {
-            console.log(e.toString());
-        }
-    };
-    const loginApple = async (token) => {
-        try {
-            let url = 'http://34.64.185.40/auth/loginApple';
-            let options = {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8'
-                },
-                body: JSON.stringify({
-                    userInfo: {
-                        token
                     }
                 })
             };
@@ -143,10 +106,8 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 <View flex={1} style={{marginTop: 50}}>
                     <View style={{alignItems: 'center'}}>
                         <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}}>
-                            <View flex={1} flexDirection="row" style={{alignItems: 'center'}}>
-                                <KakaotalkLogo width={23} height={23}/>
-                                <AppText style={{...styles.loginText}}>카카오로 계속하기</AppText>
-                            </View>
+                            <KakaotalkLogo width={23} height={23}/>
+                            <AppText style={{...styles.loginText}}>카카오로 계속하기</AppText>
                         </TouchableOpacity>
                         {/*<TouchableOpacity*/}
                         {/*    style={{*/}
@@ -224,13 +185,14 @@ const styles = StyleSheet.create({
         padding: 14,
         fontSize: 16,
         fontWeight: '700',
-        flex: 1
     },
     socialLoginBtn: {
+        flexDirection : 'row',
         height: 52,
         borderRadius: 10,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        width : '100%'
     }
 });
 
