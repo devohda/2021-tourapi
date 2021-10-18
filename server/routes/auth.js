@@ -12,6 +12,8 @@ const {verifyToken} = require('../middleware/jwt');
 
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 60 });
+const jwtDecode = require('jwt-decode')
+const { JwtHeader } = require('jwt-decode');
 
 //[GET]
 // 본인인증 - 코드 보내고 인증하기
@@ -207,7 +209,29 @@ router.post('/loginJWT', async (req, res, next) => {
 // apple 로그인
 router.post('/loginApple', async (req, res, next) => {
     try {
-        const {email, password: plainPassword} = req.body.user;
+        const {email, password: plainPassword, nickname, token} = req.body.user;
+
+        // 회원가입 절차
+        if(email && nickname){
+            const request = context.switchToHttp().getRequest();
+            const response = context.switchToHttp().getResponse();
+            const token = request.body.identityToken;
+                const jwt = await this.apple.ValidateTokenAndDecode(token);
+
+                try {
+                    const [sessionId, user] = await this.login.AttemptLogin(jwt.email);
+                    if (sessionId && user) {
+                    request.user = user;
+                    response.set('Auth-Token', sessionId);
+                    response.set('Access-Control-Expose-Headers', 'Auth-Token');
+                    return true;
+                }
+                } catch (error) {
+                    throw new HttpException(`Validation failed for login. ${error.message ?? ''}`, HttpStatus.UNAUTHORIZED);
+                }
+
+                return false;
+        }
 
         // 유저 정보 확인
         const userData = await authService.readUserByEmail(email);

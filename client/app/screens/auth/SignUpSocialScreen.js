@@ -60,7 +60,10 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 .then(async response => {
                     if (response.code === 200) {
                         // 캐시 삭제하고 로그인 처리
-                        await cache.remove(user);
+                        if(user){
+                            await cache.remove(user);
+                        }
+                        // 로그인
                         await SecureStore.setItemAsync('accessToken', response.accessToken);
                         setToken(response.accessToken);
                         setIsSignedIn(true);
