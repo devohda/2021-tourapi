@@ -29,10 +29,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.11",
+      "buildNumber": "0.7.3",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
