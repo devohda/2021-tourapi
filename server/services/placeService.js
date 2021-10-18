@@ -22,14 +22,17 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     }
 
     let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
-                 IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score
+                        IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score, 
+                        pri_review_img AS review_img
                  FROM places p
                  LEFT OUTER JOIN like_place lp
                  ON lp.place_pk = p.place_pk
                  AND lp.user_pk = ${user_pk}
                  LEFT OUTER JOIN (
                      SELECT place_pk, COUNT(*) AS like_cnt 
-                     FROM like_place GROUP BY place_pk
+                     FROM like_place
+                     WHERE (like_time > DATE_SUB(now(), INTERVAL ${day} DAY))
+                     GROUP BY place_pk
                  ) llp
                  ON llp.place_pk = p.place_pk
                  LEFT OUTER JOIN (
@@ -45,6 +48,18 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
                      GROUP BY place_pk
                  ) pr
                  ON pr.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, pri_review_img
+                     FROM (SELECT place_pk
+                                , pri_review_img
+                                , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                , @cd := place_pk
+                             FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                , (SELECT @cd := '', @rn := 0) b
+                           ) a
+                    WHERE rn <= 1
+                 ) pri
+                 ON pri.place_pk = p.place_pk
                  `
 
     if(keyword){
@@ -129,19 +144,25 @@ exports.readPlace = async (user_pk, place_pk) => {
                     AND place_pk = ${place_pk}
                     AND review_create_time BETWEEN DATE_ADD(NOW(), INTERVAL -7 DAY ) AND NOW()
                     `
+    const query5 = `SELECT pri_review_img
+                    FROM place_review_img
+                    WHERE place_pk = ${place_pk}`
 
     const result1 = await db.query(query1);
     const result2 = await db.query(query2);
     const result3 = await db.query(query3);
     const result4 = await db.query(query4);
+    const result5 = await db.query(query5);
     const facility = result3.map(facility => facility.facility_name);
+    const review_img = result5.map(img => img.pri_review_img);
 
     const result = {
         placeData : result1[0],
         review : {
             ...result2[0],
             ...result4[0],
-            facility
+            facility,
+            review_img
         }
     }
     return result;

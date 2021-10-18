@@ -3,7 +3,7 @@
     "name": "Here",
     "slug": "Here",
     "version": "0.0.7",
-    "scheme": "here",
+    "scheme": "Here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
     "splash": {
@@ -29,7 +29,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.11"
+      "buildNumber": "0.0.11",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
     },
     "android": {
       "adaptiveIcon": {

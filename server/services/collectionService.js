@@ -180,6 +180,7 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                       LEFT OUTER JOIN (
                           SELECT collection_pk, COUNT(*) AS like_cnt 
                           FROM like_collection 
+                          WHERE (like_time > DATE_SUB(now(), INTERVAL ${day} DAY))
                           GROUP BY collection_pk
                       ) lc
                       ON lc.collection_pk = c.collection_pk

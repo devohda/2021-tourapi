@@ -23,7 +23,8 @@ exports.readLikePlace = async (user_pk, sort) => {
     // TODO 나중에 별점 추가
 
     let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, 
-                 IFNULL(review_score, -1) AS review_score, IFNULL(like_cnt, 0) AS like_cnt
+                        IFNULL(review_score, -1) AS review_score, IFNULL(like_cnt, 0) AS like_cnt,
+                        pri_review_img AS review_img
                  FROM places p
                  INNER JOIN like_place lp
                  ON lp.user_pk = ${user_pk}
@@ -39,6 +40,18 @@ exports.readLikePlace = async (user_pk, sort) => {
                      FROM like_place GROUP BY place_pk
                  ) llp
                  ON llp.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, pri_review_img
+                     FROM (SELECT place_pk
+                                , pri_review_img
+                                , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                , @cd := place_pk
+                             FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                , (SELECT @cd := '', @rn := 0) b
+                           ) a
+                    WHERE rn <= 1
+                 ) pri
+                 ON pri.place_pk = p.place_pk
                  `
 
     switch (sort) {

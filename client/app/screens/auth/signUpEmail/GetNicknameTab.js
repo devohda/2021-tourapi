@@ -24,6 +24,37 @@ const InputBox = styled(TextInput)`
   paddingBottom: 11px;
 `;
 
+const signUp = async (user_email, user_password, user_nickname) => {
+    try {
+        let url = 'http://34.64.185.40/auth/account';
+        let options = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                userInfo: {
+                    user_email,
+                    user_password,
+                    user_nickname
+                }
+            })
+        };
+        const result = await fetch(url, options)
+            .then(res => res.json())
+            .then(response => {
+                return response.code === 200;
+            })
+            .catch(error => console.log(error));
+
+        return result;
+    } catch (e) {
+        console.log(e.toString());
+    }
+};
+
 const GetNicknameTab = ({route, navigation}) => {
     const {email, password} = route.params;
     const [isValid, setIsValid] = useState(false);

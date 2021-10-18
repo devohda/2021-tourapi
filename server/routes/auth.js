@@ -12,6 +12,8 @@ const {verifyToken} = require('../middleware/jwt');
 
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 60 });
+const jwtDecode = require('jwt-decode')
+const { JwtHeader } = require('jwt-decode');
 
 //[GET]
 // 본인인증 - 코드 보내고 인증하기
@@ -203,6 +205,82 @@ router.post('/loginJWT', async (req, res, next) => {
         });
     }
 });
+
+// apple 로그인
+router.post('/loginApple', async (req, res, next) => {
+    try {
+        const {email, password: plainPassword, nickname, token} = req.body.user;
+
+        // 회원가입 절차
+        if(email && nickname){
+            const request = context.switchToHttp().getRequest();
+            const response = context.switchToHttp().getResponse();
+            const token = request.body.identityToken;
+                const jwt = await this.apple.ValidateTokenAndDecode(token);
+
+                try {
+                    const [sessionId, user] = await this.login.AttemptLogin(jwt.email);
+                    if (sessionId && user) {
+                    request.user = user;
+                    response.set('Auth-Token', sessionId);
+                    response.set('Access-Control-Expose-Headers', 'Auth-Token');
+                    return true;
+                }
+                } catch (error) {
+                    throw new HttpException(`Validation failed for login. ${error.message ?? ''}`, HttpStatus.UNAUTHORIZED);
+                }
+
+                return false;
+        }
+
+        // 유저 정보 확인
+        const userData = await authService.readUserByEmail(email);
+
+        // [1] 해당 유저 정보 없음.
+        if (userData.length !== 1) {
+            return res.status(404).json({
+                code: 404,
+                status: 'NOT EXIST'
+            });
+        }
+
+        // 비밀번호 일치 확인
+        const {salt, user_password, ...user} = userData[0];
+        const makePasswordHashed = (plainPassword) =>
+            new Promise(async (resolve, reject) => {
+                // salt를 가져오는 부분은 각자의 DB에 따라 수정
+                crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+                    if (err) reject(err);
+                    resolve(key.toString('base64'));
+                });
+            });
+
+        const password = await makePasswordHashed(plainPassword);
+
+        // [2] 비밀번호 일치 하지 않음.
+        if (user_password !== password) {
+            return res.status(403).json({
+                code: 403,
+                status: 'NOT MATCHED'
+            });
+        }
+
+        // jwt 토큰 발급.
+        const accessToken = await authService.createToken(user);
+
+        return res.status(200).json({
+            code: 200,
+            status: 'OK',
+            accessToken: accessToken
+        });
+    } catch (err) {
+        console.log(err)
+        return res.status(501).json({
+            code: 501,
+            status: 'SERVER ERROR'
+        });
+    }
+})
 
 // [PUT]
 // 비밀번호 재설정
