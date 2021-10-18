@@ -22,7 +22,8 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
     }
 
     let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
-                 IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score
+                        IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score, 
+                        pri_review_img AS review_img
                  FROM places p
                  LEFT OUTER JOIN like_place lp
                  ON lp.place_pk = p.place_pk
@@ -47,6 +48,18 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
                      GROUP BY place_pk
                  ) pr
                  ON pr.place_pk = p.place_pk
+                 LEFT OUTER JOIN (
+                     SELECT place_pk, pri_review_img
+                     FROM (SELECT place_pk
+                                , pri_review_img
+                                , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                , @cd := place_pk
+                             FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                , (SELECT @cd := '', @rn := 0) b
+                           ) a
+                    WHERE rn <= 1
+                 ) pri
+                 ON pri.place_pk = p.place_pk
                  `
 
     if(keyword){

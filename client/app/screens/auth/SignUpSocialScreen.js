@@ -109,18 +109,6 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             <KakaotalkLogo width={23} height={23}/>
                             <AppText style={{...styles.loginText}}>카카오로 계속하기</AppText>
                         </TouchableOpacity>
-                        {/*<TouchableOpacity*/}
-                        {/*    style={{*/}
-                        {/*        backgroundColor: colors.defaultDarkColor,*/}
-                        {/*        ...styles.socialLoginBtn*/}
-                        {/*    }}*/}
-                        {/*    onPress={() => signIn(email, password, navigation, setIsSignedIn)}*/}
-                        {/*>*/}
-                        {/*    <View flexDirection="row" style={{alignItems: 'center'}}>*/}
-                        {/*        <AppleLogo/>*/}
-                        {/*        <AppText style={{...styles.loginText, color: colors.defaultColor}}>Apple로 계속하기</AppText>*/}
-                        {/*    </View>*/}
-                        {/*</TouchableOpacity>*/}
                         <AppleAuthentication.AppleAuthenticationButton
                             buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                             buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
