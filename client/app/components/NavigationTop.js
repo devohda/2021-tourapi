@@ -10,14 +10,13 @@ const NavigationTop = props => {
     const {colors} = useTheme();
 
     return (
-        <View flexDirection="row" style={{
+        <View flexDirection="row" style={[{
             height: 24,
             marginBottom: 20,
-            marginTop: Platform.OS === 'android' ? 20 : 10,
             marginHorizontal: 20,
             alignItems: 'center',
             justifyContent: 'center'
-        }}>
+        }, Platform.OS === 'android' ? {marginTop: 20} : {marginTop: 10}]}>
             <View style={{position: 'absolute', left: 0}}>
                 <TouchableOpacity onPress={() => props.navigation.goBack()}>
                     <BackIcon width={24} height={24} style={{color: colors.mainColor}}/>

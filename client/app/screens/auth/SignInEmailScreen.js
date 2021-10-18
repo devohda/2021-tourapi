@@ -130,13 +130,12 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         </View>
                     </View>
                     <TouchableOpacity
-                        style={{
-                            backgroundColor: email && password ? colors.mainColor : colors.gray[6],
+                        style={[{
                             height: 52,
                             borderRadius: 10,
                             alignItems: 'center',
                             justifyContent: 'center'
-                        }}
+                        }, email && password ? {backgroundColor: colors.mainColor} : {backgroundColor: colors.gray[6]}]}
                         disabled={email && password ? false : true}
                         onPress={() => signIn()}
                     >
@@ -147,7 +146,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                             <AppText>회원가입</AppText>
                         </TouchableOpacity>
                         <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
-                        <TouchableOpacity onPress={() => navigation.navigate('FindPassword')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')} disabled={true}>
                             <AppText>비밀번호 재설정</AppText>
                         </TouchableOpacity>
                     </View>

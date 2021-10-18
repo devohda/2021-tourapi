@@ -3,11 +3,13 @@ import {
     TouchableOpacity,
     View,
     Image,
-    TouchableHighlight, Alert,
+    TouchableHighlight,
+    Alert,
+    StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
-
+import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import TipsList from './TipsList';
@@ -15,7 +17,6 @@ import { useToken } from '../../contexts/TokenContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import AlternativeSpaceList from './AlternativeSpaceList';
@@ -23,18 +24,12 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 
 const ShowPlacesForFree = props => {
     const { colors } = useTheme();
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
-        isCommentPosted, isPostedCommentMapPk, isPostedComment,
-        isCommentEdited, isEditedCommentMapPk, isEditedComment,
-        isCommentDeleted, isDeletedComment,
-        isReplacementGotten, isGottenReplacementMapPk,
+    const { day, index, isEditPage, item, length, curLength, navigation, pk, isDeleted, isDeletedOrigin, isLimited,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
-        postPlaceComment, putPlaceComment,
+        postPlaceComment, putPlaceComment, deletePlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
-    // console.log(item)
-    const isFree = (typeof day === 'undefined');
-    const [update, setUpdate] = setUpdated();
+    const isFree = (day === -1);
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isLiked, setIsLiked] = useState(item.like_flag);
@@ -83,9 +78,7 @@ const ShowPlacesForFree = props => {
                         return;
                     }
 
-                    setIsLiked(response.data[index].like_flag);
-                    // console.log(response.data)
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setIsLiked(response.data.placeList[index].like_flag);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -204,51 +197,85 @@ const ShowPlacesForFree = props => {
         if(!isEditPage && !isLimited) {
             if(index <= 4) return false;
             else return true;
-        }
+        } else return false;
     };
+
+    
+    const [deleteVisible, setDeleteVisible] = useState(false);
+
+    const DeleteModal = () => {
+        return (
+            <Modal
+                visible={deleteVisible}
+                backdropStyle={styles.backdrop}
+                style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
+                onBackdropPress={() => setDeleteVisible(false)}>
+                <Card disabled={true}
+                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+                >
+                    <View style={{marginTop: 35}}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>공간을 삭제할까요?</AppText>
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                let newArr = [...isDeletedOrigin];
+                                newArr[index] = true;
+                                isDeleted(newArr);
+                                setDeleteVisible(false);
+                            }}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Card>
+            </Modal>
+        )
+    };
+
     return (
         <View style={checkLimit() && {display: 'none'}}>
-            {/* {item.place_pk !== collectionData.places[0].place_pk && <View style={{
-                width: '100%',
-                height: 1,
-                backgroundColor: colors.red_gray[6],
-                zIndex: -1000,
-                marginVertical: 13
-            }}></View>} */}
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                 <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
-                    <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={{flexDirection: 'row', marginVertical: 6, justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableOpacity onPress={()=>{
+                                setDeleteVisible(true);
+                            }} style={!isEditPage && {display: 'none'}}>
+                                <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
+                                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                        <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                            <DeleteModal />
                         <TouchableOpacity onPress={() => {
                             countPlaceView(item.place_pk);
-                            props.navigation.navigate('Place', {data: item});
-
+                            const data = {
+                                'place_pk': item.place_pk,
+                            };
+                            props.navigation.navigate('Place', {data: data});
                         }} disabled={isEditPage && true}>
-                            <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
-                                { isEditPage &&
-                                    <TouchableOpacity onPress={()=>{
-                                        let newArr = [...isDeletedOrigin];
-                                        console.log(newArr);
-                                        newArr[index] = true;
-                                        // setIsDeletedOrigin(newArr);
-                                        isDeleted(newArr);
-                                    }}>
-                                        <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
-                                        </View>
-                                    </TouchableOpacity>
-                                }
+                            <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '100%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
+                                <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
                                 {
                                     item.place_img ?
                                         <Image source={{uri: item.place_img}}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
                                         <Image source={require('../../assets/images/here_default.png')}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/>
                                 }
                                 <View style={{
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     flexDirection: 'row',
-                                    width: '67%'
+                                    width: '80%'
                                 }}>
                                     <View style={{marginLeft: 8, marginTop: '2%'}}>
                                         <View style={{flexDirection: 'row'}}>
@@ -258,12 +285,12 @@ const ShowPlacesForFree = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
                                             }}>{checkType(item.place_type)}</AppText>
+                                            <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
                                             <AppText style={{
                                                 marginHorizontal: 4, color: colors.gray[7],
                                                 textAlign: 'center',
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
-                                                display: parseInt(item.review_score) == -1 && 'none'
                                             }}>|</AppText>
                                             <Image source={require('../../assets/images/review_star.png')}
                                                 style={{
@@ -271,7 +298,6 @@ const ShowPlacesForFree = props => {
                                                     height: 10,
                                                     alignSelf: 'center',
                                                     marginTop: '1%',
-                                                    display: parseInt(item.review_score) == -1 && 'none'
                                                 }}></Image>
                                             <AppText style={{
                                                 color: colors.gray[3],
@@ -279,8 +305,8 @@ const ShowPlacesForFree = props => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold',
                                                 marginLeft: 2,
-                                                display: parseInt(item.review_score) == -1 && 'none'
                                             }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                            </View>
                                         </View>
                                         <View style={{width: '100%'}}>
                                             <AppText style={{
@@ -295,31 +321,11 @@ const ShowPlacesForFree = props => {
                                     </View>
                                 </View>
                             </View>
+                        </View>
                         </TouchableOpacity>
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            {/* {item.like_flag === 0 ?  */}
-                            {/* <TouchableOpacity onPress={() => {
-                            let newArr = [...isPress];
-                            if (newArr[index]) {
-                                newArr[index] = false;
-                                setIsPress(newArr);
-                                deletePlace(item.place_pk);
-                            } else {
-                                // for(let i=0;i<newArr.length;i++) {
-                                //     if(i == index) continue;
-                                //     else newArr[i] = false;
-                                // }
-                                newArr[index] = true;
-                                setIsPress(newArr);
-                                likePlace(item.place_pk);
-                            }
-                        }}> */}
                             {
                                 !isEditPage ?
-                                // <TouchableOpacity onPress={() => {
-                                //     console.log(item.place_pk)
-                                //     console.log(item)
-                                // }}>
                                     <TouchableOpacity onPress={() => {
                                         if (isLiked) {
                                             DeleteLikedPlace(item.place_pk);
@@ -336,16 +342,31 @@ const ShowPlacesForFree = props => {
                             }
                         </View>
                     </View>
-                    <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
-                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
-                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
-                        replacementData={replacementData}
-                    />
-                    <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
+                    {!isEditPage && <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} private={props.private} navigation={navigation} pk={pk}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement}
+                            postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                            replacementData={replacementData}
+                        />}
+                    {!isEditPage && <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
                 </View>
             </TouchableHighlight>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    backdrop: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    shadowOption: {
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        elevation: 1,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+    }
+});
 
 export default ShowPlacesForFree;

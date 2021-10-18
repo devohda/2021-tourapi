@@ -6,22 +6,22 @@ import AppText from '../../components/AppText';
 import {Modal, Card} from '@ui-kitten/components';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import BackIcon from '../../assets/images/back-icon.svg';
+import AlternativeSpaceScreen from './AlternativeSpaceScreen';
 
 const AlternativeSpaceList = props => {
-    const { data, idx, day, length, isEditPage, navigation, pk,
-        isReplacementGotten, isGottenReplacementMapPk,
-        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
+    const { data, idx, day, isEditPage, navigation, pk,
+        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement,
         postReplacement, getReplacement, getInitialPlaceData, replacementData
     } = props;
     const {colors} = useTheme();
     const [visible, setVisible] = useState(false);
     const [changedTip, setChangedTip] = useState('');
-    const isFree = (typeof props.day === 'undefined');
+    const isFree = (day === -1);
 
     const checkNone = () => {
         //내가 만든거일때
         if(props.private === 1) {
-            //수정페이지에서 이미 완성된 한줄평일때만
+            //수정페이지에서 이미 완성된 대체공간일때만
             if(isEditPage) {
                 if(data.replacement_cnt) return false;
                 else return true;
@@ -33,20 +33,19 @@ const AlternativeSpaceList = props => {
         }
         //내가 만든게 아닐때
         else {
-            //이미 완성된 한줄평일때만
+            //이미 완성된 대체공간일때만
             if(data.replacement_cnt) return false;
             else return true;
         }
-    }
-
+    };
+    
     return(
         <TouchableOpacity onPress={()=>{
             if(data.replacement_cnt) {
-                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, postReplacement: postReplacement, pk: pk, getReplacement: getReplacement, getInitialPlaceData: getInitialPlaceData, replacementData: replacementData,
-                    isReplacementDeleted: isReplacementDeleted, checkDeletedReplacement: checkDeletedReplacement, isDeletedReplacement: isDeletedReplacement});
+                navigation.navigate('AlternativeSpace', {data: data, day: day, private: props.private, pk: pk});
                 getReplacement(data.cpm_map_pk);
             }
-            else navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
+            else navigation.navigate('SearchForAdd', {pk: pk, placeData: data, day : day, replace: true});
         }}>
             <View flex={1} style={{flexDirection: 'row'}}>
                 <View style={[{

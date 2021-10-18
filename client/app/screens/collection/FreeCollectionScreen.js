@@ -11,19 +11,21 @@ import {
     Pressable,
     FlatList,
     Modal,
-    Alert
+    Alert,
+    KeyboardAvoidingView,
+    Share
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
-import { SwipeListView } from 'react-native-swipe-list-view';
 import RBSheet from 'react-native-raw-bottom-sheet';
-
+import { useSharedValue } from 'react-native-reanimated';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import { tipsList } from '../../contexts/TipsListContextProvider';
+
 import {useToken} from '../../contexts/TokenContextProvider';
 
 import DragAndDropListForFree from './DragAndDropListForFree';
@@ -32,16 +34,13 @@ import ShowPlacesForFree from './ShowPlacesForFree';
 import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import DefaultProfile from '../../assets/images/profile_default.svg';
+import DefaultThumbnail from '../../assets/images/profile_default.svg';
+import CustomMarker from '../../assets/images/map/map-marker.svg';
 
 import moment from 'moment';
 import 'moment/locale/ko';
-// import Example from './App2';
-import { setUpdated } from '../../contexts/SetUpdateContextProviders';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
-
-
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -53,7 +52,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [placeData, setPlaceData] = useState([]);
     const [commentsData, setCommentsData] = useState([]);
     const [placeLength, setPlaceLength] = useState(0);
-    const [tmpData, setTmpData] = tipsList();
     const [isEditPage, setIsEditPage] = useState(false);
     
     const [keywords, setKeywords] = useState([]);
@@ -64,25 +62,32 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [update, setUpdate] = setUpdated();
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
     const [alertDuplicated, setAlertDuplicated] = useState(false);
 
+    const onShare = async () => {
+        try {
+            const result = await Share.share({
+                message:
+                `[히든쥬얼] ${collectionData.collection_name}`
+            });
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // shared with activity type of result.activityType
+                } else {
+                    // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
+        } catch (error) {
+            Alert.alert('', error.message);
+        }
+    };
+
     const isDeleted = (deletedData) => {
         setIsDeletedOrigin(deletedData);
-    };
-
-    const isCommentPosted = (postedCommentMapPk, postedComment) => {
-        //map pk랑 comment
-        setIsPostedCommentMapPk(postedCommentMapPk);
-        setIsPostedComment(postedComment);
-    };
-
-    const isCommentEdited = (editedCommentMapPk, editedComment) => {
-        //map pk랑 comment
-        setIsEditedCommentMapPk(editedCommentMapPk);
-        setIsEditedComment(editedCommentMapPk);
     };
 
     const isCommentDeleted = (deletedCommentData) => {
@@ -94,7 +99,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const isReplacementDeleted = (deletedReplacementData) => {
-        console.log(deletedReplacementData);
         setIsDeletedReplacement(deletedReplacementData);
     };
 
@@ -136,17 +140,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         getInitialCollectionData();
         getInitialPlaceData();
         getCollectionCommentsData();
-
-        setTmpData([
-            {
-                id: 1,
-                tip: '근처에 xxx파전 맛집에서 막걸리 한잔 캬',
-            },
-            {
-                id: 2,
-                tip: '두번째 팁'
-            }
-        ]);
         getUserData();
     }, [isFocused]);
 
@@ -175,6 +168,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                     setCollectionData(response.data);
                     setKeywords(response.data.keywords);
+                    setObjects();
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -194,8 +189,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
-                .then(async (response) => {
+            }).then(res => res.json())
+                .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -208,10 +203,10 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    setPlaceData(response.data);
-                    setPlaceLength(response.data.length);
-                    setFalse();
-                    setDeletedData(response.data);
+                    setPlaceData(response.data.placeList);
+                    setPlaceLength(response.data.placeList.length);
+                    setFalse(response.data.placeList);
+                    setDeletedData(response.data.placeList);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -220,6 +215,83 @@ const FreeCollectionScreen = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
+    };
+
+    const updatePlaceData = (updatedData, deletedData) => {
+        // 공간 수정
+        var putData = []; var isEmpty = 0;
+        console.log(updatedData)
+        //빈 객체일때는 원래 순서 그대로 넣어주기
+        for(var j=0;j<placeData.length;j++) {
+            var forPutObj = {};
+            if(Object.keys(updatedData[0]).length === 0) {
+                isEmpty += 1;
+                forPutObj = {
+                    cpm_map_pk: placeData[j].cpm_map_pk,
+                    planDay: -1,
+                    order: placeData[j].cpm_order
+                }
+            } else {
+                forPutObj = {
+                    cpm_map_pk: placeData[j].cpm_map_pk,
+                    planDay: -1,
+                    order: Object.values(updatedData[0])[j]
+                }
+            };
+            putData.push(forPutObj)
+        }
+
+        var DATA = {};
+        DATA.placeList = putData;
+        DATA.deletePlaceList = deletedData;
+        console.log(putData); console.log(deletedData);
+        console.log(isEmpty)
+        if(isEmpty !== placeData.length || deletedData.length !== 0) {
+            try {
+                fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'x-access-token': token
+                    },
+                    body: JSON.stringify(DATA),
+                }).then(res => res.json())
+                    .then(async response => {
+                        if (response.code === 405 && !alertDuplicated) {
+                            Alert.alert('', '다른 기기에서 로그인했습니다.');
+                            setAlertDuplicated(true);
+                        }
+    
+                        if (parseInt(response.code / 100) === 4) {
+                            await SecureStore.deleteItemAsync('accessToken');
+                            setToken(null);
+                            setIsSignedIn(false);
+                            return;
+                        }
+                        console.log(response);
+                        await getInitialPlaceData();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const checkDeletedPlace = () => {
+        console.log(isDeletedComment)
+        var forDeleteData = [];
+        for(var i=0;i<isDeletedOrigin.length;i++) {
+            if(isDeletedOrigin[i] === true) {
+                // deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
+                forDeleteData.push(placeData[i].cpm_map_pk);
+            }
+        }
+        
+        return forDeleteData;
     };
 
     const getCollectionCommentsData = () => {
@@ -244,75 +316,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    
                     setCommentsData(response.data);
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const getPlaceCommentsData = () => {
-        try {
-            fetch(`http://34.64.185.40/collection/${pk}/placeList/${item.cpm_map_pk}/comment`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-            }).then((res) => res.json())
-                .then(async response => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    // setCommentsData(response.data)
-                    console.log(response.data);
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const getReplacementData = (map_pk) => {
-        try {
-            fetch(`http://34.64.185.40/collection/${pk}/replacement/placeList`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                }
-            }).then((res) => res.json())
-                .then(async response => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -360,62 +365,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const checkDeletedPlace = () => {
-        for(var i=0;i<isDeletedOrigin.length;i++) {
-            if(isDeletedOrigin[i] === true) {
-                deletePlace(placeData[i].cpm_map_pk, placeData[i].cpm_plan_day);
-            }
-        }
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
-                deletePlaceComment(placeData[i].cpm_map_pk, isDeletedComment[i]);
-            }
-        }
-    };
-
-    const checkDeletedReplacement = () => {
-        for(var i=0;i<isDeletedComment.length;i++) {
-            if(isDeletedComment[i] !== false) {
-                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
-            }
-        }
-    };
-
-    const deletePlace = (map_pk, day) => {
-        // 공간 삭제
-        try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${map_pk}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-            }).then((res) => res.json())
-                .then(async (response) => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    getInitialPlaceData();
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const checkTrue = () => {
         if (collectionData.collection_private) return true;
         return false;
@@ -427,17 +376,17 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const [isPress, setIsPress] = useState([]);
-    const setFalse = () => {
+    const setFalse = (data) => {
         var pressed = [];
-        for (let i = 0; i < placeLength; i++) {
+        for (let i = 0; i < data.length; i++) {
             pressed.push(false);
         }
         setIsPress(pressed);
     };
 
-    const deleteCollection = () => {
+    const deleteCollection = (refRBSheet) => {
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -458,8 +407,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    Alert.alert('', '삭제되었습니다.');
-                    navigation.goBack();
+                    Alert.alert('', '삭제되었습니다.', [
+                        {text : 'OK', onPress: () => {
+                            if(data.now) navigation.pop(2);
+                            else navigation.goBack();
+                            setDeleteMenu(!deleteMenu);
+                            refRBSheet.current.close();
+                        }}]);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -654,8 +608,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
             console.error(err);
         }
     };
+
     const getReplacement = (cpmMapPk) => {
-        console.log(cpmMapPk);
         //대체공간 불러오기
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
@@ -678,7 +632,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
                     setReplacementData(response.data);
                     setDeletedReplacementData(response.data);
                 })
@@ -779,6 +732,14 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
+    const checkDeletedReplacement = () => {
+        for(var i=0;i<isDeletedComment.length;i++) {
+            if(isDeletedComment[i] !== false) {
+                deleteReplacement(placeData[i].cpm_map_pk, isDeletedComment[i]);
+            }
+        }
+    };
+
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
         try {
@@ -858,14 +819,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     //공간 삭제
     const [isDeletedOrigin, setIsDeletedOrigin] = useState([]);
 
-    //한줄평 추가 : map Pk, 코멘트
-    const [isPostedCommentMapPk, setIsPostedCommentMapPk] = useState(0);
-    const [isPostedComment, setIsPostedComment] = useState('');
-
-    //한줄평 수정 : map Pk, 코멘트
-    const [isEditedCommentMapPk, setIsEditedCommentMapPk] = useState(0);
-    const [isEditedComment, setIsEditedComment] = useState('');
-
     //대체공간 가져오기 : map Pk
     const [isGottenReplacementMapPk, setIsGottenReplacementMapPk] = useState(0);
 
@@ -882,20 +835,16 @@ const FreeCollectionScreen = ({route, navigation}) => {
         setIsDeletedComment(newArr);
     };
 
-    const SwipeList = () => {
-        //일반 페이지에서 불러오기, 추가, 수정, 삭제 모두 가능하도록
-        // getPlaceCommentsData();
+    const GeneralPage = () => {
         return (
             <>
                 <SafeAreaView>
                     <FlatList data={placeData}
-                        renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
-                            isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
-                            isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
-                            isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                        renderItem={({item, index}) => <ShowPlacesForFree day={-1} item={item} index={index} key={index} isEditPage={isEditPage} navigation={navigation} length={placeLength} curLength={placeLength}
+                            private={collectionData.is_creator} pk={collectionData.collection_pk} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
                             isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                             isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                            postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                            postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}
                             postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
                         />}
                         keyExtractor={(item, idx) => {idx.toString();}}
@@ -904,8 +853,37 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 </SafeAreaView>
             </>
         );};
+
+    const setObjects = () => {
+        var newArr = [{}];
+        editData.value = newArr;
+    }
+    const editData = useSharedValue([]);
+
+    const isEdited = (data, day) => {
+        var newObject = [...editData.value];
+        newObject[0] = data;
+        editData.value = newObject;
+        return data;
+    };
     
-    const [showMenu, setShowMenu] = useState(false);
+    const EditPage = () => {
+        return (
+            <SafeAreaView>
+                <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress}
+                    navigation={navigation} length={placeLength} curLength={placeLength}
+                    private={collectionData.is_creator} pk={collectionData.collection_pk} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
+                    isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
+                    isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
+                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
+                    postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
+                    postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
+                    isEdited={isEdited}
+                />
+            </SafeAreaView>
+        )
+    };
+    
     const [deleteMenu, setDeleteMenu] = useState(false);
 
     const list = [
@@ -954,11 +932,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             <AppText style={styles.textStyle}>취소하기</AppText>
                         </Pressable>
                         <Pressable
-                            style={{...styles.button, backgroundColor: colors.mainColor}}
+                            style={{...styles.button, backgroundColor: colors.red[3]}}
                             onPress={() => {
-                                props.refRBSheet.current.close();
-                                setDeleteMenu(!deleteMenu);
-                                deleteCollection();
+                                deleteCollection(props.refRBSheet);
                             }}
                         >
                             <AppText style={styles.textStyle}>삭제하기</AppText>
@@ -989,7 +965,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             <>
                 <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
                     <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                        <DefaultProfile width={36} height={36}/>
+                        <DefaultThumbnail width={36} height={36}/>
                     </View>
                     <View>
                         <View style={{
@@ -1032,52 +1008,74 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const ShowCollectionComments = () => {
         const [comments, setComments] = useState('');
         return (
-            <View style={{marginBottom: 143}}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
-                    <AppText style={{
-                        color: colors.gray[3],
-                        fontSize: 14,
-                        marginStart: 11,
-                        marginTop: 5
-                    }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
-                </View>
-                <View style={{marginVertical: 20}}>
-                    <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
-                        <TextInput flex={1} style={{fontSize: 16}}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            placeholder="보관함에 댓글을 남겨보세요!"
-                            value={comments}
-                            placeholderTextColor={colors.gray[5]}
-                            onChangeText={(text)=>setComments(text)}
-                            onSubmitEditing={()=>{
+            <View flex={1} style={{marginVertical: 20, justifyContent: 'flex-end'}}>
+                <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
+                    <TextInput flex={1} style={{fontSize: 16}}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        placeholder="보관함에 댓글을 남겨보세요!"
+                        value={comments}
+                        placeholderTextColor={colors.gray[5]}
+                        onChangeText={(text)=>setComments(text)}
+                        onSubmitEditing={()=>{
+                            if(comments !== '') {
                                 setComments(comments);
                                 postCollectionCommentsData(comments);
-                                setComments('');
-                            }}
-                        />
-                        <Pressable style={{marginLeft: 5}} onPress={()=>{
-                            postCollectionCommentsData(comments);
+                            }
                             setComments('');
-                        }}>
-                            <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
-                                name={'pencil'} size={16}></Icon>
-                        </Pressable>
-                    </View>
+                        }}
+                    />
+                    <Pressable style={{marginLeft: 5}} onPress={()=>{
+                        if(comments !== '') {
+                            setComments(comments);
+                            postCollectionCommentsData(comments);
+                        }
+                        setComments('');
+                    }}>
+                        <Icon style={{color: colors.gray[5], marginTop: 3, marginRight: 2}} type="ionicon"
+                            name={'pencil'} size={16}></Icon>
+                    </Pressable>
                 </View>
-                {
-                    commentsData.length !== 0 &&
-                    <View style={{marginTop: 4}}>{
-                        commentsData.map((data, idx) => (
-                            <ShowComments data={data} key={idx} idx={idx}/>
-                        ))
-                    }</View>
-                }
             </View>
         );
     };
 
+    const window = Dimensions.get('window');
+    const WIDTH = window.width;
+    const HEIGHT = window.height;
+
+    const ASPECT_RATIO = WIDTH / HEIGHT;
+    const LATITUDE_DELTA = 0.35;
+    const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+    const [lnt, setLnt] = useState(126.9775482762618);
+    const [region, setRegion] = useState({
+        latitude: 37.56633546113615,
+        longitude: 126.9775482762618,
+        latitudeDelta: 0.0015,
+        longitudeDelta: 0.0015,
+    });
+
+    const onMarkerPress = (event) => {
+        const { id, coordinate } = event.nativeEvent;
+        // console.log(coordinate)
+        const newRegion = { ...region };
+        newRegion.latitude = coordinate.latitude;
+        newRegion.longitude = coordinate.longitude;
+    
+        setRegion(newRegion);
+    };
+
+    const EntireButton = () => {
+        return (
+            <View style={{position: 'absolute', right: 0, bottom: 0}}>
+                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: placeData})}>
+                    <Image source={require('../../assets/images/map/entire-button.png')} style={{width: 40, height: 40}}/>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+    
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -1091,9 +1089,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
                         if(data.now) {
-                            navigation.pop(2);
+                            if(isEditPage) setIsEditPage(false);
+                            else navigation.pop(2);
                         }
-                        else navigation.goBack();}}>
+                        else {
+                            if(isEditPage) setIsEditPage(false);
+                            else navigation.goBack();
+                        }}}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -1136,6 +1138,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                 refRBSheet.current.close();
                                                 navigation.navigate('MakeFreeCollection', {data: collectionData, update: true});
                                             }
+                                            if(i === 2) {
+                                                onShare();
+                                            }
                                             if(i === 3) {
                                                 setDeleteMenu(true);
                                             }
@@ -1150,11 +1155,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
-                                    onPress={() => {
+                                    onPress={async () => {
                                         setIsEditPage(false);
                                         isDeleted(isDeletedOrigin);
                                         isCommentDeleted(isDeletedComment);
-                                        checkDeletedPlace();
+                                        await updatePlaceData(editData.value, checkDeletedPlace());
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -1164,8 +1169,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     }</>}
             </View>
 
-            <ScrollView>
-                <ScreenContainerView>
+            <ScrollView flex={1} stickyHeaderIndices={[1]}>
+                <ScreenContainerView flex={1}>
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -1241,28 +1246,32 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     </View>
                 </ScreenContainerView>
 
-                <View style={{marginTop: 20}}>
-                    {/* <Image source={require('../../assets/images/map_tmp.png')} style={{width: '100%', height: 201}}/> */}
-                    
-                    <View>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200}}
-                            initialRegion={{
-                                latitude: 37.56633546113615,
-                                longitude: 126.9779482762618,
-                                latitudeDelta: 0.0015,
-                                longitudeDelta: 0.0015,
-                            }}
-                        ><Marker coordinate={{
+                <View style={{marginTop: 20}} flex={1}>
+                    <View flex={1}>
+                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1, alignItems: 'flex-end'}}
+                            region={region}
+                            moveOnMarkerPress
+                            tracksViewChanges={false}
+                            onMarkerPress={onMarkerPress}
+                        >
+                            <Marker coordinate={{
                                 latitude: 37.56633546113615,
                                 longitude: 126.9779482762618
-                            }}
-                            title="서울시청"
-                            description="기본값입니다"/>
+                            }} title={'기본'}
+                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
+                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <CustomMarker />
+                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
+                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
+                                    </View>
+                                </View>
+                            </Marker>
                         </MapView>
+                        <EntireButton />
                     </View>
                 </View>
 
-                <ScreenContainerView>
+                <ScreenContainerView flex={1}>
                     {
                         placeLength !== 0 ?
                             <View style={{marginTop: 16}}>
@@ -1273,7 +1282,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                     <TouchableOpacity onPress={()=>{
                                         navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : -1, replace: false});
-                                    }} style={!collectionData.is_creator && {display: 'none'}}>
+                                    }} style={(!collectionData.is_creator || isEditPage) && {display: 'none'}}>
                                         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                             <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
@@ -1284,30 +1293,12 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     <SafeAreaView>
                                         {
                                             !isEditPage ?
-                                                <SwipeList /> :
-                                                // <Example />
-                                                <FlatList data={placeData}
-                                                    renderItem={({item, index}) => <ShowPlacesForFree item={item} index={index} key={index} isEditPage={isEditPage} isPress={isPress} length={placeData.length} navigation={navigation} private={collectionData.is_creator} pk={collectionData.collection_pk} navigation={navigation} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited}
-                                                        isCommentPosted={isCommentPosted} isPostedCommentMapPk={isPostedCommentMapPk} isPostedComment={isPostedComment}
-                                                        isCommentEdited={isCommentEdited} isEditedCommentMapPk={isEditedCommentMapPk} isEditedComment={isEditedComment}
-                                                        isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}
-                                                        isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
-                                                        isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
-                                                        postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment}
-                                                        postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} replacementData={replacementData}
-                                                    />}
-                                                    keyExtractor={(item, idx) => {idx.toString();}}
-                                                    key={(item, idx) => {idx.toString();}}
-                                                    nestedScrollEnabled/>
-                                            // <DragAndDropListForFree data={placeData} isEditPage={isEditPage} isPress={isPress} navigation={navigation}/>
+                                                <GeneralPage /> :
+                                                <EditPage />
                                         }
                                     </SafeAreaView>
                                 </SafeAreaView>
-                                {placeLength > 5 && !isEditPage && <TouchableOpacity onPress={() => {
-                                    // if(isLimited) setIsLimited(false);
-                                    // else setIsLimited(true);
-                                    // console.log(isLimited)
-                                }}>
+                                {placeLength > 5 && !isEditPage && <TouchableOpacity>
                                     <View style={{
                                         flexDirection: 'row',
                                         marginVertical: 16,
@@ -1316,7 +1307,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     }}>
                                         {
                                             !isLimited ?
-                                                <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                                <TouchableOpacity onPress={()=>setIsLimited(true)}
                                                     style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
                                                 >
                                                     <AppText style={{
@@ -1332,7 +1323,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                             marginBottom: 5
                                                         }}></Image>
                                                 </TouchableOpacity> :
-                                                <TouchableOpacity onPress={()=>setIsLimited(!isLimited)}
+                                                <TouchableOpacity onPress={()=>setIsLimited(false)}
                                                     style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
                                                 >
                                                     <AppText style={{
@@ -1392,10 +1383,32 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                 <ScreenDivideLine style={{marginVertical: 16}}/>
 
-                <ScreenContainerView>
-                    <ShowCollectionComments />
+                <ScreenContainerView flex={1}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <AppText style={{...styles.titles, color: colors.mainColor}}>댓글</AppText>
+                        <AppText style={{
+                            color: colors.gray[3],
+                            fontSize: 14,
+                            marginStart: 11,
+                            marginTop: 5
+                        }}>총 <AppText style={{fontWeight: '700'}}>{commentsData.length}개</AppText></AppText>
+                    </View>
                 </ScreenContainerView>
-            </ScrollView>
+
+                <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <ScreenContainerView flex={1}>
+                        <ShowCollectionComments />
+                        {
+                            commentsData.length !== 0 &&
+                            <View style={{marginTop: 4}}>{
+                                commentsData.map((data, idx) => (
+                                    <ShowComments data={data} key={idx} idx={idx}/>
+                                ))
+                            }</View>
+                        }
+                    </ScreenContainerView>
+                </KeyboardAvoidingView>
+                </ScrollView>
         </ScreenContainer>
     );
 };

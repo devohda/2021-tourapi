@@ -1,32 +1,51 @@
-import React, {useState} from "react";
+import React, {useState} from 'react';
 import {StyleSheet, TextInput, TouchableOpacity, View, Pressable} from "react-native";
-import { Icon } from "react-native-elements";
-import styled from "styled-components/native";
-import AppText from "../../../components/AppText";
 import { useTheme } from '@react-navigation/native';
-import CustomTextInput from "../../../components/CustomTextInput";
+import { Icon } from "react-native-elements";
+import * as SMS from 'expo-sms';
+import PhoneInput from 'react-native-phone-number-input';
 
-const ProgressBar = styled(View)`
-  flexDirection: row;
-  width: 100%;
-  justify-content: flex-end;
-  height: 8px;
-`;
+import ScreenContainer from '../../../components/ScreenContainer';
+import AppText from '../../../components/AppText';
+import styled from "styled-components/native";
+import CustomTextInput from "../../../components/CustomTextInput";
 
 const Form = styled(View)`
   margin-top: 63px;
 `;
 
-const InputBox = styled(TextInput)`
-  fontSize: 16px;
-  borderBottomWidth: 1px;
-  borderBottomColor: #C5C5C5;
-  marginBottom: 27px;
-  paddingBottom: 11px;
-`;
+const changePw = async (e, pw) => {
+    try {
 
-const GetPasswordTab = ({route, navigation}) => {
-    const {email} = route.params
+        let url = 'http://34.64.185.40/auth/password';
+        let options = {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                email: e,
+                password: pw,
+            })
+        };
+        const result = await fetch(url, options)
+            .then(res => res.json())
+            .then(response => {
+                console.log(response)
+                return response.code === 200;
+            })
+            .catch(error => console.log(error));
+
+        return result;
+    } catch (e) {
+        console.log(e.toString());
+    }
+};
+
+const ChangePasswordTab = ({route, authNavigation}) => {
+    const {email} = route.params;
     const [password, setPassword] = useState("");
     const { colors } = useTheme();
     const [color, setColor] = useState(colors.gray[5]);
@@ -40,19 +59,17 @@ const GetPasswordTab = ({route, navigation}) => {
 
         if(!pattern1.test(pw) || !pattern2.test(pw) || !pattern3.test(pw)) {
             setIsPasswordValid(false);
-            // setColor(colors.gray[5]);
         }
         else {
             setIsPasswordValid(true);
-            // setColor(colors.red[2]);
         }
     }
 
     const checkIsValid = async () => {
-        if(!isPasswordValid) {
-            setColor(colors.red[2]);
+        const result = await changePw(email, password);
+        if (result) {
+            authNavigation.navigate('SignInEmail');
         }
-        navigation.navigate('nicknameTab', {email, password})
     }
 
     const styles = StyleSheet.create({
@@ -71,9 +88,9 @@ const GetPasswordTab = ({route, navigation}) => {
             backgroundColor: colors.gray[5]
         },
         title_text: {
-            fontSize: 30,
+            fontSize: 16,
             color: colors.mainColor,
-            lineHeight: 44,
+            lineHeight: 23.68
         },
         continue_btn: {
             backgroundColor: password.length >= 8 && isPasswordValid ? colors.mainColor : colors.gray[6],
@@ -87,27 +104,18 @@ const GetPasswordTab = ({route, navigation}) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingBottom: 11,
-            marginTop: 40,
+            marginTop: 16,
             marginBottom: 6
         },
     })
 
     return (
         <>
-            <View flex={1}>
-                <ProgressBar>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                    <View style={{...styles.progress, ...styles.progress_active}}></View>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                    <View style={{...styles.progress, ...styles.progress_inactive}}></View>
-                </ProgressBar>
+            <View flex={1} style={{marginTop: 10}}>
                 <Form>
-                    <AppText>
-                        <View>
-                            <AppText style={styles.title_text}><AppText
-                                style={{fontWeight: 'bold'}}>비밀번호</AppText><AppText>를</AppText></AppText>
-                            <AppText style={styles.title_text}>설정해주세요</AppText>
-                        </View>
+                    <AppText style={styles.title_text}><AppText
+                        style={{fontWeight: 'bold'}}>비밀번호</AppText>
+                        <AppText>를 입력해주세요</AppText>
                     </AppText>
                     <View flexDirection="row" style={{...styles.password_box, borderColor: color}}>
                         <CustomTextInput
@@ -117,6 +125,7 @@ const GetPasswordTab = ({route, navigation}) => {
                             secureTextEntry={showPassword}
                             style={{
                                 fontSize: 16,
+                                color : colors.mainColor
                             }}
                             flex={1}
                             onChangeText={async (text) => {
@@ -162,10 +171,10 @@ const GetPasswordTab = ({route, navigation}) => {
                                 {
                                     showPassword ?
                                     <Icon style={{marginTop: 3, marginRight: 5}} name={'eye'} type="ionicon"
-                                    size={18} color={colors.gray[9]}></Icon>
+                                    size={18} color={password ? colors.mainColor : colors.gray[9]}></Icon>
                                     :
                                     <Icon style={{marginTop: 3, marginRight: 5}} name={'eye-off'} type="ionicon"
-                                    size={18} color={colors.gray[9]}></Icon>
+                                    size={18} color={password ? colors.mainColor : colors.gray[9]}></Icon>
                                 }
                         </Pressable>
                     </View>
@@ -187,11 +196,11 @@ const GetPasswordTab = ({route, navigation}) => {
                     onPress={() => checkIsValid()}
                     disabled={password.length >= 8 && isPasswordValid ? false : true}
                 >
-                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
+                    <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>비밀번호 재설정하기</AppText>
                 </TouchableOpacity>
             </View>
         </>
-    )
-}
+    );
+};
 
-export default GetPasswordTab;
+export default ChangePasswordTab;

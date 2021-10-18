@@ -3,6 +3,7 @@
     "name": "Here",
     "slug": "Here",
     "version": "0.0.7",
+    "scheme": "Here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
     "splash": {

@@ -8,8 +8,9 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import ScreenDivideLine from '../../components/ScreenDivideLine';
 import Star from '../../assets/images/search/star.svg';
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import SearchPlaceForAdd from './SearchPlaceForAdd';
+import ShowRecommendPlace from '../../components/ShowRecommendPlace';
 
 const SearchScreenForAdd = ({route, navigation}) => {
     const {colors} = useTheme();
@@ -141,14 +142,9 @@ const SearchScreenForAdd = ({route, navigation}) => {
             <NavigationTop title="검색" navigation={navigation}/>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
-                <SearchBar />
-                    {searchKeyword !== '' && <View>
-                        {replace ?
-                            <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace}
-                            postReplacement={route.params.postReplacement}
-                            /> :
-                        <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace} />}
-                    </View>}
+                    <SearchBar />
+                    {searchKeyword !== '' && 
+                    <SearchPlaceForAdd pk={pk} placeData={placeData} day={day} navigation={navigation} replace={replace} />}
                 </ScreenContainerView>
 
                 {searchKeyword !== '' && <ScreenDivideLine/>}
@@ -161,17 +157,7 @@ const SearchScreenForAdd = ({route, navigation}) => {
                                 <AppText style={{color: colors.defaultColor, fontSize: 12, fontWeight: '700'}}>AD</AppText>
                             </View> */}
                         </View>
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                            <RecommendedPlace name="서울식물원" address="서울 강서구 마곡동 812"/>
-                            <RecommendedPlace name="경의선숲길" address="서울 용산구 용문동"/>
-                            <RecommendedPlace name="헬로피자" address="서울 마포구"/>
-                        </ScrollView>
+                        <ShowRecommendPlace navigation={navigation}/>
                     </View>
                 </ScreenContainerView>
             </ScrollView>

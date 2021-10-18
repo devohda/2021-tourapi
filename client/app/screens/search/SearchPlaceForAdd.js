@@ -4,7 +4,7 @@ import {useTheme} from '@react-navigation/native';
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import AppText from '../../components/AppText';
-import { useSearchKeyword } from '../../contexts/search/SearchkeywordContextProvider';
+import { useSearchKeyword } from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
@@ -52,7 +52,48 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         return;
                     }
 
-                    Alert.alert('', '추가되었습니다.');
+                    Alert.alert('', '공간이 추가되었습니다.');
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const postReplacement = (placePk, prev) => {
+        //대체공간 추가
+        // console.log(replacementData.length+prev+1);
+        // console.log(props)
+        try {
+            fetch(`http://34.64.185.40/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    order: placeData.replacement_cnt+prev+1,
+                    placeId: placePk
+                })
+            }).then(res => res.json())
+                .then(async response => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+                    console.log(response)
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }      
+                    if(response.code === 200) Alert.alert('', '대체공간이 추가되었습니다.');
                 })
                 .catch((err) => {
                     console.error(err);
@@ -168,10 +209,13 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
     const PlaceContainer = ({item, index}) => ( 
         <TouchableOpacity onPress={()=>{
             countPlaceView(item.place_pk);
-            props.navigation.navigate('Place', {data : item});
+            const data = {
+                'place_pk': item.place_pk,
+            };
+            props.navigation.navigate('Place', {data : data});
         }}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View style={{flexDirection: 'row', width: '85%'}}>
+                <View style={{flexDirection: 'row', width: '82%'}}>
                     {
                         item.place_img ?
                             <Image source={{uri: item.place_img}}
@@ -182,9 +226,11 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
                             <AppText style={{fontSize: 10, color: colors.mainColor}}>{checkType(item.place_type)}</AppText>
-                            <View style={{...styles.score_line, backgroundColor: colors.gray[4], display: parseInt(item.review_score) == -1 && 'none'}}></View>
-                            <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}} />
-                            <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                <View style={{...styles.score_line, backgroundColor: colors.gray[4]}}></View>
+                                <Star width={11} height={11} style={{marginTop: 2}} />
+                                <AppText style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                            </View>
                         </View>
                         <AppText style={{fontSize: 16, fontWeight: '700', color: colors.mainColor}}>{item.place_name}</AppText>
                         <AppText style={{fontSize: 12, fontWeight: '400', color: colors.gray[4]}}>{item.place_addr}</AppText>
@@ -200,9 +246,8 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         newArr[index] = true;
                         setIsPress(newArr);
                         if(replace) {
-                            const postReplacement = props.postReplacement;
                             var prevLength = isPress.filter(element => (element === true)).length;
-                            postReplacement(pk, item.place_pk, prevLength);
+                            postReplacement(item.place_pk, prevLength);
                         }
                         else addPlace(item.place_pk);
                     }

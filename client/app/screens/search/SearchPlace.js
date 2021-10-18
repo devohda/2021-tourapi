@@ -15,22 +15,22 @@ import {useIsFocused} from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
-import {searchPlaceResult} from '../../contexts/search/SearchPlaceContextProvider';
 
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-const SearchPlace = ({navigation}) => {
+const SearchPlace = props => {
     const {colors} = useTheme();
+    const { countPlace, navigation } = props;
     const [placeList, setPlaceList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    const [searchLength, setSearchLength] = searchPlaceResult();
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
@@ -53,12 +53,14 @@ const SearchPlace = ({navigation}) => {
     });
 
     useEffect(() => {
-        getResults();
+        getResults('SCORE');
+        setShowMenu(false);
+        setCurrentMenu('평점순');
     }, [searchKeyword, isFocused]);
 
-    const getResults = () => {
+    const getResults = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
+            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -79,9 +81,8 @@ const SearchPlace = ({navigation}) => {
                         return;
                     }
 
-                    setSearchLength(response.data.length);
+                    countPlace(response.data.length);
                     setPlaceList(response.data);
-                    // setFalse();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -116,7 +117,7 @@ const SearchPlace = ({navigation}) => {
                         return;
                     }
 
-                    getResults();
+                    getResults('SCORE');
                 })
                 .catch((err) => {
                     console.error(err);
@@ -151,7 +152,7 @@ const SearchPlace = ({navigation}) => {
                         return;
                     }
 
-                    getResults();
+                    getResults('SCORE');
                 })
                 .catch((err) => {
                     console.error(err);
@@ -221,14 +222,16 @@ const SearchPlace = ({navigation}) => {
 
     const SelectBox = () => {
         return (
-            <>
+            <View style={{
+                position: 'absolute',
+                zIndex: 9000
+            }} flex={1}>
                 {
                     showMenu && <View style={{
-                        position: 'absolute',
                         width: 80,
-                        height: 80,
+                        height: 60,
                         backgroundColor: '#fff',
-                        // flex: 1,
+                        flex: 1,
                         borderRadius: 10,
                         zIndex: 0,
                         shadowColor: '#000',
@@ -245,16 +248,23 @@ const SearchPlace = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('평점순');
+                                getResults('SCORE');
                             }}
                             style={{
+                                flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 flexDirection: 'row',
-                                paddingLeft: 8.5
+                                paddingLeft: 8.5,
+                                width: '100%'
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
-                            {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                                {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                            </View>
                         </TouchableOpacity>
                     
                         <View style={{
@@ -270,52 +280,68 @@ const SearchPlace = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
-                            }}
-                            style={{
+                                getResults('LIKE');
+                            }} style={{
+                                flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 flexDirection: 'row',
-                                paddingLeft: 8.5
+                                paddingLeft: 8.5,
+                                width: '100%',
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                            {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                                {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                            </View>
                         </TouchableOpacity>
-                    
-                        <View style={{
+
+                        {/* <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
                             borderWidth: 0.4,
                             borderRadius: 1,
-                            zIndex: 0
+                            zIndex: 0,
+                            backgroundColor: colors.backgroundColor,
                         }}></View>
                     
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('거리순');
-                            }}
-                            style={{
+                                getResults('LIKE');
+                            }} style={{
+                                flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
                                 flex: 1,
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 flexDirection: 'row',
-                                paddingLeft: 8.5
+                                paddingLeft: 8.5,
+                                width: '100%',
                             }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                            {currentMenu === '거리순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                        </TouchableOpacity>
+                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
+                                {currentMenu === '거리순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                            </View>
+                        </TouchableOpacity> */}
                     </View>
                 }
-            </>
+            </View>
         );};
 
-    const PlaceContainer = ({item, index}) => {
+    const PlaceContainer = ({item}) => {
         return (
             <TouchableOpacity onPress={() => {
                 countPlaceView(item.place_pk);
-                navigation.navigate('Place', {data: item});
-            }}>
+                const data = {
+                    'place_pk': item.place_pk,
+                };
+                navigation.navigate('Place', {data: data});
+            }} style={{zIndex: 9999}}>
                 <View style={{
                     marginBottom: 8,
                     alignItems: 'center',
@@ -339,10 +365,12 @@ const SearchPlace = ({navigation}) => {
                                         fontSize: 10,
                                         color: colors.mainColor
                                     }}>{checkType(item.place_type)}</AppText>
-                                <View style={{...styles.score_line, display: parseInt(item.review_score) == -1 && 'none'}}></View>
-                                <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}}/>
+                                <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                <View style={{...styles.score_line}}></View>
+                                <Star width={11} height={11} style={{marginTop: 2}}/>
                                 <AppText
-                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                </View>
                             </View>
                             <AppText style={{
                                 fontSize: 16,
@@ -358,20 +386,6 @@ const SearchPlace = ({navigation}) => {
                         </View>
                     </View>
                     <TouchableOpacity onPress={() => {
-                        // let newArr = [...isPress];
-                        // if (newArr[index]) {
-                        //     newArr[index] = false;
-                        //     setIsPress(newArr);
-                        //     deletePlace(item.place_pk);
-                        // } else {
-                        //     for (let i = 0; i < newArr.length; i++) {
-                        //         if (i == index) continue;
-                        //         else newArr[i] = false;
-                        //     }
-                        //     newArr[index] = true;
-                        //     setIsPress(newArr);
-                        //     likePlace(item.place_pk);
-                        // }
                         if (item.like_flag) {
                             DeleteLikedPlace(item.place_pk);
                         } else {
@@ -392,26 +406,26 @@ const SearchPlace = ({navigation}) => {
                 {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
-                        <>
-                            {/* <View style={{position: 'relative'}}>
-                        <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
-                            <View flexDirection="row" flex={1} style={{justifyContent: 'flex-end'}}>
-                                <TouchableOpacity onPress={()=>{
-                                    setShowMenu(!showMenu);
-                                }} style={{flexDirection: 'row'}}>
-                                    <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
-                                    <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                                        name={'chevron-down-outline'} size={16}></Icon>
-                                </TouchableOpacity>
-                                <SelectBox />
+                        <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
+                            <SelectBox />
+                            <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, position: 'relative', zIndex: 50}} flex={1}>
+                                <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                                    <View flexDirection="row" flex={1}>
+                                        <TouchableOpacity onPress={()=>{
+                                            setShowMenu(!showMenu);
+                                        }} style={{flexDirection: 'row'}}>
+                                            <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                            <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                                name={'chevron-down-outline'} size={16}></Icon>
+                                        </TouchableOpacity>
+                                    </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                        </TouchableWithoutFeedback>
-                        </View> */}
                             <SafeAreaView flex={1}>
                                 <FlatList data={placeList} renderItem={PlaceContainer}
                                     keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                             </SafeAreaView>
-                        </>
+                        </View>
                 }
             </ScrollView>
         </View>

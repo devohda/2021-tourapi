@@ -6,20 +6,13 @@ import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 
-import { tipsList } from '../../contexts/TipsListContextProvider';
-
 const TipsList = props => {
-    const { comment, data, idx, day, isEditPage, postPlaceComment, putPlaceComment, isCommentDeleted, isDeletedComment} = props;
+    const { comment, data, idx, day, isEditPage, postPlaceComment, putPlaceComment, deletePlaceComment} = props;
     const {colors} = useTheme();
     const [addVisible, setAddVisible] = useState(false);
     const [editVisible, setEditVisible] = useState(false);
     const [deleteVisible, setDeleteVisible] = useState(false);
-    const [changedTip, setChangedTip] = useState('');
-    const [tmpData, setTmpData] = tipsList();
-    const isFree = (typeof props.day === 'undefined');
-    const [defaultValue, setDefaultValue] = useState(
-        isFree? tmpData[0].tip : tmpData[0].places[0].tip
-    );
+    const isFree = (day === -1);
 
     const AddModal = () => {
         const [changed, setChanged] = useState('');
@@ -40,7 +33,7 @@ const TipsList = props => {
                         <AppText style={{color: colors.gray[3], fontSize: 12, fontWeight: '500', lineHeight: 19.2, textAlign: 'center'}}>{data.place_name}을 위한 팁을 공유해주세요!</AppText>
                     </View>
                     <View style={{marginTop: 14}}>
-                        <TextInput defaultValue={data.tip} onChangeText={(text)=>{
+                        <TextInput onChangeText={(text)=>{
                             setChanged(text);
                             
                             }}
@@ -68,7 +61,6 @@ const TipsList = props => {
                         <TouchableOpacity onPress={() => {
                             if(changed !== '') {
                                 postPlaceComment(data.cpm_map_pk, changed);
-                                setChangedTip(changed);
                             }
                             setAddVisible(false);
                         }}>
@@ -94,7 +86,7 @@ const TipsList = props => {
                 style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor}}
             >
                 <View style={{marginTop: 5}}>
-                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁 수정</AppText>
+                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁</AppText>
                 </View>
                 <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 5}}>
                     <View style={{width: '95%', justifyContent: 'center', alignItems: 'center'}}>
@@ -106,6 +98,7 @@ const TipsList = props => {
                             }}
                             style={{
                                 color: colors.mainColor,
+                                backgroundColor: colors.defaultColor,
                                 borderWidth: 1,
                                 borderColor: changed ? colors.mainColor : colors.defaultColor,
                                 width: 295,
@@ -120,20 +113,22 @@ const TipsList = props => {
                             ></TextInput>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 20}}>
-                        <TouchableOpacity onPress={() => {setEditVisible(false)}}>
-                            <View style={{width: 86, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                                <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
-                            </View>
-                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
                             if(changed !== comment && changed !== '') {
                                 putPlaceComment(data.cpm_map_pk, changed);
-                                setChangedTip(changed);
                             }
                             setEditVisible(false);
                         }}>
-                            <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>수정하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            setEditVisible(false);
+                            setDeleteVisible(true);
+                            }}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -163,10 +158,8 @@ const TipsList = props => {
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
-                                let newArr = [...isDeletedComment];
-                                newArr[idx] = true;
-                                isCommentDeleted(newArr);
                                 setDeleteVisible(false);
+                                deletePlaceComment(data.cpm_map_pk, comment);
                             }}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
@@ -200,32 +193,23 @@ const TipsList = props => {
         }
     }
 
-    return(
+    return (
         <View flex={1}>
-        <View style={[{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}, isDeletedComment[idx] && comment && {display: 'none'}]}>
-            { isEditPage && comment &&
-            <TouchableOpacity onPress={()=>{
-                if(props.private) setDeleteVisible(true);
-            }} disabled={props.private === 1 ? false : true}>
-                <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
-                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                        <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
-                    </View>
-                </View>
-            </TouchableOpacity>
-            }
-            <View style={[isFree ? {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: comment || !isEditPage ? 8 : 36} : {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: comment && isEditPage ? 8 : 36}, checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
+        <View style={[{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}]}>
+            <View style={[isFree ? 
+                {...styles.freeContainer, backgroundColor: colors.defaultColor, marginLeft: 8} :
+                {...styles.planContainer, backgroundColor: colors.defaultColor, marginLeft: comment && isEditPage ? 8 : 36},
+                checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
                 <TouchableOpacity onPress={() => {
                     if(comment) {
                         if(props.private) setEditVisible(true);
-                        setChangedTip(defaultValue);
                     }
                     else {
                         if(props.private) setAddVisible(true);
                     }
                     }}
                     >
-                    <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 6, width: '95%'}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 6, width: '90%'}}>
                         {   comment ?
                             <Image source={require('../../assets/images/tipIcon.png')}
                             style={{width: 12, height: 12, marginEnd: 8}}></Image> :
@@ -234,20 +218,12 @@ const TipsList = props => {
                         }
                         {
                             isFree ?
-                            <AppText style={{color: comment ? colors.blue[1] : colors.gray[4], fontSize: 14}}>{comment ? comment : '한줄팁 추가하기'}</AppText> :
-                            <AppText style={{color: comment ? colors.blue[1] : colors.gray[4], fontSize: 14}}>{comment ? comment : '한줄팁 추가하기'}</AppText>
+                            <AppText style={{color: comment ? colors.blue[1] : colors.gray[4], fontSize: 14}} numberOfLines={1}>{comment ? comment : '한줄팁 추가하기'}</AppText> :
+                            <AppText style={{color: comment ? colors.blue[1] : colors.gray[4], fontSize: 14}} numberOfLines={1}>{comment ? comment : '한줄팁 추가하기'}</AppText>
                         }
                     </View>
                 </TouchableOpacity>
             </View>
-        {/* {idx < length-1 &&
-            <View style={{
-                width: '100%',
-                height: 1,
-                backgroundColor: colors.red_gray[6],
-                zIndex: -1000,
-                marginVertical: 12
-            }}></View>} */}
 
             <AddModal />
             <EditModal />
@@ -271,7 +247,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     planContainer : {
-        // height: 30,
+        height: 30,
         paddingVertical: 6,
         paddingLeft: 6,
         paddingRight: 5,
@@ -284,7 +260,7 @@ const styles = StyleSheet.create({
         width: '88%'
     },
     freeContainer: {
-        // height: 30,
+        height: 30,
         paddingVertical: 6,
         paddingLeft: 6,
         paddingRight: 5,

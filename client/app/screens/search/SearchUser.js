@@ -2,21 +2,19 @@ import React, {useEffect, useState} from 'react';
 import {View, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Dimensions, Alert} from 'react-native';
 import AppText from '../../components/AppText';
 import {useTheme} from '@react-navigation/native';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
-import {searchResult} from '../../contexts/search/SearchResultContextProvider';
-import {searchUserResult} from '../../contexts/search/SearchUserContextProvider';
 import {useIsFocused} from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
-const SearchUser = () => {
+const SearchUser = (props) => {
     const {colors} = useTheme();
+    const { countUser } = props;
     const [userList, setUserList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    const [searchLength, setSearchLength] = searchUserResult();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
@@ -24,7 +22,7 @@ const SearchUser = () => {
 
     useEffect(() => {
         getResults();
-    }, [searchKeyword, isFocused]);
+    }, [searchKeyword]);
 
     const getResults = () => {
         try {
@@ -48,8 +46,10 @@ const SearchUser = () => {
                         setIsSignedIn(false);
                         return;
                     }
+                    // console.log(response.data)
+                    // console.log(response.data.length)
 
-                    setSearchLength(response.data.length);
+                    countUser(response.data.length);
                     setUserList(response.data);
                 })
                 .catch((err) => {
@@ -85,10 +85,15 @@ const SearchUser = () => {
 
     const UserContainer = ({item}) => {
         return (
-            <View style={{alignItems: 'center', paddingBottom: 20, marginHorizontal: collectionMargin}}>
+            <View style={{alignItems: 'center', paddingBottom: 20, marginHorizontal: collectionMargin, justifyContent: 'space-between'}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <Image style={styles.authorImage}
-                        source={require('../../assets/images/here_default.png')}></Image>
+                    {item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
+                        <Image
+                        style={styles.authorImage}
+                        source={require('../../assets/images/default-profile.png')}
+                        /> :
+                        <Image source={{ uri: item.user_img }} style={styles.authorImage} />
+                    }
                     <View style={{
                         backgroundColor: colors.red_gray[2],
                         borderRadius: 50,
@@ -107,7 +112,7 @@ const SearchUser = () => {
                             fontSize: 12,
                             fontWeight: '500',
                             lineHeight: 19.2
-                        }}>{item.madeCollectionCnt}</AppText></View>
+                        }}>{item.collection_cnt}</AppText></View>
                 </View>
                 <AppText style={{
                     fontSize: 16,
@@ -116,12 +121,14 @@ const SearchUser = () => {
                     marginTop: 8
                 }}>{item.user_nickname}</AppText>
 
-                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-                    {item.keywords.length != 0 &&
-                    item.keywords.map((k) => {
-                        return <View style={{marginHorizontal: 3}}><AppText
-                            style={{fontSize: 12, color: colors.gray[4]}}># {k}</AppText></View>;
-                    })}
+                <View>
+                    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4, flexWrap: 'wrap', justifyContent: 'flex-start', width: '90%'}}>
+                        {item.keywords.length != 0 &&
+                        item.keywords.map((k) => {
+                            return <View style={{marginHorizontal: 3, flexDirection: 'row'}}><AppText
+                                style={{fontSize: 12, color: colors.gray[4]}}># {k}</AppText></View>;
+                        })}
+                    </View>
                 </View>
             </View>
         );
@@ -129,14 +136,17 @@ const SearchUser = () => {
     };
 
     return (
-        <View flexDirection="row" style={{
-            marginBottom: 8, alignItems: 'center', marginTop: 22, justifyContent: userList.length === 0 && 'center'
-        }}>
+        <View flexDirection="row" style={[{
+            marginBottom: 8,
+            alignItems: 'center',
+            marginTop: 22,
+            width: '100%'
+        }, userList.length === 0 && {justifyContent: 'center'}]}>
             {
                 userList.length === 0 ?
                     <ShowEmpty/> :
                     <SafeAreaView>
-                        <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
+                        <FlatList contentContainerStyle={{justifyContent: 'space-between', alignItems: 'flex-start'}} numColumns={2}
                             data={userList} renderItem={UserContainer}
                             keyExtractor={(item) => item.user_pk.toString()} nestedScrollEnabled/>
                     </SafeAreaView>
