@@ -141,7 +141,6 @@ const SearchCollection = (props, {navigation}) => {
                         },
                         shadowOpacity: 0.25,
                         shadowRadius: 3.84,
-                        elevation: 5,
                         overflow: 'visible'
                     }}>
                         <TouchableOpacity
@@ -417,7 +416,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
-        elevation: 5,
         marginHorizontal: 4,
         marginTop: 5
     },
@@ -426,7 +424,6 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         paddingHorizontal: 8,
         borderRadius: 14,
-        elevation: 1,
         width: 43,
         height: 22,
         marginLeft: 9,
@@ -457,7 +454,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
@@ -470,7 +466,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'

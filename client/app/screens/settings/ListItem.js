@@ -199,8 +199,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                             onPress={() => setReportMenu(!reportMenu)}
                         >
                             <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
@@ -212,8 +211,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                             onPress={() => {
                                 setReportMenu(!reportMenu);
                                 setReportConfirmMenu(true);
@@ -283,8 +281,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                             onPress={() => setAskMenu(!askMenu)}
                         >
                             <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
@@ -296,8 +293,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                                 onPress={() => {
                                 setAskMenu(!askMenu);
                                 setAskConfirmMenu(true);

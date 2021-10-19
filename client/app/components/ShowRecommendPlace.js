@@ -7,8 +7,9 @@ import AppText from '../components/AppText';
 
 const ShowRecommendPlace = props => {
     const {colors} = useTheme();
-    const { navigation } = props;
+    const {navigation} = props;
     const [popularPlace, setPopularPlace] = useState({});
+    const [thumbnail, setThumbnail] = useState([]);
     const [token, setToken] = useToken();
 
     useEffect(() => {
@@ -58,6 +59,22 @@ const ShowRecommendPlace = props => {
                     }
 
                     setPopularPlace(response.data);
+                    console.log(response.data)
+                    var newArr = [];
+                    const res = response.data;
+                    for (var i = 0; i < res.length; i++) {
+                        if (res[i].place_img) {
+                            newArr.push(res[i].place_img);
+                        } else if (res[i].place_thumbnail) {
+                            newArr.push(res[i].place_thumbnail);
+                        } else if (res[i].review_img) {
+                            newArr.push(res[i].review_img);
+                        } else {
+                            newArr.push('');
+                        }
+                    }
+                    setThumbnail(newArr);
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -102,9 +119,9 @@ const ShowRecommendPlace = props => {
     };
 
     const ShowRecommends = props => {
-        const { item } = props;
+        const {item, index} = props;
         return (
-            <TouchableOpacity onPress={()=>{
+            <TouchableOpacity onPress={() => {
                 countPlaceView(item.place_pk);
                 const data = {
                     'place_pk': item.place_pk,
@@ -113,12 +130,17 @@ const ShowRecommendPlace = props => {
             }}>
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
-                        <Image source={item.place_img ? {uri: item.place_img} : require('../assets/images/here_default.png')}
-                            style={{width: 141, height: 101, borderRadius: 10}}></Image>
+                        {
+                            thumbnail[index] !== '' ?
+                                <Image style={{width: 141, height: 101, borderRadius: 10}}
+                                       source={{uri: thumbnail[index]}}/> :
+                                <Image style={{width: 141, height: 101, borderRadius: 10}}
+                                       source={require('../assets/images/here_default.png')}/>
+                        }
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
                         <AppText style={{color: colors.gray[3], fontSize: 10}}>{checkType(item.place_type)}</AppText>
-                        { parseInt(item.review_score) !== -1 && <>
+                        {parseInt(item.review_score) !== -1 && <>
                             <AppText style={{
                                 color: colors.gray[3],
                                 fontSize: 10,
@@ -131,12 +153,16 @@ const ShowRecommendPlace = props => {
                                 marginBottom: 2
                             }}>
                                 <Image source={require('../assets/images/review_star.png')}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        alignSelf: 'center',
-                                    }}></Image>
-                                <AppText style={{color: colors.gray[3], fontSize: 10, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                       style={{
+                                           width: 10,
+                                           height: 10,
+                                           alignSelf: 'center',
+                                       }}></Image>
+                                <AppText style={{
+                                    color: colors.gray[3],
+                                    fontSize: 10,
+                                    marginLeft: 2
+                                }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                             </View></>}
                     </View>
                     <View style={{width: '90%'}}>
@@ -148,7 +174,8 @@ const ShowRecommendPlace = props => {
                         }}>{item.place_name}</AppText>
                     </View>
                     <View style={{width: '90%'}}>
-                        <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>{item.place_addr}</AppText>
+                        <AppText
+                            style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2}}>{item.place_addr}</AppText>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -157,10 +184,14 @@ const ShowRecommendPlace = props => {
 
     return (
         <FlatList data={popularPlace}
-            renderItem={({item, index}) => <ShowRecommends item={item} index={index} key={index} />}
-            keyExtractor={(item, idx) => {idx.toString();}}
-            key={(item, idx) => {idx.toString();}}
-            nestedScrollEnabled horizontal showsHorizontalScrollIndicator={false}/>
+                  renderItem={({item, index}) => <ShowRecommends item={item} index={index} key={index}/>}
+                  keyExtractor={(item, idx) => {
+                      idx.toString();
+                  }}
+                  key={(item, idx) => {
+                      idx.toString();
+                  }}
+                  nestedScrollEnabled horizontal showsHorizontalScrollIndicator={false}/>
     );
 };
 

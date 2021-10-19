@@ -186,7 +186,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     keywordHashTag: {
-        elevation: 1,
         justifyContent: 'center',
         alignItems: 'center',
         fontSize: 12
@@ -202,7 +201,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
     },
     //modal example
     centeredView: {

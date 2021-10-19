@@ -238,7 +238,6 @@ const SearchPlace = props => {
                         },
                         shadowOpacity: 0.25,
                         shadowRadius: 3.84,
-                        elevation: 5,
                         overflow: 'visible'
                     }}>
                         <TouchableOpacity
@@ -294,37 +293,6 @@ const SearchPlace = props => {
                                 {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
                             </View>
                         </TouchableOpacity>
-
-                        {/* <View style={{
-                            height: 1,
-                            borderColor: colors.gray[5],
-                            borderWidth: 0.4,
-                            borderRadius: 1,
-                            zIndex: 0,
-                            backgroundColor: colors.backgroundColor,
-                        }}></View>
-                    
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowMenu(false);
-                                setCurrentMenu('거리순');
-                                getResults('LIKE');
-                            }} style={{
-                                flex: 1,
-                                zIndex: 0,
-                            }}>
-                            <View style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                flexDirection: 'row',
-                                paddingLeft: 8.5,
-                                width: '100%',
-                            }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                                {currentMenu === '거리순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                            </View>
-                        </TouchableOpacity> */}
                     </View>
                 }
             </View>
@@ -352,8 +320,14 @@ const SearchPlace = props => {
                             item.place_img ?
                                 <Image source={{uri: item.place_img}}
                                     style={{borderRadius: 10, width: 72, height: 72}}/> :
-                                <Image source={require('../../assets/images/here_default.png')}
-                                    style={{borderRadius: 10, width: 72, height: 72}}/>
+                                    item.place_thumbnail ?
+                                    <Image source={{uri: item.place_thumbnail}}
+                                    style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        item.review_img ?
+                                        <Image source={{uri: item.review_img}}
+                                        style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        <Image source={require('../../assets/images/here_default.png')}
+                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
                         }
                         <View flex={1} style={styles.info_container}>
                             <View flexDirection="row" style={{alignItems: 'center'}}>

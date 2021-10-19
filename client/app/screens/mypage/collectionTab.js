@@ -254,7 +254,6 @@ const CollectionTab = ({navigation}) => {
                         },
                         shadowOpacity: 0.25,
                         shadowRadius: 3.84,
-                        elevation: 5,
                         overflow: 'visible'
                     }}>
                         <TouchableOpacity
@@ -318,7 +317,7 @@ const CollectionTab = ({navigation}) => {
         <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
             <SelectBox />
             <ScreenContainerView flex={1}>
-                <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 6, marginBottom: 8, position: 'relative', zIndex: 50}}>
+                <View flexDirection="row" style={{justifyContent: 'flex-start', marginTop: 6, marginBottom: 8, position: 'relative', zIndex: 50}}>
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
@@ -330,15 +329,6 @@ const CollectionTab = ({navigation}) => {
                             </TouchableOpacity>
                         </View>
                     </TouchableWithoutFeedback>
-
-
-                    <View flexDirection="row" style={{marginRight: 8}}>
-                        <View flexDirection="row">
-                            <Icon style={{marginTop: Platform.OS === 'android' ? 3 : 1, marginRight: 2}} type="ionicon"
-                                name={'funnel'} size={13} color={colors.mainColor}></Icon>
-                            <AppText style={{color: colors.mainColor}}>필터</AppText>
-                        </View>
-                    </View>
                 </View>
                 <SafeAreaView flex={1}>
                     <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
@@ -365,7 +355,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
-        elevation: 5,
     },
     likesContainer: {
         width: Dimensions.get('screen').width / 2.25,
@@ -407,7 +396,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
@@ -420,7 +408,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'

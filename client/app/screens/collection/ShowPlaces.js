@@ -33,7 +33,6 @@ const ShowPlaces = props => {
     const isFree = (typeof day === 'undefined');
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-
     const [isLiked, setIsLiked] = useState(item.like_flag);
     const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
@@ -273,7 +272,7 @@ const ShowPlaces = props => {
             </Modal>
         );
     };
-
+    
     return (
         <View style={checkLimit() && {display: 'none'}}>
             { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
@@ -310,8 +309,14 @@ const ShowPlaces = props => {
                                             item.place_img ?
                                                 <Image source={{uri: item.place_img}}
                                                     style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
-                                                <Image source={require('../../assets/images/here_default.png')}
-                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                                    item.place_thumbnail ?
+                                                    <Image source={{uri: item.place_thumbnail}}
+                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                        item.review_img ?
+                                                        <Image source={{uri: item.review_img}}
+                                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                        <Image source={require('../../assets/images/here_default.png')}
+                                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                                         }
                                         <View style={{
                                             justifyContent: 'space-between',
@@ -448,7 +453,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

@@ -22,6 +22,7 @@ const PlaceTab = ({navigation}) => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
+    const [thumbnail, setThumbnail] = useState([]);
 
     const [placeList, setPlaceList] = useState({});
     const [collectionList, setCollectionList] = useState({});
@@ -66,8 +67,23 @@ const PlaceTab = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-
+                    
                     setPlaceList(response.data);
+
+                    var newArr = [];
+                    const res = response.data;
+                    for(var i=0;i<res.length;i++) {
+                        if(res[i].place_img) {
+                            newArr.push(res[i].place_img);
+                        } else if(res[i].place_thumbnail) {
+                            newArr.push(res[i].place_thumbnail);
+                        } else if(res[i].review_img) {
+                            newArr.push(res[i].review_img);
+                        } else{
+                            newArr.push('');
+                        }
+                    }
+                    setThumbnail(newArr);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -324,7 +340,7 @@ const PlaceTab = ({navigation}) => {
         );
     };
 
-    const PlaceContainer = ({item}) => (
+    const PlaceContainer = ({item, index}) => (
         <TouchableOpacity style={{...styles.placeContainer, shadowColor: colors.red_gray[6], backgroundColor: colors.backgroundColor, zIndex: 9999}} onPress={() => {
             countPlaceView(item.place_pk);
             const data = {
@@ -334,8 +350,8 @@ const PlaceTab = ({navigation}) => {
         }}>
             <View style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
                 {
-                    item.place_img ?
-                        <Image style={styles.defaultPlaceImage} source={{uri: item.place_img}}/> :
+                    thumbnail[index] !== '' ?
+                        <Image style={styles.defaultPlaceImage} source={{uri: thumbnail[index]}}/> :
                         <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
                 }
                 <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 113, position: 'absolute'}}>
@@ -551,7 +567,6 @@ const PlaceTab = ({navigation}) => {
                         },
                         shadowOpacity: 0.25,
                         shadowRadius: 3.84,
-                        elevation: 5,
                         overflow: 'visible'
                     }}>
                         <TouchableOpacity
@@ -657,7 +672,7 @@ const PlaceTab = ({navigation}) => {
                     </ScrollView>
                 </View>
 
-                <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, marginBottom: 8, position: 'relative', zIndex: 50}}>
+                <View flexDirection="row" style={{justifyContent: 'flex-start', marginTop: 2, marginBottom: 8, position: 'relative', zIndex: 50}}>
                     <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
@@ -669,13 +684,6 @@ const PlaceTab = ({navigation}) => {
                             </TouchableOpacity>
                         </View>
                     </TouchableWithoutFeedback>
-                    <View flexDirection="row" style={{marginRight: 10}}>
-                        <View flexDirection="row">
-                            <Icon style={{marginTop: Platform.OS === 'android' ? 3 : 1, marginRight: 2}} type="ionicon"
-                                name={'funnel'} size={13} color={colors.mainColor}></Icon>
-                            <AppText style={{color: colors.mainColor}}>필터</AppText>
-                        </View>
-                    </View>
                 </View>
                 <SafeAreaView flex={1}>
                     <SetRendering />
@@ -699,7 +707,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
-        elevation: 5,
     },
     placeContainer: {
         width: '49%',
@@ -745,7 +752,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
@@ -758,7 +764,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
