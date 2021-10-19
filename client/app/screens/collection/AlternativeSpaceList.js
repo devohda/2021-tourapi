@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

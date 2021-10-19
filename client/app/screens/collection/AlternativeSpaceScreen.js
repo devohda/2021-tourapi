@@ -43,6 +43,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [thumbnail, setThumbnail] = useState('');
 
     const setDeletedData = (data) => {
         var newArr = [];
@@ -101,6 +102,12 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     }
 
                     setPlaceData(response.data.placeData);
+                    const res = response.data;
+                    if(res.placeData.place_img) {
+                        setThumbnail(res.placeData.place_img)
+                    } else if(res.review.review_img) {
+                        setThumbnail(res.review.review_img);
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -605,11 +612,9 @@ console.log(response)
                                     </View>
                                 </View>
                                 {
-                                    data.place_img ?
-                                        <Image source={{uri: data.place_img}}
-                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                                        <Image source={require('../../assets/images/here_default.png')}
-                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                    thumbnail !== '' ?
+                                        <Image style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}} source={{uri: thumbnail}}/> :
+                                        <Image style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}} source={require('../../assets/images/here_default.png')}/> 
                                 }
                                 <View style={{
                                     justifyContent: 'space-between',
@@ -730,7 +735,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowOpacity: 0.1,
         shadowOffset: {width: 0, height: 1},
-        elevation: 1
     },
     dirFreeText: {
         fontSize: 12,
@@ -855,7 +859,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

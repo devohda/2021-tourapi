@@ -100,7 +100,7 @@ function EditPlaces({
 
       if (positionY <= scrollY.value + dataHeight) {
         // Scroll up
-        scrollY.value = withTiming(0, { duration: 1500 });
+        scrollY.value = withTiming(0, { duration: 0 });
       } else if (
         positionY >=
         scrollY.value + dimensions.height - dataHeight
@@ -110,13 +110,13 @@ function EditPlaces({
         const containerHeight =
           dimensions.height - insets.top - insets.bottom;
         const maxScroll = contentHeight - containerHeight;
-        scrollY.value = withTiming(maxScroll, { duration: 1500 });
+        scrollY.value = withTiming(maxScroll, { duration: 0 });
       } else {
         cancelAnimation(scrollY);
       }
 
       top.value = withTiming(positionY - dataHeight, {
-        duration: 16,
+        duration: 0,
       });
 
       const newPosition = clamp(

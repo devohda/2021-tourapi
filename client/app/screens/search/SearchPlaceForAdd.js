@@ -219,9 +219,15 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                     {
                         item.place_img ?
                             <Image source={{uri: item.place_img}}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                            <Image source={require('../../assets/images/here_default.png')}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                item.place_thumbnail ?
+                                <Image source={{uri: item.place_thumbnail}}
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                    item.review_img ?
+                                    <Image source={{uri: item.review_img}}
+                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                    <Image source={require('../../assets/images/here_default.png')}
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                     }
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>

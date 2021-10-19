@@ -512,7 +512,6 @@ const styles = StyleSheet.create({
         shadowColor: 'rgba(203, 180, 180, 0.3)',
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -535,7 +534,6 @@ const styles = StyleSheet.create({
             height: 4
         },
         shadowOpacity: 0.25,
-        elevation: 4,
     },
     selectType: {
         borderWidth: 1,
@@ -546,8 +544,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
-        // width: 58,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -561,8 +557,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
-        // width: 58,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'

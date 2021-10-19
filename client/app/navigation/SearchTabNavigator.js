@@ -93,7 +93,6 @@ const SearchTabNavigator = ({navigation}) => {
                     tabBarLabelStyle: {fontSize: 16, fontWeight: '700'},
                     tabBarStyle: {
                         backgroundColor: colors.backgroundColor,
-                        elevation: 0,
                         shadowOpacity: 0,
                         justifyContent : 'center',
                         height : 56
