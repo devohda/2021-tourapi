@@ -21,7 +21,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
         }
     }
 
-    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
+    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
                         IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score, 
                         pri_review_img AS review_img
                  FROM places p
