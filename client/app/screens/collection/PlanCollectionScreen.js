@@ -41,6 +41,7 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -67,7 +68,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const onShare = async () => {
         try {
@@ -117,7 +118,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -158,7 +158,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -207,7 +206,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -245,7 +243,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     const newRegion = { ...region };
                     newRegion.latitude = Number(parseFloat(newArr[0].place_latitude).toFixed(10));
                     newRegion.longitude = Number(parseFloat(newArr[0].place_longitude).toFixed(10));
-                
+
                     setRegion(newRegion);
 
                 })
@@ -266,7 +264,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         for(var i=0;i<planDays.length;i++) {
             for(var j=0;j<placeData.length;j++) {
                 if(placeData[j].cpm_plan_day === i) {
-                    cur += 1
+                    cur += 1;
                     var forPutObj = {};
                     if(Object.keys(updatedData[i]).length === 0) {
                         isEmpty += 1;
@@ -274,16 +272,16 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             cpm_map_pk: placeData[j].cpm_map_pk,
                             planDay: i,
                             order: placeData[j].cpm_order
-                        }
+                        };
                     } else {
                         // console.log(Object.values(updatedData[i])[j])
                         forPutObj = {
                             cpm_map_pk: placeData[j].cpm_map_pk,
                             planDay: i,
                             order: Object.values(updatedData[i])[cur-1]
-                        }
-                    };
-                    putData.push(forPutObj)
+                        };
+                    }
+                    putData.push(forPutObj);
                 } else cur = 0;
                 // console.log(cur)
 
@@ -352,7 +350,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -389,7 +386,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -442,7 +438,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -482,7 +477,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -517,7 +511,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -555,7 +548,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -593,7 +585,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -631,7 +622,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -666,7 +656,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -714,7 +703,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -754,7 +742,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -797,7 +784,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -832,7 +818,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -882,7 +867,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 day: data[i].cpm_plan_day,
                 isDeleted: false,
             });
-        };
+        }
         setDeletedLengthByDays(newDays);
         setIsDeletedOrigin(newArr);
     };
@@ -891,16 +876,16 @@ const PlanCollectionScreen = ({route, navigation}) => {
         //현재 Day의 길이 (시간대 제외)
         var cnt = 0;
         for (let i = 0; i < placeData.length; i++) {
-          if(placeData[i].cpm_plan_day === props.idx && placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) {
-            cnt += 1;
-          }
+            if(placeData[i].cpm_plan_day === props.idx && placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) {
+                cnt += 1;
+            }
         }
 
         return (
             <SafeAreaView style={isEditPage && {display: 'none'}}>
                 <FlatList data={placeData}
                     renderItem={({item, index}) => <ShowPlaces day={props.idx} item={item} index={index} key={index} isEditPage={isEditPage} navigation={navigation} curLength={cnt}
-                    length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
+                        length={placeLength} private={collectionData.is_creator} pk={collectionData.collection_pk} originData={placeData} isDeleted={isDeleted} isDeletedOrigin={isDeletedOrigin} isLimited={isLimited[props.idx]}
                         isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk}
                         isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData}
                         postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}
@@ -918,7 +903,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         var newArr = [];
         for(var i=0;i<data.length;i++) newArr.push({});
         editData.value = newArr;
-    }
+    };
     const editData = useSharedValue([]);
 
     const isEdited = (data, day) => {
@@ -936,10 +921,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
         var cnt = 0;
         var editedData = [];
         for (let i = 0; i < placeData.length; i++) {
-          if(placeData[i].cpm_plan_day === props.idx) {
-            if(placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) cnt += 1;
-            editedData.push(placeData[i])
-          }
+            if(placeData[i].cpm_plan_day === props.idx) {
+                if(placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) cnt += 1;
+                editedData.push(placeData[i]);
+            }
         }
 
         return (
@@ -1507,9 +1492,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         </View>
                         <SafeAreaView>
                             <FlatList data={planDays} renderItem={ShowDays}
-                            keyExtractor={(item, index) => index.toString()}
-                            key={(item, index) => index.toString()}
-                            nestedScrollEnabled/>
+                                keyExtractor={(item, index) => index.toString()}
+                                key={(item, index) => index.toString()}
+                                nestedScrollEnabled/>
                         </SafeAreaView>
                     </View>
                 </ScreenContainerView>

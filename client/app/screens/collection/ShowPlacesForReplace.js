@@ -19,13 +19,14 @@ import { useToken } from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import { Icon } from 'react-native-elements';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ShowPlacesForReplace = props => {
     const { colors } = useTheme();
     const { item, index, isEditPage, navigation, likeFlag, getInitialReplacementData, getInitialData, isReplacementDeleted, isDeletedReplacement} = props;
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -60,7 +61,6 @@ const ShowPlacesForReplace = props => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -96,7 +96,6 @@ const ShowPlacesForReplace = props => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -133,7 +132,6 @@ const ShowPlacesForReplace = props => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -157,38 +155,38 @@ const ShowPlacesForReplace = props => {
 
     const DeleteModal = props => (
         <Modal
-        visible={deleteMenu}
-        backdropStyle={styles.backdrop}
-        style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
-        onBackdropPress={() => setDeleteMenu(false)}>
-        <Card disabled={true}
-            style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
-        >
-            <View style={{marginTop: 55}}>
-                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                    <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
-                        <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                            <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {
-                                let newArr = [...isDeletedReplacement];
-                                newArr[index] = true;
-                                isReplacementDeleted(newArr);
-                                console.log(newArr);
-                                setDeleteMenu(false);
-                            }}>
-                        <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                            <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
-                        </View>
-                    </TouchableOpacity>
+            visible={deleteMenu}
+            backdropStyle={styles.backdrop}
+            style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
+            onBackdropPress={() => setDeleteMenu(false)}>
+            <Card disabled={true}
+                style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+            >
+                <View style={{marginTop: 55}}>
+                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
                 </View>
-            </View>
-        </Card>
-    </Modal>
+                <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                        <TouchableOpacity onPress={() => {setDeleteVisible(false);}}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            let newArr = [...isDeletedReplacement];
+                            newArr[index] = true;
+                            isReplacementDeleted(newArr);
+                            console.log(newArr);
+                            setDeleteMenu(false);
+                        }}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Card>
+        </Modal>
     );
 
     return (
@@ -242,26 +240,26 @@ const ShowPlacesForReplace = props => {
                                                 fontWeight: 'bold'
                                             }}>{checkType(item.place_type)}</AppText>
                                             <View style={[parseInt(item.review_score) == -1 && {display: 'none'}, {flexDirection: 'row'}]}>
-                                            <AppText style={{
-                                                marginHorizontal: 4, color: colors.gray[7],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                            }}>|</AppText>
-                                            <Image source={require('../../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                    marginTop: '1%',
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                marginLeft: 2,
-                                            }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                                <AppText style={{
+                                                    marginHorizontal: 4, color: colors.gray[7],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                }}>|</AppText>
+                                                <Image source={require('../../assets/images/review_star.png')}
+                                                    style={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        alignSelf: 'center',
+                                                        marginTop: '1%',
+                                                    }}></Image>
+                                                <AppText style={{
+                                                    color: colors.gray[3],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                    marginLeft: 2,
+                                                }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                                             </View>
                                         </View>
                                         <View style={{width: '100%'}}>

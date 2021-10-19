@@ -15,6 +15,7 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import DefaultThumbnail from '../../assets/images/profile_default.svg';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const PlaceTab = ({navigation}) => {
     const {colors} = useTheme();
@@ -25,7 +26,7 @@ const PlaceTab = ({navigation}) => {
 
     const [placeList, setPlaceList] = useState({});
     const [collectionList, setCollectionList] = useState({});
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [directoryType, setDirectoryType] = useState([
         {
             name: '공간',
@@ -57,7 +58,6 @@ const PlaceTab = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -106,7 +106,6 @@ const PlaceTab = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -142,7 +141,6 @@ const PlaceTab = ({navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -176,7 +174,6 @@ const PlaceTab = ({navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -209,7 +206,6 @@ const PlaceTab = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -243,7 +239,6 @@ const PlaceTab = ({navigation}) => {
             }).then(res => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -294,7 +289,7 @@ const PlaceTab = ({navigation}) => {
         }
         setShowMenu(false);
         setCurrentMenu('최근 추가순');
-    }
+    };
 
     const Keyword = ({type, idx}) => {
         return (
@@ -441,7 +436,7 @@ const PlaceTab = ({navigation}) => {
     const setBGColor = (thumbnail) => {
         if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
         else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color
+        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
         else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
         else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
@@ -454,11 +449,11 @@ const PlaceTab = ({navigation}) => {
                 <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
                     <DefaultThumbnail width={97} height={70.38}/>
                 </View>
-            )
+            );
         } else {
             return (
                 <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
-            )
+            );
         }
     };
 
@@ -667,7 +662,7 @@ const PlaceTab = ({navigation}) => {
 
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
-                <SelectBox />
+            <SelectBox />
             <ScreenContainerView flex={1}>
                 <View flexDirection="row" style={{alignItems: 'center', justifyContent: 'center', marginVertical: 4, position: 'relative', zIndex: 50}}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>

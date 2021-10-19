@@ -27,6 +27,7 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import DefaultThumbnail from '../../assets/images/profile_default.svg';
 import * as SecureStore from 'expo-secure-store';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 export const navigationRef = React.createRef();
 
@@ -50,7 +51,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     const [putKeywords, setPutKeywords] = useState('');
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isVisible, setIsVisible] = useState(false);
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
@@ -100,7 +101,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         let form = new FormData();
         var forPostData = {};
 
-        if(image) {
+        if (image) {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
@@ -110,9 +111,9 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 uri: image,
                 type: 'multipart/form-data',
                 name: 'image.jpg',
-            }
+            };
             form.append('img', file);
-             
+
         } else {
             forPostData = {
                 name: collectionName,
@@ -127,14 +128,13 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
             fetch('http://34.64.185.40/collection/free', {
                 method: 'POST',
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    'Content-Type': 'multipart/form-data',
                     'x-access-token': token
                 },
                 body: form
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -144,17 +144,19 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(form)
+                    console.log(form);
                     const item = {
                         'collection_pk': response.collectionId,
                         'now': true,
                     };
-                    if(response.code === 200) {
+                    if (response.code === 200) {
                         Alert.alert('', '자유보관함이 생성되었습니다.', [
-                        {text : 'OK', onPress: () => {
-                            navigation.navigate('FreeCollection', {data: item});
-                            navigation.setOptions({tabBarVisible: true});
-                        }}]);
+                            {
+                                text: 'OK', onPress: () => {
+                                    navigation.navigate('FreeCollection', {data: item});
+                                    navigation.setOptions({tabBarVisible: true});
+                                }
+                            }]);
                     } else {
                         Alert.alert('', '자유보관함 생성에 실패했습니다. 다시 시도해주세요.');
                     }
@@ -185,7 +187,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         let form = new FormData();
         var forPostData = {};
 
-        if(image) {
+        if (image) {
             forPostData = {
                 name: collectionName,
                 isPrivate: forPostEnable,
@@ -195,9 +197,9 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 uri: image,
                 type: 'multipart/form-data',
                 name: 'image.jpg',
-            }
+            };
             form.append('img', file);
-             
+
         } else {
             forPostData = {
                 name: collectionName,
@@ -218,7 +220,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -234,10 +235,12 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         'now': true,
                     };
                     Alert.alert('', '자유보관함이 수정되었습니다.', [
-                        {text : 'OK', onPress: () => {
-                            navigation.navigate('FreeCollection', {data: item});
-                            navigation.setOptions({tabBarVisible: true});
-                        }}]);
+                        {
+                            text: 'OK', onPress: () => {
+                                navigation.navigate('FreeCollection', {data: item});
+                                navigation.setOptions({tabBarVisible: true});
+                            }
+                        }]);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -265,18 +268,18 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 setIsEnabled(true);
             }
 
-            if(data.collection_thumbnail === defaultThumbnailList[0].name) setSelectedIndex(0);
-            else if(data.collection_thumbnail === defaultThumbnailList[1].name) setSelectedIndex(1);
-            else if(data.collection_thumbnail === defaultThumbnailList[2].name) setSelectedIndex(2);
-            else if(data.collection_thumbnail === defaultThumbnailList[3].name) setSelectedIndex(3);
-            else if(data.collection_thumbnail === defaultThumbnailList[4].name) setSelectedIndex(4);
+            if (data.collection_thumbnail === defaultThumbnailList[0].name) setSelectedIndex(0);
+            else if (data.collection_thumbnail === defaultThumbnailList[1].name) setSelectedIndex(1);
+            else if (data.collection_thumbnail === defaultThumbnailList[2].name) setSelectedIndex(2);
+            else if (data.collection_thumbnail === defaultThumbnailList[3].name) setSelectedIndex(3);
+            else if (data.collection_thumbnail === defaultThumbnailList[4].name) setSelectedIndex(4);
             else {
-                var newArr =[...defaultThumbnailList];
+                var newArr = [...defaultThumbnailList];
                 newArr[5].name = data.collection_thumbnail;
                 setDefaultThumbnailList(newArr);
                 setImage(data.collection_thumbnail);
             }
-        };
+        }
     }, []);
 
     const getKeywords = useCallback(() => {
@@ -336,11 +339,11 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         const Keyword = ({keyword, idx}) => {
             return (
                 <View key={idx}
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
+                      style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                      }}
                 >
                     <TouchableOpacity onPress={() => {
                         if (pressed[keyword.keyword_pk - 1]) {
@@ -376,7 +379,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
             <>
                 <TouchableOpacity onPress={() => refRBSheet.current.open()}>
                     <Image source={require('../../assets/images/add_keyword.png')}
-                        style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
+                           style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                 </TouchableOpacity>
                 <RBSheet
                     ref={refRBSheet}
@@ -415,46 +418,46 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                     ))
                                 }
                             </View>
-                            <View style={{flexDirection: 'row'}}>
-                                {
-                                    keywordData.map((keyword, idx) => (
-                                        <>{4 <= idx && idx <= 6 &&
+                                <View style={{flexDirection: 'row'}}>
+                                    {
+                                        keywordData.map((keyword, idx) => (
+                                            <>{4 <= idx && idx <= 6 &&
                                             <Keyword keyword={keyword} key={idx + '1111'} idx={idx + '1111'}/>}</>
-                                    ))
-                                }
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
-                                {
-                                    keywordData.map((keyword, idx) => (
-                                        <>{7 <= idx && idx <= 10 &&
+                                        ))
+                                    }
+                                </View>
+                                <View style={{flexDirection: 'row'}}>
+                                    {
+                                        keywordData.map((keyword, idx) => (
+                                            <>{7 <= idx && idx <= 10 &&
                                             <Keyword keyword={keyword} key={idx + '2222'} idx={idx + '2222'}/>}</>
-                                    ))
-                                }
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
-                                {
-                                    keywordData.map((keyword, idx) => (
-                                        <>{11 <= idx && idx <= 13 &&
+                                        ))
+                                    }
+                                </View>
+                                <View style={{flexDirection: 'row'}}>
+                                    {
+                                        keywordData.map((keyword, idx) => (
+                                            <>{11 <= idx && idx <= 13 &&
                                             <Keyword keyword={keyword} key={idx + '3333'} idx={idx + '3333'}/>}</>
-                                    ))
-                                }
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
-                                {
-                                    keywordData.map((keyword, idx) => (
-                                        <>{14 <= idx && idx <= 17 &&
+                                        ))
+                                    }
+                                </View>
+                                <View style={{flexDirection: 'row'}}>
+                                    {
+                                        keywordData.map((keyword, idx) => (
+                                            <>{14 <= idx && idx <= 17 &&
                                             <Keyword keyword={keyword} key={idx + '4444'} idx={idx + '4444'}/>}</>
-                                    ))
-                                }
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
-                                {
-                                    keywordData.map((keyword, idx) => (
-                                        <>{18 <= idx && idx <= 19 &&
+                                        ))
+                                    }
+                                </View>
+                                <View style={{flexDirection: 'row'}}>
+                                    {
+                                        keywordData.map((keyword, idx) => (
+                                            <>{18 <= idx && idx <= 19 &&
                                             <Keyword keyword={keyword} key={idx + '5555'} idx={idx + '5555'}/>}</>
-                                    ))
-                                }
-                            </View>
+                                        ))
+                                    }
+                                </View>
                             </>
                             <View style={{marginTop: 30, marginBottom: 20, bottom: 0}}>
                                 <TouchableOpacity
@@ -468,14 +471,14 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                     }}
                                     disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
                                 ><AppText
-                                        style={{
-                                            textAlign: 'center',
-                                            padding: 14,
-                                            fontSize: 16,
-                                            color: colors.defaultColor,
-                                            fontWeight: 'bold'
-                                        }}
-                                    >선택완료</AppText>
+                                    style={{
+                                        textAlign: 'center',
+                                        padding: 14,
+                                        fontSize: 16,
+                                        color: colors.defaultColor,
+                                        fontWeight: 'bold'
+                                    }}
+                                >선택완료</AppText>
                                 </TouchableOpacity>
                             </View>
                         </ScreenContainerView>
@@ -488,17 +491,17 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     const SelectedKeyword = ({keyword, idx}) => {
         return (
             <View key={idx}
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
+                  style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                  }}
             >
                 <TouchableOpacity style={[styles.selectType, {
                     borderColor: colors.defaultColor,
                     backgroundColor: colors.defaultColor
                 }]}
-                disabled={true}
+                                  disabled={true}
                 >
                     <AppText
                         style={{...styles.selectTypeText, color: colors.mainColor}}>{keyword.keyword_title}</AppText>
@@ -508,21 +511,21 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
     };
 
     const setBGColor = (idx) => {
-        return defaultThumbnailList[idx].color
+        return defaultThumbnailList[idx].color;
     };
 
     const [image, setImage] = useState(null);
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
         });
-    
+
         console.log(result);
-        var newArr =[...defaultThumbnailList];
-    
+        var newArr = [...defaultThumbnailList];
+
         if (!result.cancelled) {
             setImage(result.uri);
             newArr[5].name = result.uri;
@@ -538,44 +541,58 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         return (
             <View style={{alignItems: 'center'}}>
                 {image ?
-                <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
-                <View style={{...styles.selectedImage, backgroundColor: selectedIndex === 5 && !image ? colors.red[3] : setBGColor(selectedIndex)}}>
-                    <DefaultThumbnail width={83} height={60.2}/>
-                </View>
+                    <Image source={{uri: image}} style={{...styles.selectedImage}}/> :
+                    <View style={{
+                        ...styles.selectedImage,
+                        backgroundColor: selectedIndex === 5 && !image ? colors.red[3] : setBGColor(selectedIndex)
+                    }}>
+                        <DefaultThumbnail width={83} height={60.2}/>
+                    </View>
                 }
                 <FlatList data={defaultThumbnailList} horizontal
-                    renderItem={({item, index}) =>
-                    <TouchableOpacity onPress={()=>{
-                        if(index === 5) {
-                            (async () => {
-                                if (Platform.OS !== 'web') {
-                                  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                                  if (status !== 'granted') {
-                                    alert('Sorry, we need camera roll permissions to make this work!');
+                          renderItem={({item, index}) =>
+                              <TouchableOpacity onPress={() => {
+                                  if (index === 5) {
+                                      (async () => {
+                                          if (Platform.OS !== 'web') {
+                                              const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                                              if (status !== 'granted') {
+                                                  alert('Sorry, we need camera roll permissions to make this work!');
+                                              }
+                                          }
+                                      })();
+                                      pickImage();
+                                  } else {
+                                      setImage('');
                                   }
-                                }
-                              })();
-                            pickImage();
-                        } else {
-                            setImage('');
-                        }
-                        setSelectedIndex(index);
-                    }}>
-                        <View style={{backgroundColor: item.color, width: 28, height: 28, borderRadius: 10, marginHorizontal: 5, marginTop: 17}}>
-                            <Icon type="ionicon" name={"camera"} style={[index !== 5 && {display: 'none'}, {
-                                shadowOffset: {
-                                    width: 2,
-                                    height: 2
-                                },
-                                shadowOpacity: 0.25,
-                                shadowColor: 'rgba(0, 0, 0, 0.25)',
-                                }]} color={colors.gray[6]}></Icon>
-                        </View>
-                    </TouchableOpacity>
-                }
-                    keyExtractor={(item, idx) => {idx.toString();}}
-                    key={(item, idx) => {idx.toString();}}
-                    nestedScrollEnabled/>
+                                  setSelectedIndex(index);
+                              }}>
+                                  <View style={{
+                                      backgroundColor: item.color,
+                                      width: 28,
+                                      height: 28,
+                                      borderRadius: 10,
+                                      marginHorizontal: 5,
+                                      marginTop: 17
+                                  }}>
+                                      <Icon type="ionicon" name={"camera"} style={[index !== 5 && {display: 'none'}, {
+                                          shadowOffset: {
+                                              width: 2,
+                                              height: 2
+                                          },
+                                          shadowOpacity: 0.25,
+                                          shadowColor: 'rgba(0, 0, 0, 0.25)',
+                                      }]} color={colors.gray[6]}></Icon>
+                                  </View>
+                              </TouchableOpacity>
+                          }
+                          keyExtractor={(item, idx) => {
+                              idx.toString();
+                          }}
+                          key={(item, idx) => {
+                              idx.toString();
+                          }}
+                          nestedScrollEnabled/>
             </View>
         );
     };
@@ -585,7 +602,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
             <NavigationTop navigation={navigation} title={update ? '자유보관함 수정' : '자유보관함 만들기'}/>
             <ScrollView>
                 <ScreenContainerView flex={1}>
-                    <SelectProfile />
+                    <SelectProfile/>
                     <View style={{marginTop: 25}}>
                         <CustomTextInput
                             style={{
@@ -601,7 +618,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         </CustomTextInput>
                     </View>
                 </ScreenContainerView>
-                <ScreenDivideLine />
+                <ScreenDivideLine/>
                 <ScreenContainerView flex={1}>
                     <View style={{marginTop: 24}}>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -617,11 +634,12 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         }}>
 
                             <View flexDirection="row">
-                                <SelectKeyword />
+                                <SelectKeyword/>
                                 {
                                     keywordData.map((keyword, idx) => (
                                         <>{isPress[idx] === true &&
-                                                <SelectedKeyword keyword={keyword} key={idx+'selected'} idx={idx+'selected'}/>}</>
+                                        <SelectedKeyword keyword={keyword} key={idx + 'selected'}
+                                                         idx={idx + 'selected'}/>}</>
                                     ))
                                 }
                             </View>
@@ -642,12 +660,12 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                             value={isEnabled}
                         />
                     </View>
-                    </ScreenContainerView>
-                </ScrollView>
-                <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                    <ScreenContainerView flex={1}>
-                        <View flex={1} style={{bottom: 20, justifyContent: 'flex-end'}}>
-                            <TouchableOpacity
+                </ScreenContainerView>
+            </ScrollView>
+            <KeyboardAvoidingView flex={1} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScreenContainerView flex={1}>
+                    <View flex={1} style={{bottom: 20, justifyContent: 'flex-end'}}>
+                        <TouchableOpacity
                             testID="completed"
                             style={{
                                 backgroundColor: DATA.collection_name.length >= 2 ? colors.mainColor : colors.gray[5],
@@ -655,19 +673,19 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                 borderRadius: 10
                             }}
                             onPress={() => {
-                                if(update) updateCollections();
+                                if (update) updateCollections();
                                 else postCollections();
                             }}
                             disabled={DATA.collection_name.length < 2 ? true : false}
                         ><AppText
-                                style={{
-                                    textAlign: 'center',
-                                    padding: 14,
-                                    fontSize: 16,
-                                    color: colors.defaultColor,
-                                    fontWeight: 'bold'
-                                }}
-                            >{update ? '보관함 수정' : '보관함 만들기'}</AppText>
+                            style={{
+                                textAlign: 'center',
+                                padding: 14,
+                                fontSize: 16,
+                                color: colors.defaultColor,
+                                fontWeight: 'bold'
+                            }}
+                        >{update ? '보관함 수정' : '보관함 만들기'}</AppText>
                         </TouchableOpacity>
                     </View>
                 </ScreenContainerView>

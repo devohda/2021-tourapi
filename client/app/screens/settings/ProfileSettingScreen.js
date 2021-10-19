@@ -13,6 +13,7 @@ import { useToken } from '../../contexts/TokenContextProvider';
 import BackIcon from '../../assets/images/back-icon.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ProfileSettingScreen = ({route, navigation}) => {
     useEffect(() => {
@@ -25,7 +26,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
     
     const [token, setToken] = useToken();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [userData, setUserData] = useState({});
     const [userNickname, setUserNickname] = useState('');
@@ -69,7 +70,6 @@ const ProfileSettingScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -114,7 +114,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 uri: image,
                 type: 'multipart/form-data',
                 name: 'image.jpg',
-            }
+            };
             form.append('img', file);
              
         } else {
@@ -128,17 +128,16 @@ const ProfileSettingScreen = ({route, navigation}) => {
         form.append('userData', JSON.stringify(forPostData));
 
         try {
-            fetch(`http://34.64.185.40/user/info`, {
+            fetch('http://34.64.185.40/user/info', {
                 method: 'PUT',
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    'Content-Type': 'multipart/form-data',
                     'x-access-token': token
                 },
                 body: form
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -148,7 +147,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+                    console.log(response);
 
                     Alert.alert('', '프로필이 수정되었습니다.', [
                         {text : 'OK', onPress: () => {
@@ -342,7 +341,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                         for(var i=0;i<keywordData.length;i++) {
                                             if(pressed[i]) newArr.push(keywordData[i].keyword_title);
                                         }
-                                        setUserKeywordData(newArr)
+                                        setUserKeywordData(newArr);
                                     }}
                                     disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
                                 ><AppText
@@ -366,16 +365,16 @@ const ProfileSettingScreen = ({route, navigation}) => {
     const [image, setImage] = useState(img);
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
         });
     
         console.log(result);
     
         if (!result.cancelled) {
-          setImage(result.uri);
+            setImage(result.uri);
         }
     };
 
@@ -427,13 +426,13 @@ const ProfileSettingScreen = ({route, navigation}) => {
                     >
                         {image === '' || image === 'default-user' || image.startsWith('../') || image === 'default-img' ?
                             <Image
-                            style={{
-                                width: 90,
-                                height: 90,
-                                borderRadius: 60,
-                                backgroundColor: colors.defaultColor,
-                            }}
-                            source={require('../../assets/images/default-profile.png')}
+                                style={{
+                                    width: 90,
+                                    height: 90,
+                                    borderRadius: 60,
+                                    backgroundColor: colors.defaultColor,
+                                }}
+                                source={require('../../assets/images/default-profile.png')}
                             /> :
                             <Image source={{ uri: image }} style={{
                                 width: 90,
@@ -449,10 +448,10 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                 if (Platform.OS !== 'web') {
                                     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                                     if (status !== 'granted') {
-                                    alert('Sorry, we need camera roll permissions to make this work!');
+                                        alert('Sorry, we need camera roll permissions to make this work!');
                                     }
                                 }
-                                })();
+                            })();
                             pickImage();
                         }}>
                             <View style={{...styles.cameraIcon, backgroundColor: colors.defaultColor}}>
