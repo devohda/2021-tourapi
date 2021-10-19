@@ -9,6 +9,7 @@ import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SearchPlaceForAdd = (props, {route, navigation}) => {
     const {colors} = useTheme();
@@ -20,7 +21,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
 
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const addPlace = (place_pk) => {
         var prevLength = isPress.filter(element => (element === true)).length;
@@ -41,7 +42,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -80,7 +80,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -115,7 +114,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -151,7 +149,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 

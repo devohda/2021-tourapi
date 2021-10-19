@@ -1,9 +1,9 @@
 const dbConfig = {
-    host: '34.146.76.44',
+    host: '34.64.244.73',
     port: '3306',
-    user: 'tourapi',
+    user: 'root',
     password: 'tourapi2021',
-    database: 'tourapi_db',
+    database: 'here',
     multipleStatements: true,
     connectionLimit : 100,
     waitForConnections : true

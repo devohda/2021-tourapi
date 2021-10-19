@@ -19,13 +19,14 @@ import { useToken } from '../../contexts/TokenContextProvider';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import { Icon } from 'react-native-elements';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ShowPlacesForReplace = props => {
     const { colors } = useTheme();
     const { item, index, isEditPage, navigation, likeFlag, getInitialReplacementData, getInitialData, isReplacementDeleted, isDeletedReplacement} = props;
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -60,7 +61,6 @@ const ShowPlacesForReplace = props => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -96,7 +96,6 @@ const ShowPlacesForReplace = props => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -133,7 +132,6 @@ const ShowPlacesForReplace = props => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -186,8 +184,8 @@ const ShowPlacesForReplace = props => {
                     </TouchableOpacity>
                 </View>
             </View>
-        </Card>
-    </Modal>
+            </Card>
+        </Modal>
     );
 
     return (
@@ -241,26 +239,26 @@ const ShowPlacesForReplace = props => {
                                                 fontWeight: 'bold'
                                             }}>{checkType(item.place_type)}</AppText>
                                             <View style={[parseInt(item.review_score) == -1 && {display: 'none'}, {flexDirection: 'row'}]}>
-                                            <AppText style={{
-                                                marginHorizontal: 4, color: colors.gray[7],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                            }}>|</AppText>
-                                            <Image source={require('../../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                    marginTop: '1%',
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                marginLeft: 2,
-                                            }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                                <AppText style={{
+                                                    marginHorizontal: 4, color: colors.gray[7],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                }}>|</AppText>
+                                                <Image source={require('../../assets/images/review_star.png')}
+                                                    style={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        alignSelf: 'center',
+                                                        marginTop: '1%',
+                                                    }}></Image>
+                                                <AppText style={{
+                                                    color: colors.gray[3],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                    marginLeft: 2,
+                                                }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                                             </View>
                                         </View>
                                         <View style={{width: '100%'}}>

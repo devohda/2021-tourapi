@@ -20,6 +20,7 @@ import SlideMenu from '../../assets/images/menu_for_edit.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import AlternativeSpaceList from './AlternativeSpaceList';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ShowPlaces = props => {
     const { colors } = useTheme();
@@ -33,7 +34,7 @@ const ShowPlaces = props => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [isLiked, setIsLiked] = useState(item.like_flag);
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -80,7 +81,6 @@ const ShowPlaces = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -115,7 +115,6 @@ const ShowPlaces = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -150,7 +149,6 @@ const ShowPlaces = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -186,7 +184,6 @@ const ShowPlaces = props => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -251,7 +248,7 @@ const ShowPlaces = props => {
                     </View>
                     <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                            <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false);}}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
                                 </View>
@@ -270,7 +267,7 @@ const ShowPlaces = props => {
                     </View>
                 </Card>
             </Modal>
-        )
+        );
     };
     
     return (
@@ -333,26 +330,26 @@ const ShowPlaces = props => {
                                                         fontWeight: 'bold'
                                                     }}>{checkType(item.place_type)}</AppText>
                                                     <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
-                                                    <AppText style={{
-                                                        marginHorizontal: 4, color: colors.gray[7],
-                                                        textAlign: 'center',
-                                                        fontSize: 10,
-                                                        fontWeight: 'bold',
-                                                    }}>|</AppText>
-                                                    <Image source={require('../../assets/images/review_star.png')}
-                                                        style={{
-                                                            width: 10,
-                                                            height: 10,
-                                                            alignSelf: 'center',
-                                                            marginTop: '1%',
-                                                        }}></Image>
-                                                    <AppText style={{
-                                                        color: colors.gray[3],
-                                                        textAlign: 'center',
-                                                        fontSize: 10,
-                                                        fontWeight: 'bold',
-                                                        marginLeft: 2,
-                                                    }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                                        <AppText style={{
+                                                            marginHorizontal: 4, color: colors.gray[7],
+                                                            textAlign: 'center',
+                                                            fontSize: 10,
+                                                            fontWeight: 'bold',
+                                                        }}>|</AppText>
+                                                        <Image source={require('../../assets/images/review_star.png')}
+                                                            style={{
+                                                                width: 10,
+                                                                height: 10,
+                                                                alignSelf: 'center',
+                                                                marginTop: '1%',
+                                                            }}></Image>
+                                                        <AppText style={{
+                                                            color: colors.gray[3],
+                                                            textAlign: 'center',
+                                                            fontSize: 10,
+                                                            fontWeight: 'bold',
+                                                            marginLeft: 2,
+                                                        }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                                                     </View>
                                                 </View>
                                                 <View style={{width: '100%'}}>
@@ -371,22 +368,22 @@ const ShowPlaces = props => {
                                 </View>
                             </TouchableOpacity>
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            {
-                                !isEditPage ?
-                                    <TouchableOpacity onPress={() => {
-                                        if (isLiked) {
-                                            DeleteLikedPlace(item.place_pk);
-                                        } else {
-                                            LikePlace(item.place_pk);
-                                        }
-                                    }}>
-                                        <Jewel width={26} height={21}
-                                            style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
-                                    </TouchableOpacity> :
-                                    <TouchableOpacity>
-                                        <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
-                                    </TouchableOpacity>
-                            }
+                                {
+                                    !isEditPage ?
+                                        <TouchableOpacity onPress={() => {
+                                            if (isLiked) {
+                                                DeleteLikedPlace(item.place_pk);
+                                            } else {
+                                                LikePlace(item.place_pk);
+                                            }
+                                        }}>
+                                            <Jewel width={26} height={21}
+                                                style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
+                                        </TouchableOpacity> :
+                                        <TouchableOpacity>
+                                            <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
+                                        </TouchableOpacity>
+                                }
                             </View>
                         </View>
                         {!isEditPage && <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} private={props.private} navigation={navigation} pk={pk}

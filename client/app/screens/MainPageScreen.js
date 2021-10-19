@@ -19,6 +19,7 @@ import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 import Jewel from '../assets/images/jewel.svg';
 import DefaultThumbnail from '../assets/images/profile_default.svg';
 import * as SecureStore from 'expo-secure-store';
+import {useAlertDuplicated} from '../contexts/LoginContextProvider';
 
 export default function MainPageScreen({navigation}) {
     const {colors} = useTheme();
@@ -31,7 +32,7 @@ export default function MainPageScreen({navigation}) {
     const [days, setDays] = useState('DAY');
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
@@ -89,7 +90,6 @@ export default function MainPageScreen({navigation}) {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -122,7 +122,6 @@ export default function MainPageScreen({navigation}) {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -170,7 +169,6 @@ export default function MainPageScreen({navigation}) {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -238,7 +236,6 @@ export default function MainPageScreen({navigation}) {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -271,7 +268,6 @@ export default function MainPageScreen({navigation}) {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -306,7 +302,6 @@ export default function MainPageScreen({navigation}) {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -331,7 +326,7 @@ export default function MainPageScreen({navigation}) {
     const setBGColor = (thumbnail) => {
         if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
         else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color
+        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
         else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
         else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
@@ -436,18 +431,18 @@ export default function MainPageScreen({navigation}) {
             <View style={{alignItems: 'center'}}>
                 {
                     user_img === '' || user_img === 'default-user' || user_img.startsWith('../') || user_img === 'default-img' ?
-                    <View style={{...styles.authorImage}}>
-                        <Image
-                        style={{
-                            width: 88,
-                            height: 88,
-                            borderRadius: 50,
-                            backgroundColor: colors.defaultColor,
-                        }}
-                        source={require('../assets/images/default-profile.png')}
-                        /></View> :
-                    <View style={{...styles.authorImage}}>
-                        <Image source={{ uri: user_img }} style={{
+                        <View style={{...styles.authorImage}}>
+                            <Image
+                                style={{
+                                    width: 88,
+                                    height: 88,
+                                    borderRadius: 50,
+                                    backgroundColor: colors.defaultColor,
+                                }}
+                                source={require('../assets/images/default-profile.png')}
+                            /></View> :
+                        <View style={{...styles.authorImage}}>
+                            <Image source={{ uri: user_img }} style={{
                                 width: 88,
                                 height: 88,
                                 borderRadius: 50,
@@ -461,14 +456,14 @@ export default function MainPageScreen({navigation}) {
                     marginTop: 8
                 }}>{user_nickname}</AppText>
                 <View style={{justifyContent: 'center'}}>
-                {
-                    keyword.length !== 0 &&
+                    {
+                        keyword.length !== 0 &&
                     <View style={{flexDirection: 'row', marginTop: 4, width: '95%', flexWrap: 'wrap', alignItems: 'flex-start'}}>{
                         keyword.map((data, idx) => (
                             <UserKeyword data={data} key={idx + 'user'}/>
                         ))
                     }</View>
-                }
+                    }
                 </View>
             </View>
         );
@@ -522,7 +517,6 @@ export default function MainPageScreen({navigation}) {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 

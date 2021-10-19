@@ -13,6 +13,7 @@ import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
@@ -20,7 +21,7 @@ const SystemSettingScreen = ({navigation}) => {
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     useEffect(() => {
         getUserData();
@@ -38,7 +39,6 @@ const SystemSettingScreen = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -84,10 +84,10 @@ const SystemSettingScreen = ({navigation}) => {
             //         name: '버전 정보 ' + appJson.expo.version
             //     }]
             data: [{index: 1, name: '문의하기'}, {index: 2, name: '신고하기'},
-            {
-                index: 3,
-                name: '버전 정보 ' + appJson.expo.version
-            }]
+                {
+                    index: 3,
+                    name: '버전 정보 ' + appJson.expo.version
+                }]
         },
         {
             index: 3,

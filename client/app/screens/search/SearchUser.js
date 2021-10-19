@@ -8,6 +8,7 @@ import {useToken} from '../../contexts/TokenContextProvider';
 import {useIsFocused} from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SearchUser = (props) => {
     const {colors} = useTheme();
@@ -18,7 +19,7 @@ const SearchUser = (props) => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     useEffect(() => {
         getResults();
@@ -36,7 +37,6 @@ const SearchUser = (props) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -87,8 +87,8 @@ const SearchUser = (props) => {
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     {item.user_img === '' || item.user_img === 'default-user' || item.user_img.startsWith('../') || item.user_img === 'default-img' ?
                         <Image
-                        style={styles.authorImage}
-                        source={require('../../assets/images/default-profile.png')}
+                            style={styles.authorImage}
+                            source={require('../../assets/images/default-profile.png')}
                         /> :
                         <Image source={{ uri: item.user_img }} style={styles.authorImage} />
                     }

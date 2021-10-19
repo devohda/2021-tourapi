@@ -1,5 +1,5 @@
 //전역 선언 방법 찾아보기
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, TouchableOpacity, View, Dimensions, Text, onError, Alert} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
@@ -17,6 +17,8 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import {Cache} from 'react-native-cache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useToken} from '../../contexts/TokenContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
+
 
 const cache = new Cache({
     namespace: 'myapp',
@@ -32,8 +34,16 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     const [password, setPassword] = useState(null);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [token, setToken] = useToken();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const {colors} = useTheme();
+
+    useEffect(() => {
+        if(alertDuplicated){
+            Alert.alert('다른 기기에서 로그인했습니다.');
+        }
+        setAlertDuplicated(false);
+    },[]);
 
     const loginApple = async (user, email, nickname, token) => {
         try {
@@ -47,6 +57,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 },
                 body: JSON.stringify({
                     userInfo: {
+                        user,
                         email,
                         password: 'FJO4rI!@EK#WJaN!FbdK&%1&',
                         nickname,
@@ -120,30 +131,33 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             onPress={
                                 async () => {
                                     try {
-                                        const credential = await AppleAuthentication.signInAsync({
-                                            requestedScopes: [
-                                                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                                                AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                                            ],
-                                        });
-
-                                        const cachedName = await cache.get(credential.user);
-                                        const detailsArePopulated = (!!credential.fullName && !!credential.email);
-
-                                        // 항상 토큰을 같이 보내기.
-                                        if (!detailsArePopulated && !cachedName) {
-                                            await loginApple(null, null, null, credential.identityToken);
-                                        } else if (!detailsArePopulated && cachedName) {
-                                            // 새로 계정 만드는 것.(중간에 튕겼을 때)
-                                            await loginApple(credential.user, cachedName.email, cachedName.fullName, credential.identityToken);
-                                        } else {
-                                            // 새로 계정 만드는 것.
-                                            // 캐시에 저장
-                                            await cache.set(credential.user, {
-                                                fullName: credential.fullName,
-                                                email: credential.email
+                                        const available = await AppleAuthentication.isAvailableAsync();
+                                        if(available){
+                                            const credential = await AppleAuthentication.signInAsync({
+                                                requestedScopes: [
+                                                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                                                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                                                ],
                                             });
-                                            await loginApple(credential.user, credential.email, credential.fullName, credential.identityToken);
+
+                                            const cachedName = await cache.get(credential.user);
+                                            const detailsArePopulated = (!!credential.fullName && !!credential.email);
+
+                                            // 항상 토큰을 같이 보내기.
+                                            if (!detailsArePopulated && !cachedName) {
+                                                await loginApple(credential.user, null, null, credential.identityToken);
+                                            } else if (!detailsArePopulated && cachedName) {
+                                                // 새로 계정 만드는 것.(중간에 튕겼을 때)
+                                                await loginApple(credential.user, cachedName.email, cachedName.fullName, credential.identityToken);
+                                            } else {
+                                                // 새로 계정 만드는 것.
+                                                // 캐시에 저장
+                                                await cache.set(credential.user, {
+                                                    fullName: credential.fullName,
+                                                    email: credential.email
+                                                });
+                                                await loginApple(credential.user, credential.email, credential.fullName, credential.identityToken);
+                                            }
                                         }
                                     } catch (error) {
                                         if (error.code === 'ERR_CANCELED') {

@@ -7,8 +7,8 @@ const LocationContextProvider = ({children}) => {
         <LocationContext.Provider value={useState(null)}>
             {children}
         </LocationContext.Provider>
-    )
-}
+    );
+};
 
-export const myLocation = () => useContext(LocationContext)
+export const myLocation = () => useContext(LocationContext);
 export default LocationContextProvider;
