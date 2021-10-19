@@ -19,7 +19,7 @@ const ShowRecommendCollection = props => {
 
     const getPopularCollectionData = () => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=POPULAR`, {
+            fetch('http://34.64.185.40/collection/list?type=MAIN&sort=POPULAR', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -29,7 +29,6 @@ const ShowRecommendCollection = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -64,7 +63,6 @@ const ShowRecommendCollection = props => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -120,7 +118,7 @@ const ShowRecommendCollection = props => {
     const setBGColor = (thumbnail) => {
         if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
         else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color
+        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
         else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
         else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
@@ -142,7 +140,7 @@ const ShowRecommendCollection = props => {
                         <DefaultThumbnail width={107} height={80.38}/>
                     </View>
                 </View>
-            )
+            );
         } else {
             return (
                 <View flexDirection="row" style={{
@@ -155,7 +153,7 @@ const ShowRecommendCollection = props => {
                 }}>
                     <Image source={{ uri: thumbnail }} style={{width: '100%', height: '100%'}}/>
                 </View>
-            )
+            );
         }
     };
 

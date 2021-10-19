@@ -10,6 +10,7 @@ import { useToken } from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import SettingsIcon from '../../assets/images/settings-icon.svg';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const MyPageScreen = ({navigation}) => {
     const {colors} = useTheme();
@@ -18,7 +19,7 @@ const MyPageScreen = ({navigation}) => {
     const [userKeywordData, setUserKeywordData] = useState([]);
     const [userImage, setUserImage] = useState('');
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -37,7 +38,6 @@ const MyPageScreen = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -107,21 +107,21 @@ const MyPageScreen = ({navigation}) => {
                     >
                         {
                             userImage === '' || userImage === 'default-user' || userImage.startsWith('../') || userImage === 'default-img' ?
-                            <Image
-                            style={{
-                                width: 90,
-                                height: 90,
-                                borderRadius: 60,
-                                backgroundColor: colors.defaultColor,
-                            }}
-                            source={require('../../assets/images/default-profile.png')}
-                            /> :
-                            <Image source={{ uri: userImage }} style={{
-                                width: 90,
-                                height: 90,
-                                borderRadius: 60,
-                                backgroundColor: colors.defaultColor,
-                            }} />
+                                <Image
+                                    style={{
+                                        width: 90,
+                                        height: 90,
+                                        borderRadius: 60,
+                                        backgroundColor: colors.defaultColor,
+                                    }}
+                                    source={require('../../assets/images/default-profile.png')}
+                                /> :
+                                <Image source={{ uri: userImage }} style={{
+                                    width: 90,
+                                    height: 90,
+                                    borderRadius: 60,
+                                    backgroundColor: colors.defaultColor,
+                                }} />
                         }
                     </View>
                     <View style={{marginTop: 4}}>

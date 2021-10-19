@@ -24,13 +24,14 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import moment from 'moment';
 import 'moment/locale/ko';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height, getCollectionList}) => {
     const maxHeight = Dimensions.get('screen').height;
     const [isCollectionClicked, setIsCollectionClicked] = useState(Array.from({length: collectionList.length}, () => false));
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const postPlace = (refRBSheet) => {
         const index = isCollectionClicked.findIndex((element) => element === true);
@@ -56,7 +57,6 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -256,7 +256,7 @@ const PlaceScreen = ({route, navigation}) => {
     const isFocused = useIsFocused();
     const [height, setHeight] = useState(180 + 90 * collectionList.length);
 
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const getInitialData = () => {
         try {
@@ -270,7 +270,6 @@ const PlaceScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -280,7 +279,7 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
+                    console.log(response.data);
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
@@ -311,7 +310,7 @@ const PlaceScreen = ({route, navigation}) => {
         if(data.placeData.place_img !== null) newArr.push(data.placeData.place_img);
         if(data.review.review_img.length !== 0) newArr.push(...data.review.review_img);
         setImageList(newArr);
-    }
+    };
 
     const getPopularPlaceData = () => {
         try {
@@ -325,7 +324,6 @@ const PlaceScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -377,7 +375,6 @@ const PlaceScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -413,7 +410,6 @@ const PlaceScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -731,7 +727,6 @@ const PlaceScreen = ({route, navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -765,7 +760,6 @@ const PlaceScreen = ({route, navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -811,7 +805,7 @@ const PlaceScreen = ({route, navigation}) => {
                                 <Image style={styles.reviewImage}
                                     source={require('../../assets/images/default-profile.png')}></Image> :
                                 <Image style={styles.reviewImage}
-                                source={{ uri: item.user_img }}></Image>
+                                    source={{ uri: item.user_img }}></Image>
                             }
                         </View>
                         <View style={{marginLeft: 12, marginRight: 20}}>
@@ -829,9 +823,9 @@ const PlaceScreen = ({route, navigation}) => {
                                     {item.cpc_comment}</AppText>
                             </View>
                             <View><AppText
-                            style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
-                            {item.collection_name}
-                        </AppText></View>
+                                style={{fontSize: 12, color: colors.mainColor, width: 267, lineHeight: 16}}>
+                                {item.collection_name}
+                            </AppText></View>
                             <View style={{
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
@@ -900,7 +894,7 @@ const PlaceScreen = ({route, navigation}) => {
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
                         <Image source={item.place_img ? {uri: item.place_img} : require('../../assets/images/here_default.png')}
-                        style={{width: 141, height: 101, borderRadius: 10}}></Image>
+                            style={{width: 141, height: 101, borderRadius: 10}}></Image>
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
                         <AppText style={{color: colors.gray[3], fontSize: 10}}>{checkType(item.place_type)}</AppText>
@@ -938,7 +932,7 @@ const PlaceScreen = ({route, navigation}) => {
                     </View>
                 </View>
             </TouchableOpacity>
-        )
+        );
     };
 
     return (

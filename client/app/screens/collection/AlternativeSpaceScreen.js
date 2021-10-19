@@ -30,6 +30,7 @@ import 'moment/locale/ko';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import DragAndDropListForReplace from './DragAndDropListForReplace';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const AlternativeSpaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
@@ -41,7 +42,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const isFocused = useIsFocused();
     const [token, setToken] = useToken();
     const refRBSheet = useRef();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const setDeletedData = (data) => {
@@ -89,7 +90,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -124,7 +124,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -163,14 +162,14 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         cpm_map_pk: data.cpm_map_pk,
                         placeId: replacementData[j].place_pk,
                         order: replacementData[j].cpr_order
-                    }
+                    };
                 } else {
                     forPutObj = {
                         cpm_map_pk: data.cpm_map_pk,
                         placeId: replacementData[j].place_pk,
                         order: Object.values(updatedData[0])[j]
-                    }
-                };
+                    };
+                }
                 putData.push(forPutObj);
             }
         }
@@ -227,10 +226,9 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
-console.log(response)
+                    console.log(response);
                     if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
@@ -261,7 +259,6 @@ console.log(response)
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -296,7 +293,6 @@ console.log(response)
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -332,7 +328,6 @@ console.log(response)
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -394,7 +389,7 @@ console.log(response)
     const setObjects = () => {
         var newArr = [{}];
         editData.value = newArr;
-    }
+    };
     const editData = useSharedValue([]);
 
     const isEdited = (data) => {
@@ -406,12 +401,12 @@ console.log(response)
     
     const EditPage = () => {
         return (
-                <DragAndDropListForReplace
-                    data={replacementData} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
-                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
-                    isEdited={isEdited}
-                />
-        )
+            <DragAndDropListForReplace
+                data={replacementData} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
+                isEdited={isEdited}
+            />
+        );
     };
     
     const [deleteMenu, setDeleteMenu] = useState(false);
@@ -484,7 +479,6 @@ console.log(response)
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -626,26 +620,26 @@ console.log(response)
                                                 fontWeight: 'bold'
                                             }}>{checkType(data.place_type)}</AppText>
                                             <View style={[{flexDirection: 'row'}, parseInt(data.review_score) == -1 && {display: 'none'}]}>
-                                            <AppText style={{
-                                                marginHorizontal: 4, color: colors.gray[7],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                            }}>|</AppText>
-                                            <Image source={require('../../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                    marginTop: '1%',
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                marginLeft: 2,
-                                            }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                                <AppText style={{
+                                                    marginHorizontal: 4, color: colors.gray[7],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                }}>|</AppText>
+                                                <Image source={require('../../assets/images/review_star.png')}
+                                                    style={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        alignSelf: 'center',
+                                                        marginTop: '1%',
+                                                    }}></Image>
+                                                <AppText style={{
+                                                    color: colors.gray[3],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                    marginLeft: 2,
+                                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
                                             </View>
                                         </View>
                                         <View style={{width: '100%'}}>

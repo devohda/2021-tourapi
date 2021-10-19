@@ -47,7 +47,6 @@ const ShowRecommendPlace = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -83,7 +82,6 @@ const ShowRecommendPlace = props => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -116,7 +114,7 @@ const ShowRecommendPlace = props => {
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
                         <Image source={item.place_img ? {uri: item.place_img} : require('../assets/images/here_default.png')}
-                        style={{width: 141, height: 101, borderRadius: 10}}></Image>
+                            style={{width: 141, height: 101, borderRadius: 10}}></Image>
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
                         <AppText style={{color: colors.gray[3], fontSize: 10}}>{checkType(item.place_type)}</AppText>
@@ -154,7 +152,7 @@ const ShowRecommendPlace = props => {
                     </View>
                 </View>
             </TouchableOpacity>
-        )
+        );
     };
 
     return (

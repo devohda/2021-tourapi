@@ -33,24 +33,24 @@ const EntireMap = ({route, navigation}) => {
     const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
-      (async () => {
-        if(!myLocations) {
-            if (Platform.OS === 'android' && !Constants.isDevice) {
-                setErrorMsg(
-                  'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-                );
-                return;
-            }
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-            setErrorMsg('Permission to access location was denied');
-            return;
-            }
+        (async () => {
+            if(!myLocations) {
+                if (Platform.OS === 'android' && !Constants.isDevice) {
+                    setErrorMsg(
+                        'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+                    );
+                    return;
+                }
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setErrorMsg('Permission to access location was denied');
+                    return;
+                }
     
-            let loc = await Location.getCurrentPositionAsync({});
-            setMyLocations(loc);
-        }
-      })();
+                let loc = await Location.getCurrentPositionAsync({});
+                setMyLocations(loc);
+            }
+        })();
     }, [myLocations]);
 
     const countPlaceView = (place_pk) => {
@@ -67,7 +67,6 @@ const EntireMap = ({route, navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -154,7 +153,7 @@ const EntireMap = ({route, navigation}) => {
                     </View>
                 </View>
             </Marker>
-        )
+        );
     };
 
     const ShowMyMarkers = () => {
@@ -167,7 +166,7 @@ const EntireMap = ({route, navigation}) => {
                     <CustomMyMarker />
                 </View>
             </Marker>
-        )
+        );
     };
 
     const getInitialPlaceData = () => {
@@ -182,7 +181,6 @@ const EntireMap = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -217,7 +215,6 @@ const EntireMap = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -253,7 +250,6 @@ const EntireMap = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -304,8 +300,8 @@ const EntireMap = ({route, navigation}) => {
                                             <Image source={require('../../assets/images/here_default.png')}
                                                 style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                                     } */}
-                                                                                <Image source={require('../../assets/images/here_default.png')}
-                                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                    <Image source={require('../../assets/images/here_default.png')}
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                                     <View style={{
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
@@ -329,33 +325,33 @@ const EntireMap = ({route, navigation}) => {
                                                 {/* <View style={[{flexDirection: 'row'}, parseInt(data.review_score) == -1 && {display: 'none'}]}> */}
                                                 <View style={[{flexDirection: 'row'}]}>
 
-                                                <AppText style={{
-                                                    marginHorizontal: 4, color: colors.gray[7],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold',
-                                                }}>|</AppText>
-                                                <Image source={require('../../assets/images/review_star.png')}
-                                                    style={{
-                                                        width: 10,
-                                                        height: 10,
-                                                        alignSelf: 'center',
-                                                        marginTop: '1%',
-                                                    }}></Image>
-                                                {/* <AppText style={{
+                                                    <AppText style={{
+                                                        marginHorizontal: 4, color: colors.gray[7],
+                                                        textAlign: 'center',
+                                                        fontSize: 10,
+                                                        fontWeight: 'bold',
+                                                    }}>|</AppText>
+                                                    <Image source={require('../../assets/images/review_star.png')}
+                                                        style={{
+                                                            width: 10,
+                                                            height: 10,
+                                                            alignSelf: 'center',
+                                                            marginTop: '1%',
+                                                        }}></Image>
+                                                    {/* <AppText style={{
                                                     color: colors.gray[3],
                                                     textAlign: 'center',
                                                     fontSize: 10,
                                                     fontWeight: 'bold',
                                                     marginLeft: 2,
                                                 }}>{parseFloat(data.review_score).toFixed(2)}</AppText> */}
-                                                <AppText style={{
-                                                    color: colors.gray[3],
-                                                    textAlign: 'center',
-                                                    fontSize: 10,
-                                                    fontWeight: 'bold',
-                                                    marginLeft: 2,
-                                                }}>4.84</AppText>
+                                                    <AppText style={{
+                                                        color: colors.gray[3],
+                                                        textAlign: 'center',
+                                                        fontSize: 10,
+                                                        fontWeight: 'bold',
+                                                        marginLeft: 2,
+                                                    }}>4.84</AppText>
                                                 </View>
                                             </View>
                                             {/* <View style={{width: '100%'}}>
@@ -376,7 +372,7 @@ const EntireMap = ({route, navigation}) => {
                                             </View>
                                             {/* <AppText
                                                 style={{fontSize: 12, color: colors.gray[4]}}>{data.place_addr}</AppText> */}
-                                                <AppText
+                                            <AppText
                                                 style={{fontSize: 12, color: colors.gray[4]}}>주소주소</AppText>
                                         </View>
                                     </View>
@@ -398,10 +394,10 @@ const EntireMap = ({route, navigation}) => {
                     </ScreenContainerView>
                 </View>
             </View>
-        )
+        );
     };
 
-    console.log(region)
+    console.log(region);
     const GetMyLocationButton = () => {
         return (
             <View style={{position: 'absolute', right: 10, bottom: 10}}>

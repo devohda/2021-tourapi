@@ -21,6 +21,7 @@ import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import DefaultThumbnail from '../../assets/images/profile_default.svg';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SearchCollection = (props, {navigation}) => {
     const {colors} = useTheme();
@@ -32,7 +33,7 @@ const SearchCollection = (props, {navigation}) => {
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const isFocused = useIsFocused();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     useEffect(() => {
         getResults('LIKE');
@@ -52,7 +53,6 @@ const SearchCollection = (props, {navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -89,7 +89,6 @@ const SearchCollection = (props, {navigation}) => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -254,7 +253,7 @@ const SearchCollection = (props, {navigation}) => {
     const setBGColor = (thumbnail) => {
         if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
         else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color
+        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
         else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
         else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
@@ -267,11 +266,11 @@ const SearchCollection = (props, {navigation}) => {
                 <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
                     <DefaultThumbnail width={97} height={70.38}/>
                 </View>
-            )
+            );
         } else {
             return (
                 <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
-            )
+            );
         }
     };
 

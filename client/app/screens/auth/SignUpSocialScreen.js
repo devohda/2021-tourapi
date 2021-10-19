@@ -1,5 +1,5 @@
 //전역 선언 방법 찾아보기
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, TouchableOpacity, View, Dimensions, Text, onError, Alert} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
@@ -17,6 +17,8 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import {Cache} from 'react-native-cache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useToken} from '../../contexts/TokenContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
+
 
 const cache = new Cache({
     namespace: 'myapp',
@@ -32,8 +34,16 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     const [password, setPassword] = useState(null);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [token, setToken] = useToken();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const {colors} = useTheme();
+
+    useEffect(() => {
+        if(alertDuplicated){
+            Alert.alert('다른 기기에서 로그인했습니다.');
+        }
+        setAlertDuplicated(false);
+    },[]);
 
     const loginApple = async (user, email, nickname, token) => {
         try {

@@ -33,6 +33,7 @@ import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import SearchIcon from '../../assets/images/search-icon.svg';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 export const navigationRef = React.createRef();
 
@@ -61,7 +62,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const [originStartDate, setOriginStartDate] = useState(new Date());
     const [originEndDate, setOriginEndDate] = useState(new Date());
 
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [defaultThumbnailList, setDefaultThumbnailList] = useState([
         {
             id: 1,
@@ -147,7 +148,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 setDefaultThumbnailList(newArr);
                 setImage(data.collection_thumbnail);
             }
-        };
+        }
     }, []);
 
     const getKeywords = useCallback(() => {
@@ -206,7 +207,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 uri: image,
                 type: 'multipart/form-data',
                 name: 'image.jpg',
-            }
+            };
             form.append('img', file);
              
         } else {
@@ -225,14 +226,13 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
             fetch('http://34.64.185.40/collection/plan', {
                 method: 'POST',
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    'Content-Type': 'multipart/form-data',
                     'x-access-token': token
                 },
                 body: form
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -249,10 +249,10 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                     };
                     if(response.code === 200) {
                         Alert.alert('', '일정보관함이 생성되었습니다', [
-                        {text : 'OK', onPress: () => {
-                            navigation.navigate('PlanCollection', {data: item});
-                            navigation.setOptions({tabBarVisible: true});
-                        }}]);             
+                            {text : 'OK', onPress: () => {
+                                navigation.navigate('PlanCollection', {data: item});
+                                navigation.setOptions({tabBarVisible: true});
+                            }}]);             
                     } else {
                         Alert.alert('', '일정보관함 생성에 실패했습니다. 다시 시도해주세요.');
                     }
@@ -298,7 +298,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                 uri: image,
                 type: 'multipart/form-data',
                 name: 'image.jpg',
-            }
+            };
             form.append('img', file);
              
         } else {
@@ -323,7 +323,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -638,69 +637,69 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     };
 
     const setBGColor = (idx) => {
-        return defaultThumbnailList[idx].color
+        return defaultThumbnailList[idx].color;
     };
 
     const [image, setImage] = useState(null);
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
         });
     
         console.log(result);
     
         if (!result.cancelled) {
-          setImage(result.uri);
+            setImage(result.uri);
         }
 
         var newArr =[...defaultThumbnailList];
         newArr[5].name = result.uri;
         setDefaultThumbnailList(newArr);
-      };
+    };
 
     const SelectProfile = () => {
         return (
             <View style={{alignItems: 'center'}}>
                 {image ?
-                <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
-                <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
-                    <DefaultThumbnail width={83} height={60.2}/>
-                </View>
+                    <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
+                    <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
+                        <DefaultThumbnail width={83} height={60.2}/>
+                    </View>
                 }
                 <FlatList data={defaultThumbnailList} horizontal
                     renderItem={({item, index}) =>
-                    <TouchableOpacity onPress={()=>{
-                        if(index === 5) {
-                            (async () => {
-                                if (Platform.OS !== 'web') {
-                                  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                                  if (status !== 'granted') {
-                                    alert('Sorry, we need camera roll permissions to make this work!');
-                                  }
-                                }
-                              })();
-                            pickImage();
-                        } else {
-                            setImage('');
-                        }
-                        setSelectedIndex(index);
-                    }}>
-                        <View style={{backgroundColor: item.color, width: 28, height: 28, borderRadius: 10, marginHorizontal: 5, marginTop: 17}}>
-                            <Icon type="ionicon" name={"camera"} style={[index !== 5 && {display: 'none'}, {
-                                shadowOffset: {
-                                    width: 2,
-                                    height: 2
-                                },
-                                shadowOpacity: 0.25,
-                                elevation: 1,
-                                shadowColor: 'rgba(0, 0, 0, 0.25)',
-                            }]} color={colors.gray[6]}></Icon>
-                        </View>
-                    </TouchableOpacity>
-                }
+                        <TouchableOpacity onPress={()=>{
+                            if(index === 5) {
+                                (async () => {
+                                    if (Platform.OS !== 'web') {
+                                        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                                        if (status !== 'granted') {
+                                            alert('Sorry, we need camera roll permissions to make this work!');
+                                        }
+                                    }
+                                })();
+                                pickImage();
+                            } else {
+                                setImage('');
+                            }
+                            setSelectedIndex(index);
+                        }}>
+                            <View style={{backgroundColor: item.color, width: 28, height: 28, borderRadius: 10, marginHorizontal: 5, marginTop: 17}}>
+                                <Icon type="ionicon" name={'camera'} style={[index !== 5 && {display: 'none'}, {
+                                    shadowOffset: {
+                                        width: 2,
+                                        height: 2
+                                    },
+                                    shadowOpacity: 0.25,
+                                    elevation: 1,
+                                    shadowColor: 'rgba(0, 0, 0, 0.25)',
+                                }]} color={colors.gray[6]}></Icon>
+                            </View>
+                        </TouchableOpacity>
+                    }
                     keyExtractor={(item, idx) => {idx.toString();}}
                     key={(item, idx) => {idx.toString();}}
                     nestedScrollEnabled/>

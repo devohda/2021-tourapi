@@ -24,6 +24,7 @@ import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SearchPlace = props => {
     const {colors} = useTheme();
@@ -35,7 +36,7 @@ const SearchPlace = props => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const [token, setToken] = useToken();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const styles = StyleSheet.create({
         info_container: {
@@ -70,7 +71,6 @@ const SearchPlace = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -106,7 +106,6 @@ const SearchPlace = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -141,7 +140,6 @@ const SearchPlace = props => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -177,7 +175,6 @@ const SearchPlace = props => {
             })
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -366,10 +363,10 @@ const SearchPlace = props => {
                                         color: colors.mainColor
                                     }}>{checkType(item.place_type)}</AppText>
                                 <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
-                                <View style={{...styles.score_line}}></View>
-                                <Star width={11} height={11} style={{marginTop: 2}}/>
-                                <AppText
-                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                    <View style={{...styles.score_line}}></View>
+                                    <Star width={11} height={11} style={{marginTop: 2}}/>
+                                    <AppText
+                                        style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                                 </View>
                             </View>
                             <AppText style={{

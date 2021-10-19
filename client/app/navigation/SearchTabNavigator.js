@@ -13,6 +13,7 @@ import SearchUser from '../screens/search/SearchUser';
 import { useToken } from '../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 import * as SecureStore from 'expo-secure-store';
+import {useAlertDuplicated} from '../contexts/LoginContextProvider';
 
 
 const SearchTabNavigator = ({navigation}) => {
@@ -24,7 +25,7 @@ const SearchTabNavigator = ({navigation}) => {
     const [searchUser, setSearchUser] = useState(0);
     const [userNickname, setUserNickname] = useState('');
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     useEffect(() => {
         getUserData();
@@ -53,7 +54,6 @@ const SearchTabNavigator = ({navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 

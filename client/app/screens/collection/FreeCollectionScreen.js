@@ -41,6 +41,7 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -64,7 +65,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const refRBSheet = useRef();
     const [replacementData, setReplacementData] = useState([]);
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const onShare = async () => {
         try {
@@ -114,7 +115,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -155,7 +155,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -192,7 +191,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then(res => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -220,7 +218,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const updatePlaceData = (updatedData, deletedData) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
-        console.log(updatedData)
+        console.log(updatedData);
         //빈 객체일때는 원래 순서 그대로 넣어주기
         for(var j=0;j<placeData.length;j++) {
             var forPutObj = {};
@@ -230,22 +228,22 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     cpm_map_pk: placeData[j].cpm_map_pk,
                     planDay: -1,
                     order: placeData[j].cpm_order
-                }
+                };
             } else {
                 forPutObj = {
                     cpm_map_pk: placeData[j].cpm_map_pk,
                     planDay: -1,
                     order: Object.values(updatedData[0])[j]
-                }
-            };
-            putData.push(forPutObj)
+                };
+            }
+            putData.push(forPutObj);
         }
 
         var DATA = {};
         DATA.placeList = putData;
         DATA.deletePlaceList = deletedData;
         console.log(putData); console.log(deletedData);
-        console.log(isEmpty)
+        console.log(isEmpty);
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
@@ -282,7 +280,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
-        console.log(isDeletedComment)
+        console.log(isDeletedComment);
         var forDeleteData = [];
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
@@ -306,7 +304,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -343,7 +340,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -396,7 +392,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -437,7 +432,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -472,7 +466,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -511,7 +504,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -549,7 +541,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -587,7 +578,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -622,7 +612,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -670,7 +659,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -710,7 +698,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -753,7 +740,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -788,7 +774,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -857,7 +842,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const setObjects = () => {
         var newArr = [{}];
         editData.value = newArr;
-    }
+    };
     const editData = useSharedValue([]);
 
     const isEdited = (data, day) => {
@@ -881,7 +866,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     isEdited={isEdited}
                 />
             </SafeAreaView>
-        )
+        );
     };
     
     const [deleteMenu, setDeleteMenu] = useState(false);
@@ -1408,7 +1393,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         }
                     </ScreenContainerView>
                 </KeyboardAvoidingView>
-                </ScrollView>
+            </ScrollView>
         </ScreenContainer>
     );
 };

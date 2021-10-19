@@ -12,6 +12,7 @@ import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const MakeReviewScreen = ({route, navigation}) => {
     const { colors } = useTheme();
@@ -27,7 +28,7 @@ const MakeReviewScreen = ({route, navigation}) => {
     const [ratedAccessibilityScore, setRatedAccessibilityScore] = useState(0);
     const [ratedMarketScore, setRatedMarketScore] = useState(0);
 
-    const [alertDuplicated, setAlertDuplicated] = useState(false);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
         {
@@ -69,7 +70,6 @@ const MakeReviewScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -103,7 +103,6 @@ const MakeReviewScreen = ({route, navigation}) => {
             }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
-                        Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
 
@@ -177,7 +176,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                     uri: image[0],
                     type: 'multipart/form-data',
                     name: 'image.jpg',
-                }
+                };
                 form.append('img', file);
             } else {
                 var newArr = [];
@@ -202,7 +201,7 @@ const MakeReviewScreen = ({route, navigation}) => {
             fetch(`http://34.64.185.40/place/${place_pk}/review`, {
                 method: 'POST',
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    'Content-Type': 'multipart/form-data',
                     'x-access-token': token
                 },
                 body: form,
@@ -221,10 +220,10 @@ const MakeReviewScreen = ({route, navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-console.log(response)
+                    console.log(response);
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
                         {text : 'OK', onPress: () => navigation.goBack()}
-                        ]);
+                    ]);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -386,17 +385,17 @@ console.log(response)
     const [image, setImage] = useState([]);
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
         });
     
         console.log(result);
     
         if (!result.cancelled) {
             var newArr = [...image];
-            newArr.push(result.uri)
+            newArr.push(result.uri);
             setImage(newArr);
         }
     };
@@ -410,38 +409,38 @@ console.log(response)
                 </View>
                 <ScrollView horizontal nestedScrollEnabled showsHorizontalScrollIndicator={false}>
 
-                <View style={{flexDirection: 'row'}}>
-                    <TouchableOpacity onPress={()=>{
-                        if(image.length === 5) {
-                            Alert.alert('', '사진은 최대 5개까지 가능합니다.');
-                        } else {
-                            pickImage();
-                        }
-                    }}>
-                        <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
-                            <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
-                        </View>
-                    </TouchableOpacity>
-                    <FlatList data={image} horizontal scrollEnabled={false}
-                        renderItem={({item, index}) =>
-                        <>
-                            <Image style={{...styles.addedPictures}} source={{ uri: item }}>
-                            </Image>
-                            <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', position: 'absolute', ...styles.removeContainer}}>
-                                <TouchableOpacity onPress={()=>{
-                                    var newArr = [...image];
-                                    newArr.splice(index, 1);
-                                    setImage(newArr);
-                                }}>
-                                    <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
-                                </TouchableOpacity>
+                    <View style={{flexDirection: 'row'}}>
+                        <TouchableOpacity onPress={()=>{
+                            if(image.length === 5) {
+                                Alert.alert('', '사진은 최대 5개까지 가능합니다.');
+                            } else {
+                                pickImage();
+                            }
+                        }}>
+                            <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
+                                <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
                             </View>
-                        </>
-                        }
-                        keyExtractor={(item, idx) => {idx.toString();}}
-                        key={(item, idx) => {idx.toString();}}
-                        nestedScrollEnabled/>
-                </View>
+                        </TouchableOpacity>
+                        <FlatList data={image} horizontal scrollEnabled={false}
+                            renderItem={({item, index}) =>
+                                <>
+                                    <Image style={{...styles.addedPictures}} source={{ uri: item }}>
+                                    </Image>
+                                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', position: 'absolute', ...styles.removeContainer}}>
+                                        <TouchableOpacity onPress={()=>{
+                                            var newArr = [...image];
+                                            newArr.splice(index, 1);
+                                            setImage(newArr);
+                                        }}>
+                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            }
+                            keyExtractor={(item, idx) => {idx.toString();}}
+                            key={(item, idx) => {idx.toString();}}
+                            nestedScrollEnabled/>
+                    </View>
                 </ScrollView>
 
             </View>
