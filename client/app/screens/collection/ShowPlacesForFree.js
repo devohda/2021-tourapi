@@ -239,7 +239,7 @@ const ShowPlacesForFree = props => {
             </Modal>
         )
     };
-
+    
     return (
         <View style={checkLimit() && {display: 'none'}}>
             <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
@@ -267,9 +267,15 @@ const ShowPlacesForFree = props => {
                                 {
                                     item.place_img ?
                                         <Image source={{uri: item.place_img}}
-                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
-                                        <Image source={require('../../assets/images/here_default.png')}
-                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/>
+                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                            item.place_thumbnail ?
+                                            <Image source={{uri: item.place_thumbnail}}
+                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                item.review_img ?
+                                                <Image source={{uri: item.review_img}}
+                                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                <Image source={require('../../assets/images/here_default.png')}
+                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                                 }
                                 <View style={{
                                     justifyContent: 'space-between',
@@ -364,7 +370,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

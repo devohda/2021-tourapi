@@ -14,36 +14,6 @@ const Form = styled(View)`
   margin-top: 63px;
 `;
 
-const changePw = async (e, pw) => {
-    try {
-
-        let url = 'http://34.64.185.40/auth/password';
-        let options = {
-            method: 'PUT',
-            mode: 'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({
-                email: e,
-                password: pw,
-            })
-        };
-        const result = await fetch(url, options)
-            .then(res => res.json())
-            .then(response => {
-                console.log(response)
-                return response.code === 200;
-            })
-            .catch(error => console.log(error));
-
-        return result;
-    } catch (e) {
-        console.log(e.toString());
-    }
-};
-
 const ChangePasswordTab = ({route, authNavigation}) => {
     const {email} = route.params;
     const [password, setPassword] = useState("");
@@ -63,7 +33,38 @@ const ChangePasswordTab = ({route, authNavigation}) => {
         else {
             setIsPasswordValid(true);
         }
-    }
+    };
+    
+    
+    const changePw = async (e, pw) => {
+        try {
+            let url = 'http://34.64.185.40/auth/password';
+            let options = {
+                method: 'PUT',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    email: e,
+                    password: pw,
+                })
+            };
+            const result = await fetch(url, options)
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response)
+                    console.log(e); console.log(pw);
+                    return response.code === 200;
+                })
+                .catch(error => console.log(error));
+
+            return result;
+        } catch (e) {
+            console.log(e.toString());
+        }
+    };
 
     const checkIsValid = async () => {
         const result = await changePw(email, password);
