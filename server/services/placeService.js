@@ -68,16 +68,16 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
 
     switch (sort){
         case 'SCORE' :
-            query += ' ORDER BY review_score DESC, p.place_pk DESC'
+            query += ' ORDER BY review_score DESC, like_cnt DESC, view_cnt DESC, p.place_pk ASC'
             break;
         case 'LIKE':
-            query += ' ORDER BY like_cnt DESC, p.place_pk DESC';
+            query += ' ORDER BY like_cnt DESC, review_score DESC, view_cnt DESC, p.place_pk ASC';
             break;
         case 'POPULAR':
-            query += ' ORDER BY view_cnt DESC, p.place_pk DESC';
+            query += ' ORDER BY view_cnt DESC, review_score DESC, like_cnt DESC, p.place_pk ASC';
             break
         default:
-            query += ' ORDER BY review_score DESC, p.place_pk DESC';
+            query += ' ORDER BY review_score DESC, like_cnt DESC, view_cnt DESC, p.place_pk ASC';
     }
 
     if(type === 'MAIN'){

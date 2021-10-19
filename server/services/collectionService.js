@@ -206,19 +206,19 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
 
         switch (sort) {
             case 'RESENT':
-                query1 += ' ORDER BY c.collection_pk DESC';
+                query1 += ' ORDER BY c.collection_pk DESC, like_cnt DESC, view_cnt DESC';
                 break;
             case 'OLD':
-                query1 += ' ORDER BY c.collection_pk ASC';
+                query1 += ' ORDER BY c.collection_pk ASC, like_cnt DESC, view_cnt DESC';
                 break;
             case 'LIKE':
-                query1 += ' ORDER BY like_cnt DESC, c.collection_pk DESC';
+                query1 += ' ORDER BY like_cnt DESC, view_cnt DESC, c.collection_pk DESC';
                 break;
             case 'POPULAR':
-                query1 += ' ORDER BY view_cnt DESC, c.collection_pk DESC';
+                query1 += ' ORDER BY view_cnt DESC, like_cnt DESC, c.collection_pk DESC';
                 break
             default:
-                query1 += ' ORDER BY c.collection_pk DESC';
+                query1 += ' ORDER BY c.collection_pk DESC, like_cnt DESC, view_cnt DESC';
         }
 
         if (type === 'MAIN') {
