@@ -28,8 +28,7 @@ router.post('/authPhone', async (req, res) => {
     let verifyCode = "";
     for (let i = 0; i < 6; i++) {
         verifyCode += parseInt(Math.random() * 10);
-    }
-    ;
+    };
 
     // 캐시에 저장
     cache.set(phoneNumber, verifyCode);
@@ -226,7 +225,6 @@ router.post('/loginApple', async (req, res, next) => {
         // 토큰 풀기
 
 
-
         // 회원가입 절차
         if (email && nickname) {
             const createSalt = () =>
@@ -249,11 +247,11 @@ router.post('/loginApple', async (req, res, next) => {
             const {password, salt} = await createHashedPassword(plainPassword);
 
             const userData = {
-                user_email : email,
-                user_nickname: nickname,
+                user_email: email,
+                user_nickname: `${nickname.familyName} ${nickname.givenName}`,
                 user_password: password,
-                salt : salt,
-                apple_name : user
+                salt: salt,
+                apple_name: user
             }
             const result1 = await authService.createUserApple(userData);
             console.log(result1);
