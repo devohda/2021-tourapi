@@ -10,7 +10,7 @@ const keywordRouter = require('./keyword');
 const userRouter = require('./user');
 const viewRouter = require('./view');
 const facilityRouter = require('./facility');
-const tourApiRouter = require('./tourApi');
+// const tourApiRouter = require('./tourApi');
 const visitantRouter = require('./visitant');
 
 
@@ -23,7 +23,7 @@ router.use('/keyword', keywordRouter);
 router.use('/user', userRouter);
 router.use('/view', viewRouter);
 router.use('/facility', facilityRouter);
-router.use('/tourApi', tourApiRouter);
+// router.use('/tourApi', tourApiRouter);
 router.use('/visitant', visitantRouter);
 
 
