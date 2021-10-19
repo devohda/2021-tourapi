@@ -21,7 +21,7 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
         }
     }
 
-    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
+    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, 
                         IFNULL(like_cnt, 0) AS like_cnt, IFNULL(view_cnt, 0) AS view_cnt, IFNULL(review_score, -1) AS review_score, 
                         pri_review_img AS review_img
                  FROM places p
@@ -68,16 +68,16 @@ exports.readPlaceList = async (user_pk, keyword, sort, type, term) => {
 
     switch (sort){
         case 'SCORE' :
-            query += ' ORDER BY review_score DESC, p.place_pk DESC'
+            query += ' ORDER BY review_score DESC, like_cnt DESC, view_cnt DESC, p.place_pk ASC'
             break;
         case 'LIKE':
-            query += ' ORDER BY like_cnt DESC, p.place_pk DESC';
+            query += ' ORDER BY like_cnt DESC, review_score DESC, view_cnt DESC, p.place_pk ASC';
             break;
         case 'POPULAR':
-            query += ' ORDER BY view_cnt DESC, p.place_pk DESC';
+            query += ' ORDER BY view_cnt DESC, review_score DESC, like_cnt DESC, p.place_pk ASC';
             break
         default:
-            query += ' ORDER BY review_score DESC, p.place_pk DESC';
+            query += ' ORDER BY review_score DESC, like_cnt DESC, view_cnt DESC, p.place_pk ASC';
     }
 
     if(type === 'MAIN'){

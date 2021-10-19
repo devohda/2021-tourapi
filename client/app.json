@@ -2,14 +2,14 @@
   "expo": {
     "name": "Here",
     "slug": "Here",
-    "version": "0.0.7",
+    "version": "0.7.0",
     "scheme": "here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
     "splash": {
       "image": "./app/assets/images/here_splash.png",
       "resizeMode": "cover",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFF8F8"
     },
     "packagerOpts": {
       "config": "metro.config.js",
@@ -29,10 +29,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.11",
+      "buildNumber": "0.7.5",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {

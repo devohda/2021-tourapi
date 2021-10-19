@@ -22,7 +22,7 @@ exports.createLikeCollection = async (user_pk, collection_pk) => {
 exports.readLikePlace = async (user_pk, sort) => {
     // TODO 나중에 별점 추가
 
-    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_type, 
+    let query = `SELECT p.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, 
                         IFNULL(review_score, -1) AS review_score, IFNULL(like_cnt, 0) AS like_cnt,
                         pri_review_img AS review_img
                  FROM places p

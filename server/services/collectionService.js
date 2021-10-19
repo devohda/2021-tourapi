@@ -206,19 +206,19 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
 
         switch (sort) {
             case 'RESENT':
-                query1 += ' ORDER BY c.collection_pk DESC';
+                query1 += ' ORDER BY c.collection_pk DESC, like_cnt DESC, view_cnt DESC';
                 break;
             case 'OLD':
-                query1 += ' ORDER BY c.collection_pk ASC';
+                query1 += ' ORDER BY c.collection_pk ASC, like_cnt DESC, view_cnt DESC';
                 break;
             case 'LIKE':
-                query1 += ' ORDER BY like_cnt DESC, c.collection_pk DESC';
+                query1 += ' ORDER BY like_cnt DESC, view_cnt DESC, c.collection_pk DESC';
                 break;
             case 'POPULAR':
-                query1 += ' ORDER BY view_cnt DESC, c.collection_pk DESC';
+                query1 += ' ORDER BY view_cnt DESC, like_cnt DESC, c.collection_pk DESC';
                 break
             default:
-                query1 += ' ORDER BY c.collection_pk DESC';
+                query1 += ' ORDER BY c.collection_pk DESC, like_cnt DESC, view_cnt DESC';
         }
 
         if (type === 'MAIN') {
@@ -314,9 +314,9 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query1 = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, place_mapy AS place_latitude, place_mapx AS place_longitude, cpm_order, 
+    const query1 = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, place_mapy AS place_latitude, place_mapx AS place_longitude, cpm_order, 
                            CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
-                           cpc_comment AS comment, IFNULL(review_score, -1) AS review_score
+                           cpc_comment AS comment, IFNULL(review_score, -1) AS review_score, pri_review_img AS review_img
                     FROM collection_place_map cpm
                     LEFT OUTER JOIN places p
                     ON p.place_pk = cpm.place_pk
@@ -337,31 +337,42 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
                         GROUP BY place_pk
                     ) pr
                     ON pr.place_pk = p.place_pk
+                    LEFT OUTER JOIN (
+                        SELECT place_pk, pri_review_img
+                        FROM (SELECT place_pk
+                                   , pri_review_img
+                                   , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                   , @cd := place_pk
+                                FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                   , (SELECT @cd := '', @rn := 0) b
+                              ) a
+                        WHERE rn <= 1
+                    ) pri
+                    ON pri.place_pk = p.place_pk
                     WHERE collection_pk = ${collection_pk}
                     ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
-    const query2 = `SELECT cpm.cpm_map_pk, cpm_plan_day, place_mapy AS place_latitude, place_mapx AS place_longitude
-                    FROM collection_place_map cpm
-                    LEFT OUTER JOIN places p
-                    ON p.place_pk = cpm.place_pk
-                    WHERE collection_pk = ${collection_pk}
-                    AND p.place_pk > 0
-                    ORDER BY cpm_plan_day ASC, cpm_order ASC`;
+    // const query2 = `SELECT cpm.cpm_map_pk, cpm_plan_day, place_mapy AS place_latitude, place_mapx AS place_longitude
+    //                 FROM collection_place_map cpm
+    //                 LEFT OUTER JOIN places p
+    //                 ON p.place_pk = cpm.place_pk
+    //                 WHERE collection_pk = ${collection_pk}
+    //                 AND p.place_pk > 0
+    //                 ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
     const result1 = await db.query(query1);
-    const result2 = await db.query(query2);
-    const mapData = {}
-    for (const data of result2) {
-        if (mapData[data.cpm_plan_day]) {
-            mapData[data.cpm_plan_day].push({place_latitude: data.place_latitude, place_longitude: data.place_longitude})
-        } else {
-            mapData[data.cpm_plan_day] = [{place_latitude: data.place_latitude, place_longitude: data.place_longitude}]
-        }
-    }
+    // const result2 = await db.query(query2);
+    // const mapData = {}
+    // for (const data of result2) {
+    //     if (mapData[data.cpm_plan_day]) {
+    //         mapData[data.cpm_plan_day].push({place_latitude: data.place_latitude, place_longitude: data.place_longitude})
+    //     } else {
+    //         mapData[data.cpm_plan_day] = [{place_latitude: data.place_latitude, place_longitude: data.place_longitude}]
+    //     }
+    // }
 
     const result = {
         placeList : result1,
-        mapData
     }
 
     return result;
@@ -380,8 +391,8 @@ exports.readCollectionCommentList = async (collection_pk) => {
 
 // 보관함 대체 공간 리스트
 exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
-    const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_type, cpr_order,
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score
+    const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, cpr_order,
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score, pri_review_img AS review_img
                    FROM collection_place_replacement cpr
                    INNER JOIN places p
                    ON cpr.place_pk = p.place_pk
@@ -394,6 +405,18 @@ exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
                        GROUP BY place_pk
                    ) pr
                    ON pr.place_pk = cpr.place_pk
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, pri_review_img
+                       FROM (SELECT place_pk
+                                  , pri_review_img
+                                  , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                  , @cd := place_pk
+                               FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                  , (SELECT @cd := '', @rn := 0) b
+                             ) a
+                       WHERE rn <= 1
+                   ) pri
+                   ON pri.place_pk = p.place_pk
                    WHERE cpm_map_pk = ${cpm_map_pk}
                    ORDER BY cpr_order ASC
                    `
