@@ -47,6 +47,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 },
                 body: JSON.stringify({
                     userInfo: {
+                        user,
                         email,
                         password: 'FJO4rI!@EK#WJaN!FbdK&%1&',
                         nickname,
@@ -120,30 +121,33 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             onPress={
                                 async () => {
                                     try {
-                                        const credential = await AppleAuthentication.signInAsync({
-                                            requestedScopes: [
-                                                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                                                AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                                            ],
-                                        });
-
-                                        const cachedName = await cache.get(credential.user);
-                                        const detailsArePopulated = (!!credential.fullName && !!credential.email);
-
-                                        // 항상 토큰을 같이 보내기.
-                                        if (!detailsArePopulated && !cachedName) {
-                                            await loginApple(null, null, null, credential.identityToken);
-                                        } else if (!detailsArePopulated && cachedName) {
-                                            // 새로 계정 만드는 것.(중간에 튕겼을 때)
-                                            await loginApple(credential.user, cachedName.email, cachedName.fullName, credential.identityToken);
-                                        } else {
-                                            // 새로 계정 만드는 것.
-                                            // 캐시에 저장
-                                            await cache.set(credential.user, {
-                                                fullName: credential.fullName,
-                                                email: credential.email
+                                        const available = await AppleAuthentication.isAvailableAsync();
+                                        if(available){
+                                            const credential = await AppleAuthentication.signInAsync({
+                                                requestedScopes: [
+                                                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                                                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                                                ],
                                             });
-                                            await loginApple(credential.user, credential.email, credential.fullName, credential.identityToken);
+
+                                            const cachedName = await cache.get(credential.user);
+                                            const detailsArePopulated = (!!credential.fullName && !!credential.email);
+
+                                            // 항상 토큰을 같이 보내기.
+                                            if (!detailsArePopulated && !cachedName) {
+                                                await loginApple(credential.user, null, null, credential.identityToken);
+                                            } else if (!detailsArePopulated && cachedName) {
+                                                // 새로 계정 만드는 것.(중간에 튕겼을 때)
+                                                await loginApple(credential.user, cachedName.email, cachedName.fullName, credential.identityToken);
+                                            } else {
+                                                // 새로 계정 만드는 것.
+                                                // 캐시에 저장
+                                                await cache.set(credential.user, {
+                                                    fullName: credential.fullName,
+                                                    email: credential.email
+                                                });
+                                                await loginApple(credential.user, credential.email, credential.fullName, credential.identityToken);
+                                            }
                                         }
                                     } catch (error) {
                                         if (error.code === 'ERR_CANCELED') {
