@@ -66,7 +66,7 @@ router.get('/visitant', async (req, res) => {
     url += `MobileOS=ETC&`;
     url += `MobileApp=AppTest&`;
     url += `numOfRows=2000&`;
-    url += `pageNo=${6}&`;
+    url += `pageNo=${1}&`;
     url += `startYmd=20211001&`;
     url += `endYmd=20211030&`;
     url += `_type=json`;

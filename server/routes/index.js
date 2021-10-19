@@ -11,6 +11,7 @@ const userRouter = require('./user');
 const viewRouter = require('./view');
 const facilityRouter = require('./facility');
 const tourApiRouter = require('./tourApi');
+const visitantRouter = require('./visitant');
 
 
 // 라우터 파일 등록하기
@@ -23,6 +24,7 @@ router.use('/user', userRouter);
 router.use('/view', viewRouter);
 router.use('/facility', facilityRouter);
 router.use('/tourApi', tourApiRouter);
+router.use('/visitant', visitantRouter);
 
 
 module.exports = router;
