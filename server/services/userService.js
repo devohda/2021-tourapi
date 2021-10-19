@@ -4,7 +4,8 @@ const mysql = require('mysql2');
 // READ
 // 유저 정보 조회
 exports.readUser = async (user_pk) => {
-    const query1 = `SELECT user_nickname, user_img, user_email FROM users 
+    const query1 = `SELECT user_nickname, user_img, user_email, 
+                           CASE WHEN apple_name IS NULL THEN 0 ELSE 1 END AS isAppleLogin FROM users 
                     WHERE user_pk = ${user_pk}`
 
     const query2 = `SELECT keyword_title FROM keywords k
