@@ -44,7 +44,6 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response.data)
                     setKeywordData(response.data);
                     setFalse(response.data);
                 })
@@ -105,7 +104,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
         var forPostData = {};
         let form = new FormData();
 
-        if(image !== 'default-user' && image) {
+        if(image !== 'default-img' && image) {
             forPostData = {
                 nickname: userNickname,
                 keywords: datas,
@@ -126,7 +125,6 @@ const ProfileSettingScreen = ({route, navigation}) => {
         }
 
         form.append('userData', JSON.stringify(forPostData));
-
         try {
             fetch(`http://34.64.185.40/user/info`, {
                 method: 'PUT',
@@ -148,7 +146,6 @@ const ProfileSettingScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
 
                     Alert.alert('', '프로필이 수정되었습니다.', [
                         {text : 'OK', onPress: () => {
@@ -371,9 +368,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
           aspect: [4, 3],
           quality: 1,
         });
-    
-        console.log(result);
-    
+        
         if (!result.cancelled) {
           setImage(result.uri);
         }
@@ -512,7 +507,6 @@ const styles = StyleSheet.create({
         shadowColor: 'rgba(203, 180, 180, 0.3)',
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -535,7 +529,6 @@ const styles = StyleSheet.create({
             height: 4
         },
         shadowOpacity: 0.25,
-        elevation: 4,
     },
     selectType: {
         borderWidth: 1,
@@ -546,8 +539,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
-        // width: 58,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -561,8 +552,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
-        // width: 58,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'

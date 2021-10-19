@@ -43,6 +43,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const refRBSheet = useRef();
     const [alertDuplicated, setAlertDuplicated] = useState(false);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [thumbnail, setThumbnail] = useState('');
 
     const setDeletedData = (data) => {
         var newArr = [];
@@ -101,6 +102,12 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     }
 
                     setPlaceData(response.data.placeData);
+                    const res = response.data;
+                    if(res.placeData.place_img) {
+                        setThumbnail(res.placeData.place_img)
+                    } else if(res.review.review_img) {
+                        setThumbnail(res.review.review_img);
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -151,7 +158,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const updateReplacementData = (updatedData, deletedData) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
-        // console.log(updatedData)
         for(var j=0;j<replacementData.length;j++) {
             var forPutObj = {};
 
@@ -177,7 +183,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
         var DATA = {};
         DATA.replacementPlaceList = putData;
-        // console.log(DATA);
         if(isEmpty !== placeData.length) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
@@ -201,7 +206,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                             setIsSignedIn(false);
                             return;
                         }
-                        console.log(response);
                         await getInitialReplacementData();
                     })
                     .catch((err) => {
@@ -215,7 +219,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
-        // console.log(cpmMapPk); console.log(place_pk);
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
@@ -230,7 +233,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
-console.log(response)
                     if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
@@ -308,7 +310,6 @@ console.log(response)
                     }
 
                     getInitialData();
-                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -344,7 +345,6 @@ console.log(response)
                     }
 
                     getInitialData();
-                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -605,11 +605,9 @@ console.log(response)
                                     </View>
                                 </View>
                                 {
-                                    data.place_img ?
-                                        <Image source={{uri: data.place_img}}
-                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                                        <Image source={require('../../assets/images/here_default.png')}
-                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                    thumbnail !== '' ?
+                                        <Image style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}} source={{uri: thumbnail}}/> :
+                                        <Image style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}} source={require('../../assets/images/here_default.png')}/> 
                                 }
                                 <View style={{
                                     justifyContent: 'space-between',
@@ -730,7 +728,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowOpacity: 0.1,
         shadowOffset: {width: 0, height: 1},
-        elevation: 1
     },
     dirFreeText: {
         fontSize: 12,
@@ -855,7 +852,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

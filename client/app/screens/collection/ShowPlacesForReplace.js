@@ -178,7 +178,6 @@ const ShowPlacesForReplace = props => {
                                 let newArr = [...isDeletedReplacement];
                                 newArr[index] = true;
                                 isReplacementDeleted(newArr);
-                                console.log(newArr);
                                 setDeleteMenu(false);
                             }}>
                         <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -217,9 +216,15 @@ const ShowPlacesForReplace = props => {
                                 {
                                     item.place_img ?
                                         <Image source={{uri: item.place_img}}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> :
-                                        <Image source={require('../../assets/images/here_default.png')}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
+                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                            item.place_thumbnail ?
+                                            <Image source={{uri: item.place_thumbnail}}
+                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                item.review_img ?
+                                                <Image source={{uri: item.review_img}}
+                                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                <Image source={require('../../assets/images/here_default.png')}
+                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                                 }
                                 <View style={{
                                     justifyContent: 'space-between',
@@ -333,7 +338,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

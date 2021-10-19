@@ -34,7 +34,6 @@ const signUp = async (form) => {
         const result = await fetch(url, options)
             .then(res => res.json())
             .then(response => {
-                console.log(response)
                 return response.code === 200;
             })
             .catch(error => console.log(error));
@@ -68,7 +67,6 @@ const GetKeywordTab = ({route, authNavigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response.data)
                     setKeywordData(response.data);
                     setFalse();
                 })
@@ -149,7 +147,6 @@ const GetKeywordTab = ({route, authNavigation}) => {
             paddingVertical: 1,
             paddingHorizontal: 8,
             borderRadius: 14,
-            elevation: 1,
             height: 19,
             marginBottom: 10,
             flexDirection: 'row',
@@ -170,7 +167,6 @@ const GetKeywordTab = ({route, authNavigation}) => {
             marginRight: 10,
             shadowOffset: {width: 0, height: 1},
             shadowOpacity: 0.1,
-            elevation: 1,
             // width: 58,
             height: 28,
             alignItems: 'center',
@@ -185,7 +181,6 @@ const GetKeywordTab = ({route, authNavigation}) => {
             marginRight: 10,
             shadowOffset: {width: 0, height: 1},
             shadowOpacity: 0.1,
-            elevation: 1,
             // width: 58,
             height: 28,
             alignItems: 'center',

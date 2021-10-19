@@ -3,7 +3,7 @@ import {View, Image, Switch, StyleSheet, Pressable, Modal, FlatList, TextInput, 
 import Constants from 'expo-constants';
 import {useIsFocused, useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
-import { CheckBox } from 'react-native-elements';
+import { CheckBox, Icon } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
@@ -14,6 +14,7 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import { myLocation } from '../../contexts/LocationContextProvider';
 
 import hereIcon from '../../assets/images/appicon.png';
+import AppleIcon from '../../assets/images/login/apple.svg';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -27,70 +28,47 @@ const ListItem = props => {
     const [location, setLocation] = myLocation();
     const [errorMsg, setErrorMsg] = useState(null);
     const isFocused = useIsFocused();
+    const [userData, setUserData] = useState({});
 
     useEffect(() => {
         if(location !== null) setIsEnabled(true);
-    }, [isFocused])
-    const askSearchLocation = async (type) => {
-        console.log(type)
-        if(type === true && location === null) {
-            // 안드 에뮬은 안됨
-            if (Platform.OS === 'android' && !Constants.isDevice) {
-                setErrorMsg(
-                  'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-                );
-                return;
-            };
+        getUserData();
+    }, [isFocused]);
 
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                setIsEnabled(false);
-                await (await Location.watchPositionAsync(           {
-                    accuracy: Location.Accuracy.High,
-                    distanceInterval: 1,
-                    timeInterval: 1,
-                  }, ()=>{
-                    setIsEnabled(false);
-                    setLocation(null);
-                })).remove();
-                const location = 'location';
-                Location.hasStartedLocationUpdatesAsync(location).then((value) => {
-                    if (value) {
-                        Location.stopLocationUpdatesAsync(location);
-                        setLocation(null);
+    const getUserData = () => {
+        try {
+            fetch('http://34.64.185.40/user', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
                     }
-                  });
-                return;
-            }
-    
-            let getLocation = await Location.getCurrentPositionAsync({});
-            setLocation(getLocation);
-            setIsEnabled(true);
 
-        } else {
-            await (await Location.watchPositionAsync(           {
-                accuracy: Location.Accuracy.High,
-                distanceInterval: 1,
-                timeInterval: 1,
-              }, ()=>{
-                setIsEnabled(false);
-                setLocation(null);
-            })).remove();
-            const location = 'location';
-            Location.hasStartedLocationUpdatesAsync(location).then((value) => {
-                if (value) {
-                    Location.stopLocationUpdatesAsync(location);
-                    setLocation(null);
-                }
-              });
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    await setUserData(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
         }
-    }
-
-    const toggleSwitch = () => {
-        setIsEnabled(previousState => !previousState);
-        askSearchLocation(!isEnabled);
     };
+
 
     const [reportMenu, setReportMenu] = useState(false);
     const [reportConfirmMenu, setReportConfirmMenu] = useState(false);
@@ -199,8 +177,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                             onPress={() => setReportMenu(!reportMenu)}
                         >
                             <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
@@ -212,8 +189,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                             onPress={() => {
                                 setReportMenu(!reportMenu);
                                 setReportConfirmMenu(true);
@@ -283,8 +259,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                             onPress={() => setAskMenu(!askMenu)}
                         >
                             <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
@@ -296,8 +271,7 @@ const ListItem = props => {
                                     width: 3,
                                     height: 6
                                 },
-                                shadowOpacity: 0.25,
-                                elevation: 1}}
+                                shadowOpacity: 0.25}}
                                 onPress={() => {
                                 setAskMenu(!askMenu);
                                 setAskConfirmMenu(true);
@@ -485,17 +459,9 @@ const ListItem = props => {
                 props.index === 1 ?
                     <View
                         style={props.index === 1 ? {...styles.list_style_version1} : {...styles.list_style_version2}}>
-                        {props.index === 1 &&
-                        <Image source={hereIcon} style={{width: 24, height: 24, marginEnd: 9}}></Image>}
+                        {userData.isAppleLogin ? <Icon type="ionicon" name={"logo-apple"} size={16} style={{marginRight: 9}}></Icon> :
+                        <Image source={hereIcon} style={{width: 24, height: 24, marginRight: 9}}></Image>}
                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 20}}>{props.data}</AppText>
-                        {/* {props.index === 2 && <Switch
-                            trackColor={{false: colors.gray[6], true: colors.mainColor}}
-                            thumbColor={colors.defaultColor}
-                            ios_backgroundColor={colors.gray[6]}
-                            onChange={toggleSwitch}
-                            value={isEnabled}
-                            style={{ transform: [{ scaleX: .8 }, { scaleY: .8 }] }}
-                        />} */}
                     </View> :
                     <View style={{...styles.list_style}}>
                         {

@@ -10,11 +10,10 @@ import * as Linking from 'expo-linking';
 import NavigationTop from '../../components/NavigationTop';
 import Score from '../../components/Score';
 import Time from '../../components/Time';
-import Facility from '../../components/Facility';
 import AppText from '../../components/AppText';
 
 import Jewel from '../../assets/images/jewel.svg';
-import CustomMarker from '../../assets/images/map/map-marker.svg';
+import CustomMyMarker from '../../assets/images/map/map-mylocation-marker.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -246,8 +245,8 @@ const PlaceScreen = ({route, navigation}) => {
 
     const [popularPlace, setPopularPlace] = useState({});
 
-    const [placeLat, setPlaceLat] = useState(0);
-    const [placeLng, setPlaceLng] = useState(0);
+    const [placeLat, setPlaceLat] = useState(37.56633546113615);
+    const [placeLng, setPlaceLng] = useState(126.9779482762618);
     const [placeTitle, setPlaceTitle] = useState('');
 
     const [token, setToken] = useToken();
@@ -267,7 +266,7 @@ const PlaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then(res => res.json())
+            }).then((res) => res.json())
                 .then(async response => {
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
@@ -280,7 +279,7 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
+
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
@@ -291,8 +290,15 @@ const PlaceScreen = ({route, navigation}) => {
                     setPlaceScore(parseFloat(response.data.review.review_score).toFixed(2));
                     setReviewAccess(response.data.review.recent_review_flag);
 
-                    setPlaceLat(parseFloat(response.data.placeData.place_latitude).toFixed(5));
-                    setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(5));
+                    setPlaceLat(parseFloat(response.data.placeData.place_latitude).toFixed(10));
+                    setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(10));
+
+                    const newRegion = { ...region };
+                    newRegion.latitude = Number(parseFloat(response.data.placeData.place_latitude).toFixed(10));
+                    newRegion.longitude = Number(parseFloat(response.data.placeData.place_longitude).toFixed(10));
+                
+                    setRegion(newRegion);
+
                     setPlaceTitle(response.data.placeData.place_name);
 
                     setImages(response.data);
@@ -699,17 +705,15 @@ const PlaceScreen = ({route, navigation}) => {
     const LATITUDE_DELTA = 0.35;
     const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-    const [lnt, setLnt] = useState(126.9775482762618);
     const [region, setRegion] = useState({
-        latitude: 37.56633546113615,
-        longitude: 126.9775482762618,
+        latitude: placeLat,
+        longitude: placeLng,
         latitudeDelta: 0.0015,
         longitudeDelta: 0.0015,
     });
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        // console.log(coordinate)
         const newRegion = { ...region };
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;
@@ -899,7 +903,7 @@ const PlaceScreen = ({route, navigation}) => {
             }}>
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
-                        <Image source={item.place_img ? {uri: item.place_img} : require('../../assets/images/here_default.png')}
+                        <Image source={item.place_img ? {uri: item.place_img} : item.review_img ? {uri: item.review_img} : require('../../assets/images/here_default.png')}
                         style={{width: 141, height: 101, borderRadius: 10}}></Image>
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
@@ -1072,15 +1076,11 @@ const PlaceScreen = ({route, navigation}) => {
                             onMarkerPress={onMarkerPress}
                         >
                             <Marker coordinate={{
-                                latitude: 37.56633546113615,
-                                longitude: 126.9779482762618
-                            }} title={'기본'}
-                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
+                                latitude: placeLat,
+                                longitude: placeLng
+                            }}>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <CustomMarker />
-                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
-                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
-                                    </View>
+                                    <CustomMyMarker />
                                 </View>
                             </Marker>
                         </MapView>

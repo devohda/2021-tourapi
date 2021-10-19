@@ -25,6 +25,8 @@ export default function MainPageScreen({navigation}) {
     const [popularCollection, setPopularCollection] = useState([]);
     const [popularPlace, setPopularPlace] = useState([]);
     const [popularUser, setPopularUser] = useState([]);
+    const [recommendRegion, setRecommendRegion] = useState([]);
+    const [thumbnail, setThumbnail] = useState([]);
     const [token, setToken] = useToken();
     const [days, setDays] = useState('DAY');
     const isFocused = useIsFocused();
@@ -66,6 +68,7 @@ export default function MainPageScreen({navigation}) {
     useEffect(() => {
         getPopularCollectionData('DAY');
         getPopularPlaceData();
+        getRecommendRegionData();
         getPopularUserData();
         () => {
             setPopularCollection([]);
@@ -131,6 +134,20 @@ export default function MainPageScreen({navigation}) {
                     }
 
                     setPopularPlace(response.data);
+                    var newArr = [];
+                    const res = response.data;
+                    for(var i=0;i<res.length;i++) {
+                        if(res[i].place_img) {
+                            newArr.push(res[i].place_img);
+                        } else if(res[i].place_thumbnail) {
+                            newArr.push(res[i].place_thumbnail);
+                        } else if(res[i].review_img) {
+                            newArr.push(res[i].review_img);
+                        } else{
+                            newArr.push('');
+                        }
+                    }
+                    setThumbnail(newArr);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -165,6 +182,38 @@ export default function MainPageScreen({navigation}) {
                     }
 
                     setPopularUser(response.data);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getRecommendRegionData = () => {
+        try {
+            fetch('http://34.64.185.40/visitant/place', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    setRecommendRegion(response.data);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -293,7 +342,7 @@ export default function MainPageScreen({navigation}) {
         if (thumbnail.startsWith('default')) {
             return (
                 <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
-                    <DefaultThumbnail width={127} height={90.38}/>
+                    <DefaultThumbnail width={117} height={90.38}/>
                 </View>
             );
         } else {
@@ -492,9 +541,34 @@ export default function MainPageScreen({navigation}) {
             console.error(err);
         }
     };
+    
+    const rec = [
+        require('../assets/images/main/recommend-default-1.jpg'),
+        require('../assets/images/main/recommend-default-2.jpg'),
+        require('../assets/images/main/recommend-default-3.jpg'),
+        require('../assets/images/main/recommend-default-4.jpg'),
+        require('../assets/images/main/recommend-default-5.jpg'),
+    ]
+
+    const ShowRecommendRegion = props => {
+        const {data, idx} = props;
+
+        return (
+            <ImageBackground source={rec[idx]}
+                style={styles.regionImage} imageStyle={{borderRadius: 15}}>
+                <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: 237, height: 163, position: 'absolute', borderRadius: 15}}></View>
+                <View style={styles.regionText}>
+                    <AppText
+                        style={{fontSize: 16, fontWeight: '700', color: colors.backgroundColor}}>{data.sigungu_name}</AppText>
+                    <AppText numberOfLines={2} ellipsizeMode='tail'
+                        style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>한 달간 총 {data.visitant_cnt} 명 방문</AppText>
+                </View>
+            </ImageBackground>
+        )
+    }
 
     const ShowPopularPlace = props => {
-        const {data} = props;
+        const {data, idx} = props;
         const item = {
             'place_pk': data.place_pk,
         };
@@ -507,11 +581,9 @@ export default function MainPageScreen({navigation}) {
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         {
-                            data.place_img ?
-                                <Image source={{uri: data.place_img}}
-                                    style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/> :
-                                <Image source={require('../assets/images/here_default.png')}
-                                    style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}/>
+                            thumbnail[idx] !== '' ?
+                                <Image style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}} source={{uri: thumbnail[idx]}}/> :
+                                <Image style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}} source={require('../assets/images/here_default.png')}/> 
                         }
                         <View style={{marginLeft: 8, width: '70%'}}>
                             <View style={{flexDirection: 'row'}}>
@@ -712,35 +784,19 @@ export default function MainPageScreen({navigation}) {
                         </View>
                     </View>
 
-                    {/* <View style={{marginTop: 38}}>
-                        <AppText style={{...styles.titles, color: colors.mainColor}}>지역추천</AppText>
+                    <View style={{marginTop: 38}}>
+                        <AppText style={{...styles.titles, color: colors.mainColor}}>지역 추천</AppText>
                         <View style={{flexDirection: 'row', marginTop: 18}}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                                <ImageBackground source={{uri: 'https://via.placeholder.com/150/56a8c2'}}
-                                    style={styles.regionImage} imageStyle={{borderRadius: 15}}>
-                                    <View style={styles.regionText}>
-                                        <AppText
-                                            style={{fontSize: 16, fontWeight: '700', color: colors.backgroundColor}}>충청북도
-                                            단양</AppText>
-                                        <AppText numberOfLines={2} ellipsizeMode='tail'
-                                            style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는
-                                            이유는 다음과 같습니다</AppText>
-                                    </View>
-                                </ImageBackground>
-                                <ImageBackground source={{uri: 'https://via.placeholder.com/150/1ee8a4'}}
-                                    style={styles.regionImage} imageStyle={{borderRadius: 15}}>
-                                    <View style={styles.regionText}>
-                                        <AppText
-                                            style={{fontSize: 16, fontWeight: '700', color: colors.backgroundColor}}>전라남도
-                                            여수</AppText>
-                                        <AppText numberOfLines={2} ellipsizeMode='tail'
-                                            style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>추천하는
-                                            이유는 다음과 같습니다. 추천하는 이유는 다음과 같습니다</AppText>
-                                    </View>
-                                </ImageBackground>
+                                {
+                                    recommendRegion.map((data, idx) => {
+                                        return (
+                                            <ShowRecommendRegion data={data} key={idx} idx={idx} />);
+                                    })
+                                }
                             </ScrollView>
                         </View>
-                    </View> */}
+                    </View>
 
                     <View style={{marginTop: 45, marginBottom: 30}}>
                         <AppText style={{...styles.titles, color: colors.mainColor}}>요즘 뜨는 공간</AppText>
@@ -780,7 +836,6 @@ const styles = StyleSheet.create({
             height: 8
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(132, 92, 92, 0.14)',
         marginHorizontal: 6
     },
@@ -814,7 +869,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 2.5,
     },
     keywordHashTag: {
-        elevation: 1,
         justifyContent: 'center',
         alignItems: 'center',
         fontSize: 12
@@ -824,7 +878,7 @@ const styles = StyleSheet.create({
         height: 163,
         marginEnd: 20,
         borderRadius: 10,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
     },
     regionText: {
         position: 'absolute',
@@ -843,7 +897,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
-        elevation: 1,
         marginRight: 12,
         marginTop: 20
     },
@@ -852,7 +905,6 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         paddingHorizontal: 8,
         borderRadius: 14,
-        elevation: 1,
         width: 43,
         height: 22,
         marginLeft: 9,

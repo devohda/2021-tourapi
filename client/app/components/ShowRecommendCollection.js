@@ -178,8 +178,6 @@ const ShowRecommendCollection = props => {
                     shadowOffset: {width: 0, height: 1},
                     shadowOpacity: 0.27,
                     shadowRadius: 6,
-                    elevation: 1,
-
                     marginRight : 8,
                     borderRadius : 10,
                     overflow: 'hidden'
@@ -263,7 +261,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
-        elevation: 5,
     },
     likesContainer: {
         width: Dimensions.get('screen').width / 2.25,
@@ -305,7 +302,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'
@@ -318,7 +314,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         justifyContent: 'center',
         alignItems: 'center'

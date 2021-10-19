@@ -47,7 +47,6 @@ const MyPageScreen = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log(response.data)
                     setUserData(response.data);
                     setUserKeywordData(response.data.keywords);
                     setUserImage(response.data.user_img);
@@ -186,7 +185,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     keywordHashTag: {
-        elevation: 1,
         justifyContent: 'center',
         alignItems: 'center',
         fontSize: 12
@@ -202,7 +200,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
     },
     //modal example
     centeredView: {

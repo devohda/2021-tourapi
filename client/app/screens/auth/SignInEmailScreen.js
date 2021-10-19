@@ -100,7 +100,8 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         borderBottomWidth: 1,
                         borderBottomColor: colors.gray[5],
                         marginBottom: 16,
-                        paddingBottom: 11
+                        paddingBottom: 11,
+                        color: colors.mainColor
                     }}
                     placeholder="이메일 주소를 입력해주세요"
                     onChangeText={(text) => setEmail(text)}
@@ -108,7 +109,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                     />
                     <View style={{marginBottom: 27}}>
                         <View flexDirection="row" style={{...styles.password_box, borderColor: colors.gray[5]}}>
-                            <TextInput flex={1} style={{fontSize: 16}}
+                            <TextInput flex={1} style={{fontSize: 16, color: colors.mainColor}}
                                 autoCorrect={false}
                                 placeholder="비밀번호를 입력해주세요" secureTextEntry={showPassword}
                                 onChangeText={(text) => setPassword(text)}
@@ -116,7 +117,6 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                                 placeholderTextColor={colors.gray[5]}/>
                             <Pressable style={{marginLeft: 5}} onPress={() => {
                                 setShowPassword(!showPassword);
-                                console.log(showPassword);
                             }}>
                                 {
                                     showPassword ?
@@ -146,7 +146,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                             <AppText>회원가입</AppText>
                         </TouchableOpacity>
                         <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
-                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')} disabled={true}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')}>
                             <AppText>비밀번호 재설정</AppText>
                         </TouchableOpacity>
                     </View>

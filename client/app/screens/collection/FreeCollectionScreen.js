@@ -207,6 +207,13 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setPlaceLength(response.data.placeList.length);
                     setFalse(response.data.placeList);
                     setDeletedData(response.data.placeList);
+
+                    const newRegion = { ...region };
+                    newRegion.latitude = Number(parseFloat(response.data.placeList[0].place_latitude).toFixed(10));
+                    newRegion.longitude = Number(parseFloat(response.data.placeList[0].place_longitude).toFixed(10));
+                
+                    setRegion(newRegion);
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -220,7 +227,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const updatePlaceData = (updatedData, deletedData) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
-        console.log(updatedData)
         //빈 객체일때는 원래 순서 그대로 넣어주기
         for(var j=0;j<placeData.length;j++) {
             var forPutObj = {};
@@ -244,8 +250,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         var DATA = {};
         DATA.placeList = putData;
         DATA.deletePlaceList = deletedData;
-        console.log(putData); console.log(deletedData);
-        console.log(isEmpty)
+
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
@@ -269,7 +274,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             setIsSignedIn(false);
                             return;
                         }
-                        console.log(response);
                         await getInitialPlaceData();
                     })
                     .catch((err) => {
@@ -282,7 +286,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
-        console.log(isDeletedComment)
         var forDeleteData = [];
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
@@ -496,7 +499,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const postPlaceComment = (cpmMapPk, addedComment) => {
         //한줄평 등록
-        console.log(addedComment);
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
                 method: 'POST',
@@ -654,7 +656,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const postReplacement = (mapPk, placePk, prev) => {
         //대체공간 추가
-        // console.log(replacementData.length+prev+1);
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
                 method: 'POST',
@@ -1058,7 +1059,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        // console.log(coordinate)
         const newRegion = { ...region };
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;
@@ -1069,13 +1069,37 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const EntireButton = () => {
         return (
             <View style={{position: 'absolute', right: 0, bottom: 0}}>
-                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: placeData})}>
+                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: placeData, type: collectionData.collection_type, pk: collectionData.collection_pk})}>
                     <Image source={require('../../assets/images/map/entire-button.png')} style={{width: 40, height: 40}}/>
                 </TouchableOpacity>
             </View>
         );
     };
-    
+    const ShowMarkers = props => {
+        const { data, idx } = props;
+
+        return (
+            <Marker coordinate={{
+                latitude: Number(parseFloat(data.place_latitude).toFixed(10)),
+                longitude: Number(parseFloat(data.place_longitude).toFixed(10))
+            }} style={{width: 100, height: 100}}>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <CustomMarker />
+                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
+                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>{data.cpm_plan_day === -1 ? 1 : data.cpm_plan_day + 1}</AppText>
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center', backgroundColor: colors.mainColor, borderRadius: 30, height: 22, widht: '100%', marginTop: 4}}>
+                        <View style={{justifyContent: 'center', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 1.5}}>
+                            <AppText style={{fontSize: 12, lineHeight: 19.2, fontWeight: '500', color: colors.defaultColor}} numberOfLines={1}>
+                                {data.place_name}
+                            </AppText>
+                        </View>
+                    </View>
+                </View>
+            </Marker>
+        )
+    };
+  
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <View flexDirection="row" style={{
@@ -1099,7 +1123,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
-                {checkPrivate() && <>
+                {checkPrivate() ? <>
                     {
                         !isEditPage ?
                             <View style={{position: 'absolute', right: 0}}>
@@ -1166,7 +1190,16 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                 </TouchableOpacity>
                             </View>
-                    }</>}
+                    }</> :
+                    <View style={{position: 'absolute', right: 0}}>
+                        <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                            style={{flex: 1, height: '100%'}} onPress={() => {
+                                onShare();
+                            }}>
+                                <Icon type="ionicon" name={'share-social'} color={colors.mainColor} size={26}/>
+                        </TouchableOpacity>
+                    </View>
+                    }
             </View>
 
             <ScrollView flex={1} stickyHeaderIndices={[1]}>
@@ -1248,24 +1281,17 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
                 <View style={{marginTop: 20}} flex={1}>
                     <View flex={1}>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1, alignItems: 'flex-end'}}
+                        <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
                             region={region}
                             moveOnMarkerPress
                             tracksViewChanges={false}
                             onMarkerPress={onMarkerPress}
                         >
-                            <Marker coordinate={{
-                                latitude: 37.56633546113615,
-                                longitude: 126.9779482762618
-                            }} title={'기본'}
-                            description="기본값입니다" onPress={()=>setLnt(126.9779482762618)}>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <CustomMarker />
-                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
-                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
-                                    </View>
-                                </View>
-                            </Marker>
+                            {
+                            placeData.map((data, idx) => (
+                                <ShowMarkers data={data} idx={idx} key={idx}/>
+                            ))
+                            }
                         </MapView>
                         <EntireButton />
                     </View>
@@ -1433,7 +1459,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowOpacity: 0.1,
         shadowOffset: {width: 0, height: 1},
-        elevation: 1
     },
     dirFreeText: {
         fontSize: 12,

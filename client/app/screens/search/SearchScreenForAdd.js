@@ -47,7 +47,6 @@ const SearchScreenForAdd = ({route, navigation}) => {
             shadowColor: colors.red_gray[7],
             shadowOffset: {width: 0, height: 1},
             shadowOpacity: 0.1,
-            elevation: 1,
             height: 22,
             marginRight: 9,
             marginTop: 8,
@@ -91,8 +90,6 @@ const SearchScreenForAdd = ({route, navigation}) => {
                 shadowOffset: {width: 0, height: 1},
                 shadowOpacity: 0.27,
                 shadowRadius: 6,
-                elevation: 1,
-
                 marginRight : 8,
                 borderRadius : 10,
                 overflow: 'hidden'

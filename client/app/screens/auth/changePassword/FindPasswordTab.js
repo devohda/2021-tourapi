@@ -6,7 +6,6 @@ import * as SMS from 'expo-sms';
 import AppText from '../../../components/AppText';
 import styled from "styled-components/native";
 import CustomTextInput from "../../../components/CustomTextInput";
-import Timer from '../../../components/Timer';
 
 const Form = styled(View)`
   margin-top: 63px;
@@ -22,24 +21,7 @@ const FindPasswordTab = ({route, navigation}) => {
     const [certNumColor, setCertNumColor] = useState(colors.gray[5]);
     const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 
-    const [minutes, setMinutes] = useState(3);
-    const [seconds, setSeconds] = useState(0);
-
-    const countdown = setInterval(() => {
-        if (parseInt(seconds) > 0) {
-          setSeconds(parseInt(seconds) - 1);
-        }
-        if (parseInt(seconds) === 0) {
-          if (parseInt(minutes) === 0) {
-            clearInterval(countdown);
-          } else {
-            setMinutes(parseInt(minutes) - 1);
-            setSeconds(59);
-          }
-        }
-      }, 1000);
-
-    const [verifyCode, setVerifyCode] = useState(0);
+    const [isVerifyCode, setIsVerifyCode] = useState(false);
 
     const [isEmailRegistered, setIsEmailRegistered] = useState(false);
 
@@ -67,8 +49,7 @@ const FindPasswordTab = ({route, navigation}) => {
     const [numVisible, setNumVisible] = useState(false);
 
     const sendSMS = (pn) => {
-        const phoneNum = `+82${phoneNumber.slice(1)}`;
-        console.log(phoneNum)
+        const phoneNum = '+82'+phoneNumber.slice(1);
         if(pn.length !== 11 || !pn.startsWith('010')) {
             Alert.alert('', '정확한 전화번호를 입력해주세요.');
         } else {
@@ -79,16 +60,15 @@ const FindPasswordTab = ({route, navigation}) => {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: {
-                        phoneNumber: pn,
-                    }
+                    body: JSON.stringify({
+                        phoneNumber: phoneNum,
+                    }),
                 }).then(res => res.json())
                     .then(async response => {
                         console.log('Success:', JSON.stringify(response));
-                        Alert.alert('', '인증번호가 전송되었습니다. 주어진 시간내에 입력해주세요.', [
+                        Alert.alert('', `인증번호가 전송되었습니다.${'\n'}3분 내에 정확히 입력해주세요.`, [
                             {text : 'OK', onPress: async () => {
                                 setNumVisible(true);
-                                await countdown();
                             }}]);
                     })
                     .catch(error => console.error('Error:', error));
@@ -100,16 +80,22 @@ const FindPasswordTab = ({route, navigation}) => {
     };
 
     const getInfo = async () => {
+        const phoneNum = '+82'+phoneNumber.slice(1);
         try {
-            fetch('http://34.64.185.40/auth/authPhone', {
-                method: 'GET',
+            fetch('http://34.64.185.40/auth/authPhoneCode', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-            }).then(res => res.json())
+                body: JSON.stringify({
+                    phoneNumber: phoneNum,
+                    verifyCode: certificateNumber,
+                }),
+            }).then((res) => res.json())
                 .then(response => {
-                    setVerifyCode(response.data.verifyCode);
+                    setIsVerifyCode(response);
+                    checkIsValid(response.code);
                 })
                 .catch(error => console.error('Error:', error));
         } catch (err) {
@@ -117,19 +103,18 @@ const FindPasswordTab = ({route, navigation}) => {
         }
     }
 
-    const checkIsValid = async () => {
+    const checkIsValid = async (code) => {
         if(!(email && phoneNumber && certificateNumber)) {
             Alert.alert('', '정보를 모두 입력해주세요.');
             return;
         };
-        console.log(isEmailRegistered)
         if(!isEmailRegistered) {
             Alert.alert('', '가입되지 않은 이메일입니다.');
             return;
-        }
+        };
 
-        if(certificateNumber === verifyCode) navigation.navigate('changeTab', {email});
-        else Alert.alert('', '인증번호가 일치하지 않습니다.');
+        if(code === 200) navigation.navigate('changeTab', {email});
+        else Alert.alert('', '인증번호가 일치하지 않거나 유효 시간이 지났습니다.');
 
     }
 
@@ -193,10 +178,10 @@ const FindPasswordTab = ({route, navigation}) => {
             <View flex={1}>
                 <Form>
                     <View flexDirection="row" style={{...styles.input_box, borderColor: emailColor, marginTop: 0}}>
-                        <CustomTextInput
-
+                        <TextInput
                             placeholder="이메일 주소를 입력해주세요"
                             autoCapitalize="none"
+                            autoCorrect={false}
                             style={{
                                 fontSize: 18,
                                 color: colors.mainColor
@@ -204,7 +189,6 @@ const FindPasswordTab = ({route, navigation}) => {
                             flex={1}
                             onChangeText={async (text) => {
                                 await findEmail(text);
-
                                 if(text.length) setEmailColor(colors.mainColor);
                                 else setEmailColor(colors.gray[5]);
                                 setEmail(text);
@@ -213,9 +197,10 @@ const FindPasswordTab = ({route, navigation}) => {
                     </View>
                     <View flexDirection="row" style={{...styles.input_box, borderColor: colors.backgroundColor, justifyContent: 'space-between', alignItems: 'center'}}>
                         <View flexDirection="row" style={{...styles.input_box, borderColor: phoneNumColor, width: '70%', justifyContent: 'center', alignItems: 'center', marginTop: 20}}>
-                            <CustomTextInput
+                            <TextInput
                                 placeholder="휴대폰 번호를 입력해주세요"
                                 autoCapitalize="none"
+                                autoCorrect={false}
                                 style={{
                                     fontSize: 18,
                                     color: colors.mainColor
@@ -226,6 +211,7 @@ const FindPasswordTab = ({route, navigation}) => {
                                     else setPhoneNumColor(colors.gray[5]);
                                     setPhoneNumber(text);
                                 }}
+                            keyboardType={'number-pad'}
                             />
                         </View>
                         <View>
@@ -240,9 +226,10 @@ const FindPasswordTab = ({route, navigation}) => {
                         </View>
                     </View>
                     <View flexDirection="row" style={{...styles.input_box, borderColor: certNumColor}}>
-                        <CustomTextInput
+                        <TextInput
                             placeholder="인증번호를 입력해주세요"
                             autoCapitalize="none"
+                            autoCorrect={false}
                             style={{
                                 fontSize: 18,
                                 color: colors.mainColor
@@ -253,25 +240,16 @@ const FindPasswordTab = ({route, navigation}) => {
                                 else setCertNumColor(colors.gray[5]);
                                 setCertificateNumber(text);
                             }}
+                            keyboardType={'number-pad'}
                         />
-                        <View style={[{flexDirection: 'row'}, !numVisible && {display: 'none'}]}>
-                            <AppText style={{marginRight: 1, color: colors.red[3], fontSize: 14}}>
-                                남은시간
-                            </AppText>
-                            <AppText style={{color: colors.red[3], fontSize: 14}}>
-                                {minutes} : { seconds < 10 ? `0${seconds}` : seconds}
-                            </AppText>
-                        </View>
                     </View>
                 </Form>
             </View>
             <View style={{marginBottom: 20}}>
                 <TouchableOpacity
                     style={styles.continue_btn}
-                    onPress={() => {
-                        findEmail(email);
-                        getInfo(); 
-                        checkIsValid();
+                    onPress={async () => {
+                        await getInfo(); 
                     }}
                     disabled={isCorrect('continue')}
                 >
@@ -279,26 +257,6 @@ const FindPasswordTab = ({route, navigation}) => {
                 </TouchableOpacity>
             </View>
         </>
-        // <ScreenContainer>
-        //     <View>
-        //         <AppText>이메일을 입력하세요.</AppText>
-        //         <TextInput autoCapitalize="none" onChangeText={(text) => setEmail(email)}/>
-        //         <Button title="확인 코드 입력" onPress={() => {
-        //         }}/>
-        //         <AppText>전화번호를 입력하세요.</AppText>
-        //         <TextInput autoCapitalize="none" onChangeText={(text) => setEmail(email)}/>
-        //         <PhoneInput
-        //             defaultCode="KR"
-        //             layout="first"
-        //             onChangeText={(text) => {
-        //                 setPhoneNumber(text);
-        //             }}
-        //         />
-        //         <Button title="sms 전송" onPress={() => {
-        //             sendSMS();
-        //         }}/>
-        //     </View>
-        // </ScreenContainer>
     );
 };
 

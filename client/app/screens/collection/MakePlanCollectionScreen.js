@@ -46,7 +46,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const { data, update } = route.params;
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
-        console.log('완료');
     }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
@@ -90,7 +89,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
         },
         {
             id: 6,
-            name: 'selected-photo',
+            name: 'default-red',
             color: colors.defaultColor
         },
     ]);
@@ -650,15 +649,17 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
           quality: 1,
         });
     
-        console.log(result);
+        var newArr =[...defaultThumbnailList];
     
         if (!result.cancelled) {
-          setImage(result.uri);
+            setImage(result.uri);
+            newArr[5].name = result.uri;
+        } else {
+            newArr[5].name = 'default-red';
+            setDefaultThumbnailList(newArr);
         }
-
-        var newArr =[...defaultThumbnailList];
-        newArr[5].name = result.uri;
         setDefaultThumbnailList(newArr);
+
       };
 
     const SelectProfile = () => {
@@ -666,7 +667,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
             <View style={{alignItems: 'center'}}>
                 {image ?
                 <Image source={{ uri: image }} style={{...styles.selectedImage}} /> :
-                <View style={{...styles.selectedImage, backgroundColor: setBGColor(selectedIndex)}}>
+                <View style={{...styles.selectedImage, backgroundColor: selectedIndex === 5 && !image ? colors.red[3] : setBGColor(selectedIndex)}}>
                     <DefaultThumbnail width={83} height={60.2}/>
                 </View>
                 }
@@ -695,7 +696,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                                     height: 2
                                 },
                                 shadowOpacity: 0.25,
-                                elevation: 1,
                                 shadowColor: 'rgba(0, 0, 0, 0.25)',
                             }]} color={colors.gray[6]}></Icon>
                         </View>
@@ -826,8 +826,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
-        // width: 58,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -841,8 +839,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
-        // width: 58,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'

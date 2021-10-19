@@ -221,7 +221,6 @@ const MakeReviewScreen = ({route, navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-console.log(response)
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
                         {text : 'OK', onPress: () => navigation.goBack()}
                         ]);
@@ -391,9 +390,7 @@ console.log(response)
           aspect: [4, 3],
           quality: 1,
         });
-    
-        console.log(result);
-    
+        
         if (!result.cancelled) {
             var newArr = [...image];
             newArr.push(result.uri)
@@ -700,7 +697,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -713,7 +709,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -757,7 +752,6 @@ const styles = StyleSheet.create({
         shadowColor: 'rgba(203, 180, 180, 0.3)',
         shadowOffset: {width: 1, height: 2},
         shadowOpacity: 1,
-        elevation: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },

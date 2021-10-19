@@ -65,8 +65,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
 
     const postReplacement = (placePk, prev) => {
         //대체공간 추가
-        // console.log(replacementData.length+prev+1);
-        // console.log(props)
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
                 method: 'POST',
@@ -85,7 +83,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
-                    console.log(response)
 
                     if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
@@ -219,9 +216,15 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                     {
                         item.place_img ?
                             <Image source={{uri: item.place_img}}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                            <Image source={require('../../assets/images/here_default.png')}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                item.place_thumbnail ?
+                                <Image source={{uri: item.place_thumbnail}}
+                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                    item.review_img ?
+                                    <Image source={{uri: item.review_img}}
+                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                    <Image source={require('../../assets/images/here_default.png')}
+                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                     }
                     <View flex={1} style={styles.info_container}>
                         <View flexDirection="row" style={{alignItems: 'center'}}>
