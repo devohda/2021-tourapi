@@ -117,7 +117,6 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                                 placeholderTextColor={colors.gray[5]}/>
                             <Pressable style={{marginLeft: 5}} onPress={() => {
                                 setShowPassword(!showPassword);
-                                console.log(showPassword);
                             }}>
                                 {
                                     showPassword ?

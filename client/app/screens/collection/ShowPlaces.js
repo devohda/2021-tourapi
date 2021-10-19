@@ -215,7 +215,6 @@ const ShowPlaces = props => {
                 if(originData[i].cpm_plan_day === day) length += 1;
             }
         }
-        // console.log(length)
         return length;
     };
     
@@ -259,9 +258,7 @@ const ShowPlaces = props => {
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
                                 let newArr = [...isDeletedOrigin];
-                                console.log(newArr);
                                 newArr[index] = true;
-                                // setIsDeletedOrigin(newArr);
                                 isDeleted(newArr);
                                 setDeleteVisible(false);
                             }}>

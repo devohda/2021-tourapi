@@ -60,7 +60,7 @@ const ShowRecommendPlace = props => {
                     }
 
                     setPopularPlace(response.data);
-console.log(response.data)
+
                     var newArr = [];
                     const res = response.data;
                     for(var i=0;i<res.length;i++) {

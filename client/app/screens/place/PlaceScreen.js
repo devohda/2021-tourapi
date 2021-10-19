@@ -10,11 +10,10 @@ import * as Linking from 'expo-linking';
 import NavigationTop from '../../components/NavigationTop';
 import Score from '../../components/Score';
 import Time from '../../components/Time';
-import Facility from '../../components/Facility';
 import AppText from '../../components/AppText';
 
 import Jewel from '../../assets/images/jewel.svg';
-import CustomMarker from '../../assets/images/map/map-marker.svg';
+import CustomMyMarker from '../../assets/images/map/map-mylocation-marker.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -280,7 +279,7 @@ const PlaceScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log(response.data.placeData)
+
                     setPlaceData(response.data.placeData);
                     setReviewData(response.data.review);
                     setFacilityData(response.data.review.facility);
@@ -715,7 +714,6 @@ const PlaceScreen = ({route, navigation}) => {
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        // console.log(coordinate)
         const newRegion = { ...region };
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;
@@ -1082,10 +1080,7 @@ const PlaceScreen = ({route, navigation}) => {
                                 longitude: placeLng
                             }}>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <CustomMarker />
-                                    <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', bottom: 8}}>
-                                        <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>1</AppText>
-                                    </View>
+                                    <CustomMyMarker />
                                 </View>
                             </Marker>
                         </MapView>

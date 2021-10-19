@@ -158,7 +158,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const updateReplacementData = (updatedData, deletedData) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
-        // console.log(updatedData)
         for(var j=0;j<replacementData.length;j++) {
             var forPutObj = {};
 
@@ -184,7 +183,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
         var DATA = {};
         DATA.replacementPlaceList = putData;
-        // console.log(DATA);
         if(isEmpty !== placeData.length) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
@@ -208,7 +206,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                             setIsSignedIn(false);
                             return;
                         }
-                        console.log(response);
                         await getInitialReplacementData();
                     })
                     .catch((err) => {
@@ -222,7 +219,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
-        // console.log(cpmMapPk); console.log(place_pk);
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
@@ -237,7 +233,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
-console.log(response)
                     if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
@@ -315,7 +310,6 @@ console.log(response)
                     }
 
                     getInitialData();
-                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -351,7 +345,6 @@ console.log(response)
                     }
 
                     getInitialData();
-                    console.log(response);
                 })
                 .catch((err) => {
                     console.error(err);

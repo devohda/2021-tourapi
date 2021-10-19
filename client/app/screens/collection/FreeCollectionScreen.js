@@ -227,7 +227,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const updatePlaceData = (updatedData, deletedData) => {
         // 공간 수정
         var putData = []; var isEmpty = 0;
-        console.log(updatedData)
         //빈 객체일때는 원래 순서 그대로 넣어주기
         for(var j=0;j<placeData.length;j++) {
             var forPutObj = {};
@@ -251,8 +250,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         var DATA = {};
         DATA.placeList = putData;
         DATA.deletePlaceList = deletedData;
-        console.log(putData); console.log(deletedData);
-        console.log(isEmpty)
+
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
@@ -276,7 +274,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             setIsSignedIn(false);
                             return;
                         }
-                        console.log(response);
                         await getInitialPlaceData();
                     })
                     .catch((err) => {
@@ -289,7 +286,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const checkDeletedPlace = () => {
-        console.log(isDeletedComment)
         var forDeleteData = [];
         for(var i=0;i<isDeletedOrigin.length;i++) {
             if(isDeletedOrigin[i] === true) {
@@ -503,7 +499,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const postPlaceComment = (cpmMapPk, addedComment) => {
         //한줄평 등록
-        console.log(addedComment);
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
                 method: 'POST',
@@ -661,7 +656,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const postReplacement = (mapPk, placePk, prev) => {
         //대체공간 추가
-        // console.log(replacementData.length+prev+1);
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
                 method: 'POST',
@@ -1065,7 +1059,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        // console.log(coordinate)
         const newRegion = { ...region };
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;

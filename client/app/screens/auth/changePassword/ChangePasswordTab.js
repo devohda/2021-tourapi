@@ -54,7 +54,6 @@ const ChangePasswordTab = ({route, authNavigation}) => {
             const result = await fetch(url, options)
                 .then(res => res.json())
                 .then(response => {
-                    console.log(response)
                     console.log(e); console.log(pw);
                     return response.code === 200;
                 })

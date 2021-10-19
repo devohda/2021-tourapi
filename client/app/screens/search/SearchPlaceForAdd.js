@@ -65,8 +65,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
 
     const postReplacement = (placePk, prev) => {
         //대체공간 추가
-        // console.log(replacementData.length+prev+1);
-        // console.log(props)
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
                 method: 'POST',
@@ -85,7 +83,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
                     }
-                    console.log(response)
 
                     if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');

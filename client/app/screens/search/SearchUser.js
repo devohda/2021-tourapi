@@ -46,8 +46,6 @@ const SearchUser = (props) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log(response.data)
-                    // console.log(response.data.length)
 
                     countUser(response.data.length);
                     setUserList(response.data);

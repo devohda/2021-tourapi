@@ -47,7 +47,6 @@ const MyPageScreen = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    // console.log(response.data)
                     setUserData(response.data);
                     setUserKeywordData(response.data.keywords);
                     setUserImage(response.data.user_img);

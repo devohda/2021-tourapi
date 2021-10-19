@@ -46,7 +46,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const { data, update } = route.params;
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
-        console.log('완료');
     }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
@@ -650,7 +649,6 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
           quality: 1,
         });
     
-        console.log(result);
         var newArr =[...defaultThumbnailList];
     
         if (!result.cancelled) {

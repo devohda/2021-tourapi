@@ -40,7 +40,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
 
     const showCopyToast = useCallback(() => {
         toastRef.current.show('비어있는 필드가 있습니다.', 2000);
-        console.log('완료');
     }, []);
     const [isEnabled, setIsEnabled] = useState(false);
     const [collectionName, setCollectionName] = useState('');
@@ -144,7 +143,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(form)
                     const item = {
                         'collection_pk': response.collectionId,
                         'now': true,
@@ -289,9 +287,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response.data)
                     setKeywordData(response.data);
-                    // console.log(update)
                     if (update) {
                         setFalseUpdated(response.data);
                     } else setFalse();
@@ -520,7 +516,6 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
           quality: 1,
         });
     
-        console.log(result);
         var newArr =[...defaultThumbnailList];
     
         if (!result.cancelled) {

@@ -178,7 +178,6 @@ const ShowPlacesForReplace = props => {
                                 let newArr = [...isDeletedReplacement];
                                 newArr[index] = true;
                                 isReplacementDeleted(newArr);
-                                console.log(newArr);
                                 setDeleteMenu(false);
                             }}>
                         <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>

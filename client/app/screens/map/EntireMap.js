@@ -92,7 +92,6 @@ const EntireMap = ({route, navigation}) => {
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        // console.log(coordinate)
         const newRegion = { ...region };
     
         newRegion.latitude = coordinate.latitude;

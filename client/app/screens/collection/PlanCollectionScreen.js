@@ -276,7 +276,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             order: placeData[j].cpm_order
                         }
                     } else {
-                        // console.log(Object.values(updatedData[i])[j])
                         forPutObj = {
                             cpm_map_pk: placeData[j].cpm_map_pk,
                             planDay: i,
@@ -285,14 +284,12 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     };
                     putData.push(forPutObj)
                 } else cur = 0;
-                // console.log(cur)
 
             }
         }
         var DATA = {};
         DATA.placeList = putData;
         DATA.deletePlaceList = deletedData;
-        // console.log(DATA)
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
                 fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
@@ -316,7 +313,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             setIsSignedIn(false);
                             return;
                         }
-                        // console.log(response);
                         await getInitialPlaceData();
                     })
                     .catch((err) => {
@@ -698,7 +694,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const postReplacement = (mapPk, placePk, prev) => {
         //대체공간 추가
-        // console.log(replacementData.length+prev+1);
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
                 method: 'POST',
@@ -924,10 +919,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const isEdited = (data, day) => {
         var newObject = [...editData.value];
         newObject[day] = data;
-        // console.log(day)
-        // console.log(newObject)
         editData.value = newObject;
-        // console.log(editData.value)
         return data;
     };
 
@@ -1255,7 +1247,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        // console.log(coordinate)
         const newRegion = { ...region };
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;

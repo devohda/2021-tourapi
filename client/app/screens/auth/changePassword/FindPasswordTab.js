@@ -50,7 +50,6 @@ const FindPasswordTab = ({route, navigation}) => {
 
     const sendSMS = (pn) => {
         const phoneNum = '+82'+phoneNumber.slice(1);
-        console.log(phoneNum)
         if(pn.length !== 11 || !pn.startsWith('010')) {
             Alert.alert('', '정확한 전화번호를 입력해주세요.');
         } else {
@@ -95,8 +94,6 @@ const FindPasswordTab = ({route, navigation}) => {
                 }),
             }).then((res) => res.json())
                 .then(response => {
-                    console.log('여기여기')
-                    console.log(response)
                     setIsVerifyCode(response);
                     checkIsValid(response.code);
                 })

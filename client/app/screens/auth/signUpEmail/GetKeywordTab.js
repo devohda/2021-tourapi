@@ -34,7 +34,6 @@ const signUp = async (form) => {
         const result = await fetch(url, options)
             .then(res => res.json())
             .then(response => {
-                console.log(response)
                 return response.code === 200;
             })
             .catch(error => console.log(error));
@@ -68,7 +67,6 @@ const GetKeywordTab = ({route, authNavigation}) => {
                 },
             }).then((res) => res.json())
                 .then((response) => {
-                    // console.log(response.data)
                     setKeywordData(response.data);
                     setFalse();
                 })

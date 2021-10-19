@@ -221,7 +221,6 @@ const MakeReviewScreen = ({route, navigation}) => {
                     //     setIsSignedIn(false);
                     //     return;
                     // }
-console.log(response)
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
                         {text : 'OK', onPress: () => navigation.goBack()}
                         ]);
@@ -391,9 +390,7 @@ console.log(response)
           aspect: [4, 3],
           quality: 1,
         });
-    
-        console.log(result);
-    
+        
         if (!result.cancelled) {
             var newArr = [...image];
             newArr.push(result.uri)

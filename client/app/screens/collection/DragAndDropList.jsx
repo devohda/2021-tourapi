@@ -10,6 +10,7 @@ import {
 import Animated, {
   cancelAnimation,
   runOnJS,
+  scrollTo,
   useAnimatedGestureHandler,
   useAnimatedReaction,
   useAnimatedRef,
@@ -84,7 +85,7 @@ function EditPlaces({
     (currentPosition, previousPosition) => {
       if (currentPosition !== previousPosition) {
         if (!moving) {
-          top.value = currentPosition * dataHeight + 120;
+          top.value = currentPosition * dataHeight;
         }
       }
     },
@@ -96,11 +97,11 @@ function EditPlaces({
       runOnJS(setMoving)(true);
     },
     onActive(event) {
-      const positionY = event.absoluteY + scrollY.value;
+      const positionY = event.absoluteY + scrollY.value - 240;
 
       if (positionY <= scrollY.value + dataHeight) {
         // Scroll up
-        scrollY.value = withTiming(0, { duration: 0 });
+        scrollY.value = withTiming(0, { duration: 1500 });
       } else if (
         positionY >=
         scrollY.value + dimensions.height - dataHeight
@@ -108,15 +109,15 @@ function EditPlaces({
         // Scroll down
         const contentHeight = dataCount * dataHeight;
         const containerHeight =
-          dimensions.height - insets.top - insets.bottom;
+          dimensions.height - insets.top - insets.bottom + 480;
         const maxScroll = contentHeight - containerHeight;
-        scrollY.value = withTiming(maxScroll, { duration: 0 });
+        scrollY.value = withTiming(maxScroll, { duration: 1500 });
       } else {
         cancelAnimation(scrollY);
       }
 
       top.value = withTiming(positionY - dataHeight, {
-        duration: 0,
+        duration: 16,
       });
 
       const newPosition = clamp(
@@ -173,11 +174,15 @@ function EditPlaces({
 const DragAndDropList = props => {
   const {colors} = useTheme();
   const Data = props.data;
-  const { isEdited, isDeletedOrigin, deletedLengthByDays, day } = props;
+  const { isEdited } = props;
   const positions = useSharedValue(listToObject(Data));
   const scrollY = useSharedValue(0);
   const scrollViewRef = useAnimatedRef();
 
+  useAnimatedReaction(
+    () => scrollY.value,
+    (scrolling) => scrollTo(scrollViewRef, 0, scrolling, false)
+  );
   const handleScroll = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
   });
