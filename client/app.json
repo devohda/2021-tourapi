@@ -2,7 +2,7 @@
   "expo": {
     "name": "Here",
     "slug": "Here",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "scheme": "here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
@@ -29,7 +29,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.7.5",
+      "buildNumber": "0.8.1",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
       },
