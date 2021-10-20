@@ -1046,8 +1046,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
         const newRegion = { ...region };
-        newRegion.latitude = coordinate.latitude;
-        newRegion.longitude = coordinate.longitude;
+        newRegion.latitude = Number(coordinate.latitude);
+        newRegion.longitude = Number(coordinate.longitude);
     
         setRegion(newRegion);
     };

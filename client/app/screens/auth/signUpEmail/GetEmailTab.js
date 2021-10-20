@@ -104,8 +104,8 @@ const GetEmailTab = ({navigation}) => {
                 <Form>
                     <AppText>
                         <View>
-                            <AppText style={styles.title_text}><AppText
-                                style={{fontWeight: 'bold'}}>이메일주소</AppText><AppText>를</AppText></AppText>
+                            <AppText style={styles.title_text}>
+                                <AppText style={{fontWeight: 'bold'}}>이메일주소</AppText><AppText>를</AppText></AppText>
                             <AppText style={styles.title_text}>입력해주세요</AppText>
                         </View>
                     </AppText>

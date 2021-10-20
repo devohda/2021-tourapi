@@ -1,5 +1,16 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Share, Alert, FlatList } from 'react-native';
+import {
+    View,
+    ScrollView,
+    Image,
+    StyleSheet,
+    SafeAreaView,
+    TouchableOpacity,
+    Dimensions,
+    Share,
+    Alert,
+    FlatList
+} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Icon, AirbnbRating, Rating} from 'react-native-elements';
 import {useToken} from '../../contexts/TokenContextProvider';
@@ -15,10 +26,10 @@ import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const MakeReviewScreen = ({route, navigation}) => {
-    const { colors } = useTheme();
+    const {colors} = useTheme();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const { placeName, place_pk } = route.params;
+    const {placeName, place_pk} = route.params;
     const [isOpened, setIsOpened] = useState(false);
     const [reviews, setReviews] = useState([
         '많이 아쉬워요', '아쉬워요', '괜찮아요', '마음에 들어요!', '다시 방문하고 싶어요!'
@@ -32,7 +43,7 @@ const MakeReviewScreen = ({route, navigation}) => {
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
         {
-            id : 1,
+            id: 1,
             data: '오전'
         },
         {
@@ -56,7 +67,7 @@ const MakeReviewScreen = ({route, navigation}) => {
         getUserData();
         getFacilityData();
         setFalse();
-    },[]);
+    }, []);
 
     const getUserData = () => {
         try {
@@ -125,8 +136,8 @@ const MakeReviewScreen = ({route, navigation}) => {
     };
 
     const postReview = () => {
-        var postBusyTime = [0,0,0,0];
-        var postFacility = [];
+        let postBusyTime = [0, 0, 0, 0];
+        let postFacility = [];
 
         for (let i = 0; i < busyTimeData.length; i++) {
             if (isBusyTimePress[i] === true) {
@@ -141,37 +152,37 @@ const MakeReviewScreen = ({route, navigation}) => {
         }
 
         // 선택사항이 많으므로 하나 하나 조건 필요
-        var DATA = {};
+        let DATA = {};
 
-        if(postBusyTime[0]) {
+        if (postBusyTime[0]) {
             DATA.review_congestion_morning = postBusyTime[0];
         }
-        if(postBusyTime[1]) {
+        if (postBusyTime[1]) {
             DATA.review_congestion_afternoon = postBusyTime[1];
         }
-        if(postBusyTime[2]) {
+        if (postBusyTime[2]) {
             DATA.review_congestion_evening = postBusyTime[2];
         }
-        if(postBusyTime[3]) {
+        if (postBusyTime[3]) {
             DATA.review_congestion_night = postBusyTime[3];
         }
-        if(ratedScore) {
+        if (ratedScore) {
             DATA.review_score = ratedScore;
         }
-        if(ratedCleanlinessScore) {
+        if (ratedCleanlinessScore) {
             DATA.review_cleanliness = ratedCleanlinessScore;
         }
-        if(ratedAccessibilityScore) {
+        if (ratedAccessibilityScore) {
             DATA.review_accessibility = ratedAccessibilityScore;
         }
-        if(ratedMarketScore) {
+        if (ratedMarketScore) {
             DATA.review_market = ratedMarketScore;
         }
         DATA.review_facility = postFacility;
 
         let form = new FormData();
-        if(image.length) {
-            if(image.length === 1) {
+        if (image.length) {
+            if (image.length === 1) {
                 let file = {
                     uri: image[0],
                     type: 'multipart/form-data',
@@ -179,24 +190,22 @@ const MakeReviewScreen = ({route, navigation}) => {
                 };
                 form.append('img', file);
             } else {
-                var newArr = [];
-                for(var i=0;i<image.length;i++) {
+                let newArr = [];
+                for (const i = 0; i < image.length; i++) {
                     newArr.push({
                         uri: image[i],
                         type: 'multipart/form-data',
-                        name: `image${i+1}.jpg`,
+                        name: `image${i + 1}.jpg`,
                     });
                 }
-                // form.append('img', newArr)
-                // for(var i=0;i<image.length;i++) {
-                //     form.append('img[]', newArr[i]);
-                // }
-                for(var i=0;i<image.length;i++) {
+                for (const i = 0; i < image.length; i++) {
                     form.append('img', newArr[i]);
                 }
             }
         }
+
         form.append('reviewData', JSON.stringify(DATA));
+
         try {
             fetch(`http://34.64.185.40/place/${place_pk}/review`, {
                 method: 'POST',
@@ -205,10 +214,10 @@ const MakeReviewScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
                 body: form,
-            }).then(res => {
-                res.json();
-            })
+            }).then(res => res.json())
                 .then(async response => {
+                    console.log(response);
+
                     if (response.code === 405 && !alertDuplicated) {
                         Alert.alert('', '다른 기기에서 로그인했습니다.');
                         setAlertDuplicated(true);
@@ -221,7 +230,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                         return;
                     }
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
-                        {text : 'OK', onPress: () => navigation.goBack()}
+                        {text: 'OK', onPress: () => navigation.goBack()}
                     ]);
                 })
                 .catch((err) => {
@@ -275,11 +284,11 @@ const MakeReviewScreen = ({route, navigation}) => {
     const BusyTime = ({keyword, idx}) => {
         return (
             <View key={idx}
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
+                  style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                  }}
 
             >
                 <TouchableOpacity onPress={() => {
@@ -295,9 +304,16 @@ const MakeReviewScreen = ({route, navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8]
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]} activeOpacity={0.8}>
+                }] : [styles.selectType, {
+                    borderColor: colors.defaultColor,
+                    backgroundColor: colors.defaultColor,
+                    shadowColor: colors.red[8]
+                }]} activeOpacity={0.8}>
                     <AppText
-                        style={isBusyTimePress[keyword.id - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.data}</AppText>
+                        style={isBusyTimePress[keyword.id - 1] ? {
+                            ...styles.selectTypeTextClicked,
+                            color: colors.defaultColor
+                        } : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.data}</AppText>
                 </TouchableOpacity>
             </View>
         );
@@ -306,12 +322,12 @@ const MakeReviewScreen = ({route, navigation}) => {
     const AroundFacility = ({keyword, idx}) => {
         return (
             <View key={idx}
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 8
-                }}
+                  style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 8
+                  }}
             >
                 <TouchableOpacity onPress={() => {
                     let newArr = [...isFacilityPress];
@@ -326,9 +342,16 @@ const MakeReviewScreen = ({route, navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8],
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]} activeOpacity={0.8}>
+                }] : [styles.selectType, {
+                    borderColor: colors.defaultColor,
+                    backgroundColor: colors.defaultColor,
+                    shadowColor: colors.red[8]
+                }]} activeOpacity={0.8}>
                     <AppText
-                        style={isFacilityPress[keyword.facility_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.facility_name}</AppText>
+                        style={isFacilityPress[keyword.facility_pk - 1] ? {
+                            ...styles.selectTypeTextClicked,
+                            color: colors.defaultColor
+                        } : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.facility_name}</AppText>
                 </TouchableOpacity>
             </View>
         );
@@ -340,24 +363,24 @@ const MakeReviewScreen = ({route, navigation}) => {
                 {
                     facilityData.map((keyword, idx) => (
                         <>{idx <= 3 &&
-                        <AroundFacility keyword={keyword} key={idx+'0'}/>}</>
+                        <AroundFacility keyword={keyword} key={idx + '0'}/>}</>
                     ))
                 }
             </View>
-            { isOpened &&
-                <><View style={{flexDirection: 'row'}}>
-                    {
-                        facilityData.map((keyword, idx) => (
-                            <>{4 <= idx && idx <= 6 &&
-                            <AroundFacility keyword={keyword} key={idx+'1'}/>}</>
-                        ))
-                    }
-                </View>
+            {isOpened &&
+            <><View style={{flexDirection: 'row'}}>
+                {
+                    facilityData.map((keyword, idx) => (
+                        <>{4 <= idx && idx <= 6 &&
+                        <AroundFacility keyword={keyword} key={idx + '1'}/>}</>
+                    ))
+                }
+            </View>
                 <View style={{flexDirection: 'row'}}>
                     {
                         facilityData.map((keyword, idx) => (
                             <>{7 <= idx && idx <= 10 &&
-                            <AroundFacility keyword={keyword} key={idx+'2'}/>}</>
+                            <AroundFacility keyword={keyword} key={idx + '2'}/>}</>
                         ))
                     }
                 </View>
@@ -365,15 +388,15 @@ const MakeReviewScreen = ({route, navigation}) => {
                     {
                         facilityData.map((keyword, idx) => (
                             <>{11 <= idx && idx <= 13 &&
-                            <AroundFacility keyword={keyword} key={idx+'3'}/>}</>
+                            <AroundFacility keyword={keyword} key={idx + '3'}/>}</>
                         ))
                     }
                 </View>
                 <View style={{flexDirection: 'row'}}>
                     {
                         facilityData.map((keyword, idx) => (
-                            <>{14 <= idx  &&
-                            <AroundFacility keyword={keyword} key={idx+'4'}/>}</>
+                            <>{14 <= idx &&
+                            <AroundFacility keyword={keyword} key={idx + '4'}/>}</>
                         ))
                     }
                 </View></>
@@ -389,7 +412,7 @@ const MakeReviewScreen = ({route, navigation}) => {
             aspect: [4, 3],
             quality: 1,
         });
-        
+
         if (!result.cancelled) {
             var newArr = [...image];
             newArr.push(result.uri);
@@ -402,13 +425,20 @@ const MakeReviewScreen = ({route, navigation}) => {
             <View style={{marginBottom: 26}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
                     <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
-                    <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
+                    <AppText style={{
+                        fontSize: 12,
+                        fontWeight: '400',
+                        lineHeight: 19.2,
+                        color: colors.gray[4],
+                        marginLeft: 8,
+                        marginTop: 2
+                    }}>최대 5장</AppText>
                 </View>
                 <ScrollView horizontal nestedScrollEnabled showsHorizontalScrollIndicator={false}>
 
                     <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={()=>{
-                            if(image.length === 5) {
+                        <TouchableOpacity onPress={() => {
+                            if (image.length === 5) {
                                 Alert.alert('', '사진은 최대 5개까지 가능합니다.');
                             } else {
                                 pickImage();
@@ -419,24 +449,32 @@ const MakeReviewScreen = ({route, navigation}) => {
                             </View>
                         </TouchableOpacity>
                         <FlatList data={image} horizontal scrollEnabled={false}
-                            renderItem={({item, index}) =>
-                                <>
-                                    <Image style={{...styles.addedPictures}} source={{ uri: item }}>
-                                    </Image>
-                                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', position: 'absolute', ...styles.removeContainer}}>
-                                        <TouchableOpacity onPress={()=>{
-                                            var newArr = [...image];
-                                            newArr.splice(index, 1);
-                                            setImage(newArr);
-                                        }} activeOpacity={0.8}>
-                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
-                                        </TouchableOpacity>
-                                    </View>
-                                </>
-                            }
-                            keyExtractor={(item, idx) => {idx.toString();}}
-                            key={(item, idx) => {idx.toString();}}
-                            nestedScrollEnabled/>
+                                  renderItem={({item, index}) =>
+                                      <>
+                                          <Image style={{...styles.addedPictures}} source={{uri: item}}>
+                                          </Image>
+                                          <View style={{
+                                              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                              position: 'absolute', ...styles.removeContainer
+                                          }}>
+                                              <TouchableOpacity onPress={() => {
+                                                  var newArr = [...image];
+                                                  newArr.splice(index, 1);
+                                                  setImage(newArr);
+                                              }} activeOpacity={0.8}>
+                                                  <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]}
+                                                        size={28}/>
+                                              </TouchableOpacity>
+                                          </View>
+                                      </>
+                                  }
+                                  keyExtractor={(item, idx) => {
+                                      idx.toString();
+                                  }}
+                                  key={(item, idx) => {
+                                      idx.toString();
+                                  }}
+                                  nestedScrollEnabled/>
                     </View>
                 </ScrollView>
 
@@ -454,9 +492,17 @@ const MakeReviewScreen = ({route, navigation}) => {
                         <View style={{justifyContent: 'space-between', marginBottom: 8}}>
                             <View style={{marginBottom: 37}}>
                                 <View style={{flexDirection: 'row'}}>
-                                    <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '700'}}>{placeName}</AppText>
+                                    <AppText style={{
+                                        ...styles.placeName,
+                                        color: colors.mainColor,
+                                        fontWeight: '700'
+                                    }}>{placeName}</AppText>
                                 </View>
-                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'} 어떤 공간이었나요?</AppText>
+                                <AppText style={{
+                                    ...styles.placeName,
+                                    color: colors.mainColor,
+                                    fontWeight: '400'
+                                }}>{isEndWithConsonant(placeName) ? '은' : '는'} 어떤 공간이었나요?</AppText>
                             </View>
                             <Rating
                                 type='custom'
@@ -469,21 +515,24 @@ const MakeReviewScreen = ({route, navigation}) => {
                                 tintColor={colors.backgroundColor}
                                 ratingBackgroundColor={colors.gray[4]}
                             />
-                        
-                            {ratedScore !== 0 ? <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText> :
+
+                            {ratedScore !== 0 ? <AppText style={{
+                                    ...styles.scoreText,
+                                    color: colors.mainColor
+                                }}>{reviews[ratedScore - 1]}</AppText> :
                                 <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
                         </View>
                     </View>
                 </ScreenContainerView>
-                <ScreenDivideLine />
+                <ScreenDivideLine/>
                 <ScreenContainerView>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                         <View>
                             <AppText style={{...styles.reviewTitle, color: colors.mainColor}}>
-                                { userData.user_nickname}님의 경험을
+                                {userData.user_nickname}님의 경험을
                             </AppText>
                             <AppText style={{...styles.reviewTitle, color: colors.mainColor}}>
-                            조금 더 들려주세요 :)
+                                조금 더 들려주세요 :)
                             </AppText>
                         </View>
                         <View style={{
@@ -561,7 +610,14 @@ const MakeReviewScreen = ({route, navigation}) => {
                         <View style={{marginBottom: 26}}>
                             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                 <AppText style={{...styles.rateStandard, color: colors.mainColor}}>혼잡한 시간대</AppText>
-                                <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
+                                <AppText style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    lineHeight: 19.2,
+                                    color: colors.gray[4],
+                                    marginLeft: 8,
+                                    marginTop: 2
+                                }}>복수선택가능</AppText>
                             </View>
                             <View style={{flexDirection: 'row', marginTop: 6}}>
                                 {
@@ -575,25 +631,32 @@ const MakeReviewScreen = ({route, navigation}) => {
                         <View style={{marginBottom: 26}}>
                             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                 <AppText style={{...styles.rateStandard, color: colors.mainColor}}>주변시설</AppText>
-                                <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
+                                <AppText style={{
+                                    fontSize: 12,
+                                    fontWeight: '400',
+                                    lineHeight: 19.2,
+                                    color: colors.gray[4],
+                                    marginLeft: 8,
+                                    marginTop: 2
+                                }}>복수선택가능</AppText>
                             </View>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 6}}>
-                                <FacilityLineBreak />
-                                <TouchableOpacity onPress={()=>setIsOpened(!isOpened)} activeOpacity={0.8}>
+                                <FacilityLineBreak/>
+                                <TouchableOpacity onPress={() => setIsOpened(!isOpened)} activeOpacity={0.8}>
                                     <View>
-                                        { isOpened ?
+                                        {isOpened ?
                                             <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                                style={{
-                                                    width: 15,
-                                                    height: 15,
-                                                    marginTop: 5,
-                                                    transform: [{rotate: '180deg'}],
-                                                }}></Image> :
+                                                   style={{
+                                                       width: 15,
+                                                       height: 15,
+                                                       marginTop: 5,
+                                                       transform: [{rotate: '180deg'}],
+                                                   }}></Image> :
                                             <Image source={require('../../assets/images/showWhole_forDir.png')}
-                                                style={{
-                                                    width: 15,
-                                                    height: 15,
-                                                }}></Image>
+                                                   style={{
+                                                       width: 15,
+                                                       height: 15,
+                                                   }}></Image>
                                         }
                                     </View>
                                 </TouchableOpacity>
@@ -601,10 +664,10 @@ const MakeReviewScreen = ({route, navigation}) => {
                         </View>
                     </View>
 
-                    <SelectReviewImage />
+                    <SelectReviewImage/>
                 </ScreenContainerView>
             </ScrollView>
-            
+
             <ScreenContainerView>
                 <TouchableOpacity
                     activeOpacity={0.8}
@@ -615,7 +678,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                         bottom: 10,
                     }}
                     disabled={ratedScore > 0 ? false : true}
-                    onPress={()=>{
+                    onPress={() => {
                         postReview();
                     }}>
                     <AppText

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
-import { Icon } from 'react-native-elements';
+import {Icon} from 'react-native-elements';
 
 import AppText from '../../components/AppText';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -28,7 +28,7 @@ import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SearchPlace = props => {
     const {colors} = useTheme();
-    const { countPlace, navigation } = props;
+    const {countPlace, navigation} = props;
     const [placeList, setPlaceList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
@@ -170,9 +170,7 @@ const SearchPlace = props => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -259,11 +257,18 @@ const SearchPlace = props => {
                                 paddingLeft: 8.5,
                                 width: '100%'
                             }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
-                                {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>평점순</AppText>
+                                {currentMenu === '평점순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                      style={{marginLeft: 10}}></Icon>}
                             </View>
                         </TouchableOpacity>
-                    
+
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
@@ -272,7 +277,7 @@ const SearchPlace = props => {
                             zIndex: 0,
                             backgroundColor: colors.backgroundColor,
                         }}></View>
-                    
+
                         <TouchableOpacity
                             activeOpacity={0.8}
                             onPress={() => {
@@ -280,9 +285,9 @@ const SearchPlace = props => {
                                 setCurrentMenu('인기순');
                                 getResults('LIKE');
                             }} style={{
-                                flex: 1,
-                                zIndex: 0,
-                            }}>
+                            flex: 1,
+                            zIndex: 0,
+                        }}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -291,14 +296,22 @@ const SearchPlace = props => {
                                 paddingLeft: 8.5,
                                 width: '100%',
                             }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                                {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>인기순</AppText>
+                                {currentMenu === '인기순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                      style={{marginLeft: 10}}></Icon>}
                             </View>
                         </TouchableOpacity>
                     </View>
                 }
             </View>
-        );};
+        );
+    };
 
     const PlaceContainer = ({item}) => {
         return (
@@ -321,15 +334,15 @@ const SearchPlace = props => {
                         {
                             item.place_img ?
                                 <Image source={{uri: item.place_img}}
-                                    style={{borderRadius: 10, width: 72, height: 72}}/> :
-                                    item.place_thumbnail ?
+                                       style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                item.place_thumbnail ?
                                     <Image source={{uri: item.place_thumbnail}}
-                                    style={{borderRadius: 10, width: 72, height: 72}}/> :
-                                        item.review_img ?
+                                           style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                    item.review_img ?
                                         <Image source={{uri: item.review_img}}
-                                        style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                               style={{borderRadius: 10, width: 72, height: 72}}/> :
                                         <Image source={require('../../assets/images/here_default.png')}
-                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
+                                               style={{borderRadius: 10, width: 72, height: 72}}/>
                         }
                         <View flex={1} style={styles.info_container}>
                             <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -338,11 +351,16 @@ const SearchPlace = props => {
                                         fontSize: 10,
                                         color: colors.mainColor
                                     }}>{checkType(item.place_type)}</AppText>
-                                <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                <View
+                                    style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
                                     <View style={{...styles.score_line}}></View>
                                     <Star width={11} height={11} style={{marginTop: 2}}/>
                                     <AppText
-                                        style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                        style={{
+                                            fontSize: 10,
+                                            color: colors.mainColor,
+                                            marginLeft: 2
+                                        }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                                 </View>
                             </View>
                             <AppText style={{
@@ -366,7 +384,7 @@ const SearchPlace = props => {
                         }
                     }} activeOpacity={0.8}>
                         <Jewel width={26} height={21}
-                            style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
+                               style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                     </TouchableOpacity>
                 </View>
             </TouchableOpacity>
@@ -380,23 +398,29 @@ const SearchPlace = props => {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
                         <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
-                            <SelectBox />
-                            <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, position: 'relative', zIndex: 50}} flex={1}>
-                                <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                            <SelectBox/>
+                            <View flexDirection="row" style={{
+                                justifyContent: 'space-between',
+                                marginTop: 2,
+                                position: 'relative',
+                                zIndex: 50
+                            }} flex={1}>
+                                <TouchableWithoutFeedback onPress={() => setShowMenu(false)}>
                                     <View flexDirection="row" flex={1}>
-                                        <TouchableOpacity onPress={()=>{
+                                        <TouchableOpacity onPress={() => {
                                             setShowMenu(!showMenu);
                                         }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
                                             <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
-                                            <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                                                name={'chevron-down-outline'} size={16}></Icon>
+                                            <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}}
+                                                  type="ionicon"
+                                                  name={'chevron-down-outline'} size={16}></Icon>
                                         </TouchableOpacity>
                                     </View>
                                 </TouchableWithoutFeedback>
                             </View>
                             <SafeAreaView flex={1}>
                                 <FlatList data={placeList} renderItem={PlaceContainer}
-                                    keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
+                                          keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
                             </SafeAreaView>
                         </View>
                 }
