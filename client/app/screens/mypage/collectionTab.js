@@ -355,6 +355,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
+        elevation: 5,
     },
     likesContainer: {
         width: Dimensions.get('screen').width / 2.25,
