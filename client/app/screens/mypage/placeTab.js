@@ -295,6 +295,7 @@ const PlaceTab = ({navigation}) => {
         return (
             <View style={styles.keyword}>
                 <TouchableOpacity
+                    activeOpacity={0.8}
                     style={type.isClicked ?
                         {...styles.selectTypeClicked, borderColor: colors.mainColor,
                             backgroundColor: colors.mainColor,
@@ -347,7 +348,7 @@ const PlaceTab = ({navigation}) => {
                 'place_pk': item.place_pk,
             };
             navigation.navigate('Place', {data : data});
-        }}>
+        }} activeOpacity={0.8}>
             <View style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
                 {
                     thumbnail[index] !== '' ?
@@ -358,7 +359,7 @@ const PlaceTab = ({navigation}) => {
                     <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                         <TouchableOpacity onPress={() => {
                             DeleteLikedPlace(item.place_pk);
-                        }}>
+                        }} activeOpacity={0.8}>
                             <Jewel width={26} height={21}
                                 style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
                         </TouchableOpacity>
@@ -467,7 +468,7 @@ const PlaceTab = ({navigation}) => {
                 };
                 if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : data});
                 else navigation.navigate('FreeCollection', {data : data});
-            }}>
+            }} activeOpacity={0.8}>
                 <View style={{overflow: 'hidden', borderRadius: 10}}>
                     { item.collection_thumbnail ?
                         <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
@@ -491,7 +492,7 @@ const PlaceTab = ({navigation}) => {
                             <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                                 <TouchableOpacity onPress={() => {
                                     DeleteLikedCollection(item.collection_pk);
-                                }}>
+                                }} activeOpacity={0.8}>
                                     <Jewel width={26} height={21}
                                         style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
                                 </TouchableOpacity>
@@ -579,7 +580,7 @@ const PlaceTab = ({navigation}) => {
                             style={{
                                 flex: 1,
                                 zIndex: 0,
-                            }}>
+                            }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -611,7 +612,7 @@ const PlaceTab = ({navigation}) => {
                             }} style={{
                                 flex: 1,
                                 zIndex: 0,
-                            }}>
+                            }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -642,7 +643,7 @@ const PlaceTab = ({navigation}) => {
                             }} style={{
                                 flex: 1,
                                 zIndex: 0,
-                            }}>
+                            }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -677,7 +678,7 @@ const PlaceTab = ({navigation}) => {
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
                                 setShowMenu(!showMenu);
-                            }} style={{flexDirection: 'row'}}>
+                            }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
                                     name={'chevron-down-outline'} size={16}></Icon>

@@ -969,6 +969,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         <View>
                             <TouchableOpacity onPress={()=>navigation.navigate('SearchForAdd', {pk: collectionData.collection_pk, placeData: placeData, day : idx, replace: false})}
                                 style={(!collectionData.is_creator || isEditPage) && {display: 'none'}}
+                                activeOpacity={0.8}
                             >
                                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                     <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
@@ -980,7 +981,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </View>
                 <GeneralPage idx={idx} key={idx+'general'}/> 
                 <EditPage idx={idx} key={idx+'edit'}/>
-                {checkLength() > 5 && !isEditPage && <TouchableOpacity>
+                {checkLength() > 5 && !isEditPage && <TouchableOpacity activeOpacity={0.8}>
                     <View style={{
                         flexDirection: 'row',
                         marginVertical: 16,
@@ -994,6 +995,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 setIsLimited(newArr);
                             }}
                             style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                            activeOpacity={0.8}
                             >
                                 <AppText style={{
                                     fontSize: 14,
@@ -1014,6 +1016,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 setIsLimited(newArr);
                             }}
                             style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                            activeOpacity={0.8}
                             >
                                 <AppText style={{
                                     fontSize: 14,
@@ -1242,7 +1245,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const EntireButton = () => {
         return (
             <View style={{position: 'absolute', right: 0, bottom: 0}}>
-                <TouchableOpacity onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: editedLocationData, type: collectionData.collection_type, pk: collectionData.collection_pk})}>
+                <TouchableOpacity activeOpacity={0.8}
+                    onPress={()=>navigation.navigate('ShowEntireMap', {title: collectionData.collection_name, placeData: editedLocationData, type: collectionData.collection_type, pk: collectionData.collection_pk})}>
                     <Image source={require('../../assets/images/map/entire-button.png')} style={{width: 40, height: 40}}/>
                 </TouchableOpacity>
             </View>
@@ -1293,7 +1297,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         else {
                             if(isEditPage) setIsEditPage(false);
                             else navigation.goBack();
-                        }}}>
+                        }}} activeOpacity={0.8}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -1304,7 +1308,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
                                         refRBSheet.current.open();
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                     <MoreIcon style={{color: colors.mainColor}}/>
                                 </TouchableOpacity>
                                 <RBSheet
@@ -1342,7 +1346,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                             if(i === 3) {
                                                 setDeleteMenu(true);
                                             }
-                                        }}>
+                                        }} activeOpacity={0.8}>
                                             <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
                                                 <AppText style={l.titleStyle}>{l.title}</AppText>
                                             </View>
@@ -1358,7 +1362,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                         isDeleted(isDeletedOrigin);
                                         isCommentDeleted(isDeletedComment);
                                         await updatePlaceData(editData.value, checkDeletedPlace());
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
                                     </View>
@@ -1369,7 +1373,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                             style={{flex: 1, height: '100%'}} onPress={() => {
                                 onShare();
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <Icon type="ionicon" name={'share-social'} color={colors.mainColor} size={26}/>
                         </TouchableOpacity>
                     </View>
@@ -1436,7 +1440,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                } else {
                                    LikeCollection();
                                }
-                           }}>
+                           }} activeOpacity={0.8}>
                                <View style={{
                                    justifyContent: 'center',
                                    alignItems: 'center',

@@ -97,7 +97,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                     <TouchableOpacity onPress={async () => {
                         // await SecureStore.setItemAsync('isSignedIn', 'true');
                         setIsSignedIn(true);
-                    }}>
+                    }} activeOpacity={0.8}>
                         <AppText style={{
                             color: colors.mainColor,
                             fontSize: 16,
@@ -119,7 +119,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 </View>
                 <View flex={1} style={{marginTop: 50}}>
                     <View style={{alignItems: 'center'}}>
-                        <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}}>
+                        <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}} activeOpacity={0.8}>
                             <KakaotalkLogo width={23} height={23}/>
                             <AppText style={{...styles.loginText}}>카카오로 계속하기</AppText>
                         </TouchableOpacity>
@@ -170,11 +170,11 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         />
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
-                        <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}}>
+                        <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}} activeOpacity={0.8}>
                             <AppText>이메일로 로그인</AppText>
                         </TouchableOpacity>
                         <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
-                        <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} activeOpacity={0.8}>
                             <AppText>이메일 회원가입</AppText>
                         </TouchableOpacity>
                     </View>

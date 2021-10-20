@@ -24,7 +24,7 @@ import Time from '../../components/Time';
 import AppText from '../../components/AppText';
 
 import Jewel from '../../assets/images/jewel.svg';
-import CustomMyMarker from '../../assets/images/map/map-mylocation-marker.svg';
+import CustomPlaceMarker from '../../assets/images/map/map-place-marker.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -128,7 +128,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                                 newArr[idx] = true;
                                 setIsCollectionClicked(arr => newArr);
                             }
-                        }}>
+                        }} activeOpacity={0.8}>
                             <View style={{paddingTop: 12}}>
                                 <View style={{
                                     flexDirection: 'row',
@@ -181,6 +181,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
                         onPress={() => {
                             postPlace(refRBSheet);
                         }}
+                        activeOpacity={0.8}
                     ><AppText
                         style={{
                             textAlign: 'center',
@@ -576,7 +577,7 @@ const PlaceScreen = ({route, navigation}) => {
                             } else {
                                 LikePlace(placeData.place_pk);
                             }
-                        }} style={{marginBottom: 2}}>
+                        }} style={{marginBottom: 2}} activeOpacity={0.8}>
                             <Jewel width={26} height={21}
                                    style={placeData.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                         </TouchableOpacity>
@@ -599,7 +600,7 @@ const PlaceScreen = ({route, navigation}) => {
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             refRBSheet.current.open();
-                        }}>
+                        }} activeOpacity={0.8}>
                             <ShowDirectories refRBSheet={refRBSheet} placeData={placeData} colors={colors}
                                              collectionList={collectionList} height={height}
                                              getCollectionList={getCollectionList}/>
@@ -617,7 +618,7 @@ const PlaceScreen = ({route, navigation}) => {
                     }}/>
 
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                        <TouchableOpacity onPress={onShare}>
+                        <TouchableOpacity onPress={onShare} activeOpacity={0.8}>
                             <Icon type="ionicon" name={'share-social'} color={colors.red_gray[3]} size={26}/>
                         </TouchableOpacity>
                         <AppText style={{
@@ -688,23 +689,7 @@ const PlaceScreen = ({route, navigation}) => {
                         <PlaceInfo icon={'location'}>
                             <AppText
                                 style={{...styles.location, color: colors.gray[1]}}>{placeData.place_addr}</AppText>
-                            {/* <AppText style={{
-                                color: colors.gray[4],
-                                fontSize: 14,
-                                lineHeight: 22.4
-                            }}>{placeData.place_addr}</AppText> */}
                         </PlaceInfo>
-                        {/* <PlaceInfo icon={'globe-outline'}>
-                            <TouchableOpacity onPress={()=>Linking.openURL('https://www.2021tourapi.com/')}>
-                                <AppText style={{color: colors.blue[3], fontSize: 12}}>https://www.2021tourapi.com/</AppText>
-                            </TouchableOpacity>
-                        </PlaceInfo> */}
-                        {/* <PlaceInfo icon={'time-outline'}>
-                            <AppText style={{color: colors.blue[3], fontSize: 12}}>매일 11:00~17:00</AppText>
-                        </PlaceInfo>
-                        <PlaceInfo icon={'call'}>
-                            <AppText style={{color: colors.blue[3], fontSize: 12}}>02-450-9311</AppText>
-                        </PlaceInfo> */}
                     </View>
 
                     <IconTab/>
@@ -838,7 +823,7 @@ const PlaceScreen = ({route, navigation}) => {
                     } else {
                         navigation.navigate('FreeCollection', {data: data});
                     }
-                }}>
+                }} activeOpacity={0.8}>
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -938,7 +923,7 @@ const PlaceScreen = ({route, navigation}) => {
                     'place_pk': item.place_pk,
                 };
                 navigation.push('Place', {data: data});
-            }}>
+            }} activeOpacity={0.8}>
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
                         <Image source={item.place_img ? {uri: item.place_img} : item.review_img ? {uri: item.review_img} : require('../../assets/images/here_default.png')}
@@ -1082,6 +1067,7 @@ const PlaceScreen = ({route, navigation}) => {
                                               place_pk: placeData.place_pk
                                           })}
                                           disabled={!reviewAccess ? false : true}
+                                          activeOpacity={0.8}
                         >
                             <Image style={{width: 20.82, height: 27, marginTop: 3}}
                                    source={require('../../assets/images/write_review_icon.png')}></Image>
@@ -1133,7 +1119,7 @@ const PlaceScreen = ({route, navigation}) => {
                                 longitude: placeLng
                             }}>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <CustomMyMarker />
+                                    <CustomPlaceMarker />
                                 </View>
                             </Marker>
                         </MapView>
@@ -1153,7 +1139,6 @@ const PlaceScreen = ({route, navigation}) => {
                             <AppText style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</AppText>
                         </View>
                         <View style={{width: '90%', marginBottom: 29}}>
-                            {/* count data 여야 */}
                             <View style={{marginBottom: 6}}><AppText style={{
                                 color: colors.gray[3],
                                 fontSize: 14,

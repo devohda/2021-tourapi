@@ -162,7 +162,7 @@ const CollectionTab = ({navigation}) => {
                 };
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data : data}) : navigation.navigate('FreeCollection', {data : data});
-            }} disabled={showMenu ? true : false}>
+            }} disabled={showMenu ? true : false} activeOpacity={0.8}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}> 
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -265,7 +265,7 @@ const CollectionTab = ({navigation}) => {
                             style={{
                                 flex: 1,
                                 zIndex: 0,
-                            }}>
+                            }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -295,7 +295,7 @@ const CollectionTab = ({navigation}) => {
                             }} style={{
                                 flex: 1,
                                 zIndex: 0,
-                            }}>
+                            }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -322,7 +322,7 @@ const CollectionTab = ({navigation}) => {
                         <View flexDirection="row" flex={1}>
                             <TouchableOpacity onPress={()=>{
                                 setShowMenu(!showMenu);
-                            }} style={{flexDirection: 'row'}}>
+                            }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
                                     name={'chevron-down-outline'} size={16}></Icon>

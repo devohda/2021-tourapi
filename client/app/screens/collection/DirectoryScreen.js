@@ -13,7 +13,7 @@ export default function DirectoryScreen() {
 
     return (
         <View style={{justifyContent: 'flex-end', paddingBottom: 15}}>
-            <TouchableOpacity onPress={() => refRBSheet.current.open()}>
+            <TouchableOpacity onPress={() => refRBSheet.current.open()} activeOpacity={0.8}>
                 <Icon type="ionicon" name={'add-circle'} size={68}/>
                 <RBSheet
                     ref={refRBSheet}

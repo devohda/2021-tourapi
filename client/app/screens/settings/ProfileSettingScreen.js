@@ -183,6 +183,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                     backgroundColor: colors.defaultColor
                 }]}
                 disabled={true}
+                activeOpacity={0.8}
                 >
                     <AppText
                         style={{...styles.selectTypeText, color: colors.mainColor}}>{keyword}</AppText>
@@ -229,7 +230,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                         borderColor: colors.defaultColor,
                         backgroundColor: colors.defaultColor,
                         shadowColor: colors.red[8]
-                    }]}>
+                    }]} activeOpacity={0.8}>
                         <AppText
                             style={pressed[keyword.keyword_pk - 1] ? {
                                 ...styles.selectTypeTextClicked,
@@ -243,7 +244,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
         return (
             <>
-                <TouchableOpacity onPress={() => refRBSheet.current.open()}>
+                <TouchableOpacity onPress={() => refRBSheet.current.open()} activeOpacity={0.8}>
                     <Image source={require('../../assets/images/add_keyword.png')}
                         style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                 </TouchableOpacity>
@@ -341,6 +342,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                         setUserKeywordData(newArr);
                                     }}
                                     disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
+                                    activeOpacity={0.8}
                                 ><AppText
                                         style={{
                                             textAlign: 'center',
@@ -384,7 +386,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', left: 0}}>
-                    <TouchableOpacity onPress={() => {navigation.goBack();}}>
+                    <TouchableOpacity onPress={() => {navigation.goBack();}} activeOpacity={0.8}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -394,7 +396,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                         else if(patterns.test(userNickname)) Alert.alert('', '특수문자는 사용할 수 없어요.');
                         else if(userNickname.length > 12) Alert.alert('', '닉네임이 너무 길어요. (영문 기준 12자 이내)');
                         else updateUserData();
-                    }}>
+                    }} activeOpacity={0.8}>
                         <View>
                             <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 23.68, fontWeight: '400'}}>완료</AppText>
                         </View>
@@ -448,7 +450,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                 }
                             })();
                             pickImage();
-                        }}>
+                        }} activeOpacity={0.8}>
                             <View style={{...styles.cameraIcon, backgroundColor: colors.defaultColor}}>
                                 <Icon size={18} type="ionicon" name={'camera'} color={colors.gray[5]} style={{padding: 6}}/>
                             </View>

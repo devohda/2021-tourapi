@@ -241,6 +241,7 @@ const SearchPlace = props => {
                         overflow: 'visible'
                     }}>
                         <TouchableOpacity
+                            activeOpacity={0.8}
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('평점순');
@@ -273,6 +274,7 @@ const SearchPlace = props => {
                         }}></View>
                     
                         <TouchableOpacity
+                            activeOpacity={0.8}
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
@@ -306,7 +308,7 @@ const SearchPlace = props => {
                     'place_pk': item.place_pk,
                 };
                 navigation.navigate('Place', {data: data});
-            }} style={{zIndex: 9999}}>
+            }} style={{zIndex: 9999}} activeOpacity={0.8}>
                 <View style={{
                     marginBottom: 8,
                     alignItems: 'center',
@@ -362,7 +364,7 @@ const SearchPlace = props => {
                         } else {
                             LikePlace(item.place_pk);
                         }
-                    }}>
+                    }} activeOpacity={0.8}>
                         <Jewel width={26} height={21}
                             style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                     </TouchableOpacity>
@@ -384,7 +386,7 @@ const SearchPlace = props => {
                                     <View flexDirection="row" flex={1}>
                                         <TouchableOpacity onPress={()=>{
                                             setShowMenu(!showMenu);
-                                        }} style={{flexDirection: 'row'}}>
+                                        }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
                                             <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                             <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
                                                 name={'chevron-down-outline'} size={16}></Icon>

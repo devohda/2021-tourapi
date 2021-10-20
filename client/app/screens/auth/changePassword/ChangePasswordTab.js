@@ -195,6 +195,7 @@ const ChangePasswordTab = ({route, authNavigation}) => {
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
                     disabled={password.length >= 8 && isPasswordValid ? false : true}
+                    activeOpacity={0.8}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>비밀번호 재설정하기</AppText>
                 </TouchableOpacity>

@@ -144,6 +144,7 @@ const SearchCollection = (props, {navigation}) => {
                         overflow: 'visible'
                     }}>
                         <TouchableOpacity
+                            activeOpacity={0.8}
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
@@ -183,6 +184,7 @@ const SearchCollection = (props, {navigation}) => {
                         }}></View>
 
                         <TouchableOpacity
+                            activeOpacity={0.8}
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('최신순');
@@ -287,7 +289,7 @@ const SearchCollection = (props, {navigation}) => {
                 };
                 item.collection_type === 1 ?
                     props.navigation.navigate('PlanCollection', {data: data}) : props.navigation.navigate('FreeCollection', {data: data});
-            }}>
+            }} activeOpacity={0.8}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10, justifyContent: 'space-between'}}>
                     <View style={{height: '68%'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -383,7 +385,7 @@ const SearchCollection = (props, {navigation}) => {
                                 <View flexDirection="row" flex={1}>
                                     <TouchableOpacity onPress={()=>{
                                         setShowMenu(!showMenu);
-                                    }} style={{flexDirection: 'row'}}>
+                                    }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
                                         <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                         <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
                                             name={'chevron-down-outline'} size={16}></Icon>

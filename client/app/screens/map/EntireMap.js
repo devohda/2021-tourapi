@@ -233,7 +233,7 @@ const EntireMap = ({route, navigation}) => {
                                     'place_pk': currentData.place_pk,
                                 };
                                 navigation.navigate('Place', {data: item});
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{flexDirection: 'row', width: '100%'}}>
                                     <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                         <View style={{
@@ -342,7 +342,7 @@ const EntireMap = ({route, navigation}) => {
                     newRegion.longitude = myLocations.coords.longitude;
 
                     setRegion(newRegion);
-                }}>
+                }} activeOpacity={0.8}>
                     <Image source={require('../../assets/images/map/search-location-button.png')}
                            style={{width: 50, height: 50}}/>
                 </TouchableOpacity>

@@ -470,7 +470,7 @@ const ListItem = props => {
                                     <TouchableOpacity onPress={() => {
                                         props.data === '로그아웃' && setIsLogout(true);
                                         props.data === '회원 탈퇴하기' && setIsWithdraw(true);
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                         <AppText style={{
                                             color: props.data === '로그아웃' ? colors.gray[4] : colors.red[3],
                                             fontSize: 16,
@@ -485,7 +485,7 @@ const ListItem = props => {
                                     <TouchableOpacity disabled={props.data.startsWith('버전 정보') ? true: false} onPress={()=>{
                                         if(props.data === '신고하기') setReportMenu(true);
                                         else setAskMenu(true);
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                         <AppText style={{
                                             color: colors.mainColor,
                                             fontSize: 16,

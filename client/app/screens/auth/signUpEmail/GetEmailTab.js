@@ -144,6 +144,7 @@ const GetEmailTab = ({navigation}) => {
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
                     disabled={!email.match(emailRegExp) ? true : false}
+                    activeOpacity={0.8}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>

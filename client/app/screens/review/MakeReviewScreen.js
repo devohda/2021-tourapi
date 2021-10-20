@@ -295,7 +295,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8]
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]} activeOpacity={0.8}>
                     <AppText
                         style={isBusyTimePress[keyword.id - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.data}</AppText>
                 </TouchableOpacity>
@@ -326,7 +326,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8],
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]} activeOpacity={0.8}>
                     <AppText
                         style={isFacilityPress[keyword.facility_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.facility_name}</AppText>
                 </TouchableOpacity>
@@ -413,7 +413,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                             } else {
                                 pickImage();
                             }
-                        }}>
+                        }} activeOpacity={0.8}>
                             <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
                                 <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
                             </View>
@@ -428,7 +428,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                                             var newArr = [...image];
                                             newArr.splice(index, 1);
                                             setImage(newArr);
-                                        }}>
+                                        }} activeOpacity={0.8}>
                                             <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                         </TouchableOpacity>
                                     </View>
@@ -579,7 +579,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                             </View>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 6}}>
                                 <FacilityLineBreak />
-                                <TouchableOpacity onPress={()=>setIsOpened(!isOpened)}>
+                                <TouchableOpacity onPress={()=>setIsOpened(!isOpened)} activeOpacity={0.8}>
                                     <View>
                                         { isOpened ?
                                             <Image source={require('../../assets/images/showWhole_forDir.png')}
@@ -607,6 +607,7 @@ const MakeReviewScreen = ({route, navigation}) => {
             
             <ScreenContainerView>
                 <TouchableOpacity
+                    activeOpacity={0.8}
                     style={{
                         backgroundColor: ratedScore > 0 ? colors.mainColor : colors.gray[5],
                         height: 48,

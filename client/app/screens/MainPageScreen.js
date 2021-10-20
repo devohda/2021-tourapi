@@ -362,7 +362,7 @@ export default function MainPageScreen({navigation}) {
                 };
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data: data}) : navigation.navigate('FreeCollection', {data: data});
-            }}>
+            }} activeOpacity={0.8}>
                 <View flex={1} style={{overflow: 'hidden', borderRadius: 10}}>
                     <View style={{height: '68%'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -571,7 +571,7 @@ export default function MainPageScreen({navigation}) {
             <TouchableOpacity onPress={() => {
                 countPlaceView(data.place_pk);
                 navigation.navigate('Place', {data: item});
-            }}>
+            }} activeOpacity={0.8}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 14}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         {
@@ -632,7 +632,7 @@ export default function MainPageScreen({navigation}) {
                                 } else {
                                     LikePlace(data.place_pk);
                                 }
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <Jewel width={26} height={21}
                                     style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                             </TouchableOpacity>
@@ -661,7 +661,7 @@ export default function MainPageScreen({navigation}) {
                     }}>Here.</AppText>
                 </View>
                 <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Search')} activeOpacity={0.8}>
                         <Icon
                             type="ionicon"
                             name={'md-search'}
@@ -701,7 +701,7 @@ export default function MainPageScreen({navigation}) {
                                 style={days === 'DAY' ?
                                     {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
                                     {...styles.notSelectedRankings}
-                                }><AppText
+                                } activeOpacity={0.8}><AppText
                                     style={
                                         days === 'DAY' ?
                                             {
@@ -721,7 +721,7 @@ export default function MainPageScreen({navigation}) {
                                 style={days === 'WEEK' ?
                                     {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
                                     {...styles.notSelectedRankings}
-                                }><AppText
+                                } activeOpacity={0.8}><AppText
                                     style={
                                         days === 'WEEK' ?
                                             {
@@ -741,7 +741,7 @@ export default function MainPageScreen({navigation}) {
                                 style={days === 'MONTH' ?
                                     {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
                                     {...styles.notSelectedRankings}
-                                }><AppText
+                                } activeOpacity={0.8}><AppText
                                     style={
                                         days === 'MONTH' ?
                                             {
