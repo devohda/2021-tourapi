@@ -40,11 +40,11 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     const {colors} = useTheme();
 
     useEffect(() => {
-        if(alertDuplicated){
+        if (alertDuplicated) {
             Alert.alert('다른 기기에서 로그인했습니다.');
         }
         setAlertDuplicated(false);
-    },[]);
+    }, []);
 
     const loginApple = async (user, email, nickname, token) => {
         try {
@@ -72,7 +72,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                 .then(async response => {
                     if (response.code === 200) {
                         // 캐시 삭제하고 로그인 처리
-                        if(user){
+                        if (user) {
                             await cache.remove(user);
                         }
                         // 로그인
@@ -94,21 +94,21 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <ScreenContainerView flex={1}>
-                <View style={{height: 24, marginTop: 20, justifyContent: 'center'}}>
-                    <TouchableOpacity onPress={async () => {
-                        // await SecureStore.setItemAsync('isSignedIn', 'true');
-                        setIsSignedIn(true);
-                    }} activeOpacity={0.8}>
-                        <AppText style={{
-                            color: colors.mainColor,
-                            fontSize: 16,
-                            fontWeight: '400',
-                            alignSelf: 'flex-end',
-                            display: 'none'
-                        }}>둘러보기</AppText>
-                    </TouchableOpacity>
-                </View>
-                <View flex={1} style={{alignItems: 'center', justifyContent: 'flex-end'}}>
+                {/*<View style={{height: 50, marginTop: 20, justifyContent: 'flex-end'}}>*/}
+                {/*    <TouchableOpacity onPress={async () => {*/}
+                {/*        // await SecureStore.setItemAsync('isSignedIn', 'true');*/}
+                {/*        setIsSignedIn(true);*/}
+                {/*    }} activeOpacity={0.8}>*/}
+                {/*        <AppText style={{*/}
+                {/*            color: colors.mainColor,*/}
+                {/*            fontSize: 16,*/}
+                {/*            fontWeight: '400',*/}
+                {/*            alignSelf: 'flex-end',*/}
+                {/*            display: 'none'*/}
+                {/*        }}>둘러보기</AppText>*/}
+                {/*    </TouchableOpacity>*/}
+                {/*</View>*/}
+                <View flex={2} style={{alignItems: 'center', justifyContent: 'flex-end'}}>
                     <MainBoxIcon/>
                     <View style={{marginTop: 35.08, alignItems: 'center'}}>
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>나만의 </AppText>
@@ -118,7 +118,9 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</AppText>
                     </View>
                 </View>
-                <View flex={1} style={{marginTop: 25}}>
+                <View flex={1} style={{
+                    justifyContent: 'flex-end', paddingBottom: 100
+                }}>
                     <View style={{alignItems: 'center'}}>
                         {/* <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}} activeOpacity={0.8}>
                             <KakaotalkLogo width={23} height={23}/>
@@ -133,7 +135,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                                 async () => {
                                     try {
                                         const available = await AppleAuthentication.isAvailableAsync();
-                                        if(available){
+                                        if (available) {
                                             const credential = await AppleAuthentication.signInAsync({
                                                 requestedScopes: [
                                                     AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -171,7 +173,11 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                             disabled={Platform.OS === 'ios' ? false : true}
                         />
                     </View>
-                    <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: colors.blue[2], borderColor: colors.backgroundColor}} activeOpacity={0.8} onPress={() => navigation.navigate('SignInEmail')} >
+                    <TouchableOpacity style={{
+                        ...styles.socialLoginBtn,
+                        backgroundColor: colors.blue[2],
+                        borderColor: colors.backgroundColor
+                    }} activeOpacity={0.8} onPress={() => navigation.navigate('SignInEmail')}>
                         <Jewel width={23} height={23} color={colors.red[3]}/>
                         <AppText style={{...styles.loginText, color: colors.defaultColor}}>이메일로 로그인</AppText>
                     </TouchableOpacity>
@@ -195,12 +201,12 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     socialLoginBtn: {
-        flexDirection : 'row',
+        flexDirection: 'row',
         height: 52,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width : '100%'
+        width: '100%'
     }
 });
 
