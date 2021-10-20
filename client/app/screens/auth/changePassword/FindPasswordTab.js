@@ -220,6 +220,7 @@ const FindPasswordTab = ({route, navigation}) => {
                                 onPress={() => {
                                     sendSMS(phoneNumber);
                                 }}
+                                activeOpacity={0.8}
                             >
                                 <AppText style={{color: colors.defaultColor, fontSize: 14, fontWeight: 'bold'}}>인증요청</AppText>
                             </TouchableOpacity>
@@ -252,6 +253,7 @@ const FindPasswordTab = ({route, navigation}) => {
                         await getInfo(); 
                     }}
                     disabled={isCorrect('continue')}
+                    activeOpacity={0.8}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>

@@ -126,7 +126,7 @@ const ShowRecommendPlace = props => {
                     'place_pk': item.place_pk,
                 };
                 navigation.navigate('Place', {data: data});
-            }}>
+            }} activeOpacity={0.8}>
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
                         {

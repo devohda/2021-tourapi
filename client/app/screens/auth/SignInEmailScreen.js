@@ -138,15 +138,16 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
                         }, email && password ? {backgroundColor: colors.mainColor} : {backgroundColor: colors.gray[6]}]}
                         disabled={email && password ? false : true}
                         onPress={() => signIn()}
+                        activeOpacity={0.8}
                     >
                         <AppText style={styles.loginText}>로그인</AppText>
                     </TouchableOpacity>
                     <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center'}}>
-                        <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}}>
+                        <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} style={{marginRight: 29}} activeOpacity={0.8}>
                             <AppText>회원가입</AppText>
                         </TouchableOpacity>
                         <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
-                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')} activeOpacity={0.8}>
                             <AppText>비밀번호 재설정</AppText>
                         </TouchableOpacity>
                     </View>

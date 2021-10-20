@@ -16,7 +16,7 @@ export default function MakeCollectionBtn({route, navigation}) {
             <TouchableOpacity style={{height: 50, marginHorizontal: '15%', justifyContent: 'center', alignItems: 'center', marginBottom: 3}} onPress={() => {
                 refRBSheet.current.open();
                 setClicked(true);
-            }}>
+            }} activeOpacity={0.8}>
                 <Icon type="ionicon" name={'add-circle-outline'} size={38} color={colors.mainColor}></Icon>
             </TouchableOpacity>
             <RBSheet
@@ -49,7 +49,7 @@ export default function MakeCollectionBtn({route, navigation}) {
                         }}>보관함 만들기</AppText>
                         <TouchableOpacity onPress={() => {
                             refRBSheet.current.close();
-                        }} style={{marginLeft: '58%', color: colors.mainColor}}><Icon type="ionicon"
+                        }} style={{marginLeft: '58%', color: colors.mainColor}} activeOpacity={0.8}><Icon type="ionicon"
                                 name={'close'}></Icon></TouchableOpacity>
                     </View>
                     <View style={{alignItems: 'center', justifyContent: 'center', marginTop: '1%'}}>
@@ -63,7 +63,7 @@ export default function MakeCollectionBtn({route, navigation}) {
                             refRBSheet.current.close();
                             navigation.navigate('MakePlanCollection', {update: false});
                             navigation.setOptions({tabBarVisible: false});
-                        }}>
+                        }} activeOpacity={0.8}>
                             <AppText style={{
                                 textAlign: 'center',
                                 paddingTop: 13,
@@ -90,7 +90,7 @@ export default function MakeCollectionBtn({route, navigation}) {
                             refRBSheet.current.close();
                             navigation.navigate('MakeFreeCollection', {update: false});
                             navigation.setOptions({tabBarVisible: false});
-                        }}>
+                        }} activeOpacity={0.8}>
                             <AppText style={{
                                 textAlign: 'center',
                                 paddingTop: 13,

@@ -248,7 +248,7 @@ const ShowPlaces = props => {
                     </View>
                     <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                            <TouchableOpacity onPress={() => {setDeleteVisible(false);}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false);}} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
                                 </View>
@@ -258,7 +258,7 @@ const ShowPlaces = props => {
                                 newArr[index] = true;
                                 isDeleted(newArr);
                                 setDeleteVisible(false);
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                                 </View>
@@ -278,7 +278,7 @@ const ShowPlaces = props => {
                         <View style={{flexDirection: 'row', marginVertical: 6, justifyContent: 'center', alignItems: 'center'}}>
                             <TouchableOpacity onPress={()=>{
                                 setDeleteVisible(true);
-                            }} style={!isEditPage && {display: 'none'}}>
+                            }} style={!isEditPage && {display: 'none'}} activeOpacity={0.8}>
                                 <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
                                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                         <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
@@ -299,7 +299,7 @@ const ShowPlaces = props => {
                                     'place_pk': item.place_pk,
                                 };
                                 props.navigation.navigate('Place', {data: data});
-                            }} disabled={isEditPage && true}>
+                            }} disabled={isEditPage && true} activeOpacity={0.8}>
                                 <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '88%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
                                     <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
                                         {
@@ -376,11 +376,11 @@ const ShowPlaces = props => {
                                             } else {
                                                 LikePlace(item.place_pk);
                                             }
-                                        }}>
+                                        }} activeOpacity={0.8}>
                                             <Jewel width={26} height={21}
                                                 style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
                                         </TouchableOpacity> :
-                                        <TouchableOpacity>
+                                        <TouchableOpacity activeOpacity={0.8}>
                                             <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
                                         </TouchableOpacity>
                                 }
@@ -397,13 +397,6 @@ const ShowPlaces = props => {
                 item.cpm_plan_day === day && curLength > 0 &&
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={[{flexDirection: 'row', justifyContent: 'space-between'}, isDeletedOrigin[index] && {display: 'none'}]}>
-                        {/* <TouchableOpacity onPress={()=>{
-                            setDeleteVisible(true);
-                        }} style={{display: 'none'}}>
-                            <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
-                            </View>
-                        </TouchableOpacity> */}
                         <DeleteModal />
                         <View style={{
                             height: 30,

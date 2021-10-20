@@ -444,7 +444,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                             <TouchableOpacity onPress={() => {
                                 props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
                                 </View>
@@ -453,7 +453,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
                                 deleteAllReplacement(data.cpm_map_pk);
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                                 </View>
@@ -511,7 +511,9 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
                         if(isEditSpace) setIsEditSpace(false);
-                        else navigation.goBack();}}>
+                        else navigation.goBack();}}
+                        activeOpacity={0.8}
+                        >
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -527,7 +529,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                                     style={{flex: 1, height: '100%'}} onPress={() => {
                                         refRBSheet.current.open();
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                     <MoreIcon style={{color: colors.mainColor}}/>
                                 </TouchableOpacity>
                                 <RBSheet
@@ -558,7 +560,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                             if(i === 1) {
                                                 setDeleteMenu(true);
                                             }
-                                        }}>
+                                        }} activeOpacity={0.8}>
                                             <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
                                                 <AppText style={l.titleStyle}>{l.title}</AppText>
                                             </View>
@@ -568,7 +570,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 </RBSheet>
                             </View> :
                             <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
-                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} activeOpacity={0.8}
                                     onPress={async () => {
                                         setIsEditSpace(false);
                                         isReplacementDeleted(isDeletedReplacement);
@@ -591,7 +593,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 'place_pk': data.place_pk,
                             };
                             navigation.navigate('Place', {data: item});
-                        }}>
+                        }} activeOpacity={0.8}>
                             <View style={{flexDirection: 'row', width: '100%'}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
@@ -661,7 +663,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 } else {
                                     LikePlace(placeData.place_pk);
                                 }
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <Jewel width={26} height={21}
                                     style={{color: placeData.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity>
@@ -681,7 +683,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         </View>
                         <TouchableOpacity onPress={()=>{
                             navigation.navigate('SearchForAdd', {pk: pk, placeData: data, day : day, replace: true});
-                        }} style={(!route.params.private || isEditSpace) && {display: 'none'}}>
+                        }} style={(!route.params.private || isEditSpace) && {display: 'none'}} activeOpacity={0.8}>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
                                 <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>

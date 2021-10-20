@@ -56,6 +56,7 @@ const AuthTab = ({btnStyles, question, placeHolder, nextBtnText}, goToNextTab, s
                     marginTop: 303
                 }}
                 onPress={() => goToNextTab(tab => tab + 1)}
+                activeOpacity={0.8}
             >
                 <AppText style={{
                     textAlign: 'center',

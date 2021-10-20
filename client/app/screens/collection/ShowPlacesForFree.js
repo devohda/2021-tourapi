@@ -235,7 +235,7 @@ const ShowPlacesForFree = props => {
                         }}>
                             <TouchableOpacity onPress={() => {
                                 setDeleteVisible(false);
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{
                                     width: 138,
                                     height: 43,
@@ -260,7 +260,7 @@ const ShowPlacesForFree = props => {
                                 newArr[index] = true;
                                 isDeleted(newArr);
                                 setDeleteVisible(false);
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{
                                     width: 138,
                                     height: 43,
@@ -300,7 +300,7 @@ const ShowPlacesForFree = props => {
                     }}>
                         <TouchableOpacity onPress={() => {
                             setDeleteVisible(true);
-                        }} style={!isEditPage && {display: 'none'}}>
+                        }} style={!isEditPage && {display: 'none'}} activeOpacity={0.8}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                     <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
@@ -314,7 +314,7 @@ const ShowPlacesForFree = props => {
                                 'place_pk': item.place_pk,
                             };
                             props.navigation.navigate('Place', {data: data});
-                        }} disabled={isEditPage && true}>
+                        }} disabled={isEditPage && true} activeOpacity={0.8}>
                             <View style={{
                                 flexDirection: 'row',
                                 width: isEditPage ? '98%' : '100%',
@@ -421,11 +421,11 @@ const ShowPlacesForFree = props => {
                                         } else {
                                             LikePlace(item.place_pk);
                                         }
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                         <Jewel width={26} height={21}
                                                style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
                                     </TouchableOpacity> :
-                                    <TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.8}>
                                         <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
                                     </TouchableOpacity>
                             }

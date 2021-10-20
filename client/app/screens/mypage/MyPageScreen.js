@@ -84,7 +84,7 @@ const MyPageScreen = ({navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('SystemSetting')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SystemSetting')} activeOpacity={0.8}>
                         <SettingsIcon width={24} height={24} style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -150,7 +150,7 @@ const MyPageScreen = ({navigation}) => {
                                 }</View>
                             }
                         </View>
-                        <TouchableOpacity style={{marginTop: 8}} onPress={()=>navigation.navigate('ProfileSetting', {keywords: userData.keywords, img: userData.user_img})}>
+                        <TouchableOpacity style={{marginTop: 8}} onPress={()=>navigation.navigate('ProfileSetting', {keywords: userData.keywords, img: userData.user_img})} activeOpacity={0.8}>
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                 <View style={{...styles.editProfileButton, backgroundColor: colors.defaultColor, borderColor: colors.defaultColor, borderWidth: 1}}>
                                     <AppText style={{color: colors.gray[5], fontSize: 12, lineHeight: 19.2, paddingVertical: 2.5, paddingHorizontal: 12, fontWeight: '700'}}>

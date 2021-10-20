@@ -46,7 +46,7 @@ const AlternativeSpaceList = props => {
                 getReplacement(data.cpm_map_pk);
             }
             else navigation.navigate('SearchForAdd', {pk: pk, placeData: data, day : day, replace: true});
-        }}>
+        }} activeOpacity={0.8}>
             <View flex={1} style={{flexDirection: 'row'}}>
                 <View style={[{
                     ...styles.spaceContainer,

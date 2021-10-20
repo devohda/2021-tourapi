@@ -385,7 +385,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                     startDate: update ? originStartDate : new Date(),
                     endDate: update ? originEndDate : new Date
                 });
-            }}><AppText style={{
+            }} activeOpacity={0.8}><AppText style={{
                 color: colors.mainColor,
                 fontSize: 14,
                 fontWeight: '400',
@@ -462,6 +462,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                                     refCalendarRBSheet.current.close();
                                     setRange(date);
                                 }}
+                                activeOpacity={0.8}
                             ><AppText
                                 style={{
                                     textAlign: 'center',
@@ -517,7 +518,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                         borderColor: colors.defaultColor,
                         backgroundColor: colors.defaultColor,
                         shadowColor: colors.red[8]
-                    }]}>
+                    }]} activeOpacity={0.8}>
                         <AppText
                             style={pressed[keyword.keyword_pk - 1] ? {
                                 ...styles.selectTypeTextClicked,
@@ -531,7 +532,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
 
         return (
             <>
-                <TouchableOpacity onPress={() => refKeywordRBSheet.current.open()}>
+                <TouchableOpacity onPress={() => refKeywordRBSheet.current.open()} activeOpacity={0.8}>
                     <Image source={require('../../assets/images/add_keyword.png')}
                            style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                 </TouchableOpacity>
@@ -624,6 +625,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                                         setIsPress(pressed);
                                     }}
                                     disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
+                                    activeOpacity={0.8}
                                 ><AppText
                                     style={{
                                         textAlign: 'center',
@@ -656,7 +658,8 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                     backgroundColor: colors.defaultColor,
                     shadowColor: colors.red[8]
                 }]}
-                                  disabled={true}
+                    disabled={true}
+                    activeOpacity={0.8}
                 >
                     <AppText
                         style={{...styles.selectTypeText, color: colors.mainColor}}>{keyword.keyword_title}</AppText>
@@ -720,7 +723,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                                       setImage('');
                                   }
                                   setSelectedIndex(index);
-                              }}>
+                              }} activeOpacity={0.8}>
                                   <View style={{
                                       backgroundColor: item.color,
                                       width: 28,
@@ -840,6 +843,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
                                 else postCollections();
                             }}
                             disabled={DATA.collection_name.length < 2 ? true : false}
+                            activeOpacity={0.8}
                         ><AppText
                             style={{
                                 textAlign: 'center',

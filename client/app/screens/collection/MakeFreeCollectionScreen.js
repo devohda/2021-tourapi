@@ -359,7 +359,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                         borderColor: colors.defaultColor,
                         backgroundColor: colors.defaultColor,
                         shadowColor: colors.red[8]
-                    }]}>
+                    }]} activeOpacity={0.8}>
                         <AppText
                             style={pressed[keyword.keyword_pk - 1] ? {
                                 ...styles.selectTypeTextClicked,
@@ -373,7 +373,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
 
         return (
             <>
-                <TouchableOpacity onPress={() => refRBSheet.current.open()}>
+                <TouchableOpacity onPress={() => refRBSheet.current.open()} activeOpacity={0.8}>
                     <Image source={require('../../assets/images/add_keyword.png')}
                            style={{width: 32, height: 32, marginEnd: 8.5}}></Image>
                 </TouchableOpacity>
@@ -466,6 +466,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                         setIsPress(pressed);
                                     }}
                                     disabled={pressed.filter(element => element === true).length > 0 && pressed.filter(element => element === true).length <= 3 ? false : true}
+                                    activeOpacity={0.8}
                                 ><AppText
                                     style={{
                                         textAlign: 'center',
@@ -497,7 +498,8 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                     borderColor: colors.defaultColor,
                     backgroundColor: colors.defaultColor
                 }]}
-                                  disabled={true}
+                    disabled={true}
+                    activeOpacity={0.8}
                 >
                     <AppText
                         style={{...styles.selectTypeText, color: colors.mainColor}}>{keyword.keyword_title}</AppText>
@@ -561,7 +563,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                       setImage('');
                                   }
                                   setSelectedIndex(index);
-                              }}>
+                              }} activeOpacity={0.8}>
                                   <View style={{
                                       backgroundColor: item.color,
                                       width: 28,
@@ -672,6 +674,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
                                 else postCollections();
                             }}
                             disabled={DATA.collection_name.length < 2 ? true : false}
+                            activeOpacity={0.8}
                         ><AppText
                             style={{
                                 textAlign: 'center',

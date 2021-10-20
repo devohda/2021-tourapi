@@ -207,7 +207,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                 'place_pk': item.place_pk,
             };
             props.navigation.navigate('Place', {data : data});
-        }}>
+        }} activeOpacity={0.8}>
             <View style={{marginBottom: 8, alignItems: 'center', height: 72, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', width: '82%'}}>
                     {
@@ -241,7 +241,6 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                     if(newArr[index]) {
                         newArr[index] = false;
                         setIsPress(newArr);
-                        // deletePlace(item.place_pk)
                     } else {
                         newArr[index] = true;
                         setIsPress(newArr);
@@ -254,6 +253,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
                 }}
                 style={{width: '15%'}}
                 disabled={isPress[index] && true}
+                activeOpacity={0.8}
                 >
                     <View style={[{height: 28, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}, isPress[index] ? {backgroundColor: colors.gray[6]} : {backgroundColor: colors.mainColor}]}>
                         <View style={{paddingVertical: 4.5, paddingHorizontal: 4.5}}>

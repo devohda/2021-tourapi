@@ -229,7 +229,7 @@ const GetKeywordTab = ({route, authNavigation}) => {
                     borderColor: colors.defaultColor,
                     backgroundColor: colors.defaultColor,
                     shadowColor: colors.red[8]
-                }]}>
+                }]} activeOpacity={0.8}>
                     <AppText
                         style={isPress[keyword.keyword_pk - 1] ? {
                             ...styles.selectTypeTextClicked,
@@ -323,6 +323,7 @@ const GetKeywordTab = ({route, authNavigation}) => {
                 <TouchableOpacity
                     style={styles.later_btn}
                     onPress={() => checkIsValid(true)}
+                    activeOpacity={0.8}
                 >
                     <AppText style={{color: colors.gray[4], fontSize: 12, fontWeight: '400', lineHeight: 16.8, width: 150, textAlign: 'center'}}>나중에 선택할게요</AppText>
                     <View style={{borderWidth: 0.5, width: 86, borderColor: colors.gray[4]}}></View>
@@ -331,6 +332,7 @@ const GetKeywordTab = ({route, authNavigation}) => {
                     style={styles.continue_btn}
                     onPress={() => checkIsValid(false)}
                     disabled={isPress.filter(element => element === true).length > 0 && isPress.filter(element => element === true).length <= 3 ? false : true}
+                    activeOpacity={0.8}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>시작하기</AppText>
                 </TouchableOpacity>

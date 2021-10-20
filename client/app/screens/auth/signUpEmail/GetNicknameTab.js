@@ -182,6 +182,7 @@ const GetNicknameTab = ({route, navigation}) => {
                     style={styles.continue_btn}
                     onPress={() => checkIsValid()}
                     disabled={nickname && nickname.length <= 12 && !patterns.test(nickname) ? false : true}
+                    activeOpacity={0.8}
                 >
                     <AppText style={{color: colors.defaultColor, fontSize: 16, fontWeight: 'bold'}}>계속하기</AppText>
                 </TouchableOpacity>

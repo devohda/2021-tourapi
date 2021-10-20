@@ -167,7 +167,7 @@ const ShowPlacesForReplace = props => {
             </View>
             <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                    <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
+                    <TouchableOpacity onPress={() => {setDeleteVisible(false)}} activeOpacity={0.8}>
                         <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                             <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
                         </View>
@@ -177,7 +177,7 @@ const ShowPlacesForReplace = props => {
                                 newArr[index] = true;
                                 isReplacementDeleted(newArr);
                                 setDeleteMenu(false);
-                            }}>
+                            }} activeOpacity={0.8}>
                         <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                             <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                         </View>
@@ -200,12 +200,12 @@ const ShowPlacesForReplace = props => {
                                 'place_pk': item.place_pk,
                             };
                             navigation.navigate('Place', {data: data});
-                        }} disabled={isEditPage ? true : false}>
+                        }} disabled={isEditPage ? true : false} activeOpacity={0.8}>
                             <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%', alignItems: 'center'}}>
                                 { isEditPage &&
                                     <TouchableOpacity onPress={()=>{
                                         setDeleteMenu(true);
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                         <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                             <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                         </View>
@@ -284,11 +284,11 @@ const ShowPlacesForReplace = props => {
                                         } else {
                                             LikePlace(item.place_pk);
                                         }
-                                    }}>
+                                    }} activeOpacity={0.8}>
                                         <Jewel width={26} height={21}
                                             style={{color: likeFlag ? colors.red[3] : colors.red_gray[5]}}/>
                                     </TouchableOpacity> :
-                                    <TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.8}>
                                         <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
                                     </TouchableOpacity>
                             }

@@ -53,7 +53,7 @@ const TipsList = props => {
                         ></TextInput>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 20}}>
-                        <TouchableOpacity onPress={() => {setAddVisible(false)}}>
+                        <TouchableOpacity onPress={() => {setAddVisible(false)}} activeOpacity={0.8}>
                             <View style={{width: 86, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
                             </View>
@@ -63,7 +63,7 @@ const TipsList = props => {
                                 postPlaceComment(data.cpm_map_pk, changed);
                             }
                             setAddVisible(false);
-                        }}>
+                        }} activeOpacity={0.8}>
                             <View style={{width: 201, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>추가하기</AppText>
                             </View>
@@ -118,7 +118,7 @@ const TipsList = props => {
                                 putPlaceComment(data.cpm_map_pk, changed);
                             }
                             setEditVisible(false);
-                        }}>
+                        }} activeOpacity={0.8}>
                             <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>수정하기</AppText>
                             </View>
@@ -126,7 +126,7 @@ const TipsList = props => {
                         <TouchableOpacity onPress={() => {
                             setEditVisible(false);
                             setDeleteVisible(true);
-                            }}>
+                            }} activeOpacity={0.8}>
                             <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                             </View>
@@ -152,7 +152,7 @@ const TipsList = props => {
                     </View>
                     <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                            <TouchableOpacity onPress={() => {setDeleteVisible(false)}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false)}} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
                                 </View>
@@ -160,7 +160,7 @@ const TipsList = props => {
                             <TouchableOpacity onPress={() => {
                                 setDeleteVisible(false);
                                 deletePlaceComment(data.cpm_map_pk, comment);
-                            }}>
+                            }} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                                 </View>
@@ -208,6 +208,7 @@ const TipsList = props => {
                         if(props.private) setAddVisible(true);
                     }
                     }}
+                    activeOpacity={0.8}
                     >
                     <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 6, width: '90%'}}>
                         {   comment ?

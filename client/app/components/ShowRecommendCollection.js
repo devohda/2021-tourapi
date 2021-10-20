@@ -168,7 +168,7 @@ const ShowRecommendCollection = props => {
                 };
                 item.collection_type === 1 ?
                     navigation.navigate('PlanCollection', {data : data}) : navigation.navigate('FreeCollection', {data : data});
-            }}>
+            }} activeOpacity={0.8}>
                 <View style={{
                     width: 162,
                     height: 249,
