@@ -1,30 +1,42 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Image, TouchableOpacity, View, StyleSheet, SafeAreaView, FlatList, ScrollView, TouchableWithoutFeedback} from 'react-native';
+import {
+    Image,
+    TouchableOpacity,
+    View,
+    StyleSheet,
+    SafeAreaView,
+    FlatList,
+    ScrollView,
+    TouchableWithoutFeedback,
+    Alert
+} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 
 import AppText from '../../components/AppText';
-import {useSearchKeyword} from '../../contexts/search/SearchkeywordContextProvider';
+import ScreenContainerView from '../../components/ScreenContainerView';
+import {useSearchKeyword} from '../../contexts/SearchkeywordContextProvider';
 import ShowEmpty from '../../components/ShowEmpty';
 import {useToken} from '../../contexts/TokenContextProvider';
-import {searchPlaceResult} from '../../contexts/search/SearchPlaceContextProvider';
 
 import Star from '../../assets/images/search/star.svg';
 import Jewel from '../../assets/images/jewel.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
-const SearchPlace = ({navigation}) => {
+const SearchPlace = props => {
     const {colors} = useTheme();
+    const { countPlace, navigation } = props;
     const [placeList, setPlaceList] = useState([]);
     const [like, setLike] = useState(false);
     const [searchKeyword, setSearchKeyword] = useSearchKeyword();
-    const [searchLength, setSearchLength] = searchPlaceResult();
     const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
 
     const [token, setToken] = useToken();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const styles = StyleSheet.create({
         info_container: {
@@ -42,12 +54,14 @@ const SearchPlace = ({navigation}) => {
     });
 
     useEffect(() => {
-        getResults();
+        getResults('SCORE');
+        setShowMenu(false);
+        setCurrentMenu('평점순');
     }, [searchKeyword, isFocused]);
 
-    const getResults = () => {
+    const getResults = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
+            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -56,17 +70,19 @@ const SearchPlace = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response);
-                    setSearchLength(response.data.length);
+
+                    countPlace(response.data.length);
                     setPlaceList(response.data);
-                    // setFalse();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -89,15 +105,18 @@ const SearchPlace = ({navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
 
-                    getResults();
+                    getResults('SCORE');
                 })
                 .catch((err) => {
                     console.error(err);
@@ -120,15 +139,18 @@ const SearchPlace = ({navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
 
-                    getResults();
+                    getResults('SCORE');
                 })
                 .catch((err) => {
                     console.error(err);
@@ -151,15 +173,17 @@ const SearchPlace = ({navigation}) => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -195,101 +219,96 @@ const SearchPlace = ({navigation}) => {
 
     const SelectBox = () => {
         return (
-            <>
-            {
-            showMenu && <View style={{
+            <View style={{
                 position: 'absolute',
-                width: 80,
-                height: 80,
-                backgroundColor: '#fff',
-                // flex: 1,
-                borderRadius: 10,
-                zIndex: 0,
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-                overflow: 'visible'
-                }}>
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('평점순');
-                    }}
-                    style={{
+                zIndex: 9000
+            }} flex={1}>
+                {
+                    showMenu && <View style={{
+                        width: 80,
+                        height: 60,
+                        backgroundColor: '#fff',
                         flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
-                        {currentMenu === '평점순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                    
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
+                        borderRadius: 10,
                         zIndex: 0,
-                        backgroundColor: colors.backgroundColor,
-                    }}></View>
-                    
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('인기순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        overflow: 'visible'
                     }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                        {currentMenu === '인기순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('평점순');
+                                getResults('SCORE');
+                            }}
+                            style={{
+                                flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5,
+                                width: '100%'
+                            }}>
+                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
+                                {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                            </View>
+                        </TouchableOpacity>
                     
-                    <View style={{
-                        height: 1,
-                        borderColor: colors.gray[5],
-                        borderWidth: 0.4,
-                        borderRadius: 1,
-                        zIndex: 0
-                    }}></View>
+                        <View style={{
+                            height: 1,
+                            borderColor: colors.gray[5],
+                            borderWidth: 0.4,
+                            borderRadius: 1,
+                            zIndex: 0,
+                            backgroundColor: colors.backgroundColor,
+                        }}></View>
                     
-                    <TouchableOpacity
-                    onPress={() => {
-                        setShowMenu(false);
-                        setCurrentMenu('거리순');
-                    }}
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'row',
-                        paddingLeft: 8.5
-                    }}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>거리순</AppText>
-                        {currentMenu === '거리순' && <Icon type="ionicon" name={"checkmark-sharp"} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
-                    </TouchableOpacity>
-                </View>
-            }
-            </>
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                setShowMenu(false);
+                                setCurrentMenu('인기순');
+                                getResults('LIKE');
+                            }} style={{
+                                flex: 1,
+                                zIndex: 0,
+                            }}>
+                            <View style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                flexDirection: 'row',
+                                paddingLeft: 8.5,
+                                width: '100%',
+                            }}>
+                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
+                                {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                }
+            </View>
         );};
 
-    const PlaceContainer = ({item, index}) => {
+    const PlaceContainer = ({item}) => {
         return (
             <TouchableOpacity onPress={() => {
-                countPlaceView(item.place_pk)
-                navigation.navigate('Place', {data: item});
-            }}>
+                countPlaceView(item.place_pk);
+                const data = {
+                    'place_pk': item.place_pk,
+                };
+                navigation.navigate('Place', {data: data});
+            }} style={{zIndex: 9999}} activeOpacity={0.8}>
                 <View style={{
                     marginBottom: 8,
                     alignItems: 'center',
@@ -303,8 +322,14 @@ const SearchPlace = ({navigation}) => {
                             item.place_img ?
                                 <Image source={{uri: item.place_img}}
                                     style={{borderRadius: 10, width: 72, height: 72}}/> :
-                                <Image source={require('../../assets/images/here_default.png')}
-                                    style={{borderRadius: 10, width: 72, height: 72}}/>
+                                    item.place_thumbnail ?
+                                    <Image source={{uri: item.place_thumbnail}}
+                                    style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        item.review_img ?
+                                        <Image source={{uri: item.review_img}}
+                                        style={{borderRadius: 10, width: 72, height: 72}}/> :
+                                        <Image source={require('../../assets/images/here_default.png')}
+                                            style={{borderRadius: 10, width: 72, height: 72}}/> 
                         }
                         <View flex={1} style={styles.info_container}>
                             <View flexDirection="row" style={{alignItems: 'center'}}>
@@ -313,10 +338,12 @@ const SearchPlace = ({navigation}) => {
                                         fontSize: 10,
                                         color: colors.mainColor
                                     }}>{checkType(item.place_type)}</AppText>
-                                <View style={{...styles.score_line, display: parseInt(item.review_score) == -1 && 'none'}}></View>
-                                <Star width={11} height={11} style={{marginTop: 2, display: parseInt(item.review_score) == -1 && 'none'}}/>
-                                <AppText
-                                    style={{fontSize: 10, color: colors.mainColor, marginLeft: 2, display: parseInt(item.review_score) == -1 && 'none'}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                    <View style={{...styles.score_line}}></View>
+                                    <Star width={11} height={11} style={{marginTop: 2}}/>
+                                    <AppText
+                                        style={{fontSize: 10, color: colors.mainColor, marginLeft: 2}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                </View>
                             </View>
                             <AppText style={{
                                 fontSize: 16,
@@ -332,26 +359,12 @@ const SearchPlace = ({navigation}) => {
                         </View>
                     </View>
                     <TouchableOpacity onPress={() => {
-                        // let newArr = [...isPress];
-                        // if (newArr[index]) {
-                        //     newArr[index] = false;
-                        //     setIsPress(newArr);
-                        //     deletePlace(item.place_pk);
-                        // } else {
-                        //     for (let i = 0; i < newArr.length; i++) {
-                        //         if (i == index) continue;
-                        //         else newArr[i] = false;
-                        //     }
-                        //     newArr[index] = true;
-                        //     setIsPress(newArr);
-                        //     likePlace(item.place_pk);
-                        // }
                         if (item.like_flag) {
                             DeleteLikedPlace(item.place_pk);
                         } else {
                             LikePlace(item.place_pk);
                         }
-                    }}>
+                    }} activeOpacity={0.8}>
                         <Jewel width={26} height={21}
                             style={{color: item.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                     </TouchableOpacity>
@@ -366,26 +379,26 @@ const SearchPlace = ({navigation}) => {
                 {
                     placeList.length === 0 ?
                         <ShowEmpty/> :
-                        <>
-                        {/* <View style={{position: 'relative'}}>
-                        <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
-                            <View flexDirection="row" flex={1} style={{justifyContent: 'flex-end'}}>
-                                <TouchableOpacity onPress={()=>{
-                                    setShowMenu(!showMenu);
-                                }} style={{flexDirection: 'row'}}>
-                                    <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
-                                    <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                                        name={'chevron-down-outline'} size={16}></Icon>
-                                </TouchableOpacity>
-                                <SelectBox />
+                        <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
+                            <SelectBox />
+                            <View flexDirection="row" style={{justifyContent: 'space-between', marginTop: 2, position: 'relative', zIndex: 50}} flex={1}>
+                                <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                                    <View flexDirection="row" flex={1}>
+                                        <TouchableOpacity onPress={()=>{
+                                            setShowMenu(!showMenu);
+                                        }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
+                                            <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
+                                            <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
+                                                name={'chevron-down-outline'} size={16}></Icon>
+                                        </TouchableOpacity>
+                                    </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                        </TouchableWithoutFeedback>
-                        </View> */}
-                        <SafeAreaView flex={1}>
-                            <FlatList data={placeList} renderItem={PlaceContainer}
-                                keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
-                        </SafeAreaView>
-                        </>
+                            <SafeAreaView flex={1}>
+                                <FlatList data={placeList} renderItem={PlaceContainer}
+                                    keyExtractor={(item, index) => item.place_pk.toString()} nestedScrollEnabled/>
+                            </SafeAreaView>
+                        </View>
                 }
             </ScrollView>
         </View>

@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
-import { StatusBar, Platform } from 'react-native';
-import AppLoading from 'expo-app-loading';
-import { useFonts } from 'expo-font';
+import { StatusBar, Platform, View } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
 
 import AppNavigator from './navigation/AppNavigator';
 import AppContextProviders from './contexts/AppContextProviders';
@@ -68,29 +68,61 @@ const ColorTheme = {
 
 
 export default function App() {
+    const [appIsReady, setAppIsReady] = useState(false);
 
-    let [fontsLoaded] = useFonts({
-        'Pretendard-Thin': require('./assets/fonts/Pretendard-Thin.otf'),
-        'Pretendard-ExtraLight': require('./assets/fonts/Pretendard-ExtraLight.otf'),
-        'Pretendard-Light': require('./assets/fonts/Pretendard-Light.otf'),
-        'Pretendard-Regular': require('./assets/fonts/Pretendard-Regular.otf'),
-        'Pretendard-Medium': require('./assets/fonts/Pretendard-Medium.otf'),
-        'Pretendard-SemiBold': require('./assets/fonts/Pretendard-SemiBold.otf'),
-        'Pretendard-Bold' : require('./assets/fonts/Pretendard-Bold.otf'),
-        'Pretendard-ExtraBold' : require('./assets/fonts/Pretendard-ExtraBold.otf'),
-        'Pretendard-Black' : require('./assets/fonts/Pretendard-Black.otf'),
-    });
+    useEffect(() => {
+        async function prepare() {
+            try {
+                // Keep the splash screen visible while we fetch resources
+                await SplashScreen.preventAutoHideAsync();
+                // Pre-load fonts, make any API calls you need to do here
+                await Font.loadAsync({
+                    'Pretendard-Thin': require('./assets/fonts/Pretendard-Thin.otf'),
+                    'Pretendard-ExtraLight': require('./assets/fonts/Pretendard-ExtraLight.otf'),
+                    'Pretendard-Light': require('./assets/fonts/Pretendard-Light.otf'),
+                    'Pretendard-Regular': require('./assets/fonts/Pretendard-Regular.otf'),
+                    'Pretendard-Medium': require('./assets/fonts/Pretendard-Medium.otf'),
+                    'Pretendard-SemiBold': require('./assets/fonts/Pretendard-SemiBold.otf'),
+                    'Pretendard-Bold' : require('./assets/fonts/Pretendard-Bold.otf'),
+                    'Pretendard-ExtraBold' : require('./assets/fonts/Pretendard-ExtraBold.otf'),
+                    'Pretendard-Black' : require('./assets/fonts/Pretendard-Black.otf'),
+                });
+                // Artificially delay for two seconds to simulate a slow loading
+                // experience. Please remove this if you copy and paste the code!
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } catch (e) {
+                console.warn(e);
+            } finally {
+                // Tell the application to render
+                setAppIsReady(true);
+            }
+        }
 
-    if (!fontsLoaded) {
-        return <AppLoading />;
-    }else{
-        return (
+        prepare();
+    }, []);
+
+
+
+    const onLayoutRootView = useCallback(async () => {
+        if (appIsReady) {
+            await SplashScreen.hideAsync();
+        }
+    }, [appIsReady]);
+
+    if (!appIsReady) {
+        return null;
+    }
+
+    return (
+        <View
+            style={{ flex: 1}}
+            onLayout={onLayoutRootView}>
             <AppContextProviders>
                 <NavigationContainer theme={ColorTheme}>
                     {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
                     <AppNavigator/>
                 </NavigationContainer>
             </AppContextProviders>
-        );
-    }
+        </View>
+    );
 }

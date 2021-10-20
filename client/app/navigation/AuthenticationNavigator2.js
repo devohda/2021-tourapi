@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import SignInEmailScreen from '../screens/auth/SignInEmailScreen';
-import FindPasswordScreen from '../screens/auth/FindPasswordScreen';
+import ChangePasswordScreen from '../screens/auth/ChangePasswordScreen';
 import SignUpSocialScreen from '../screens/auth/SignUpSocialScreen';
 import SignUpEmailScreen from '../screens/auth/SignUpEmailScreen';
 
@@ -15,7 +15,7 @@ export default function AuthenticationNavigator({navigation : appNavigation}) {
             <Stack.Screen name="SignUpSocial" component={SignUpSocialScreen} options={{headerShown: false}}/>
             <Stack.Screen name="SignInEmail" children={({navigation}) => <SignInEmailScreen navigation={navigation} appNavigation={appNavigation}/> }/>
             <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen}/>
-            <Stack.Screen name="FindPassword" component={FindPasswordScreen}/>
+            <Stack.Screen name="ChangePassword" children={({navigation}) => <ChangePasswordScreen navigation={navigation} appNavigation={appNavigation}/> }/>
         </Stack.Navigator>
     );
 }

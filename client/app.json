@@ -2,13 +2,14 @@
   "expo": {
     "name": "Here",
     "slug": "Here",
-    "version": "0.0.6",
+    "version": "0.8.0",
+    "scheme": "here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
     "splash": {
       "image": "./app/assets/images/here_splash.png",
       "resizeMode": "cover",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFF8F8"
     },
     "packagerOpts": {
       "config": "metro.config.js",
@@ -28,15 +29,19 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.0.8"
+      "buildNumber": "0.8.1",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/appicon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#FFF8F8"
       },
       "package": "com.ohda.Here",
-      "versionCode": 6,
+      "versionCode": 7,
       "config": { "googleMaps": { "apiKey": "AIzaSyBfbTmomxwAPk8E9vUUep3qG703s11DYdI" } }
     },
     "web": {

@@ -3,10 +3,13 @@ import {
     TouchableOpacity,
     View,
     Image,
-    TouchableHighlight
+    TouchableHighlight,
+    Alert,
+    StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
+import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import TipsList from './TipsList';
@@ -17,24 +20,21 @@ import SlideMenu from '../../assets/images/menu_for_edit.svg';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import AlternativeSpaceList from './AlternativeSpaceList';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ShowPlaces = props => {
     const { colors } = useTheme();
 
-    const { day, index, isEditPage, isPress, item, length, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
-        isCommentPosted, isPostedCommentMapPk, isPostedComment,
-        isCommentEdited, isEditedCommentMapPk, isEditedComment,
-        isCommentDeleted, isDeletedComment,
-        isReplacementGotten, isGottenReplacementMapPk,
+    const { day, index, isEditPage, item, length, curLength, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
         isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
-        postPlaceComment, putPlaceComment,
+        postPlaceComment, putPlaceComment, deletePlaceComment,
         postReplacement, getReplacement, replacementData
     } = props;
     const isFree = (typeof day === 'undefined');
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-
     const [isLiked, setIsLiked] = useState(item.like_flag);
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const checkType = (type) => {
         if(type === 12) {
@@ -80,17 +80,18 @@ const ShowPlaces = props => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
 
-                    setIsLiked(response.data[index].like_flag);
-                    // console.log(response.data)
-                    // setIsTrue(userData.user_pk === data.user_pk && collectionData.collection_private === 0);
+                    setIsLiked(response.data.placeList[index].like_flag);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -113,8 +114,11 @@ const ShowPlaces = props => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -144,8 +148,11 @@ const ShowPlaces = props => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -175,15 +182,17 @@ const ShowPlaces = props => {
             }).then((res) => {
                 res.json();
             })
-                .then((response) => {
-                    // if(response.code === 401 || response.code === 403 || response.code === 419){
-                    //     // Alert.alert('','로그인이 필요합니다');
-                    //     await SecureStore.deleteItemAsync('accessToken');
-                    //     setToken(null);
-                    //     setIsSignedIn(false);
-                    //     return;
-                    // }
-                    console.log(response)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -193,7 +202,6 @@ const ShowPlaces = props => {
             console.error(err);
         }
     };
-
     const checkCurrentDay = () => {
         var length = 0;
         for(var i=0;i<originData.length;i++) {
@@ -214,52 +222,98 @@ const ShowPlaces = props => {
             if(originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) length += 1;
         }
         return idx - length;
-    }
+    };
 
     const checkLimit = () => {
         if(!isEditPage && !isLimited && checkCurrentDay() > 5) {
             if(checkCurrentIndex(index) <= 4) return false;
             else return true;
         } else return false;
-    }
+    };
+
+    const [deleteVisible, setDeleteVisible] = useState(false);
+
+    const DeleteModal = () => {
+        return (
+            <Modal
+                visible={deleteVisible}
+                backdropStyle={styles.backdrop}
+                style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
+                onBackdropPress={() => setDeleteVisible(false)}>
+                <Card disabled={true}
+                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+                >
+                    <View style={{marginTop: 35}}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>공간을 삭제할까요?</AppText>
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false);}} activeOpacity={0.8}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                let newArr = [...isDeletedOrigin];
+                                newArr[index] = true;
+                                isDeleted(newArr);
+                                setDeleteVisible(false);
+                            }} activeOpacity={0.8}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Card>
+            </Modal>
+        );
+    };
+    
     return (
         <View style={checkLimit() && {display: 'none'}}>
             { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
-                        <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                                    <TouchableOpacity onPress={()=>{
-                                        let newArr = [...isDeletedOrigin];
-                                        console.log(newArr)
-                                        newArr[index] = true;
-                                        // setIsDeletedOrigin(newArr);
-                                        isDeleted(newArr);
-                                    }} style={!isEditPage && {display: 'none'}}>
-                                        <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
-                                            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                                <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity>
-                                    <View style={[{justifyContent: 'center', alignItems: 'center', marginEnd: 12}, isEditPage && {display: 'none'}]}>
-                                        <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
-                                            <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                                {checkIndex()}    
-                                            </AppText>
-                                        </View>
+                        <View style={{flexDirection: 'row', marginVertical: 6, justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableOpacity onPress={()=>{
+                                setDeleteVisible(true);
+                            }} style={!isEditPage && {display: 'none'}} activeOpacity={0.8}>
+                                <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
+                                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                        <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
                                     </View>
+                                </View>
+                            </TouchableOpacity>
+                            <DeleteModal />
+                            <View style={[{justifyContent: 'center', alignItems: 'center', marginRight: 12}, isEditPage && {display: 'none'}]}>
+                                <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
+                                    <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
+                                        {checkIndex()}    
+                                    </AppText>
+                                </View>
+                            </View>
                             <TouchableOpacity onPress={() => {
                                 countPlaceView(item.place_pk);
-                                props.navigation.navigate('Place', {data: item})
-                            }} disabled={isEditPage && true}>
+                                const data = {
+                                    'place_pk': item.place_pk,
+                                };
+                                props.navigation.navigate('Place', {data: data});
+                            }} disabled={isEditPage && true} activeOpacity={0.8}>
                                 <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '88%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
                                     <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
                                         {
                                             item.place_img ?
                                                 <Image source={{uri: item.place_img}}
                                                     style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
-                                                <Image source={require('../../assets/images/here_default.png')}
-                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                                    item.place_thumbnail ?
+                                                    <Image source={{uri: item.place_thumbnail}}
+                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                        item.review_img ?
+                                                        <Image source={{uri: item.review_img}}
+                                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                        <Image source={require('../../assets/images/here_default.png')}
+                                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
                                         }
                                         <View style={{
                                             justifyContent: 'space-between',
@@ -275,29 +329,28 @@ const ShowPlaces = props => {
                                                         fontSize: 10,
                                                         fontWeight: 'bold'
                                                     }}>{checkType(item.place_type)}</AppText>
-                                                    <AppText style={{
-                                                        marginHorizontal: 4, color: colors.gray[7],
-                                                        textAlign: 'center',
-                                                        fontSize: 10,
-                                                        fontWeight: 'bold',
-                                                        display: parseInt(item.review_score) == -1 && 'none'
-                                                    }}>|</AppText>
-                                                    <Image source={require('../../assets/images/review_star.png')}
-                                                        style={{
-                                                            width: 10,
-                                                            height: 10,
-                                                            alignSelf: 'center',
-                                                            marginTop: '1%',
-                                                            display: parseInt(item.review_score) == -1 && 'none'
-                                                        }}></Image>
-                                                    <AppText style={{
-                                                        color: colors.gray[3],
-                                                        textAlign: 'center',
-                                                        fontSize: 10,
-                                                        fontWeight: 'bold',
-                                                        marginLeft: 2,
-                                                        display: parseInt(item.review_score) == -1 && 'none'
-                                                    }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                                    <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                                        <AppText style={{
+                                                            marginHorizontal: 4, color: colors.gray[7],
+                                                            textAlign: 'center',
+                                                            fontSize: 10,
+                                                            fontWeight: 'bold',
+                                                        }}>|</AppText>
+                                                        <Image source={require('../../assets/images/review_star.png')}
+                                                            style={{
+                                                                width: 10,
+                                                                height: 10,
+                                                                alignSelf: 'center',
+                                                                marginTop: '1%',
+                                                            }}></Image>
+                                                        <AppText style={{
+                                                            color: colors.gray[3],
+                                                            textAlign: 'center',
+                                                            fontSize: 10,
+                                                            fontWeight: 'bold',
+                                                            marginLeft: 2,
+                                                        }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                                    </View>
                                                 </View>
                                                 <View style={{width: '100%'}}>
                                                     <AppText style={{
@@ -315,23 +368,6 @@ const ShowPlaces = props => {
                                 </View>
                             </TouchableOpacity>
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                {/* {item.like_flag === 0 ?  */}
-                                {/* <TouchableOpacity onPress={() => {
-                            let newArr = [...isPress];
-                            if (newArr[index]) {
-                                newArr[index] = false;
-                                setIsPress(newArr);
-                                deletePlace(item.place_pk);
-                            } else {
-                                // for(let i=0;i<newArr.length;i++) {
-                                //     if(i == index) continue;
-                                //     else newArr[i] = false;
-                                // }
-                                newArr[index] = true;
-                                setIsPress(newArr);
-                                likePlace(item.place_pk);
-                            }
-                        }}> */}
                                 {
                                     !isEditPage ?
                                         <TouchableOpacity onPress={() => {
@@ -340,71 +376,54 @@ const ShowPlaces = props => {
                                             } else {
                                                 LikePlace(item.place_pk);
                                             }
-                                        }}>
+                                        }} activeOpacity={0.8}>
                                             <Jewel width={26} height={21}
                                                 style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
                                         </TouchableOpacity> :
-                                        <TouchableOpacity>
+                                        <TouchableOpacity activeOpacity={0.8}>
                                             <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
                                         </TouchableOpacity>
                                 }
                             </View>
                         </View>
-                        <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} isFree={isFree} private={props.private} navigation={navigation} pk={pk}
-                            isReplacementGotten={isReplacementGotten} isGottenReplacementMapPk={isGottenReplacementMapPk} 
-                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement} setDeletedReplacementData={setDeletedReplacementData} postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
+                        {!isEditPage && <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} private={props.private} navigation={navigation} pk={pk}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement}
+                            postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
                             replacementData={replacementData}
-                        />
-                        <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} isCommentDeleted={isCommentDeleted} isDeletedComment={isDeletedComment}/>
+                        />}
+                        {!isEditPage && <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
                     </View>
                 </TouchableHighlight> :
-                item.cpm_plan_day === day && length > 0 &&
+                item.cpm_plan_day === day && curLength > 0 &&
                 <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={[{flexDirection: 'row', justifyContent: 'space-between'}, isDeletedOrigin[index] && {display: 'none'}]}>
-                        { isEditPage &&
-                            <TouchableOpacity onPress={()=>{
-                                // console.log(isDeleted);
-                                var newArr = [...isDeletedOrigin];
-                                newArr[index] = true;
-                                // setIsDeletedOrigin(newArr);
-                                isDeleted(newArr);
-                            }}>
-                                <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
-                                    <Icon type="ionicon" name={"remove-circle"} color={colors.red[3]} size={28}/>
-                                </View>
-                            </TouchableOpacity>
-                        }
+                        <DeleteModal />
                         <View style={{
                             height: 30,
                             paddingVertical: 6,
-                            paddingRight: 15,
-                            paddingBottom: 6,
-                            paddingTop: 4,
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            backgroundColor: colors.backgroundColor
+                            backgroundColor: colors.backgroundColor,
                         }}>
                             <View style={{
-                                width: !isEditPage ? '90%' : '70%',
+                                width: !isEditPage ? '88%' : '80.5%',
                                 borderStyle: 'dotted',
                                 borderRadius: 1,
                                 borderWidth: 1,
                                 borderColor: colors.gray[4],
                                 zIndex: -1000,
-                                    
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}></View>
-                            <View style={{marginStart: 6}}>
+                            <View style={{marginHorizontal: '2%'}}>
                                 <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>
                                     {item.place_pk === -1 ? '12PM' : '18PM'}
                                 </AppText>
                             </View>
-                            {
-                                isEditPage &&
-                                <TouchableOpacity style={{marginStart: 12}}>
-                                    <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
-                                </TouchableOpacity>
-                            }
+                            <TouchableOpacity style={!isEditPage && {display: 'none'}}>
+                                <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -413,5 +432,19 @@ const ShowPlaces = props => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    backdrop: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    shadowOption: {
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+    }
+});
 
 export default ShowPlaces;

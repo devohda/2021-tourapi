@@ -3,6 +3,7 @@ import { View, ScrollView, Image, StyleSheet, SafeAreaView, TouchableOpacity, Di
 import {useTheme} from '@react-navigation/native';
 import {Icon, AirbnbRating, Rating} from 'react-native-elements';
 import {useToken} from '../../contexts/TokenContextProvider';
+import * as ImagePicker from 'expo-image-picker';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
@@ -11,6 +12,7 @@ import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const MakeReviewScreen = ({route, navigation}) => {
     const { colors } = useTheme();
@@ -26,6 +28,7 @@ const MakeReviewScreen = ({route, navigation}) => {
     const [ratedAccessibilityScore, setRatedAccessibilityScore] = useState(0);
     const [ratedMarketScore, setRatedMarketScore] = useState(0);
 
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [userData, setUserData] = useState({});
     const [busyTimeData, setBusyTimeData] = useState([
         {
@@ -66,8 +69,11 @@ const MakeReviewScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -96,14 +102,16 @@ const MakeReviewScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response.data)
 
                     setFacilityData(response.data);
                 })
@@ -123,22 +131,30 @@ const MakeReviewScreen = ({route, navigation}) => {
         for (let i = 0; i < busyTimeData.length; i++) {
             if (isBusyTimePress[i] === true) {
                 postBusyTime[i] = 1;
-            };
-        };
+            }
+        }
 
         for (let i = 0; i < facilityData.length; i++) {
             if (isFacilityPress[i] === true) {
                 postFacility.push(facilityData[i].facility_pk);
-            };
-        };
+            }
+        }
 
         // 선택사항이 많으므로 하나 하나 조건 필요
-        var DATA = {
-            review_congestion_morning: postBusyTime[0],
-            review_congestion_afternoon: postBusyTime[1],
-            review_congestion_evening: postBusyTime[2],
-            review_congestion_night: postBusyTime[3],
-        };
+        var DATA = {};
+
+        if(postBusyTime[0]) {
+            DATA.review_congestion_morning = postBusyTime[0];
+        }
+        if(postBusyTime[1]) {
+            DATA.review_congestion_afternoon = postBusyTime[1];
+        }
+        if(postBusyTime[2]) {
+            DATA.review_congestion_evening = postBusyTime[2];
+        }
+        if(postBusyTime[3]) {
+            DATA.review_congestion_night = postBusyTime[3];
+        }
         if(ratedScore) {
             DATA.review_score = ratedScore;
         }
@@ -151,33 +167,66 @@ const MakeReviewScreen = ({route, navigation}) => {
         if(ratedMarketScore) {
             DATA.review_market = ratedMarketScore;
         }
-        if(postFacility.length !== 0) {
-            DATA.review_facility = postFacility;
-        }
+        DATA.review_facility = postFacility;
 
+        let form = new FormData();
+        if(image.length) {
+            if(image.length === 1) {
+                let file = {
+                    uri: image[0],
+                    type: 'multipart/form-data',
+                    name: 'image.jpg',
+                };
+                form.append('img', file);
+            } else {
+                var newArr = [];
+                for(var i=0;i<image.length;i++) {
+                    newArr.push({
+                        uri: image[i],
+                        type: 'multipart/form-data',
+                        name: `image${i+1}.jpg`,
+                    });
+                }
+                // form.append('img', newArr)
+                // for(var i=0;i<image.length;i++) {
+                //     form.append('img[]', newArr[i]);
+                // }
+                for(var i=0;i<image.length;i++) {
+                    form.append('img', newArr[i]);
+                }
+            }
+        }
+        form.append('reviewData', JSON.stringify(DATA));
         try {
             fetch(`http://34.64.185.40/place/${place_pk}/review`, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                     'x-access-token': token
                 },
-                body: JSON.stringify({
-                    reviewData: DATA,
-                })
-            }).then((res) => {
+                body: form,
+            }).then(res => {
                 res.json();
             })
-                .then((response) => {
-                    console.log(response)
-                    Alert.alert('', '리뷰 등록이 완료되었습니다.');
-                    navigation.goBack();
+                .then(async response => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        Alert.alert('', '다른 기기에서 로그인했습니다.');
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                    Alert.alert('', '리뷰 등록이 완료되었습니다.', [
+                        {text : 'OK', onPress: () => navigation.goBack()}
+                    ]);
                 })
                 .catch((err) => {
                     console.error(err);
-                    Alert.alert('', '리뷰 등록에 실패했습니다.');
-                    navigation.goBack();
+                    Alert.alert('', '리뷰 등록에 실패했습니다. 다시 시도해주세요.');
                 });
 
         } catch (err) {
@@ -246,7 +295,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8]
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]} activeOpacity={0.8}>
                     <AppText
                         style={isBusyTimePress[keyword.id - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.data}</AppText>
                 </TouchableOpacity>
@@ -277,7 +326,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                     borderColor: colors.mainColor,
                     backgroundColor: colors.mainColor,
                     shadowColor: colors.red[8],
-                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]}>
+                }] : [styles.selectType, {borderColor: colors.defaultColor, backgroundColor: colors.defaultColor, shadowColor: colors.red[8]}]} activeOpacity={0.8}>
                     <AppText
                         style={isFacilityPress[keyword.facility_pk - 1] ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.gray[6]}}>{keyword.facility_name}</AppText>
                 </TouchableOpacity>
@@ -332,19 +381,82 @@ const MakeReviewScreen = ({route, navigation}) => {
         </View>
     );
 
+    const [image, setImage] = useState([]);
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+        
+        if (!result.cancelled) {
+            var newArr = [...image];
+            newArr.push(result.uri);
+            setImage(newArr);
+        }
+    };
+
+    const SelectReviewImage = () => {
+        return (
+            <View style={{marginBottom: 26}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
+                    <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
+                    <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
+                </View>
+                <ScrollView horizontal nestedScrollEnabled showsHorizontalScrollIndicator={false}>
+
+                    <View style={{flexDirection: 'row'}}>
+                        <TouchableOpacity onPress={()=>{
+                            if(image.length === 5) {
+                                Alert.alert('', '사진은 최대 5개까지 가능합니다.');
+                            } else {
+                                pickImage();
+                            }
+                        }} activeOpacity={0.8}>
+                            <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
+                                <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
+                            </View>
+                        </TouchableOpacity>
+                        <FlatList data={image} horizontal scrollEnabled={false}
+                            renderItem={({item, index}) =>
+                                <>
+                                    <Image style={{...styles.addedPictures}} source={{ uri: item }}>
+                                    </Image>
+                                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', position: 'absolute', ...styles.removeContainer}}>
+                                        <TouchableOpacity onPress={()=>{
+                                            var newArr = [...image];
+                                            newArr.splice(index, 1);
+                                            setImage(newArr);
+                                        }} activeOpacity={0.8}>
+                                            <Icon type="ionicon" name={'remove-circle'} color={colors.red[3]} size={28}/>
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            }
+                            keyExtractor={(item, idx) => {idx.toString();}}
+                            key={(item, idx) => {idx.toString();}}
+                            nestedScrollEnabled/>
+                    </View>
+                </ScrollView>
+
+            </View>
+        );
+    };
+
+
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title=""/>
-            <ScrollView>
+            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
                 <ScreenContainerView>
                     <View style={{marginTop: 18}}>
                         <View style={{justifyContent: 'space-between', marginBottom: 8}}>
                             <View style={{marginBottom: 37}}>
                                 <View style={{flexDirection: 'row'}}>
                                     <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '700'}}>{placeName}</AppText>
-                                    <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'}</AppText>
                                 </View>
-                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>어떤 공간이었나요?</AppText>
+                                <AppText style={{...styles.placeName, color: colors.mainColor, fontWeight: '400'}}>{isEndWithConsonant(placeName) ? '은' : '는'} 어떤 공간이었나요?</AppText>
                             </View>
                             <Rating
                                 type='custom'
@@ -359,7 +471,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                             />
                         
                             {ratedScore !== 0 ? <AppText style={{...styles.scoreText, color: colors.mainColor}}>{reviews[ratedScore-1]}</AppText> :
-                            <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
+                                <AppText style={{...styles.scoreText, color: colors.backgroundColor}}>.</AppText>}
                         </View>
                     </View>
                 </ScreenContainerView>
@@ -451,7 +563,6 @@ const MakeReviewScreen = ({route, navigation}) => {
                                 <AppText style={{...styles.rateStandard, color: colors.mainColor}}>혼잡한 시간대</AppText>
                                 <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>복수선택가능</AppText>
                             </View>
-                            {/* TODO 아이콘 추가 */}
                             <View style={{flexDirection: 'row', marginTop: 6}}>
                                 {
                                     busyTimeData.map((keyword, idx) => (
@@ -468,7 +579,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                             </View>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 6}}>
                                 <FacilityLineBreak />
-                                <TouchableOpacity onPress={()=>setIsOpened(!isOpened)}>
+                                <TouchableOpacity onPress={()=>setIsOpened(!isOpened)} activeOpacity={0.8}>
                                     <View>
                                         { isOpened ?
                                             <Image source={require('../../assets/images/showWhole_forDir.png')}
@@ -490,22 +601,13 @@ const MakeReviewScreen = ({route, navigation}) => {
                         </View>
                     </View>
 
-                    <View style={{marginBottom: 26}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 14}}>
-                            <AppText style={{...styles.rateStandard, color: colors.mainColor}}>사진추가</AppText>
-                            <AppText style={{fontSize: 12, fontWeight: '400', lineHeight: 19.2, color: colors.gray[4], marginLeft: 8, marginTop: 2}}>최대 5장</AppText>
-                        </View>
-                        <TouchableOpacity>
-                            <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
-                                <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                    <SelectReviewImage />
                 </ScreenContainerView>
             </ScrollView>
             
             <ScreenContainerView>
                 <TouchableOpacity
+                    activeOpacity={0.8}
                     style={{
                         backgroundColor: ratedScore > 0 ? colors.mainColor : colors.gray[5],
                         height: 48,
@@ -595,7 +697,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -608,7 +709,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
-        elevation: 1,
         height: 28,
         alignItems: 'center',
         justifyContent: 'center'
@@ -648,12 +748,28 @@ const styles = StyleSheet.create({
         width: 128,
         height: 128,
         borderRadius: 10,
+        marginRight: 4,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
         shadowOffset: {width: 1, height: 2},
         shadowOpacity: 1,
-        elevation: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    addedPictures: {
+        width: 128,
+        height: 128,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 4
+    },
+    removeContainer: {
+        width: 128,
+        height: 128,
+        borderRadius: 10,
+        alignItems: 'flex-end',
+        marginHorizontal: 4,
+        justifyContent: 'flex-start'
     }
 });
 

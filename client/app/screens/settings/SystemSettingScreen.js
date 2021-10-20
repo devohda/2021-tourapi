@@ -13,6 +13,7 @@ import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const SystemSettingScreen = ({navigation}) => {
     const {colors} = useTheme();
@@ -20,6 +21,7 @@ const SystemSettingScreen = ({navigation}) => {
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     useEffect(() => {
         getUserData();
@@ -36,8 +38,11 @@ const SystemSettingScreen = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
@@ -67,19 +72,14 @@ const SystemSettingScreen = ({navigation}) => {
         },
         {
             index: 2,
-            title: '서비스 설정',
-            data: [{index: 1, name: '위치 서비스'}, {index: 2, name: '알림'}, {index: 3, name: '마케팅 수신 동의'}]
+            data: [{index: 1, name: '문의하기'}, {index: 2, name: '신고하기'},
+                {
+                    index: 3,
+                    name: '버전 정보 ' + appJson.expo.version
+                }]
         },
         {
             index: 3,
-            data: [{index: 1, name: '문의하기'}, {index: 2, name: '새로운 소식'}, {index: 3, name: '신고하기'},
-            {
-                index: 4,
-                name: '버전 정보 ' + appJson.expo.version
-            }]
-        },
-        {
-            index: 4,
             data: [{index: 1, name: '로그아웃'}, {index: 2, name: '회원 탈퇴하기'}]
         }
     ];

@@ -4,10 +4,23 @@ const mysql = require('mysql2');
 // READ
 // 유저 정보 조회
 exports.readUser = async (user_pk) => {
-    const query = `SELECT * FROM users 
-                   WHERE user_pk = ${user_pk}`
-    const result = await db.query(query);
-    return result;
+    const query1 = `SELECT user_nickname, user_img, user_email, 
+                           CASE WHEN apple_name IS NULL THEN 0 ELSE 1 END AS isAppleLogin FROM users 
+                    WHERE user_pk = ${user_pk}`
+
+    const query2 = `SELECT keyword_title FROM keywords k
+                    LEFT OUTER JOIN keywords_users ku
+                    ON ku.keyword_pk = k.keyword_pk
+                    WHERE ku.user_pk = ${user_pk}`;
+
+    const result1 = await db.query(query1);
+    const result2 = await db.query(query2);
+    const keywords = result2.map(keyword => keyword.keyword_title);
+
+    return {
+        ...result1[0],
+        keywords
+    };
 }
 
 // 유저 리스트 조회

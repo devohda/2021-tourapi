@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Platform, View, Image, StyleSheet, Button, TouchableOpacity, Alert, Modal, Pressable} from 'react-native';
-import {useTheme} from '@react-navigation/native';
+import {useIsFocused, useTheme} from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
 import AppText from '../../components/AppText';
@@ -10,17 +10,21 @@ import { useToken } from '../../contexts/TokenContextProvider';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
 import SettingsIcon from '../../assets/images/settings-icon.svg';
-import ReportIcon from '../../assets/images/Report.svg';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const MyPageScreen = ({navigation}) => {
     const {colors} = useTheme();
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
+    const [userKeywordData, setUserKeywordData] = useState([]);
+    const [userImage, setUserImage] = useState('');
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getUserData();
-    },[]);
+    },[isFocused]);
 
     const getUserData = () => {
         try {
@@ -33,15 +37,19 @@ const MyPageScreen = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-
                     setUserData(response.data);
+                    setUserKeywordData(response.data.keywords);
+                    setUserImage(response.data.user_img);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -50,6 +58,20 @@ const MyPageScreen = ({navigation}) => {
         } catch (err) {
             console.error(err);
         }
+    };
+
+    const UserKeyword = props => {
+        const {data} = props;
+        return (
+            <View
+                style={{
+                    ...styles.keywordHashTagView,
+                    backgroundColor: colors.backgroundColor,
+                    borderColor: colors.backgroundColor,
+                }}>
+                <AppText style={{...styles.keywordHashTag, color: colors.gray[4]}}>#{data}</AppText>
+            </View>
+        );
     };
 
     return (
@@ -62,7 +84,7 @@ const MyPageScreen = ({navigation}) => {
                 justifyContent: 'center',
             }}>
                 <View style={{position: 'absolute', right: 0}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('SystemSetting')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SystemSetting')} activeOpacity={0.8}>
                         <SettingsIcon width={24} height={24} style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -82,15 +104,24 @@ const MyPageScreen = ({navigation}) => {
                         className="profile-img-container"
                         style={{justifyContent: 'center', alignItems: 'center'}}
                     >
-                        <Image
-                            style={{
-                                width: 90,
-                                height: 90,
-                                borderRadius: 60,
-                                backgroundColor: colors.defaultColor,
-                            }}
-                            source={require('../../assets/images/here_default.png')}
-                        />
+                        {
+                            userImage === '' || userImage === 'default-user' || userImage.startsWith('../') || userImage === 'default-img' ?
+                                <Image
+                                    style={{
+                                        width: 90,
+                                        height: 90,
+                                        borderRadius: 60,
+                                        backgroundColor: colors.defaultColor,
+                                    }}
+                                    source={require('../../assets/images/default-profile.png')}
+                                /> :
+                                <Image source={{ uri: userImage }} style={{
+                                    width: 90,
+                                    height: 90,
+                                    borderRadius: 60,
+                                    backgroundColor: colors.defaultColor,
+                                }} />
+                        }
                     </View>
                     <View style={{marginTop: 4}}>
                         <AppText
@@ -105,20 +136,21 @@ const MyPageScreen = ({navigation}) => {
                             {userData.user_nickname}
                         </AppText>
                         <View
-                            style={{
+                            style={[{
                                 flexDirection: 'row',
-                                justifyContent: 'space-between',
                                 alignItems: 'center'
-                            }}
+                            }, userKeywordData.length === 1 ? {justifyContent: 'center'} : {justifyContent: 'space-between'}]}
                         >
-                            <View style={styles.myPageHashtag}>
-                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[3]}}>#조용한</AppText>
-                            </View>
-                            <View style={styles.myPageHashtag}>
-                                <AppText style={{...styles.myPageHashtagText, color: colors.gray[3]}}>#따뜻한</AppText>
-                            </View>
+                            {
+                                userKeywordData.length !== 0 &&
+                                <View style={{flexDirection: 'row', marginTop: 4}}>{
+                                    userKeywordData.map((data, idx) => (
+                                        <UserKeyword data={data} key={idx + 'user'}/>
+                                    ))
+                                }</View>
+                            }
                         </View>
-                        <TouchableOpacity style={{marginTop: 8}} onPress={()=>navigation.navigate('ProfileSetting')}>
+                        <TouchableOpacity style={{marginTop: 8}} onPress={()=>navigation.navigate('ProfileSetting', {keywords: userData.keywords, img: userData.user_img})} activeOpacity={0.8}>
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                 <View style={{...styles.editProfileButton, backgroundColor: colors.defaultColor, borderColor: colors.defaultColor, borderWidth: 1}}>
                                     <AppText style={{color: colors.gray[5], fontSize: 12, lineHeight: 19.2, paddingVertical: 2.5, paddingHorizontal: 12, fontWeight: '700'}}>
@@ -144,7 +176,18 @@ const styles = StyleSheet.create({
     myPageHashtagText: {
         fontSize: 12,
         textAlign: 'center',
-
+    },
+    keywordHashTagView: {
+        borderWidth: 1,
+        borderRadius: 27,
+        marginHorizontal: 2.5,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    keywordHashTag: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 12
     },
     editProfileButton: {
         justifyContent: 'center',
@@ -157,7 +200,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
     },
     //modal example
     centeredView: {
@@ -186,7 +228,6 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         color: 'white',
-        fontWeight: 'bold',
         textAlign: 'center',
         fontSize: 14,
         lineHeight: 22.4,

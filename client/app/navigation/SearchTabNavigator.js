@@ -11,25 +11,36 @@ import SearchCollection from '../screens/search/SearchCollection';
 import SearchUser from '../screens/search/SearchUser';
 
 import { useToken } from '../contexts/TokenContextProvider';
-import { searchPlaceResult } from '../contexts/search/SearchPlaceContextProvider';
-import { searchCollectionResult } from '../contexts/search/SearchCollectionContextProvider';
-import { searchUserResult } from '../contexts/search/SearchUserContextProvider';
 import {useIsSignedIn} from '../contexts/SignedInContextProvider';
 import * as SecureStore from 'expo-secure-store';
+import {useAlertDuplicated} from '../contexts/LoginContextProvider';
 
 
 const SearchTabNavigator = ({navigation}) => {
     const {colors} = useTheme();
     const [token, setToken] = useToken();
     const [userData, setUserData] = useState({});
-    const [searchPlace, setSearchPlace] = searchPlaceResult();
-    const [searchCollection, setSearchCollection] = searchCollectionResult();
-    const [searchUser, setSearchUser] = searchUserResult();
+    const [searchPlace, setSearchPlace] = useState(0);
+    const [searchCollection, setSearchCollection] = useState(0);
+    const [searchUser, setSearchUser] = useState(0);
+    const [userNickname, setUserNickname] = useState('');
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     useEffect(() => {
         getUserData();
     },[]);
+
+    const countPlace = (length) => {
+        setSearchPlace(length);
+    };
+
+    const countCollection = (length) => {
+        setSearchCollection(length);
+    };
+    const countUser = (length) => {
+        setSearchUser(length);
+    };
 
     const getUserData = () => {
         try {
@@ -42,14 +53,19 @@ const SearchTabNavigator = ({navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    setUserData(response.data);
+
+                    await setUserData(response.data);
+                    await setUserNickname(response.data.user_nickname);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -77,7 +93,6 @@ const SearchTabNavigator = ({navigation}) => {
                     tabBarLabelStyle: {fontSize: 16, fontWeight: '700'},
                     tabBarStyle: {
                         backgroundColor: colors.backgroundColor,
-                        elevation: 0,
                         shadowOpacity: 0,
                         justifyContent : 'center',
                         height : 56
@@ -95,9 +110,9 @@ const SearchTabNavigator = ({navigation}) => {
                 });
             }}
         >
-            <Tab.Screen name={`공간 ${searchPlace}`} children={() => <SearchPlace navigation={navigation}/>}/>
-            <Tab.Screen name={`보관함 ${searchCollection}`} children={() => <SearchCollection navigation={navigation} user={userData.user_nickname}/>}/>
-            <Tab.Screen name={`유저 ${searchUser}`} children={() => <SearchUser navigation={navigation}/>}/>
+            <Tab.Screen name={`공간 ${searchPlace}`} children={() => <SearchPlace navigation={navigation} countPlace={countPlace}/>}/>
+            <Tab.Screen name={`보관함 ${searchCollection}`} children={() => <SearchCollection navigation={navigation} user={userNickname} countCollection={countCollection}/>}/>
+            <Tab.Screen name={`유저 ${searchUser}`} children={() => <SearchUser navigation={navigation} countUser={countUser}/>}/>
         </Tab.Navigator>
     );
 };

@@ -6,11 +6,13 @@ import {
     Image,
     Modal,
     SafeAreaView,
-    FlatList
+    FlatList,
+    Alert
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { useSharedValue } from 'react-native-reanimated';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -19,17 +21,20 @@ import ScreenContainerView from '../../components/ScreenContainerView';
 import {useToken} from '../../contexts/TokenContextProvider';
 import ShowPlacesForReplace from '../collection/ShowPlacesForReplace';
 
+import Jewel from '../../assets/images/jewel.svg';
 import BackIcon from '../../assets/images/back-icon.svg';
 import MoreIcon from '../../assets/images/more-icon.svg';
-import Jewel from '../../assets/images/jewel.svg';
 
-import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import 'moment/locale/ko';
+import * as SecureStore from 'expo-secure-store';
+import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
+import DragAndDropListForReplace from './DragAndDropListForReplace';
+import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const AlternativeSpaceScreen = ({route, navigation}) => {
     const {colors} = useTheme();
-    const { data, day, postReplacement, pk, getReplacement } = route.params;
+    const { data, day, pk, getReplacement } = route.params;
     const [placeData, setPlaceData] = useState({});
     const [replacementData, setReplacementData] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
@@ -37,6 +42,9 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const isFocused = useIsFocused();
     const [token, setToken] = useToken();
     const refRBSheet = useRef();
+    const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
+    const [isSignedIn, setIsSignedIn] = useIsSignedIn();
+    const [thumbnail, setThumbnail] = useState('');
 
     const setDeletedData = (data) => {
         var newArr = [];
@@ -51,11 +59,16 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     };
 
     const checkDeletedReplacement = () => {
+        var forDeleteData = [];
         for(var i=0;i<isDeletedReplacement.length;i++) {
-            if(isDeletedReplacement[i] !== false) {
-                deleteReplacement(data.cpm_map_pk, replacementData[i].place_pk);
+            if(isDeletedReplacement[i] === true) {
+                // deleteReplacement(data.cpm_map_pk, replacementData[i].place_pk);
+                // 구분을 위함
+                forDeleteData.push(replacementData[i].place_pk);
             }
         }
+
+        return forDeleteData;
     };
 
     useEffect(() => {
@@ -63,7 +76,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         getInitialReplacementData();
         () => {
             setPlaceData({});
-        }
+        };
     }, [isFocused]);
 
     const getInitialData = () => {
@@ -76,9 +89,25 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     'x-access-token': token
                 },
             }).then((res) => res.json())
-                .then((response) => {
-                    // console.log(response.data.placeData)
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
                     setPlaceData(response.data.placeData);
+                    const res = response.data;
+                    if(res.placeData.place_img) {
+                        setThumbnail(res.placeData.place_img)
+                    } else if(res.review.review_img) {
+                        setThumbnail(res.review.review_img);
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -101,17 +130,20 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
-                    };
-                    console.log(response.data)
+                    }
                     setReplacementData(response.data);
                     setDeletedData(response.data);
-                    // getReplacement(data.cpm_map_pk);
+                    setObjects();
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -122,9 +154,70 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         }
     };
 
+    const updateReplacementData = (updatedData, deletedData) => {
+        // 공간 수정
+        var putData = []; var isEmpty = 0;
+        for(var j=0;j<replacementData.length;j++) {
+            var forPutObj = {};
+
+            //그대로면 api 안쏘도록
+            if(Object.values(updatedData[0])[j] == Object.keys(updatedData[0])[j]) isEmpty += 1;
+            if(!deletedData.filter((e)=>e === replacementData[j].place_pk).length) {
+                if(Object.keys(updatedData[0]).length === 0) {
+                    forPutObj = {
+                        cpm_map_pk: data.cpm_map_pk,
+                        placeId: replacementData[j].place_pk,
+                        order: replacementData[j].cpr_order
+                    };
+                } else {
+                    forPutObj = {
+                        cpm_map_pk: data.cpm_map_pk,
+                        placeId: replacementData[j].place_pk,
+                        order: Object.values(updatedData[0])[j]
+                    };
+                }
+                putData.push(forPutObj);
+            }
+        }
+
+        var DATA = {};
+        DATA.replacementPlaceList = putData;
+        if(isEmpty !== placeData.length) {
+            try {
+                fetch(`http://34.64.185.40/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'x-access-token': token
+                    },
+                    body: JSON.stringify(DATA),
+                }).then(res => res.json())
+                    .then(async response => {
+                        if (response.code === 405 && !alertDuplicated) {
+                            Alert.alert('', '다른 기기에서 로그인했습니다.');
+                            setAlertDuplicated(true);
+                        }
+    
+                        if (parseInt(response.code / 100) === 4) {
+                            await SecureStore.deleteItemAsync('accessToken');
+                            setToken(null);
+                            setIsSignedIn(false);
+                            return;
+                        }
+                        await getInitialReplacementData();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
-        console.log(cpmMapPk); console.log(place_pk)
         try {
             fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
@@ -133,16 +226,17 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => res.json())
+            }).then(res => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
                     getInitialReplacementData();
                 })
                 .catch((err) => {
@@ -166,14 +260,17 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 },
             }).then((res) => res.json())
                 .then(async response => {
-                    if(response.code === 401 || response.code === 403 || response.code === 419){
-                        // Alert.alert('','로그인이 필요합니다');
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
-                    console.log(response)
+
                     navigation.goBack();
                 })
                 .catch((err) => {
@@ -197,16 +294,18 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     getInitialData();
-                    getInitialReplacementData();
-                    getReplacement(data.cpm_map_pk);
-                    console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -229,16 +328,18 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 }
             }).then((res) => res.json())
                 .then(async (response) => {
-                    if (response.code === 401 || response.code === 403 || response.code === 419) {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
                         await SecureStore.deleteItemAsync('accessToken');
                         setToken(null);
                         setIsSignedIn(false);
                         return;
                     }
+
                     getInitialData();
-                    getInitialReplacementData();
-                    console.log(response);
-                    getReplacement(data.cpm_map_pk);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -269,6 +370,45 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         }
     };
 
+    
+    const GeneralPage = () => {
+        return (
+            <>
+                <SafeAreaView>
+                    <FlatList data={replacementData}
+                        renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} likeFlag={item.like_flag} navigation={navigation} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
+                        />}
+                        keyExtractor={(item, idx) => {idx.toString();}}
+                        key={(item, idx) => {idx.toString();}}
+                        nestedScrollEnabled/>
+                </SafeAreaView>
+            </>
+        );};
+
+    const setObjects = () => {
+        var newArr = [{}];
+        editData.value = newArr;
+    };
+    const editData = useSharedValue([]);
+
+    const isEdited = (data) => {
+        var newObject = [...editData.value];
+        newObject[0] = data;
+        editData.value = newObject;
+        return data;
+    };
+    
+    const EditPage = () => {
+        return (
+            <DragAndDropListForReplace
+                data={replacementData} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} isCreator={0} pk={pk} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
+                isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
+                isEdited={isEdited}
+            />
+        );
+    };
+    
     const [deleteMenu, setDeleteMenu] = useState(false);
 
     const list = [
@@ -294,36 +434,69 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }}
             style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
         >
-        <View style={styles.centeredView}>
-            <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                <View style={{marginTop: 55}}>
-                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
-                </View>
-                <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                        <TouchableOpacity onPress={() => {
+            <View style={styles.centeredView}>
+                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                    <View style={{marginTop: 35}}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>대체공간을 삭제할까요?</AppText>
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                            <TouchableOpacity onPress={() => {
                                 props.refRBSheet.current.close();
                                 setDeleteMenu(!deleteMenu);
-                        }}>
-                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                                <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => {
-                            props.refRBSheet.current.close();
-                            setDeleteMenu(!deleteMenu);
-                            deleteAllReplacement(data.cpm_map_pk);
-                        }}>
-                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
-                            </View>
-                        </TouchableOpacity>
+                            }} activeOpacity={0.8}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                props.refRBSheet.current.close();
+                                setDeleteMenu(!deleteMenu);
+                                deleteAllReplacement(data.cpm_map_pk);
+                            }} activeOpacity={0.8}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>
-        </View>
-    </Modal>
+        </Modal>
     );
+
+    const countPlaceView = (place_pk) => {
+        try {
+            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => {
+                res.json();
+            })
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
@@ -337,7 +510,10 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        navigation.goBack();}}>
+                        if(isEditSpace) setIsEditSpace(false);
+                        else navigation.goBack();}}
+                        activeOpacity={0.8}
+                        >
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
@@ -349,58 +525,57 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 <>
                     {
                         !isEditSpace ?
-                        <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
-                            <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-                                style={{flex: 1, height: '100%'}} onPress={() => {
-                                refRBSheet.current.open();
-                                }}>
-                                <MoreIcon style={{color: colors.mainColor}}/>
-                            </TouchableOpacity>
-                            <RBSheet
-                            ref={refRBSheet}
-                            closeOnDragDown={true}
-                            closeOnPressMask={true}
-                            height={180}
-                            customStyles={{
-                                wrapper: {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                                },
-                                draggableIcon: {
-                                    display: 'none'
-                                },
-                                container: {
-                                    borderTopLeftRadius: 10,
-                                    borderTopRightRadius: 10,
-                                    backgroundColor: colors.yellow[7],
-                                    paddingTop: 10
-                                }
-                            }}>
-                                {list.map((l, i) => (
-                                <TouchableOpacity onPress={()=>{
-                                    if(i === 0) {
-                                        setIsEditSpace(true);
-                                        refRBSheet.current.close();
-                                    }
-                                    if(i === 1) {
-                                        setDeleteMenu(true);
-                                    }
-                                }}>
-                                    <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
-                                        <AppText style={l.titleStyle}>{l.title}</AppText>
-                                    </View>
-                                </TouchableOpacity>
-                                ))}
-                                <DeleteModal refRBSheet={refRBSheet}/>
-                            </RBSheet>
-                        </View> :
                             <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
-                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}}
-                                    onPress={() => {
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                                    style={{flex: 1, height: '100%'}} onPress={() => {
+                                        refRBSheet.current.open();
+                                    }} activeOpacity={0.8}>
+                                    <MoreIcon style={{color: colors.mainColor}}/>
+                                </TouchableOpacity>
+                                <RBSheet
+                                    ref={refRBSheet}
+                                    closeOnDragDown={true}
+                                    closeOnPressMask={true}
+                                    height={180}
+                                    customStyles={{
+                                        wrapper: {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                        },
+                                        draggableIcon: {
+                                            display: 'none'
+                                        },
+                                        container: {
+                                            borderTopLeftRadius: 10,
+                                            borderTopRightRadius: 10,
+                                            backgroundColor: colors.yellow[7],
+                                            paddingTop: 10
+                                        }
+                                    }}>
+                                    {list.map((l, i) => (
+                                        <TouchableOpacity onPress={()=>{
+                                            if(i === 0) {
+                                                setIsEditSpace(true);
+                                                refRBSheet.current.close();
+                                            }
+                                            if(i === 1) {
+                                                setDeleteMenu(true);
+                                            }
+                                        }} activeOpacity={0.8}>
+                                            <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
+                                                <AppText style={l.titleStyle}>{l.title}</AppText>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <DeleteModal refRBSheet={refRBSheet}/>
+                                </RBSheet>
+                            </View> :
+                            <View style={[{position: 'absolute', right: 0}, !route.params.private && {display: 'none'}]}>
+                                <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} style={{flex: 1, height: '100%'}} activeOpacity={0.8}
+                                    onPress={async () => {
                                         setIsEditSpace(false);
-                                        // console.log('나 맞아용!!!!!!')
                                         isReplacementDeleted(isDeletedReplacement);
-                                        checkDeletedReplacement();
-                                        //완료를 눌렀을 경우에만 수정 삭제가 되도록...
+                                        // await checkDeletedReplacement();
+                                        await updateReplacementData(editData.value, checkDeletedReplacement());
                                     }}>
                                     <View>
                                         <AppText style={{color: colors.mainColor, fontSize: 16, lineHeight: 19.2, fontWeight: '700'}}>완료</AppText>
@@ -412,20 +587,24 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
             <ScreenContainerView>
                 <View>
                     <View style={{flexDirection: 'row', marginTop: 16, marginBottom: 4, justifyContent: 'center', alignItems: 'center'}}>
-                        <TouchableOpacity onPress={()=>navigation.navigate('Place', {data: placeData})}>
+                        <TouchableOpacity onPress={()=>{
+                            countPlaceView(data.place_pk);
+                            const item = {
+                                'place_pk': data.place_pk,
+                            };
+                            navigation.navigate('Place', {data: item});
+                        }} activeOpacity={0.8}>
                             <View style={{flexDirection: 'row', width: '100%'}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', marginEnd: 12}}>
                                     <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
                                         <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>1</AppText>
                                     </View>
                                 </View>
-                            {
-                                data.place_img ?
-                                <Image source={{uri: data.place_img}}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
-                                <Image source={require('../../assets/images/here_default.png')}
-                                style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
-                            }
+                                {
+                                    thumbnail !== '' ?
+                                        <Image style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}} source={{uri: thumbnail}}/> :
+                                        <Image style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}} source={require('../../assets/images/here_default.png')}/> 
+                                }
                                 <View style={{
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
@@ -440,29 +619,28 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                                 fontSize: 10,
                                                 fontWeight: 'bold'
                                             }}>{checkType(data.place_type)}</AppText>
-                                            <AppText style={{
-                                                marginHorizontal: 4, color: colors.gray[7],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                display: parseInt(data.review_score) == -1 && 'none'
-                                            }}>|</AppText>
-                                            <Image source={require('../../assets/images/review_star.png')}
-                                                style={{
-                                                    width: 10,
-                                                    height: 10,
-                                                    alignSelf: 'center',
-                                                    marginTop: '1%',
-                                                    display: parseInt(data.review_score) == -1 && 'none'
-                                                }}></Image>
-                                            <AppText style={{
-                                                color: colors.gray[3],
-                                                textAlign: 'center',
-                                                fontSize: 10,
-                                                fontWeight: 'bold',
-                                                marginLeft: 2,
-                                                display: parseInt(data.review_score) == -1 && 'none'
-                                            }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                            <View style={[{flexDirection: 'row'}, parseInt(data.review_score) == -1 && {display: 'none'}]}>
+                                                <AppText style={{
+                                                    marginHorizontal: 4, color: colors.gray[7],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                }}>|</AppText>
+                                                <Image source={require('../../assets/images/review_star.png')}
+                                                    style={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        alignSelf: 'center',
+                                                        marginTop: '1%',
+                                                    }}></Image>
+                                                <AppText style={{
+                                                    color: colors.gray[3],
+                                                    textAlign: 'center',
+                                                    fontSize: 10,
+                                                    fontWeight: 'bold',
+                                                    marginLeft: 2,
+                                                }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                            </View>
                                         </View>
                                         <View style={{width: '100%'}}>
                                             <AppText style={{
@@ -480,12 +658,12 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         </TouchableOpacity>
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
                             <TouchableOpacity onPress={() => {
-                                    if (placeData.like_flag) {
-                                        DeleteLikedPlace(placeData.place_pk);
-                                    } else {
-                                        LikePlace(placeData.place_pk);
-                                    }
-                                }}>
+                                if (placeData.like_flag) {
+                                    DeleteLikedPlace(placeData.place_pk);
+                                } else {
+                                    LikePlace(placeData.place_pk);
+                                }
+                            }} activeOpacity={0.8}>
                                 <Jewel width={26} height={21}
                                     style={{color: placeData.like_flag ? colors.red[3] : colors.red_gray[5]}}/>
                             </TouchableOpacity>
@@ -504,23 +682,21 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                                 style={{fontWeight: '700'}}>{replacementData.length}개</AppText> 대체공간</AppText>
                         </View>
                         <TouchableOpacity onPress={()=>{
-                            navigation.navigate('SearchForAdd', {pk: data.cpm_map_pk, placeData: data, day : day, replace: true, postReplacement: postReplacement});
-                        }} style={!route.params.private && {display: 'none'}}>
+                            navigation.navigate('SearchForAdd', {pk: pk, placeData: data, day : day, replace: true});
+                        }} style={(!route.params.private || isEditSpace) && {display: 'none'}} activeOpacity={0.8}>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                 <Icon type="ionicon" name={'add-outline'} size={18} color={colors.mainColor} />
-                                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
+                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700'}}>공간 추가하기</AppText>
                             </View>
                         </TouchableOpacity>
                     </View>
                     <SafeAreaView>
                         <SafeAreaView>
-                                <FlatList data={replacementData}
-                                    renderItem={({item, index}) => <ShowPlacesForReplace item={item} index={index} key={index} isEditPage={isEditSpace} length={placeData.length} navigation={navigation} private={0} pk={pk} likeFlag={item.like_flag} getInitialReplacementData={getInitialReplacementData} getInitialData={getInitialData}
-                                    isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement}
-                                    />}
-                                    keyExtractor={(item, idx) => {idx.toString();}}
-                                    key={(item, idx) => {idx.toString();}}
-                                    nestedScrollEnabled/>
+                            {
+                                !isEditSpace ?
+                                    <GeneralPage /> :
+                                    <EditPage />
+                            }
                         </SafeAreaView>
                     </SafeAreaView>
                 </View>
@@ -528,7 +704,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         </ScreenContainer>
     );
 };
-
 
 const styles = StyleSheet.create({
     titles: {
@@ -549,7 +724,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowOpacity: 0.1,
         shadowOffset: {width: 0, height: 1},
-        elevation: 1
     },
     dirFreeText: {
         fontSize: 12,
@@ -618,7 +792,6 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         color: 'white',
-        fontWeight: 'bold',
         textAlign: 'center',
         fontSize: 14,
         lineHeight: 22.4,
@@ -675,7 +848,6 @@ const styles = StyleSheet.create({
             height: 6
         },
         shadowOpacity: 0.25,
-        elevation: 1,
         shadowColor: 'rgba(203, 180, 180, 0.3)',
     }
 });

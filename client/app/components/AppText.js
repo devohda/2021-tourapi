@@ -46,7 +46,7 @@ const AppText = (props) => {
               style={{
                   ...props.style,
                   fontFamily: fontFamily,
-              }}>{props.children}
+              }} numberOfLines={props.numberOfLines}>{props.children}
         </Text>
     )
 }

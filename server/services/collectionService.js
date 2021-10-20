@@ -1,6 +1,7 @@
 const db = require('../database/database');
 const mysql = require('mysql2');
 const {files} = require("yarn/lib/cli");
+const {map} = require("twilio/lib/base/serialize");
 
 // 자유 보관함 생성
 exports.createFreeCollection = async (user_pk, collectionData) => {
@@ -18,10 +19,6 @@ exports.createFreeCollection = async (user_pk, collectionData) => {
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
 
-        // 보관함 수정 권한
-        const query2 = `INSERT INTO collection_user_map (collection_pk, user_pk) 
-                        VALUES (${collection_pk}, ${user_pk})`;
-        const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
         if (collectionData.keywords.length > 0) {
@@ -69,10 +66,6 @@ exports.createPlanCollection = async (user_pk, collectionData) => {
 
         const [result1] = await conn.query(query1);
         const collection_pk = result1.insertId;
-
-        // 보관함 수정 권한 추가
-        const query2 = `INSERT INTO collection_user_map (collection_pk, user_pk) VALUES (${collection_pk}, ${user_pk})`;
-        const result2 = await conn.query(query2);
 
         // 보관함-키워드 매핑
         if (collectionData.keywords.length > 0) {
@@ -138,7 +131,7 @@ exports.createCollectionPlaceReplacement = async (cpm_map_pk, place_pk, cpr_orde
 
 // 보관함 공간에 한줄평 생성
 exports.createCollectionPlaceComment = async (cpm_map_pk, cpc_comment) => {
-    const query = `INSERT INTO collection_place_comment (cpm_map_pk, cpc_comment)
+    const query = `INSERT IGNORE INTO collection_place_comment (cpm_map_pk, cpc_comment)
                    VALUES (${cpm_map_pk}, ${mysql.escape(cpc_comment)})`;
     const result = await db.query(query);
     return result;
@@ -177,11 +170,17 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                       FROM collections c
                       INNER JOIN users u
                       ON u.user_pk = c.user_pk
-                      LEFT OUTER JOIN (SELECT collection_pk, COUNT(*) AS place_cnt FROM collection_place_map GROUP BY collection_pk) cpm
+                      LEFT OUTER JOIN (
+                          SELECT collection_pk, COUNT(*) AS place_cnt 
+                          FROM collection_place_map
+                          WHERE place_pk > 0
+                          GROUP BY collection_pk
+                      ) cpm
                       ON cpm.collection_pk = c.collection_pk
                       LEFT OUTER JOIN (
                           SELECT collection_pk, COUNT(*) AS like_cnt 
                           FROM like_collection 
+                          WHERE (like_time > DATE_SUB(now(), INTERVAL ${day} DAY))
                           GROUP BY collection_pk
                       ) lc
                       ON lc.collection_pk = c.collection_pk
@@ -192,34 +191,34 @@ exports.readCollectionList = async (user_pk, type, sort, keyword, term) => {
                           GROUP BY collection_pk
                       ) vc
                       ON vc.collection_pk = c.collection_pk
+                      WHERE
                       `
 
-        if (type === 'MY' || keyword) {
-            query1 += ' WHERE';
+        if (type === 'MY') {
+            query1 += ` c.user_pk = ${user_pk}`;
+        } else {
+            query1 += ` c.collection_private = 0`;
+        }
 
-            if (keyword) {
-                query1 += ` collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
-            }
-            if (type === 'MY') {
-                query1 += ` c.user_pk = ${user_pk}`;
-            }
+        if (keyword) {
+            query1 += ` AND collection_name LIKE ${mysql.escape(`%${keyword}%`)}`;
         }
 
         switch (sort) {
             case 'RESENT':
-                query1 += ' ORDER BY c.collection_pk DESC';
+                query1 += ' ORDER BY c.collection_pk DESC, like_cnt DESC, view_cnt DESC';
                 break;
             case 'OLD':
-                query1 += ' ORDER BY c.collection_pk ASC';
+                query1 += ' ORDER BY c.collection_pk ASC, like_cnt DESC, view_cnt DESC';
                 break;
             case 'LIKE':
-                query1 += ' ORDER BY like_cnt DESC, c.collection_pk DESC';
+                query1 += ' ORDER BY like_cnt DESC, view_cnt DESC, c.collection_pk DESC';
                 break;
             case 'POPULAR':
-                query1 += ' ORDER BY view_cnt DESC, c.collection_pk DESC';
+                query1 += ' ORDER BY view_cnt DESC, like_cnt DESC, c.collection_pk DESC';
                 break
             default:
-                query1 += ' ORDER BY c.collection_pk DESC';
+                query1 += ' ORDER BY c.collection_pk DESC, like_cnt DESC, view_cnt DESC';
         }
 
         if (type === 'MAIN') {
@@ -315,35 +314,68 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
     // 장소 정보 & 장소 좋아요 상태
 
-    const query = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_type, cpm_order, 
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
-                          cpc_comment AS comment, IFNULL(review_score, -1) AS review_score
-                   FROM collection_place_map cpm
-                   LEFT OUTER JOIN places p
-                   ON p.place_pk = cpm.place_pk
-                   LEFT OUTER JOIN like_place lp
-                   ON lp.place_pk = cpm.place_pk
-                   AND lp.user_pk = ${user_pk}
-                   LEFT OUTER JOIN (
-                       SELECT cpm_map_pk, COUNT(*) AS replacement_cnt
-                       FROM collection_place_replacement
-                       GROUP BY cpm_map_pk
-                   ) cpr
-                   ON cpr.cpm_map_pk = cpm.cpm_map_pk
-                   LEFT OUTER JOIN collection_place_comment cpc
-                   ON cpc.cpm_map_pk = cpm.cpm_map_pk
-                   LEFT OUTER JOIN (
-                       SELECT place_pk, AVG(review_score) AS review_score
-                       FROM place_reviews
-                       GROUP BY place_pk
-                   ) pr
-                   ON pr.place_pk = p.place_pk
-                   WHERE collection_pk = ${collection_pk}
-                   ORDER BY cpm_plan_day ASC, cpm_order ASC`;
+    const query1 = `SELECT cpm.cpm_map_pk, cpm_plan_day, cpm.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, place_mapy AS place_latitude, place_mapx AS place_longitude, cpm_order, 
+                           CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(replacement_cnt, 0) AS replacement_cnt,
+                           cpc_comment AS comment, IFNULL(review_score, -1) AS review_score, pri_review_img AS review_img
+                    FROM collection_place_map cpm
+                    LEFT OUTER JOIN places p
+                    ON p.place_pk = cpm.place_pk
+                    LEFT OUTER JOIN like_place lp
+                    ON lp.place_pk = cpm.place_pk
+                    AND lp.user_pk = ${user_pk}
+                    LEFT OUTER JOIN (
+                        SELECT cpm_map_pk, COUNT(*) AS replacement_cnt
+                        FROM collection_place_replacement
+                        GROUP BY cpm_map_pk
+                    ) cpr
+                    ON cpr.cpm_map_pk = cpm.cpm_map_pk
+                    LEFT OUTER JOIN collection_place_comment cpc
+                    ON cpc.cpm_map_pk = cpm.cpm_map_pk
+                    LEFT OUTER JOIN (
+                        SELECT place_pk, AVG(review_score) AS review_score
+                        FROM place_reviews
+                        GROUP BY place_pk
+                    ) pr
+                    ON pr.place_pk = p.place_pk
+                    LEFT OUTER JOIN (
+                        SELECT place_pk, pri_review_img
+                        FROM (SELECT place_pk
+                                   , pri_review_img
+                                   , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                   , @cd := place_pk
+                                FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                   , (SELECT @cd := '', @rn := 0) b
+                              ) a
+                        WHERE rn <= 1
+                    ) pri
+                    ON pri.place_pk = p.place_pk
+                    WHERE collection_pk = ${collection_pk}
+                    ORDER BY cpm_plan_day ASC, cpm_order ASC`;
 
-    const result = await db.query(query);
+    // const query2 = `SELECT cpm.cpm_map_pk, cpm_plan_day, place_mapy AS place_latitude, place_mapx AS place_longitude
+    //                 FROM collection_place_map cpm
+    //                 LEFT OUTER JOIN places p
+    //                 ON p.place_pk = cpm.place_pk
+    //                 WHERE collection_pk = ${collection_pk}
+    //                 AND p.place_pk > 0
+    //                 ORDER BY cpm_plan_day ASC, cpm_order ASC`;
+
+    const result1 = await db.query(query1);
+    // const result2 = await db.query(query2);
+    // const mapData = {}
+    // for (const data of result2) {
+    //     if (mapData[data.cpm_plan_day]) {
+    //         mapData[data.cpm_plan_day].push({place_latitude: data.place_latitude, place_longitude: data.place_longitude})
+    //     } else {
+    //         mapData[data.cpm_plan_day] = [{place_latitude: data.place_latitude, place_longitude: data.place_longitude}]
+    //     }
+    // }
+
+    const result = {
+        placeList : result1,
+    }
+
     return result;
-
 };
 
 // 보관함 댓글 리스트
@@ -359,8 +391,8 @@ exports.readCollectionCommentList = async (collection_pk) => {
 
 // 보관함 대체 공간 리스트
 exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
-    const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_type, cpr_order,
-                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score
+    const query = `SELECT cpr_pk, cpr.place_pk, place_name, place_addr, place_img, place_thumbnail, place_type, cpr_order,
+                          CASE WHEN like_pk IS NULL THEN 0 ELSE 1 END AS like_flag, IFNULL(review_score, -1) AS review_score, pri_review_img AS review_img
                    FROM collection_place_replacement cpr
                    INNER JOIN places p
                    ON cpr.place_pk = p.place_pk
@@ -373,6 +405,18 @@ exports.readCollectionPlaceReplacement = async (user_pk, cpm_map_pk) => {
                        GROUP BY place_pk
                    ) pr
                    ON pr.place_pk = cpr.place_pk
+                   LEFT OUTER JOIN (
+                       SELECT place_pk, pri_review_img
+                       FROM (SELECT place_pk
+                                  , pri_review_img
+                                  , @rn := CASE WHEN @cd = place_pk THEN @rn + 1 ELSE 1 END rn
+                                  , @cd := place_pk
+                               FROM (SELECT * FROM place_review_img ORDER BY place_pk ASC, pri_pk DESC) a
+                                  , (SELECT @cd := '', @rn := 0) b
+                             ) a
+                       WHERE rn <= 1
+                   ) pri
+                   ON pri.place_pk = p.place_pk
                    WHERE cpm_map_pk = ${cpm_map_pk}
                    ORDER BY cpr_order ASC
                    `
@@ -398,7 +442,7 @@ exports.updateCollection = async (collection_pk, collectionData) => {
                         WHERE collection_pk = ${collection_pk}`;
         const [result2] = await conn.query(query2);
 
-        for(const keyword_pk of collectionData.keywords){
+        for (const keyword_pk of collectionData.keywords) {
             const query3 = `INSERT INTO keywords_collections_map (collection_pk, keyword_pk)
                             VALUES (${collection_pk}, ${keyword_pk})`;
             const [result3] = await conn.query(query3);
@@ -456,14 +500,14 @@ exports.updateCollectionPlaceReplacement = async (cpm_map_pk, replacementPlaceLi
     const conn = await db.pool.getConnection();
     let result = false;
 
-    try{
+    try {
         await conn.beginTransaction();
 
         const query1 = `DELETE FROM collection_place_replacement
                         WHERE cpm_map_pk = ${cpm_map_pk}`;
         await conn.query(query1);
 
-        for(const replacePlace of replacementPlaceList){
+        for (const replacePlace of replacementPlaceList) {
             const query2 = `INSERT INTO collection_place_replacement (cpm_map_pk, place_pk, cpr_order)
                             VALUES (${replacePlace.cpm_map_pk}, ${replacePlace.placeId}, ${replacePlace.order})`;
             await conn.query(query2);
