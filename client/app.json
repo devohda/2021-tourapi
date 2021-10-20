@@ -27,9 +27,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.8.1",
+      "buildNumber": "0.8.2",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
       },
