@@ -1,6 +1,6 @@
 //전역 선언 방법 찾아보기
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, TouchableOpacity, View, Dimensions, Text, onError, Alert} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, Dimensions, Text, onError, Alert, Platform} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
@@ -11,6 +11,7 @@ import AppText from '../../components/AppText';
 import MainBoxIcon from '../../assets/images/login/main_box_icon.svg';
 import AppleLogo from '../../assets/images/login/apple.svg';
 import KakaotalkLogo from '../../assets/images/login/kakaotalk.svg';
+import Jewel from '../../assets/images/jewel.svg';
 
 import * as SecureStore from 'expo-secure-store';
 import * as AppleAuthentication from 'expo-apple-authentication';
@@ -117,17 +118,17 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                         <AppText style={{fontSize: 28, color: colors.mainColor}}>채워볼까요?</AppText>
                     </View>
                 </View>
-                <View flex={1} style={{marginTop: 50}}>
+                <View flex={1} style={{marginTop: 25}}>
                     <View style={{alignItems: 'center'}}>
-                        <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}} activeOpacity={0.8}>
+                        {/* <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: '#FEE500'}} activeOpacity={0.8}>
                             <KakaotalkLogo width={23} height={23}/>
                             <AppText style={{...styles.loginText}}>카카오로 계속하기</AppText>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <AppleAuthentication.AppleAuthenticationButton
                             buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                             buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
                             cornerRadius={10}
-                            style={{width: '100%', height: 52, marginVertical: 8}}
+                            style={{width: '100%', height: 52, marginVertical: 16, fontSize: 16}}
                             onPress={
                                 async () => {
                                     try {
@@ -167,13 +168,14 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
                                         }
                                     }
                                 }}
+                            disabled={Platform.OS === 'ios' ? false : true}
                         />
                     </View>
-                    <View style={{flexDirection: 'row', marginTop: 24, alignSelf: 'center', alignContent: 'stretch'}}>
-                        <TouchableOpacity onPress={() => navigation.navigate('SignInEmail')} style={{marginRight: 29}} activeOpacity={0.8}>
-                            <AppText>이메일로 로그인</AppText>
-                        </TouchableOpacity>
-                        <AppText style={{marginRight: 29, color: colors.gray[8]}}>|</AppText>
+                    <TouchableOpacity style={{...styles.socialLoginBtn, backgroundColor: colors.blue[2], borderColor: colors.backgroundColor}} activeOpacity={0.8} onPress={() => navigation.navigate('SignInEmail')} >
+                        <Jewel width={23} height={23} color={colors.red[3]}/>
+                        <AppText style={{...styles.loginText, color: colors.defaultColor}}>이메일로 로그인</AppText>
+                    </TouchableOpacity>
+                    <View style={{flexDirection: 'row', marginTop: 22, alignSelf: 'center', alignContent: 'stretch'}}>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUpEmail')} activeOpacity={0.8}>
                             <AppText>이메일 회원가입</AppText>
                         </TouchableOpacity>
@@ -187,8 +189,9 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
 const styles = StyleSheet.create({
     loginText: {
         textAlign: 'center',
-        padding: 14,
-        fontSize: 16,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
+        fontSize: 18,
         fontWeight: '700',
     },
     socialLoginBtn: {

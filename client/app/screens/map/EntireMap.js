@@ -35,8 +35,8 @@ const EntireMap = ({route, navigation}) => {
     const {title, placeData, type, pk} = route.params;
     const [myLocations, setMyLocations] = myLocation();
     const [region, setRegion] = useState({
-        latitude: Number(parseFloat(placeData[0].place_latitude).toFixed(10)),
-        longitude: Number(parseFloat(placeData[0].place_longitude).toFixed(10)),
+        latitude: 37.56633546113615,
+        longitude: 126.9779482762618,
         latitudeDelta: 2,
         longitudeDelta: 2,
     });
@@ -66,6 +66,14 @@ const EntireMap = ({route, navigation}) => {
                 setMyLocations(loc);
             }
         })();
+        if(placeData.length) {
+            const newRegion = { ...region };
+    
+            newRegion.latitude = Number(parseFloat(placeData[0].place_latitude).toFixed(10));
+            newRegion.longitude = Number(parseFloat(placeData[0].place_longitude).toFixed(10));
+    
+            setRegion(newRegion);
+        }
     }, [myLocations]);
 
     const countPlaceView = (place_pk) => {

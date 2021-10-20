@@ -891,6 +891,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 1,
         shadowRadius: 6,
+        elevation: 1,
         marginRight: 12,
         marginTop: 20
     },

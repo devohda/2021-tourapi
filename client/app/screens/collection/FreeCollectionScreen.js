@@ -207,9 +207,11 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     setDeletedData(response.data.placeList);
 
                     const newRegion = { ...region };
-                    newRegion.latitude = Number(parseFloat(response.data.placeList[0].place_latitude).toFixed(10));
-                    newRegion.longitude = Number(parseFloat(response.data.placeList[0].place_longitude).toFixed(10));
-                
+                    if(response.data.placeList.length > 0) {
+                        newRegion.latitude = Number(parseFloat(response.data.placeList[0].place_latitude).toFixed(10));
+                        newRegion.longitude = Number(parseFloat(response.data.placeList[0].place_longitude).toFixed(10));
+                    }
+
                     setRegion(newRegion);
 
                 })
@@ -1060,6 +1062,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
             </View>
         );
     };
+
     const ShowMarkers = props => {
         const { data, idx } = props;
 
@@ -1272,13 +1275,16 @@ const FreeCollectionScreen = ({route, navigation}) => {
                             tracksViewChanges={false}
                             onMarkerPress={onMarkerPress}
                         >
-                            {
+                            { placeData.length > 0 &&
                             placeData.map((data, idx) => (
                                 <ShowMarkers data={data} idx={idx} key={idx}/>
                             ))
                             }
                         </MapView>
-                        <EntireButton />
+                        {
+                            placeData.length > 0 &&
+                            <EntireButton />
+                        }
                     </View>
                 </View>
 

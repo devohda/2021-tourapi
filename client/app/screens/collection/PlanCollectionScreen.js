@@ -169,18 +169,22 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
 
                     setCollectionData(response.data);
-                    setStartDate(response.data.collection_start_date.split('T')[0]);
-                    setEndDate(response.data.collection_end_date.split('T')[0]);
+                    if(response.data.collection_start_date) setStartDate(response.data.collection_start_date.split('T')[0]);
+                    if(response.data.collection_end_date) setEndDate(response.data.collection_end_date.split('T')[0]);
                     setKeywords(response.data.keywords);
 
-                    var gap = moment(response.data.collection_end_date.split('T')[0]).diff(moment(response.data.collection_start_date.split('T')[0]), 'days');
                     var newArr = [];
-                    for(var i=0;i<=gap;i++) {
-                        newArr.push({
-                            id: i,
-                            days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
-                        });
+
+                    if(response.data.collection_start_date && response.data.collection_end_date) {
+                        var gap = moment(response.data.collection_end_date.split('T')[0]).diff(moment(response.data.collection_start_date.split('T')[0]), 'days');
+                        for(var i=0;i<=gap;i++) {
+                            newArr.push({
+                                id: i,
+                                days: moment(response.data.collection_start_date.split('T')[0]).add(i, 'd').format('YYYY.MM.DD')
+                            });
+                        }
                     }
+
                     setPlanDays(newArr);
                     setObjects(newArr);
                     setFalse(newArr);
@@ -241,9 +245,10 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     setEditedLocationData(newArr);
 
                     const newRegion = { ...region };
-                    newRegion.latitude = Number(parseFloat(newArr[0].place_latitude).toFixed(10));
-                    newRegion.longitude = Number(parseFloat(newArr[0].place_longitude).toFixed(10));
-
+                    if(newArr.length > 0) {
+                        newRegion.latitude = Number(parseFloat(newArr[0].place_latitude).toFixed(10));
+                        newRegion.longitude = Number(parseFloat(newArr[0].place_longitude).toFixed(10));
+                    }
                     setRegion(newRegion);
 
                 })
@@ -1462,20 +1467,22 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
                 <View style={{marginTop: 20}} flex={1}>
                     <View flex={1}>
-                        <MapView style={{width: Dimensions.get('window').width, height: 175, flex: 1, alignItems: 'center'}}
+                        <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
                             region={region}
                             moveOnMarkerPress
                             tracksViewChanges={false}
                             onMarkerPress={onMarkerPress}
                         >
-                            {
-                            placeData.map((data, idx) => (
-                                data.place_pk !== -1 && data.place_pk !== -2 &&
+                            { editedLocationData.length > 0 &&
+                            editedLocationData.map((data, idx) => (
                                 <ShowMarkers data={data} idx={idx} key={idx}/>
                             ))
                             }
                         </MapView>
-                        <EntireButton />
+                        {
+                            editedLocationData.length > 0 &&
+                            <EntireButton />
+                        }
                     </View>
                 </View>
 
