@@ -41,31 +41,12 @@ const EntireMap = ({route, navigation}) => {
         longitudeDelta: 2,
     });
     const [visible, setVisible] = useState(false);
-    const [myLocationVisible, setMyLocationVisible] = useState(false);
     const [curReviewScore, setCurReviewScore] = useState(0);
     const [currentData, setCurrentData] = useState({});
     const [errorMsg, setErrorMsg] = useState(null);
     const [token, setToken] = useToken();
 
     useEffect(() => {
-        (async () => {
-            if (!myLocations) {
-                if (Platform.OS === 'android' && !Constants.isDevice) {
-                    setErrorMsg(
-                        'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-                    );
-                    return;
-                }
-                let {status} = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    setErrorMsg('Permission to access location was denied');
-                    return;
-                }
-
-                let loc = await Location.getCurrentPositionAsync({});
-                setMyLocations(loc);
-            }
-        })();
         if(placeData.length) {
             const newRegion = { ...region };
     
@@ -74,7 +55,7 @@ const EntireMap = ({route, navigation}) => {
     
             setRegion(newRegion);
         }
-    }, [myLocations]);
+    }, []);
 
     const countPlaceView = (place_pk) => {
         try {
@@ -115,6 +96,8 @@ const EntireMap = ({route, navigation}) => {
     
         newRegion.latitude = coordinate.latitude;
         newRegion.longitude = coordinate.longitude;
+        newRegion.latitudeDelta = 0.015;
+        newRegion.longitudeDelta = 0.015;
 
         setRegion(newRegion);
 
@@ -124,9 +107,7 @@ const EntireMap = ({route, navigation}) => {
 
         setCurrentData(currentInfo);
         setCurReviewScore(parseFloat(currentData.review_score).toFixed(2));
-        if (myLocations !== null) {
-            if (!(newRegion.latitude === myLocations.coords.latitude && newRegion.longitude === myLocations.coords.longitude)) setVisible(true);
-        } else setVisible(true);
+        setVisible(!visible);
     };
 
     const checkType = (type) => {
@@ -189,19 +170,6 @@ const EntireMap = ({route, navigation}) => {
                             </AppText>
                         </View>
                     </View>
-                </View>
-            </Marker>
-        );
-    };
-
-    const ShowMyMarkers = () => {
-        return (
-            <Marker coordinate={{
-                latitude: myLocations.coords.latitude,
-                longitude: myLocations.coords.longitude
-            }} style={{width: 100, height: 100}}>
-                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <CustomMyMarker/>
                 </View>
             </Marker>
         );
@@ -338,26 +306,6 @@ const EntireMap = ({route, navigation}) => {
         );
     };
 
-    const GetMyLocationButton = () => {
-        return (
-            <View style={{position: 'absolute', right: 10, bottom: visible ? 153 : 10}}>
-                <TouchableOpacity onPress={() => {
-
-                    setMyLocationVisible(!myLocationVisible);
-                    const newRegion = {...region};
-
-                    newRegion.latitude = myLocations.coords.latitude;
-                    newRegion.longitude = myLocations.coords.longitude;
-
-                    setRegion(newRegion);
-                }} activeOpacity={0.8}>
-                    <Image source={require('../../assets/images/map/search-location-button.png')}
-                           style={{width: 50, height: 50}}/>
-                </TouchableOpacity>
-            </View>
-        );
-    };
-
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title={title}/>
@@ -373,16 +321,11 @@ const EntireMap = ({route, navigation}) => {
             >
                 {
                     placeData.map((data, idx) => (
+                        ((type === 1 && data.place_pk !== -1 && data.place_pk !== -2) || type === 0) &&
                         <ShowMarkers data={data} idx={idx} key={idx}/>
                     ))
                 }
-                {myLocations !== null && myLocationVisible &&
-                <ShowMyMarkers/>
-                }
             </MapView>
-            {myLocations !== null &&
-            <GetMyLocationButton/>
-            }
             {visible &&
             <ShowInfos/>
             }
