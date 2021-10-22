@@ -93,9 +93,7 @@ const ShowRecommendPlace = props => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);

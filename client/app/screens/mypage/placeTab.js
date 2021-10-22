@@ -8,8 +8,8 @@ import AppText from '../../components/AppText';
 import {Icon} from 'react-native-elements';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
-import { useToken } from '../../contexts/TokenContextProvider';
-import { useIsFocused } from '@react-navigation/native';
+import {useToken} from '../../contexts/TokenContextProvider';
+import {useIsFocused} from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import {useIsSignedIn} from '../../contexts/SignedInContextProvider';
 
@@ -45,7 +45,7 @@ const PlaceTab = ({navigation}) => {
         setShowMenu(false);
         setCurrentMenu('최근 추가순');
     }, [isFocused]);
-    
+
     const getLikedPlace = (NOW) => {
         try {
             fetch(`http://34.64.185.40/like/placeList?sort=${NOW}`, {
@@ -67,19 +67,19 @@ const PlaceTab = ({navigation}) => {
                         setIsSignedIn(false);
                         return;
                     }
-                    
+
                     setPlaceList(response.data);
 
                     var newArr = [];
                     const res = response.data;
-                    for(var i=0;i<res.length;i++) {
-                        if(res[i].place_img) {
+                    for (var i = 0; i < res.length; i++) {
+                        if (res[i].place_img) {
                             newArr.push(res[i].place_img);
-                        } else if(res[i].place_thumbnail) {
+                        } else if (res[i].place_thumbnail) {
                             newArr.push(res[i].place_thumbnail);
-                        } else if(res[i].review_img) {
+                        } else if (res[i].review_img) {
                             newArr.push(res[i].review_img);
-                        } else{
+                        } else {
                             newArr.push('');
                         }
                     }
@@ -88,7 +88,7 @@ const PlaceTab = ({navigation}) => {
                 .catch((err) => {
                     console.error(err);
                 });
-    
+
         } catch (err) {
             console.error(err);
         }
@@ -121,7 +121,7 @@ const PlaceTab = ({navigation}) => {
                 .catch((err) => {
                     console.error(err);
                 });
-    
+
         } catch (err) {
             console.error(err);
         }
@@ -136,9 +136,7 @@ const PlaceTab = ({navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -169,9 +167,7 @@ const PlaceTab = ({navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -282,7 +278,7 @@ const PlaceTab = ({navigation}) => {
 
     const SetRenderings = (i) => {
         setCurrentRendering(i);
-        if(i === 0) {
+        if (i === 0) {
             getLikedPlace('RESENT');
         } else {
             getLikedCollection('RESENT');
@@ -297,12 +293,16 @@ const PlaceTab = ({navigation}) => {
                 <TouchableOpacity
                     activeOpacity={0.8}
                     style={type.isClicked ?
-                        {...styles.selectTypeClicked, borderColor: colors.mainColor,
+                        {
+                            ...styles.selectTypeClicked, borderColor: colors.mainColor,
                             backgroundColor: colors.mainColor,
-                            shadowColor: colors.red[7]} :
-                        {...styles.selectType, borderColor: colors.defaultColor,
+                            shadowColor: colors.red[7]
+                        } :
+                        {
+                            ...styles.selectType, borderColor: colors.defaultColor,
                             backgroundColor: colors.defaultColor,
-                            shadowColor: colors.red[7]}}
+                            shadowColor: colors.red[7]
+                        }}
                     onPress={() => {
                         // 클릭하면 색 바꾸기
                         setDirectoryType(dirType => dirType.map(
@@ -319,41 +319,50 @@ const PlaceTab = ({navigation}) => {
                     }}
                 >
                     <AppText
-                        style={type.isClicked ? {...styles.selectTypeTextClicked, color: colors.defaultColor} : {...styles.selectTypeText, color: colors.subColor}}>{type.name}</AppText>
+                        style={type.isClicked ? {
+                            ...styles.selectTypeTextClicked,
+                            color: colors.defaultColor
+                        } : {...styles.selectTypeText, color: colors.subColor}}>{type.name}</AppText>
                 </TouchableOpacity>
             </View>
         );
     };
 
     const SetRendering = () => {
-        if(currentRendering) return (
+        if (currentRendering) return (
             <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-                showsVerticalScrollIndicator={false}
-                style={{zIndex: 0}}
-                data={collectionList} renderItem={CollectionContainer}
-                keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled />
+                      showsVerticalScrollIndicator={false}
+                      style={{zIndex: 0}}
+                      data={collectionList} renderItem={CollectionContainer}
+                      keyExtractor={(item) => item.collection_pk.toString()} nestedScrollEnabled/>
         );
         else return (
             <FlatList contentContainerStyle={{justifyContent: 'space-between'}} numColumns={2}
-                showsVerticalScrollIndicator={false}
-                data={placeList} renderItem={PlaceContainer}
-                keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
+                      showsVerticalScrollIndicator={false}
+                      data={placeList} renderItem={PlaceContainer}
+                      keyExtractor={(item) => item.place_pk.toString()} nestedScrollEnabled/>
         );
     };
 
     const PlaceContainer = ({item, index}) => (
-        <TouchableOpacity style={{...styles.placeContainer, shadowColor: colors.red_gray[6], backgroundColor: colors.backgroundColor, zIndex: 9999}} onPress={() => {
+        <TouchableOpacity style={{
+            ...styles.placeContainer,
+            shadowColor: colors.red_gray[6],
+            backgroundColor: colors.backgroundColor,
+            zIndex: 9999
+        }} onPress={() => {
             countPlaceView(item.place_pk);
             const data = {
                 'place_pk': item.place_pk,
             };
-            navigation.navigate('Place', {data : data});
+            navigation.navigate('Place', {data: data});
         }} activeOpacity={0.8}>
             <View style={{overflow: 'hidden', borderRadius: 10, marginHorizontal: 4}}>
                 {
                     thumbnail[index] !== '' ?
                         <Image style={styles.defaultPlaceImage} source={{uri: thumbnail[index]}}/> :
-                        <Image style={styles.defaultPlaceImage} source={require('../../assets/images/here_default.png')}/> 
+                        <Image style={styles.defaultPlaceImage}
+                               source={require('../../assets/images/here_default.png')}/>
                 }
                 <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 113, position: 'absolute'}}>
                     <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
@@ -361,7 +370,7 @@ const PlaceTab = ({navigation}) => {
                             DeleteLikedPlace(item.place_pk);
                         }} activeOpacity={0.8}>
                             <Jewel width={26} height={21}
-                                style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
+                                   style={{marginTop: 10, marginRight: 10, color: colors.red[3]}}/>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -376,8 +385,11 @@ const PlaceTab = ({navigation}) => {
                             <AppText style={{color: colors.mainColor, fontSize: 11, marginHorizontal: 6}}>|</AppText>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                 <Image source={require('../../assets/images/here_icon.png')}
-                                    style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
-                                <AppText style={{color: colors.mainColor, fontSize: 10}}>{parseFloat(item.review_score).toFixed(2)}</AppText>
+                                       style={{width: 11.36, height: 9.23, marginTop: 2, marginRight: 3.24}}></Image>
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 10
+                                }}>{parseFloat(item.review_score).toFixed(2)}</AppText>
                             </View>
                         </View>
                     </View>
@@ -435,66 +447,83 @@ const PlaceTab = ({navigation}) => {
     ]);
 
     const setBGColor = (thumbnail) => {
-        if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
-        else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
-        else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
-        else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
+        if (thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
+        else if (thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
+        else if (thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
+        else if (thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
+        else if (thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
     };
 
     const ShowThumbnail = props => {
-        const { thumbnail } = props;
-        if(thumbnail.startsWith('default')) {
+        const {thumbnail} = props;
+        if (thumbnail.startsWith('default')) {
             return (
-                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                <View style={{
+                    ...styles.defaultImage,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: setBGColor(thumbnail)
+                }}>
                     <DefaultThumbnail width={97} height={70.38}/>
                 </View>
             );
         } else {
             return (
-                <Image source={{ uri: thumbnail }} style={{...styles.defaultImage}} />
+                <Image source={{uri: thumbnail}} style={{...styles.defaultImage}}/>
             );
         }
     };
 
     const CollectionContainer = ({item, index}) => {
         return (
-            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 9999}} onPress={() => {
-                countCollectionView(item.collection_pk);
-                const data = {
-                    'collection_pk': item.collection_pk,
-                    'now': false,
-                };
-                if(item.collection_type === 1) navigation.navigate('PlanCollection', {data : data});
-                else navigation.navigate('FreeCollection', {data : data});
-            }} activeOpacity={0.8}>
+            <TouchableOpacity style={{...styles.directoryContainer, shadowColor: colors.red_gray[6], zIndex: 9999}}
+                              onPress={() => {
+                                  countCollectionView(item.collection_pk);
+                                  const data = {
+                                      'collection_pk': item.collection_pk,
+                                      'now': false,
+                                  };
+                                  if (item.collection_type === 1) navigation.navigate('PlanCollection', {data: data});
+                                  else navigation.navigate('FreeCollection', {data: data});
+                              }} activeOpacity={0.8}>
                 <View style={{overflow: 'hidden', borderRadius: 10}}>
-                    { item.collection_thumbnail ?
-                        <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                    {item.collection_thumbnail ?
+                        <ShowThumbnail thumbnail={item.collection_thumbnail}/> :
                         <Image style={styles.defaultImage} source={require('../../assets/images/here_default.png')}/>
                     }
-                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: '100%', height: 163, position: 'absolute'}}>
+                    <View style={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        width: '100%',
+                        height: 163,
+                        position: 'absolute'
+                    }}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'space-between'}}>
                             <View style={[styles.dirType, {
                                 borderColor: colors.backgroundColor,
                                 backgroundColor: colors.backgroundColor
                             }]}>
                                 <AppText
-                                    style={item.collection_type === 1 ? {...styles.dirPlanText, color: colors.red[3]} : {...styles.dirFreeText, color: colors.mainColor}}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
+                                    style={item.collection_type === 1 ? {
+                                        ...styles.dirPlanText,
+                                        color: colors.red[3]
+                                    } : {
+                                        ...styles.dirFreeText,
+                                        color: colors.mainColor
+                                    }}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
                             </View>
                             {item.collection_private === 1 &&
-                                <View style={{marginRight: 9, marginTop: 8}}>
-                                    <Image style={{width: 20, height: 20}}
-                                        source={require('../../assets/images/lock_outline.png')}></Image>
-                                </View>
+                            <View style={{marginRight: 9, marginTop: 8}}>
+                                <Image style={{width: 20, height: 20}}
+                                       source={require('../../assets/images/lock_outline.png')}></Image>
+                            </View>
                             }
                             <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                                 <TouchableOpacity onPress={() => {
                                     DeleteLikedCollection(item.collection_pk);
                                 }} activeOpacity={0.8}>
                                     <Jewel width={26} height={21}
-                                        style={{marginTop: 10, marginRight: 10, color: colors.red[3]}} />
+                                           style={{marginTop: 10, marginRight: 10, color: colors.red[3]}}/>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -505,7 +534,13 @@ const PlaceTab = ({navigation}) => {
                             fontWeight: '400',
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
-                        <View style={{marginTop: 4, flexDirection: 'row', width: '90%', flexWrap: 'wrap', alignItems: 'flex-start'}}>
+                        <View style={{
+                            marginTop: 4,
+                            flexDirection: 'row',
+                            width: '90%',
+                            flexWrap: 'wrap',
+                            alignItems: 'flex-start'
+                        }}>
                             {item.keywords.map((keyword, idx) => {
                                 return (
                                     <AppText key={idx} style={{
@@ -516,19 +551,28 @@ const PlaceTab = ({navigation}) => {
                                     }}># {keyword}</AppText>);
                             })}
                         </View>
-                        <View flexDirection="row" style={{position: 'absolute', bottom: 15, justifyContent: 'space-between'}}>
+                        <View flexDirection="row"
+                              style={{position: 'absolute', bottom: 15, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '68%', color: colors.gray[2]}}>by {item.created_user_name}</AppText>
+                                <AppText style={{
+                                    fontSize: 8,
+                                    width: '68%',
+                                    color: colors.gray[2]
+                                }}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
                                     <Image source={require('../../assets/images/here_icon.png')}
-                                        style={{width: 8, height: 8, margin: 2}}></Image>
-                                    <AppText style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                                           style={{width: 8, height: 8, margin: 2}}></Image>
+                                    <AppText style={{
+                                        fontSize: 8,
+                                        color: colors.gray[2],
+                                        fontWeight: 'bold'
+                                    }}>{item.like_cnt}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>
                                     <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                        style={{margin: 1}}></Icon>
+                                          style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
                                         color: colors.gray[2],
@@ -540,7 +584,8 @@ const PlaceTab = ({navigation}) => {
                     </View>
                 </View>
             </TouchableOpacity>
-        );};
+        );
+    };
 
     const [showMenu, setShowMenu] = useState(false);
     const [currentMenu, setCurrentMenu] = useState('최근 추가순');
@@ -574,7 +619,7 @@ const PlaceTab = ({navigation}) => {
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('최근 추가순');
-                                if(currentRendering) getLikedCollection('RESENT');
+                                if (currentRendering) getLikedCollection('RESENT');
                                 else getLikedPlace('RESENT');
                             }}
                             style={{
@@ -589,11 +634,18 @@ const PlaceTab = ({navigation}) => {
                                 paddingLeft: 8.5,
                                 width: '100%'
                             }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>최근 추가순</AppText>
-                                {currentMenu === '최근 추가순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>최근 추가순</AppText>
+                                {currentMenu === '최근 추가순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                      style={{marginLeft: 10}}></Icon>}
                             </View>
                         </TouchableOpacity>
-                    
+
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
@@ -602,17 +654,17 @@ const PlaceTab = ({navigation}) => {
                             zIndex: 0,
                             backgroundColor: colors.backgroundColor,
                         }}></View>
-                    
+
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('인기순');
-                                if(currentRendering) getLikedCollection('LIKE');
+                                if (currentRendering) getLikedCollection('LIKE');
                                 else getLikedPlace('LIKE');
                             }} style={{
-                                flex: 1,
-                                zIndex: 0,
-                            }} activeOpacity={0.8}>
+                            flex: 1,
+                            zIndex: 0,
+                        }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -621,11 +673,18 @@ const PlaceTab = ({navigation}) => {
                                 paddingLeft: 8.5,
                                 width: '100%',
                             }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>인기순</AppText>
-                                {currentMenu === '인기순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>인기순</AppText>
+                                {currentMenu === '인기순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                      style={{marginLeft: 10}}></Icon>}
                             </View>
                         </TouchableOpacity>
-                        { !currentRendering &&
+                        {!currentRendering &&
                         <View style={{
                             height: 1,
                             borderColor: colors.gray[5],
@@ -633,17 +692,17 @@ const PlaceTab = ({navigation}) => {
                             borderRadius: 1,
                             zIndex: 0
                         }}></View>}
-                    
-                        { !currentRendering &&
+
+                        {!currentRendering &&
                         <TouchableOpacity
                             onPress={() => {
                                 setShowMenu(false);
                                 setCurrentMenu('평점순');
                                 getLikedPlace('SCORE');
                             }} style={{
-                                flex: 1,
-                                zIndex: 0,
-                            }} activeOpacity={0.8}>
+                            flex: 1,
+                            zIndex: 0,
+                        }} activeOpacity={0.8}>
                             <View style={{
                                 flex: 1,
                                 alignItems: 'center',
@@ -652,20 +711,34 @@ const PlaceTab = ({navigation}) => {
                                 paddingLeft: 8.5,
                                 width: '100%',
                             }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 16.8, fontWeight: '400'}}>평점순</AppText>
-                                {currentMenu === '평점순' && <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor} style={{marginLeft: 10}}></Icon>}
+                                <AppText style={{
+                                    color: colors.mainColor,
+                                    fontSize: 14,
+                                    lineHeight: 16.8,
+                                    fontWeight: '400'
+                                }}>평점순</AppText>
+                                {currentMenu === '평점순' &&
+                                <Icon type="ionicon" name={'checkmark-sharp'} size={14} color={colors.mainColor}
+                                      style={{marginLeft: 10}}></Icon>}
                             </View>
                         </TouchableOpacity>}
                     </View>
                 }
             </View>
-        );};
+        );
+    };
 
     return (
         <View style={{backgroundColor: colors.backgroundColor, flex: 1, position: 'relative'}}>
-            <SelectBox />
+            <SelectBox/>
             <ScreenContainerView flex={1}>
-                <View flexDirection="row" style={{alignItems: 'center', justifyContent: 'center', marginVertical: 4, position: 'relative', zIndex: 50}}>
+                <View flexDirection="row" style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginVertical: 4,
+                    position: 'relative',
+                    zIndex: 50
+                }}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         {directoryType.map(
                             (type, idx) => <Keyword type={type} key={idx} idx={idx}/>
@@ -673,21 +746,27 @@ const PlaceTab = ({navigation}) => {
                     </ScrollView>
                 </View>
 
-                <View flexDirection="row" style={{justifyContent: 'flex-start', marginTop: 2, marginBottom: 8, position: 'relative', zIndex: 50}}>
-                    <TouchableWithoutFeedback onPress={()=>setShowMenu(false)}>
+                <View flexDirection="row" style={{
+                    justifyContent: 'flex-start',
+                    marginTop: 2,
+                    marginBottom: 8,
+                    position: 'relative',
+                    zIndex: 50
+                }}>
+                    <TouchableWithoutFeedback onPress={() => setShowMenu(false)}>
                         <View flexDirection="row" flex={1}>
-                            <TouchableOpacity onPress={()=>{
+                            <TouchableOpacity onPress={() => {
                                 setShowMenu(!showMenu);
                             }} style={{flexDirection: 'row'}} activeOpacity={0.8}>
                                 <AppText style={{color: colors.mainColor}}>{currentMenu}</AppText>
                                 <Icon style={{color: colors.mainColor, paddingTop: 1, paddingLeft: 8}} type="ionicon"
-                                    name={'chevron-down-outline'} size={16}></Icon>
+                                      name={'chevron-down-outline'} size={16}></Icon>
                             </TouchableOpacity>
                         </View>
                     </TouchableWithoutFeedback>
                 </View>
                 <SafeAreaView flex={1}>
-                    <SetRendering />
+                    <SetRendering/>
                 </SafeAreaView>
             </ScreenContainerView>
         </View>

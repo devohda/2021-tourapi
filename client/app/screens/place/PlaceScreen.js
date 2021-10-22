@@ -734,10 +734,10 @@ const PlaceScreen = ({route, navigation}) => {
     });
 
     const onMarkerPress = (event) => {
-        const { id, coordinate } = event.nativeEvent;
-        const newRegion = { ...region };
-        newRegion.latitude = coordinate.latitude;
-        newRegion.longitude = coordinate.longitude;
+        const {id, coordinate} = event.nativeEvent;
+        const newRegion = {...region};
+        newRegion.latitude = Number(coordinate.latitude);
+        newRegion.longitude = Number(coordinate.longitude);
 
         setRegion(newRegion);
     };
@@ -926,8 +926,9 @@ const PlaceScreen = ({route, navigation}) => {
             }} activeOpacity={0.8}>
                 <View style={{marginEnd: 8, width: 141}}>
                     <View>
-                        <Image source={item.place_img ? {uri: item.place_img} : item.review_img ? {uri: item.review_img} : require('../../assets/images/here_default.png')}
-                        style={{width: 141, height: 101, borderRadius: 10}}></Image>
+                        <Image
+                            source={item.place_img ? {uri: item.place_img} : item.review_img ? {uri: item.review_img} : require('../../assets/images/here_default.png')}
+                            style={{width: 141, height: 101, borderRadius: 10}}></Image>
                     </View>
                     <View style={{flexDirection: 'row', marginTop: 8}}>
                         <AppText style={{color: colors.gray[3], fontSize: 10}}>{checkType(item.place_type)}</AppText>
@@ -1053,15 +1054,16 @@ const PlaceScreen = ({route, navigation}) => {
                             </Score>
                         </View>
 
-                        <TouchableOpacity style={[{
+                        <TouchableOpacity style={{
                             width: '100%',
                             flexDirection: 'row',
                             height: 38,
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRadius: 10,
-                            paddingVertical: 6
-                        }, !reviewAccess ? {backgroundColor: colors.red[3]} : {backgroundColor: colors.gray[6]}]}
+                            paddingVertical: 6,
+                            backgroundColor: !reviewAccess ? colors.red[3] : colors.gray[6]
+                        }}
                                           onPress={() => navigation.navigate('MakeReview', {
                                               placeName: placeData.place_name,
                                               place_pk: placeData.place_pk
@@ -1074,6 +1076,14 @@ const PlaceScreen = ({route, navigation}) => {
                             <AppText style={{color: colors.backgroundColor, fontWeight: 'bold', marginStart: 4}}>평점
                                 남기기</AppText>
                         </TouchableOpacity>
+                        <>
+                            {reviewAccess !== 0 &&
+                            <View style={{marginTop: 10}}>
+                                <AppText style={{color: colors.gray[4]}}>리뷰는 신뢰도를 위해 <AppText
+                                    style={{fontWeight: 'bold'}}>주 1회 작성가능</AppText> 합니다. :)</AppText>
+                            </View>
+                            }
+                        </>
                     </View>
                 </ScreenContainerView>
                 <ScreenDivideLine/>
@@ -1119,7 +1129,7 @@ const PlaceScreen = ({route, navigation}) => {
                                 longitude: placeLng
                             }}>
                                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <CustomPlaceMarker />
+                                    <CustomPlaceMarker/>
                                 </View>
                             </Marker>
                         </MapView>

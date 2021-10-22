@@ -1,15 +1,25 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, ScrollView, Dimensions, Pressable, StyleSheet, Platform, FlatList, TouchableOpacity} from 'react-native';
+import {
+    View,
+    Image,
+    ScrollView,
+    Dimensions,
+    Pressable,
+    StyleSheet,
+    Platform,
+    FlatList,
+    TouchableOpacity
+} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {useToken} from '../contexts/TokenContextProvider';
-import { Icon } from 'react-native-elements';
+import {Icon} from 'react-native-elements';
 
 import AppText from '../components/AppText';
 import DefaultThumbnail from '../assets/images/profile_default.svg';
 
 const ShowRecommendCollection = props => {
     const {colors} = useTheme();
-    const { navigation } = props;
+    const {navigation} = props;
     const [popularCollection, setPopularCollection] = useState({});
     const [token, setToken] = useToken();
 
@@ -58,9 +68,7 @@ const ShowRecommendCollection = props => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -116,17 +124,17 @@ const ShowRecommendCollection = props => {
     ]);
 
     const setBGColor = (thumbnail) => {
-        if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
-        else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
-        else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
-        else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
+        if (thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
+        else if (thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
+        else if (thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
+        else if (thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
+        else if (thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
     };
 
     const ShowThumbnail = props => {
-        const { thumbnail } = props;
-        if(thumbnail.startsWith('default')) {
+        const {thumbnail} = props;
+        if (thumbnail.startsWith('default')) {
             return (
                 <View flexDirection="row" style={{
                     flexWrap: 'wrap',
@@ -136,7 +144,13 @@ const ShowRecommendCollection = props => {
                     justifyContent: 'center',
                     alignContent: 'center'
                 }}>
-                    <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                    <View style={{
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: setBGColor(thumbnail)
+                    }}>
                         <DefaultThumbnail width={107} height={80.38}/>
                     </View>
                 </View>
@@ -151,14 +165,14 @@ const ShowRecommendCollection = props => {
                     justifyContent: 'center',
                     alignContent: 'center'
                 }}>
-                    <Image source={{ uri: thumbnail }} style={{width: '100%', height: '100%'}}/>
+                    <Image source={{uri: thumbnail}} style={{width: '100%', height: '100%'}}/>
                 </View>
             );
         }
     };
 
     const ShowRecommends = props => {
-        const { item, index } = props;
+        const {item, index} = props;
 
         return (
             <TouchableOpacity onPress={() => {
@@ -167,7 +181,7 @@ const ShowRecommendCollection = props => {
                     'now': false,
                 };
                 item.collection_type === 1 ?
-                    navigation.navigate('PlanCollection', {data : data}) : navigation.navigate('FreeCollection', {data : data});
+                    navigation.navigate('PlanCollection', {data: data}) : navigation.navigate('FreeCollection', {data: data});
             }} activeOpacity={0.8}>
                 <View style={{
                     width: 162,
@@ -176,30 +190,42 @@ const ShowRecommendCollection = props => {
                     shadowOffset: {width: 0, height: 1},
                     shadowOpacity: 0.27,
                     shadowRadius: 6,
-                    marginRight : 8,
-                    borderRadius : 10,
+                    marginRight: 8,
+                    borderRadius: 10,
                     overflow: 'hidden'
                 }}>
-                    <View style={{height: '68%'}}> 
+                    <View style={{height: '68%'}}>
                         <View style={{zIndex: 10000, flexDirection: 'row', justifyContent: 'flex-start'}}>
                             <View style={[styles.dirType, {
                                 borderColor: colors.backgroundColor,
                                 backgroundColor: colors.backgroundColor
                             }]}>
                                 <AppText
-                                    style={item.collection_type === 1 ? {...styles.dirPlanText, color: colors.red[3]} : {...styles.dirFreeText, color: colors.mainColor}}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
+                                    style={item.collection_type === 1 ? {
+                                        ...styles.dirPlanText,
+                                        color: colors.red[3]
+                                    } : {
+                                        ...styles.dirFreeText,
+                                        color: colors.mainColor
+                                    }}>{item.collection_type === 1 ? '일정' : '자유'}</AppText>
                             </View>
                         </View>
-                        { item.collection_thumbnail ?
-                            <ShowThumbnail thumbnail={item.collection_thumbnail} /> :
+                        {item.collection_thumbnail ?
+                            <ShowThumbnail thumbnail={item.collection_thumbnail}/> :
                             <Image style={styles.defaultImage} source={require('../assets/images/here_default.png')}/>
                         }
                     </View>
-                    <View flex={1} style={{backgroundColor : colors.defaultColor, padding : 8}}>
-                        <AppText style={{color : colors.mainColor, fontSize : 14, fontWeight : '700'}}>
+                    <View flex={1} style={{backgroundColor: colors.defaultColor, padding: 8}}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>
                             {item.collection_name}
                         </AppText>
-                        <View style={{marginTop: 4, flexDirection: 'row', width: '90%', flexWrap: 'wrap', alignItems: 'flex-start'}}>
+                        <View style={{
+                            marginTop: 4,
+                            flexDirection: 'row',
+                            width: '90%',
+                            flexWrap: 'wrap',
+                            alignItems: 'flex-start'
+                        }}>
                             {item.keywords.map((keyword, idx) => {
                                 return (
                                     <AppText key={idx} style={{
@@ -210,19 +236,32 @@ const ShowRecommendCollection = props => {
                                     }}># {keyword}</AppText>);
                             })}
                         </View>
-                        <View flexDirection="row" style={{position: 'absolute', bottom: 8, justifyContent: 'space-between', paddingHorizontal : 8}}>
+                        <View flexDirection="row" style={{
+                            position: 'absolute',
+                            bottom: 8,
+                            justifyContent: 'space-between',
+                            paddingHorizontal: 8
+                        }}>
                             <View style={{flexDirection: 'row'}}>
-                                <AppText style={{fontSize: 8, width: '75%', color: colors.gray[2]}}>by {item.created_user_name}</AppText>
+                                <AppText style={{
+                                    fontSize: 8,
+                                    width: '75%',
+                                    color: colors.gray[2]
+                                }}>by {item.created_user_name}</AppText>
                             </View>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                 <View style={{marginRight: 8, flexDirection: 'row'}}>
                                     <Image source={require('../assets/images/here_icon.png')}
-                                        style={{width: 8, height: 8, margin: 2}}></Image>
-                                    <AppText style={{fontSize: 8, color: colors.gray[2], fontWeight: 'bold'}}>{item.like_cnt}</AppText>
+                                           style={{width: 8, height: 8, margin: 2}}></Image>
+                                    <AppText style={{
+                                        fontSize: 8,
+                                        color: colors.gray[2],
+                                        fontWeight: 'bold'
+                                    }}>{item.like_cnt}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>
                                     <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                        style={{margin: 1}}></Icon>
+                                          style={{margin: 1}}></Icon>
                                     <AppText style={{
                                         fontSize: 8,
                                         color: colors.gray[2],
@@ -239,10 +278,14 @@ const ShowRecommendCollection = props => {
 
     return (
         <FlatList data={popularCollection}
-            renderItem={({item, index}) => <ShowRecommends item={item} index={index} key={index} />}
-            keyExtractor={(item, idx) => {idx.toString();}}
-            key={(item, idx) => {idx.toString();}}
-            nestedScrollEnabled horizontal showsHorizontalScrollIndicator={false}/>
+                  renderItem={({item, index}) => <ShowRecommends item={item} index={index} key={index}/>}
+                  keyExtractor={(item, idx) => {
+                      idx.toString();
+                  }}
+                  key={(item, idx) => {
+                      idx.toString();
+                  }}
+                  nestedScrollEnabled horizontal showsHorizontalScrollIndicator={false}/>
     );
 };
 

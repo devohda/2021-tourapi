@@ -135,14 +135,14 @@ export default function MainPageScreen({navigation}) {
                     setPopularPlace(response.data);
                     var newArr = [];
                     const res = response.data;
-                    for(var i=0;i<res.length;i++) {
-                        if(res[i].place_img) {
+                    for (var i = 0; i < res.length; i++) {
+                        if (res[i].place_img) {
                             newArr.push(res[i].place_img);
-                        } else if(res[i].place_thumbnail) {
+                        } else if (res[i].place_thumbnail) {
                             newArr.push(res[i].place_thumbnail);
-                        } else if(res[i].review_img) {
+                        } else if (res[i].review_img) {
                             newArr.push(res[i].review_img);
-                        } else{
+                        } else {
                             newArr.push('');
                         }
                     }
@@ -231,9 +231,7 @@ export default function MainPageScreen({navigation}) {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -324,11 +322,11 @@ export default function MainPageScreen({navigation}) {
     };
 
     const setBGColor = (thumbnail) => {
-        if(thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
-        else if(thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
-        else if(thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
-        else if(thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
-        else if(thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
+        if (thumbnail === defaultThumbnailList[0].name) return defaultThumbnailList[0].color;
+        else if (thumbnail === defaultThumbnailList[1].name) return defaultThumbnailList[1].color;
+        else if (thumbnail === defaultThumbnailList[2].name) return defaultThumbnailList[2].color;
+        else if (thumbnail === defaultThumbnailList[3].name) return defaultThumbnailList[3].color;
+        else if (thumbnail === defaultThumbnailList[4].name) return defaultThumbnailList[4].color;
         else return defaultThumbnailList[5].color;
     };
 
@@ -336,7 +334,12 @@ export default function MainPageScreen({navigation}) {
         const {thumbnail} = props;
         if (thumbnail.startsWith('default')) {
             return (
-                <View style={{...styles.defaultImage, justifyContent: 'center', alignItems: 'center', backgroundColor: setBGColor(thumbnail)}}>
+                <View style={{
+                    ...styles.defaultImage,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: setBGColor(thumbnail)
+                }}>
                     <DefaultThumbnail width={117} height={90.38}/>
                 </View>
             );
@@ -382,7 +385,7 @@ export default function MainPageScreen({navigation}) {
                             {item.collection_private === 1 &&
                             <View style={{marginRight: 9, marginTop: 8}}>
                                 <Image style={{width: 20, height: 20}}
-                                    source={require('../assets/images/lock_outline.png')}></Image>
+                                       source={require('../assets/images/lock_outline.png')}></Image>
                             </View>
                             }
                         </View>
@@ -390,7 +393,7 @@ export default function MainPageScreen({navigation}) {
                             {item.collection_thumbnail ?
                                 <ShowThumbnail thumbnail={item.collection_thumbnail}/> :
                                 <Image style={styles.defaultImage}
-                                    source={require('../assets/images/here_default.png')}/>
+                                       source={require('../assets/images/here_default.png')}/>
                             }
                         </View>
                     </View>
@@ -401,7 +404,7 @@ export default function MainPageScreen({navigation}) {
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
                         <View flexDirection="row"
-                            style={{marginTop: '24%', bottom: 10, justifyContent: 'space-between'}}>
+                              style={{marginTop: '24%', bottom: 10, justifyContent: 'space-between'}}>
                             <View style={{flexDirection: 'row'}}>
                                 <AppText style={{
                                     fontSize: 10,
@@ -410,7 +413,7 @@ export default function MainPageScreen({navigation}) {
                             </View>
                             <View style={{flexDirection: 'row', marginRight: 10}}>
                                 <Icon type="ionicon" name={'location'} size={8} color={colors.gray[2]}
-                                    style={{margin: 2}}></Icon>
+                                      style={{margin: 2}}></Icon>
                                 <AppText style={{
                                     fontSize: 10,
                                     color: colors.gray[4],
@@ -442,7 +445,7 @@ export default function MainPageScreen({navigation}) {
                                 source={require('../assets/images/default-profile.png')}
                             /></View> :
                         <View style={{...styles.authorImage}}>
-                            <Image source={{ uri: user_img }} style={{
+                            <Image source={{uri: user_img}} style={{
                                 width: 88,
                                 height: 88,
                                 borderRadius: 50,
@@ -458,11 +461,17 @@ export default function MainPageScreen({navigation}) {
                 <View style={{justifyContent: 'center'}}>
                     {
                         keyword.length !== 0 &&
-                    <View style={{flexDirection: 'row', marginTop: 4, width: '95%', flexWrap: 'wrap', alignItems: 'flex-start'}}>{
-                        keyword.map((data, idx) => (
-                            <UserKeyword data={data} key={idx + 'user'}/>
-                        ))
-                    }</View>
+                        <View style={{
+                            flexDirection: 'row',
+                            marginTop: 4,
+                            width: '95%',
+                            flexWrap: 'wrap',
+                            alignItems: 'flex-start'
+                        }}>{
+                            keyword.map((data, idx) => (
+                                <UserKeyword data={data} key={idx + 'user'}/>
+                            ))
+                        }</View>
                     }
                 </View>
             </View>
@@ -512,9 +521,7 @@ export default function MainPageScreen({navigation}) {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -535,7 +542,7 @@ export default function MainPageScreen({navigation}) {
             console.error(err);
         }
     };
-    
+
     const rec = [
         require('../assets/images/main/recommend-default-1.jpg'),
         require('../assets/images/main/recommend-default-2.jpg'),
@@ -549,13 +556,24 @@ export default function MainPageScreen({navigation}) {
 
         return (
             <ImageBackground source={rec[idx]}
-                style={styles.regionImage} imageStyle={{borderRadius: 15}}>
-                <View style={{backgroundColor: 'rgba(0, 0, 0, 0.1)', width: 237, height: 163, position: 'absolute', borderRadius: 15}}></View>
+                             style={styles.regionImage} imageStyle={{borderRadius: 15}}>
+                <View style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    width: 237,
+                    height: 163,
+                    position: 'absolute',
+                    borderRadius: 15
+                }}></View>
                 <View style={styles.regionText}>
                     <AppText
-                        style={{fontSize: 16, fontWeight: '700', color: colors.backgroundColor}}>{data.sigungu_name}</AppText>
+                        style={{
+                            fontSize: 16,
+                            fontWeight: '700',
+                            color: colors.backgroundColor
+                        }}>{data.sigungu_name}</AppText>
                     <AppText numberOfLines={2} ellipsizeMode='tail'
-                        style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>한 달간 총 {data.visitant_cnt} 명 방문</AppText>
+                             style={{fontSize: 12, marginTop: 7, color: colors.backgroundColor}}>한 달간
+                        총 {data.visitant_cnt} 명 방문</AppText>
                 </View>
             </ImageBackground>
         )
@@ -576,8 +594,10 @@ export default function MainPageScreen({navigation}) {
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         {
                             thumbnail[idx] !== '' ?
-                                <Image style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}} source={{uri: thumbnail[idx]}}/> :
-                                <Image style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}} source={require('../assets/images/here_default.png')}/> 
+                                <Image style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}
+                                       source={{uri: thumbnail[idx]}}/> :
+                                <Image style={{borderRadius: 15, width: 72, height: 72, marginTop: 2}}
+                                       source={require('../assets/images/here_default.png')}/>
                         }
                         <View style={{marginLeft: 8, width: '70%'}}>
                             <View style={{flexDirection: 'row'}}>
@@ -587,29 +607,29 @@ export default function MainPageScreen({navigation}) {
                                     fontSize: 10,
                                     fontWeight: '700'
                                 }}>{checkType(data.place_type)}</AppText>
-                                { parseInt(data.review_score) !== -1 &&
-                                    <View style={{flexDirection: 'row'}}>
-                                        <AppText style={{
-                                            marginHorizontal: 4,
-                                            color: colors.gray[4],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: '700',
-                                        }}>|</AppText>
-                                        <Image source={require('../assets/images/review_star.png')}
-                                            style={{
-                                                width: 10,
-                                                height: 10,
-                                                alignSelf: 'center',
-                                            }}></Image>
-                                        <AppText style={{
-                                            color: colors.gray[3],
-                                            textAlign: 'center',
-                                            fontSize: 10,
-                                            fontWeight: '700',
-                                            marginLeft: 2,
-                                        }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
-                                    </View>
+                                {parseInt(data.review_score) !== -1 &&
+                                <View style={{flexDirection: 'row'}}>
+                                    <AppText style={{
+                                        marginHorizontal: 4,
+                                        color: colors.gray[4],
+                                        textAlign: 'center',
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                    }}>|</AppText>
+                                    <Image source={require('../assets/images/review_star.png')}
+                                           style={{
+                                               width: 10,
+                                               height: 10,
+                                               alignSelf: 'center',
+                                           }}></Image>
+                                    <AppText style={{
+                                        color: colors.gray[3],
+                                        textAlign: 'center',
+                                        fontSize: 10,
+                                        fontWeight: '700',
+                                        marginLeft: 2,
+                                    }}>{parseFloat(data.review_score).toFixed(2)}</AppText>
+                                </View>
                                 }
                             </View>
                             <AppText style={{
@@ -634,7 +654,7 @@ export default function MainPageScreen({navigation}) {
                                 }
                             }} activeOpacity={0.8}>
                                 <Jewel width={26} height={21}
-                                    style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
+                                       style={data.like_flag ? {color: colors.red[3]} : {color: colors.red_gray[3]}}/>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -702,17 +722,17 @@ export default function MainPageScreen({navigation}) {
                                     {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
                                     {...styles.notSelectedRankings}
                                 } activeOpacity={0.8}><AppText
-                                    style={
-                                        days === 'DAY' ?
-                                            {
-                                                ...styles.selectedRankingsText,
-                                                color: colors.mainColor
-                                            } :
-                                            {
-                                                ...styles.selectedRankingsText,
-                                                color: colors.gray[6]
-                                            }
-                                    }>일간</AppText></TouchableOpacity></View>
+                                style={
+                                    days === 'DAY' ?
+                                        {
+                                            ...styles.selectedRankingsText,
+                                            color: colors.mainColor
+                                        } :
+                                        {
+                                            ...styles.selectedRankingsText,
+                                            color: colors.gray[6]
+                                        }
+                                }>일간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 onPress={() => {
                                     setDays('WEEK');
@@ -722,17 +742,17 @@ export default function MainPageScreen({navigation}) {
                                     {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
                                     {...styles.notSelectedRankings}
                                 } activeOpacity={0.8}><AppText
-                                    style={
-                                        days === 'WEEK' ?
-                                            {
-                                                ...styles.selectedRankingsText,
-                                                color: colors.mainColor
-                                            } :
-                                            {
-                                                ...styles.selectedRankingsText,
-                                                color: colors.gray[6]
-                                            }
-                                    }>주간</AppText></TouchableOpacity></View>
+                                style={
+                                    days === 'WEEK' ?
+                                        {
+                                            ...styles.selectedRankingsText,
+                                            color: colors.mainColor
+                                        } :
+                                        {
+                                            ...styles.selectedRankingsText,
+                                            color: colors.gray[6]
+                                        }
+                                }>주간</AppText></TouchableOpacity></View>
                             <View style={{paddingEnd: 42}}><TouchableOpacity
                                 onPress={() => {
                                     setDays('MONTH');
@@ -742,24 +762,24 @@ export default function MainPageScreen({navigation}) {
                                     {...styles.selectedRankings, borderBottomColor: colors.red[3]} :
                                     {...styles.notSelectedRankings}
                                 } activeOpacity={0.8}><AppText
-                                    style={
-                                        days === 'MONTH' ?
-                                            {
-                                                ...styles.selectedRankingsText,
-                                                color: colors.mainColor
-                                            } :
-                                            {
-                                                ...styles.selectedRankingsText,
-                                                color: colors.gray[6]
-                                            }
-                                    }>월간</AppText></TouchableOpacity></View>
+                                style={
+                                    days === 'MONTH' ?
+                                        {
+                                            ...styles.selectedRankingsText,
+                                            color: colors.mainColor
+                                        } :
+                                        {
+                                            ...styles.selectedRankingsText,
+                                            color: colors.gray[6]
+                                        }
+                                }>월간</AppText></TouchableOpacity></View>
                         </View>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             {
                                 popularCollection.map((data, idx) => {
                                     return (
                                         <ShowPopularCollection item={data} key={idx} idx={idx}
-                                            keyword={data.keywords}/>);
+                                                               keyword={data.keywords}/>);
                                 })
                             }
                         </ScrollView>
@@ -785,7 +805,7 @@ export default function MainPageScreen({navigation}) {
                                 {
                                     recommendRegion.map((data, idx) => {
                                         return (
-                                            <ShowRecommendRegion data={data} key={idx} idx={idx} />);
+                                            <ShowRecommendRegion data={data} key={idx} idx={idx}/>);
                                     })
                                 }
                             </ScrollView>

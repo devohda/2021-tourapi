@@ -66,12 +66,12 @@ const EntireMap = ({route, navigation}) => {
                 setMyLocations(loc);
             }
         })();
-        if(placeData.length) {
-            const newRegion = { ...region };
-    
+        if (placeData.length) {
+            const newRegion = {...region};
+
             newRegion.latitude = Number(parseFloat(placeData[0].place_latitude).toFixed(10));
             newRegion.longitude = Number(parseFloat(placeData[0].place_longitude).toFixed(10));
-    
+
             setRegion(newRegion);
         }
     }, [myLocations]);
@@ -85,9 +85,7 @@ const EntireMap = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -110,11 +108,11 @@ const EntireMap = ({route, navigation}) => {
     };
 
     const onMarkerPress = (event) => {
-        const { id, coordinate } = event.nativeEvent;
-        const newRegion = { ...region };
-    
-        newRegion.latitude = coordinate.latitude;
-        newRegion.longitude = coordinate.longitude;
+        const {id, coordinate} = event.nativeEvent;
+        const newRegion = {...region};
+
+        newRegion.latitude = Number(coordinate.latitude);
+        newRegion.longitude = Number(coordinate.longitude);
 
         setRegion(newRegion);
 
