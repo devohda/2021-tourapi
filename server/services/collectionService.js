@@ -372,7 +372,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
     // }
 
     const result = {
-        placeList : result1,
+        placeList: result1,
     }
 
     return result;
@@ -380,7 +380,7 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 
 // 보관함 댓글 리스트
 exports.readCollectionCommentList = async (user_pk, collection_pk) => {
-    const query = `SELECT collection_comment, cc_create_time, user_img, user_nickname,
+    const query = `SELECT cc_pk, collection_comment, cc_create_time, user_img, user_nickname,
                           CASE WHEN cc.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator
                    FROM collection_comments cc
                    INNER JOIN users u
@@ -530,6 +530,15 @@ exports.updateCollectionPlaceComment = async (cpm_map_pk, comment) => {
     const query = `UPDATE collection_place_comment
                    SET cpc_comment = ${mysql.escape(comment)}
                    WHERE cpm_map_pk = ${cpm_map_pk}`
+    const result = await db.query(query);
+    return result;
+}
+
+// 보관함에 댓글 수정
+exports.updateCollectionComment = async (cc_pk, comment) => {
+    const query = `UPDATE collection_comments
+                   SET collection_comment = ${mysql.escape(comment)}
+                   WHERE cc_pk = ${cc_pk}`;
     const result = await db.query(query);
     return result;
 }

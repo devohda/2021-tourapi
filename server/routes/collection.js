@@ -429,6 +429,25 @@ router.put('/:collectionId/place/:mapPk/comment', verifyToken, async (req, res, 
     }
 })
 
+// 보관함 댓글 수정
+router.put('/:collectionId/comments/:commentId', verifyToken, async (req, res, next) => {
+    const {commentId} = req.params;
+    const {comment} = req.body;
+    const result = await collectionService.updateCollectionComment(commentId, comment);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
 // DELETE
 // 보관함 대체 공간 1개 삭제
 router.delete('/:collectionId/place/:mapPk/replacement/:placeId', verifyToken, async (req, res, next) => {
