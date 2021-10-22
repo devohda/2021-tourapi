@@ -277,7 +277,8 @@ router.get('/:collectionId/places', verifyToken, async (req, res, next) => {
 // 보관함 댓글 리스트 조회
 router.get('/:collectionId/comments', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
-    const result = await collectionService.readCollectionCommentList(collectionId);
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionCommentList(user.user_pk, collectionId);
 
     if (result) {
         return res.status(200).json({

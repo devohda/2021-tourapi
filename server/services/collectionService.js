@@ -379,8 +379,9 @@ exports.readCollectionPlaceList = async (user_pk, collection_pk) => {
 };
 
 // 보관함 댓글 리스트
-exports.readCollectionCommentList = async (collection_pk) => {
-    const query = `SELECT cc.user_pk, collection_comment, cc_create_time, user_img, user_nickname
+exports.readCollectionCommentList = async (user_pk, collection_pk) => {
+    const query = `SELECT collection_comment, cc_create_time, user_img, user_nickname,
+                          CASE WHEN cc.user_pk = ${user_pk} THEN 1 ELSE 0 END AS is_creator
                    FROM collection_comments cc
                    INNER JOIN users u
                    ON u.user_pk = cc.user_pk
