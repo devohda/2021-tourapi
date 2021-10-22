@@ -456,10 +456,11 @@ const ProfileSettingScreen = ({route, navigation}) => {
                                     const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
                                     if (status !== 'granted') {
                                         alert('Sorry, we need camera roll permissions to make this work!');
-                                    }
+                                    } else {
+                                        pickImage();
+                                      }
                                 }
                             })();
-                            pickImage();
                         }} activeOpacity={0.8}>
                             <View style={{...styles.cameraIcon, backgroundColor: colors.defaultColor}}>
                                 <Icon size={18} type="ionicon" name={'camera'} color={colors.gray[5]}
