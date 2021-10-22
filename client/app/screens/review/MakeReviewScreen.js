@@ -418,6 +418,7 @@ const MakeReviewScreen = ({route, navigation}) => {
             newArr.push(result.uri);
             setImage(newArr);
         }
+        ImagePicker.requestMediaLibraryPermissionsAsync()
     };
 
     const SelectReviewImage = () => {
@@ -438,11 +439,20 @@ const MakeReviewScreen = ({route, navigation}) => {
 
                     <View style={{flexDirection: 'row'}}>
                         <TouchableOpacity onPress={() => {
-                            if (image.length === 5) {
-                                Alert.alert('', '사진은 최대 5개까지 가능합니다.');
-                            } else {
-                                pickImage();
+                            (async () => {
+                            if (Platform.OS !== 'web') {
+                                const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                                if (status !== 'granted') {
+                                    alert('Sorry, we need camera roll permissions to make this work!');
+                                } else {
+                                    if (image.length === 5) {
+                                        Alert.alert('', '사진은 최대 5개까지 가능합니다.');
+                                    } else {
+                                        pickImage();
+                                    }
+                                }
                             }
+                            })();
                         }} activeOpacity={0.8}>
                             <View style={{...styles.addPicture, backgroundColor: colors.backgroundColor}}>
                                 <Icon type="ionicon" name={'add-sharp'} size={20} color={colors.mainColor}></Icon>
