@@ -10,16 +10,17 @@ import {
     TextInput,
     Pressable,
     FlatList,
-    Modal,
+    Modal as RNModal,
     Alert,
     KeyboardAvoidingView,
     Share
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
-import {Icon} from 'react-native-elements';
+import { CheckBox, Icon } from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -297,6 +298,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const getCollectionCommentsData = () => {
+        //보관함 댓글 가져오기
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
                 method: 'GET',
@@ -330,6 +332,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
     };
 
     const postCollectionCommentsData = (comment) => {
+        //보관함 댓글 등록
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
                 method: 'POST',
@@ -355,6 +358,143 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     }
 
                     getCollectionCommentsData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const putCollectionCommentsData = (ccPk, comment) => {
+        //보관함 댓글 수정
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments/${ccPk}`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: comment
+                })
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getCollectionCommentsData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deleteCollectionCommentsData = (ccPk) => {
+        //보관함 댓글 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments/${ccPk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getCollectionCommentsData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const reportComment = (ccpk) => {
+        //보관함 댓글 신고
+        try {
+            fetch(`http://34.64.185.40/report/comment/${ccpk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+console.log(response)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const reportCollection = () => {
+        //보관함 신고
+        try {
+            fetch(`http://34.64.185.40/report/collection/${collectionData.collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+console.log(response)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -683,44 +823,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const putReplacement = (cpmMapPk, editedComment) => {
-        //대체공간 수정
-        // replacementPlaceList : 추후
-        try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/replacement/place`, {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-                body: {
-                    replacementPlaceList : replacementPlaceList
-                }
-            }).then((res) => res.json())
-                .then(async response => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    getReplacement(cpmMapPk);
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const checkDeletedReplacement = () => {
         for(var i=0;i<isDeletedComment.length;i++) {
             if(isDeletedComment[i] !== false) {
@@ -763,40 +865,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
         }
     };
     
-    const deleteAllReplacement = (cpmMapPk) => {
-        //대체공간 자체를 삭제
-        try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-            }).then((res) => res.json())
-                .then(async response => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    getReplacement(cpmMapPk);
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const Keyword = props => {
         return (
             <AppText style={{color: colors.gray[2], fontSize: 10, marginEnd: 8}}># {props.keyword}</AppText>
@@ -895,9 +963,197 @@ const FreeCollectionScreen = ({route, navigation}) => {
             titleStyle: { color: colors.red[3], fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
         },
     ];
-    
+
+    const customerList = [
+        { 
+            title: '보관함 공유',
+            containerStyle: { backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.mainColor, fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+        {
+            title: '보관함 신고',
+            containerStyle:{ backgroundColor: colors.backgroundColor },
+            titleStyle: { color: colors.red[3], fontSize: 16, fontWeight: '500', lineHeight: 25.6 },
+        },
+    ];
+
+    const [reportMenu, setReportMenu] = useState(false);
+    const [reportConfirmMenu, setReportConfirmMenu] = useState(false);
+
+    const reportReasons = [
+        {
+            index: 1,
+            title: '영리목적/홍보성'
+        },
+        {
+            index: 2,
+            title: '욕설/인신공격'
+        },
+        {
+            index: 3,
+            title: '음란성/선정성'
+        },
+        {
+            index: 4,
+            title: '도배/반복'
+        },
+        {
+            index: 5,
+            title: '개인정보노출'
+        },
+        {
+            index: 6,
+            title: '기타'
+        },
+    ];
+
+    const ShowReportReasons = ({item, index}) => {
+        const [isPressed, setIsPressed] = useState([
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        ]);
+
+        return (
+            <View style={{justifyContent: 'center', alignItems: 'flex-start', width: 150}}>
+                <CheckBox
+                    center
+                    title={<AppText style={{color: colors.mainColor, padding: 5}}>{item.title}</AppText>}
+                    containerStyle={{backgroundColor: colors.backgroundColor, borderWidth: 0, margin: 0, padding: 5, height: 40}}
+                    textStyle={{fontSize: 16, lineHeight: 25.6, fontWeight: '400', textAlign: 'left'}}
+                    checked={isPressed[index]}
+                    onPress={()=>{
+                        const newArr = [...isPressed];
+                        if (newArr[index]) {
+                            newArr[index] = false;
+                            setIsPressed(arr => newArr);
+                        } else {
+                            for (let i = 0; i < newArr.length; i++) {
+                                if (i == index) continue;
+                                else newArr[i] = false;
+                            }
+                            newArr[index] = true;
+                            setIsPressed(arr => newArr);
+                        }
+                    }}
+                />
+            </View>
+        );
+    };
+
+    const ReportModal  = props => {
+        const { type } = props;
+        return (
+            <RNModal
+                transparent={true}
+                visible={reportMenu}
+                onRequestClose={() => {
+                    setReportMenu(!reportMenu);
+                    if(type === 'collection') props.refRBSheet.current.close();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: windowHeight/1.9}}>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고사유</AppText>
+                        <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
+                            showsVerticalScrollIndicator={false}
+                            style={{marginTop: 10}}
+                            contentContainerStyle={{height: 120, marginBottom: -20}}
+                            data={reportReasons} renderItem={({item, index}) => <ShowReportReasons item={item} index={index} key={index}/>}
+                            keyExtractor={(item) => item.index} nestedScrollEnabled
+                        />
+                        <SafeAreaView>
+                            <TextInput
+                                style={{padding: 15, backgroundColor: colors.defaultColor, color: colors.mainColor, width: 295, height: 124}}
+                                placeholder='기타 사유를 입력해주세요.'
+                                placeholderTextColor={colors.gray[5]}
+                                textAlignVertical={'top'}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                multiline
+                            />
+                        </SafeAreaView>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.defaultColor, width: 86,
+                                    shadowColor: 'rgba(203, 180, 180, 0.3)',
+                                    shadowOffset: {
+                                        width: 3,
+                                        height: 6
+                                    },
+                                    shadowOpacity: 0.25}}
+                                onPress={() => {
+                                    setReportMenu(!reportMenu);
+                                    if(type === 'collection') props.refRBSheet.current.close();
+                                }}
+                            >
+                                <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
+                            </Pressable>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.red[3], width: 201,
+                                    shadowColor: 'rgba(203, 180, 180, 0.3)',
+                                    shadowOffset: {
+                                        width: 3,
+                                        height: 6
+                                    },
+                                    shadowOpacity: 0.25}}
+                                onPress={() => {
+                                    if(type === 'collection') {
+                                        props.refRBSheet.current.close();
+                                        reportCollection();
+                                    }
+                                    else reportComment(props.pk);
+                                    setReportMenu(!reportMenu);
+                                }}
+                            >
+                                <AppText style={styles.textStyle}>신고하기</AppText>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </RNModal>
+    )};
+
+    const ReportConfirmModal = props => {
+        const { type } = props;
+
+        return (
+            <RNModal
+                transparent={true}
+                visible={reportConfirmMenu}
+                onRequestClose={() => {
+                    setReportConfirmMenu(!reportConfirmMenu);
+                    if(type === 'collection') props.refRBSheet.current.close();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고되었습니다.</AppText>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.mainColor}}
+                                onPress={() => {
+                                    setReportConfirmMenu(!reportConfirmMenu);
+                                    if(type === 'collection') {
+                                        props.refRBSheet.current.close();
+                                        reportCollection();
+                                    }
+                                    else reportComment(props.pk);
+                                }}
+                            >
+                                <AppText style={styles.textStyle}>확인</AppText>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </RNModal>
+    )};
+
     const DeleteModal = props => (
-        <Modal
+        <RNModal
             transparent={true}
             visible={deleteMenu}
             onRequestClose={() => {
@@ -921,6 +1177,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.red[3]}}
                             onPress={() => {
+                                setDeleteMenu(!deleteMenu);
                                 deleteCollection(props.refRBSheet);
                             }}
                         >
@@ -929,57 +1186,177 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     </View>
                 </View>
             </View>
-        </Modal>
+        </RNModal>
     );
 
-    const setBGColor = (idx) => {
-        if (idx === 0 || idx === 2) {
-            return colors.red[3];
-        } else if (idx === 1 || idx === 6) {
-            return '#FFC36A';
-        } else if (idx === 3 || idx === 8) {
-            return '#639A94';
-        } else if (idx === 4 || idx === 5) {
-            return colors.blue[2];
-        } else {
-            return '#8F6DA4';
-        }
+
+    const [editVisible, setEditVisible] = useState(false);
+    const [deleteVisible, setDeleteVisible] = useState(false);
+
+    const EditCommentModal = () => {
+        const [changed, setChanged] = useState('');
+        return (
+            <Modal
+            visible={editVisible}
+            backdropStyle={styles.backdrop}
+            style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
+            onBackdropPress={() => setEditVisible(false)}>
+            <Card disabled={true}
+                style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor}}
+            >
+                <View style={{marginTop: 5}}>
+                    <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>댓글</AppText>
+                </View>
+                <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 5}}>
+                    <View style={{marginTop: 14}}>
+                        <TextInput defaultValue={currentCommentData.collection_comment} onChangeText={(text)=>{
+                                setChanged(text);
+                            }}
+                            style={{
+                                color: colors.mainColor,
+                                backgroundColor: colors.defaultColor,
+                                borderWidth: 1,
+                                borderColor: changed ? colors.mainColor : colors.defaultColor,
+                                width: 295,
+                                height: 95,
+                                borderRadius: 10,
+                                padding: 8
+                            }}
+                            placeholder='예) 이 일정대로 여행할때 대체공간도 꼭 보고 가세요'
+                            multiline
+                            placeholderTextColor={colors.gray[5]}
+                            textAlignVertical={'top'}
+                            ></TextInput>
+                    </View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 20}}>
+                        <TouchableOpacity onPress={() => {
+                            if(changed !== currentCommentData.collection_comment && changed !== '') {
+                                putCollectionCommentsData(currentCommentData.cc_pk, changed);
+                            }
+                            setEditVisible(false);
+                        }} activeOpacity={0.8}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>수정하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            setEditVisible(false);
+                            setDeleteVisible(true);
+                            }} activeOpacity={0.8}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Card>
+        </Modal>
+    )};
+
+    const DeleteCommentModal = () => {
+        return (
+            <Modal
+                visible={deleteVisible}
+                backdropStyle={styles.backdrop}
+                style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
+                onBackdropPress={() => setDeleteVisible(false)}>
+                <Card disabled={true}
+                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+                >
+                    <View style={{marginTop: 55}}>
+                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>댓글을 삭제할까요?</AppText>
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                            <TouchableOpacity onPress={() => {setDeleteVisible(false)}} activeOpacity={0.8}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                setDeleteVisible(false);
+                                deleteCollectionCommentsData(currentCommentData.cc_pk)
+                            }} activeOpacity={0.8}>
+                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                    <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Card>
+            </Modal>
+        )
     };
+
+    const [currentCommentData, setCurrentCommentData] = useState({});
 
     const ShowComments = props => {
         const { data, idx } = props;
         return (
             <>
-                <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
-                    <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                        <DefaultThumbnail width={36} height={36}/>
-                    </View>
-                    <View>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginBottom: 8,
-                            flexWrap: 'wrap'
-                        }}>
-                            <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
-                            <AppText style={{
-                                marginHorizontal: 8,
-                                color: colors.gray[5],
-                                fontSize: 10
-                            }}>|</AppText>
-                            <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                <TouchableOpacity onPress={() => {
+                    if(data.is_creator) {
+                        setCurrentCommentData(data);
+                        setEditVisible(true);
+                    }
+                    }}
+                    activeOpacity={0.8}
+                    >
+                    <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
+                    {
+                                data.user_img === '' || data.user_img === 'default-user' || data.user_img.startsWith('../') || data.user_img === 'default-img' ?
+                                    <View style={{...styles.authorImage}}>
+                                        <Image
+                                            style={{
+                                                width: 36,
+                                                height: 36,
+                                                borderRadius: 50,
+                                                backgroundColor: colors.defaultColor,
+                                            }}
+                                            source={require('../../assets/images/default-profile.png')}
+                                        /></View> :
+                                    <View style={{...styles.authorImage}}>
+                                        <Image source={{ uri: data.user_img }} style={{
+                                            width: 36,
+                                            height: 36,
+                                            borderRadius: 50,
+                                            backgroundColor: colors.defaultColor,
+                                        }}/></View>
+                            }
+                        <View>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    marginBottom: 8,
+                                    flexWrap: 'wrap'
+                                }}>
+                                    <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
+                                    <AppText style={{
+                                        marginHorizontal: 8,
+                                        color: colors.gray[5],
+                                        fontSize: 10
+                                    }}>|</AppText>
+                                    <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                                </View>                      
+                                <TouchableOpacity onPress={()=>setReportMenu(true)} activeOpacity={0.8} style={data.is_creator && {display: 'none'}}>
+                                    <Icon type="ionicon" name={"alert-circle"} color={colors.red[3]} size={16}></Icon>
+                                </TouchableOpacity>
+                                <ReportModal type={'comment'} pk={data.cc_pk} />
+                                <ReportConfirmModal type={'comment'} />
+                            </View>
+                            <View style={{flex: 1, width: '100%'}}><AppText style={{
+                                fontSize: 12,
+                                color: colors.mainColor,
+                                lineHeight: 16,
+                                fontWeight: '700',
+                                flexWrap: 'wrap',
+                                width: windowWidth - 100
+                            }}>{data.collection_comment}
+                            </AppText></View>
                         </View>
-                        <View style={{flex: 1, width: '100%'}}><AppText style={{
-                            fontSize: 12,
-                            color: colors.mainColor,
-                            lineHeight: 16,
-                            fontWeight: '700',
-                            flexWrap: 'wrap',
-                            width: windowWidth - 100
-                        }}>{data.collection_comment}
-                        </AppText></View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 <View style={{
                     width: '100%',
@@ -988,6 +1365,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                     zIndex: -1000,
                     marginVertical: 12
                 }}></View>
+
             </>
         );
     };
@@ -997,7 +1375,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         return (
             <View flex={1} style={{marginVertical: 20, justifyContent: 'flex-end'}}>
                 <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
-                    <TextInput flex={1} style={{fontSize: 16}}
+                    <TextInput flex={1} style={{fontSize: 16, color: colors.mainColor}}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="보관함에 댓글을 남겨보세요!"
@@ -1111,7 +1489,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
                 </View>
-                {checkPrivate() ? <>
+                {/* {checkPrivate() ? <> */}
                     {
                         !isEditPage ?
                             <View style={{position: 'absolute', right: 0}}>
@@ -1125,7 +1503,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     ref={refRBSheet}
                                     closeOnDragDown={true}
                                     closeOnPressMask={true}
-                                    height={250}
+                                    height={checkPrivate() ? 250 : 150}
                                     customStyles={{
                                         wrapper: {
                                             backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -1141,14 +1519,15 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                         }
                                     }}
                                 >
-                                    {list.map((l, i) => (
+                                    { checkPrivate() ?
+                                    list.map((l, i) => (
                                         <TouchableOpacity onPress={()=>{
                                             if(i === 0) {
                                                 setIsEditPage(true);
                                             }
                                             if(i === 1) {
                                                 refRBSheet.current.close();
-                                                navigation.navigate('MakeFreeCollection', {data: collectionData, update: true});
+                                                navigation.navigate('MakePlanCollection', {data: collectionData, update: true, placeLength: placeLength});
                                             }
                                             if(i === 2) {
                                                 onShare();
@@ -1161,8 +1540,26 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                                 <AppText style={l.titleStyle}>{l.title}</AppText>
                                             </View>
                                         </TouchableOpacity>
-                                    ))}
+                                    )) :
+                                    customerList.map((l, i) => (
+                                        <TouchableOpacity onPress={()=>{
+                                            if(i === 0) {
+                                                onShare();
+                                            }
+                                            if(i === 1) {
+                                                setReportMenu(true);
+                                                
+                                            }
+                                        }} activeOpacity={0.8}>
+                                            <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
+                                                <AppText style={l.titleStyle}>{l.title}</AppText>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))
+                                    }
                                     <DeleteModal refRBSheet={refRBSheet}/>
+                                    <ReportModal type={'collection'} refRBSheet={refRBSheet}/>
+                                    <ReportConfirmModal type={'collection'} refRBSheet={refRBSheet}/>
                                 </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
@@ -1178,8 +1575,9 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                     </View>
                                 </TouchableOpacity>
                             </View>
-                    }</> :
-                    <View style={{position: 'absolute', right: 0}}>
+                    }
+                    {/* </> : */}
+                    {/* <View style={{position: 'absolute', right: 0}}>
                         <TouchableOpacity hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
                             style={{flex: 1, height: '100%'}} onPress={() => {
                                 onShare();
@@ -1187,7 +1585,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 <Icon type="ionicon" name={'share-social'} color={colors.mainColor} size={26}/>
                         </TouchableOpacity>
                     </View>
-                    }
+                    } */}
             </View>
 
             <ScrollView flex={1} stickyHeaderIndices={[1]}>
@@ -1425,6 +1823,8 @@ const FreeCollectionScreen = ({route, navigation}) => {
                                 ))
                             }</View>
                         }
+                        <EditCommentModal />
+                        <DeleteCommentModal />
                     </ScreenContainerView>
                 </KeyboardAvoidingView>
             </ScrollView>
@@ -1468,29 +1868,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 5
     },
-    //swipe style
-    rowBack: {
-        alignItems: 'center',
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingLeft: 15,
-    },
-    backRightBtn: {
-        alignItems: 'center',
-        bottom: 0,
-        justifyContent: 'center',
-        position: 'absolute',
-        top: 0,
-        width: 75,
-        marginTop: 13,
-        height: '100%'
-    },
-    backRightBtnRight: {
-        backgroundColor: 'red',
-        right: 0,
-    },
-
     //modal example
     centeredView: {
         flex: 1,
@@ -1537,6 +1914,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 8
     },
+    
+    //comment css
+    backdrop: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    shadowOption: {
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+    }
 });
 
 export default FreeCollectionScreen;

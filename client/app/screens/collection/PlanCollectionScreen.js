@@ -10,12 +10,13 @@ import {
     TextInput,
     Pressable,
     FlatList,
+    Modal as RNModal,
     Alert,
     KeyboardAvoidingView,
     Share
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
-import { CheckBox, Icon} from 'react-native-elements';
+import { CheckBox, Icon } from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
@@ -340,6 +341,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const getCollectionCommentsData = () => {
+        //보관함 댓글 가져오기
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
                 method: 'GET',
@@ -373,6 +375,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     };
 
     const postCollectionCommentsData = (comment) => {
+        //보관함 댓글 등록
         try {
             fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
                 method: 'POST',
@@ -398,6 +401,141 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     }
 
                     getCollectionCommentsData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const putCollectionCommentsData = (ccPk, comment) => {
+        //보관함 댓글 수정
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments/${ccPk}`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+                body: JSON.stringify({
+                    comment: comment
+                })
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getCollectionCommentsData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const deleteCollectionCommentsData = (ccPk) => {
+        //보관함 댓글 삭제
+        try {
+            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments/${ccPk}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                },
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+
+                    getCollectionCommentsData();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const reportComment = (ccpk) => {
+        //보관함 댓글 신고
+        try {
+            fetch(`http://34.64.185.40/report/comment/${ccpk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const reportCollection = () => {
+        //보관함 신고
+        try {
+            fetch(`http://34.64.185.40/report/collection/${collectionData.collection_pk}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            }).then((res) => res.json())
+                .then(async (response) => {
+                    if (response.code === 405 && !alertDuplicated) {
+                        setAlertDuplicated(true);
+                    }
+
+                    if (parseInt(response.code / 100) === 4) {
+                        await SecureStore.deleteItemAsync('accessToken');
+                        setToken(null);
+                        setIsSignedIn(false);
+                        return;
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -725,44 +863,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const putReplacement = (cpmMapPk, editedComment) => {
-        //대체공간 수정
-        // replacementPlaceList : 추후
-        try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/replacement/place`, {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-                body: {
-                    replacementPlaceList : replacementPlaceList
-                }
-            }).then((res) => res.json())
-                .then(async response => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    getReplacement(cpmMapPk);
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const checkDeletedReplacement = () => {
         for(var i=0;i<isDeletedReplacement.length;i++) {
             if(isDeletedReplacement[i] !== false) {
@@ -775,40 +875,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         //대체공간 삭제
         try {
             fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
-                },
-            }).then((res) => res.json())
-                .then(async response => {
-                    if (response.code === 405 && !alertDuplicated) {
-                        setAlertDuplicated(true);
-                    }
-
-                    if (parseInt(response.code / 100) === 4) {
-                        await SecureStore.deleteItemAsync('accessToken');
-                        setToken(null);
-                        setIsSignedIn(false);
-                        return;
-                    }
-
-                    getReplacement(cpmMapPk);
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-    
-    const deleteAllReplacement = (cpmMapPk) => {
-        //대체공간 자체를 삭제
-        try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -1044,7 +1110,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
-    const [showMenu, setShowMenu] = useState(false);
     const [deleteMenu, setDeleteMenu] = useState(false);
 
     const list = [
@@ -1150,108 +1215,121 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
-    const ReportModal  = props => (
-        <Modal
-            transparent={true}
-            visible={reportMenu}
-            onRequestClose={() => {
-                setReportMenu(!reportMenu);
-                props.refRBSheet.current.close();
-            }}
-        >
-            <View style={styles.centeredView}>
-                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: windowHeight/1.9}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고사유</AppText>
-                    <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
-                        showsVerticalScrollIndicator={false}
-                        style={{marginTop: 10}}
-                        contentContainerStyle={{height: 120, marginBottom: -20}}
-                        data={reportReasons} renderItem={({item, index}) => <ShowReportReasons item={item} index={index} key={index}/>}
-                        keyExtractor={(item) => item.index} nestedScrollEnabled
-                    />
-                    <SafeAreaView>
-                        <TextInput
-                            style={{padding: 15, backgroundColor: colors.defaultColor, color: colors.mainColor, width: 295, height: 124}}
-                            placeholder='기타 사유를 입력해주세요.'
-                            placeholderTextColor={colors.gray[5]}
-                            textAlignVertical={'top'}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            multiline
+    const ReportModal  = props => {
+        const { type } = props;
+        return (
+            <RNModal
+                transparent={true}
+                visible={reportMenu}
+                onRequestClose={() => {
+                    setReportMenu(!reportMenu);
+                    if(type === 'collection') props.refRBSheet.current.close();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{...styles.modalView, backgroundColor: colors.backgroundColor, height: windowHeight/1.9}}>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고사유</AppText>
+                        <FlatList columnWrapperStyle={{justifyContent: 'space-between'}} numColumns={2}
+                            showsVerticalScrollIndicator={false}
+                            style={{marginTop: 10}}
+                            contentContainerStyle={{height: 120, marginBottom: -20}}
+                            data={reportReasons} renderItem={({item, index}) => <ShowReportReasons item={item} index={index} key={index}/>}
+                            keyExtractor={(item) => item.index} nestedScrollEnabled
                         />
-                    </SafeAreaView>
-                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                        <Pressable
-                            style={{...styles.button, backgroundColor: colors.defaultColor, width: 86,
-                                shadowColor: 'rgba(203, 180, 180, 0.3)',
-                                shadowOffset: {
-                                    width: 3,
-                                    height: 6
-                                },
-                                shadowOpacity: 0.25}}
-                            onPress={() => {
-                                setReportMenu(!reportMenu);
-                                props.refRBSheet.current.close();
-                            }}
-                        >
-                            <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
-                        </Pressable>
-                        <Pressable
-                            style={{...styles.button, backgroundColor: colors.red[3], width: 201,
-                                shadowColor: 'rgba(203, 180, 180, 0.3)',
-                                shadowOffset: {
-                                    width: 3,
-                                    height: 6
-                                },
-                                shadowOpacity: 0.25}}
-                            onPress={() => {
-                                setReportMenu(!reportMenu);
-                                setReportConfirmMenu(true);
-                            }}
-                        >
-                            <AppText style={styles.textStyle}>신고하기</AppText>
-                        </Pressable>
+                        <SafeAreaView>
+                            <TextInput
+                                style={{padding: 15, backgroundColor: colors.defaultColor, color: colors.mainColor, width: 295, height: 124}}
+                                placeholder='기타 사유를 입력해주세요.'
+                                placeholderTextColor={colors.gray[5]}
+                                textAlignVertical={'top'}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                multiline
+                            />
+                        </SafeAreaView>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.defaultColor, width: 86,
+                                    shadowColor: 'rgba(203, 180, 180, 0.3)',
+                                    shadowOffset: {
+                                        width: 3,
+                                        height: 6
+                                    },
+                                    shadowOpacity: 0.25}}
+                                onPress={() => {
+                                    setReportMenu(!reportMenu);
+                                    if(type === 'collection') props.refRBSheet.current.close();
+                                }}
+                            >
+                                <AppText style={{...styles.textStyle, color: colors.mainColor}}>취소하기</AppText>
+                            </Pressable>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.red[3], width: 201,
+                                    shadowColor: 'rgba(203, 180, 180, 0.3)',
+                                    shadowOffset: {
+                                        width: 3,
+                                        height: 6
+                                    },
+                                    shadowOpacity: 0.25}}
+                                onPress={() => {
+                                    if(type === 'collection') {
+                                        props.refRBSheet.current.close();
+                                        reportCollection();
+                                    }
+                                    else reportComment(props.pk);
+                                    setReportMenu(!reportMenu);
+                                }}
+                            >
+                                <AppText style={styles.textStyle}>신고하기</AppText>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
-            </View>
-        </Modal>
-    );
+            </RNModal>
+    )};
 
-    const ReportConfirmModal = props => (
-        <Modal
-            transparent={true}
-            visible={reportConfirmMenu}
-            onRequestClose={() => {
-                setReportConfirmMenu(!reportConfirmMenu);
-                props.refRBSheet.current.close();
-            }}
-        >
-            <View style={styles.centeredView}>
-                <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                    <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고되었습니다.</AppText>
-                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                        <Pressable
-                            style={{...styles.button, backgroundColor: colors.mainColor}}
-                            onPress={() => {
-                                setReportConfirmMenu(!reportConfirmMenu);
-                                props.refRBSheet.current.close();
-                            }}
-                        >
-                            <AppText style={styles.textStyle}>확인</AppText>
-                        </Pressable>
+    const ReportConfirmModal = props => {
+        const { type } = props;
+
+        return (
+            <RNModal
+                transparent={true}
+                visible={reportConfirmMenu}
+                onRequestClose={() => {
+                    setReportConfirmMenu(!reportConfirmMenu);
+                    if(type === 'collection') props.refRBSheet.current.close();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
+                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고되었습니다.</AppText>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Pressable
+                                style={{...styles.button, backgroundColor: colors.mainColor}}
+                                onPress={() => {
+                                    setReportConfirmMenu(!reportConfirmMenu);
+                                    if(type === 'collection') {
+                                        props.refRBSheet.current.close();
+                                        reportCollection();
+                                    }
+                                    else reportComment(props.pk);
+                                }}
+                            >
+                                <AppText style={styles.textStyle}>확인</AppText>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
-            </View>
-        </Modal>
-    );
+            </RNModal>
+    )};
 
     const DeleteModal = props => (
-        <Modal
+        <RNModal
             transparent={true}
             visible={deleteMenu}
             onRequestClose={() => {
                 setDeleteMenu(!deleteMenu);
-                // props.refRBSheet.current.close();
+                props.refRBSheet.current.close();
             }}
         >
             <View style={styles.centeredView}>
@@ -1279,7 +1357,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     </View>
                 </View>
             </View>
-        </Modal>
+        </RNModal>
     );
 
     const setDate = () => {
@@ -1302,27 +1380,13 @@ const PlanCollectionScreen = ({route, navigation}) => {
         }
     };
 
-    const setBGColor = (idx) => {
-        if (idx === 0 || idx === 2) {
-            return colors.red[3];
-        } else if (idx === 1 || idx === 6) {
-            return '#FFC36A';
-        } else if (idx === 3 || idx === 8) {
-            return '#639A94';
-        } else if (idx === 4 || idx === 5) {
-            return colors.blue[2];
-        } else {
-            return '#8F6DA4';
-        }
-    };
-
     const [editVisible, setEditVisible] = useState(false);
     const [deleteVisible, setDeleteVisible] = useState(false);
 
     const EditCommentModal = () => {
         const [changed, setChanged] = useState('');
         return (
-        <Modal
+            <Modal
             visible={editVisible}
             backdropStyle={styles.backdrop}
             style={{backgroundColor: colors.backgroundColor, maxHeight: '100%', borderRadius: 10, width: '95%'}}
@@ -1356,9 +1420,9 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 20}}>
                         <TouchableOpacity onPress={() => {
-                            // if(changed !== comment && changed !== '') {
-                            //     putPlaceComment(data.cpm_map_pk, changed);
-                            // }
+                            if(changed !== currentCommentData.collection_comment && changed !== '') {
+                                putCollectionCommentsData(currentCommentData.cc_pk, changed);
+                            }
                             setEditVisible(false);
                         }} activeOpacity={0.8}>
                             <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
@@ -1401,7 +1465,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
                                 setDeleteVisible(false);
-                                // deletePlaceComment(data.cpm_map_pk, comment);
+                                deleteCollectionCommentsData(currentCommentData.cc_pk)
                             }} activeOpacity={0.8}>
                                 <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                     <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
@@ -1418,35 +1482,58 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const ShowComments = props => {
         const { data, idx } = props;
-        setCurrentCommentData(data);
-
         return (
             <>
                 <TouchableOpacity onPress={() => {
-                    if(collectionData.user_pk === data.user_pk) {
+                    if(data.is_creator) {
+                        setCurrentCommentData(data);
                         setEditVisible(true);
                     }
                     }}
                     activeOpacity={0.8}
                     >
                     <View flexDirection="row" style={{flex: 1, alignItems: 'flex-start'}}>
-                        <View style={{...styles.authorImage, backgroundColor: setBGColor(idx)}}>
-                            <DefaultThumbnail width={36} height={36}/>
-                        </View>
+                            {
+                            data.user_img === '' || data.user_img === 'default-user' || data.user_img.startsWith('../') || data.user_img === 'default-img' ?
+                                <View style={{...styles.authorImage}}>
+                                    <Image
+                                        style={{
+                                            width: 36,
+                                            height: 36,
+                                            borderRadius: 50,
+                                            backgroundColor: colors.defaultColor,
+                                        }}
+                                        source={require('../../assets/images/default-profile.png')}
+                                    /></View> :
+                                <View style={{...styles.authorImage}}>
+                                    <Image source={{ uri: data.user_img }} style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: 50,
+                                        backgroundColor: colors.defaultColor,
+                                    }}/></View>
+                        }
                         <View>
-                            <View style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                marginBottom: 8,
-                                flexWrap: 'wrap'
-                            }}>
-                                <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
-                                <AppText style={{
-                                    marginHorizontal: 8,
-                                    color: colors.gray[5],
-                                    fontSize: 10
-                                }}>|</AppText>
-                                <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    marginBottom: 8,
+                                    flexWrap: 'wrap'
+                                }}>
+                                    <AppText style={{color: colors.mainColor, fontSize: 12}}>{data.user_nickname}</AppText>
+                                    <AppText style={{
+                                        marginHorizontal: 8,
+                                        color: colors.gray[5],
+                                        fontSize: 10
+                                    }}>|</AppText>
+                                    <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
+                                </View>
+                                <TouchableOpacity onPress={()=>setReportMenu(true)} activeOpacity={0.8} style={data.is_creator && {display: 'none'}}>
+                                    <Icon type="ionicon" name={"alert-circle"} color={colors.red[3]} size={16}></Icon>
+                                </TouchableOpacity>
+                                <ReportModal type={'comment'} pk={data.cc_pk} />
+                                <ReportConfirmModal type={'comment'} />
                             </View>
                             <View style={{flex: 1, width: '100%'}}><AppText style={{
                                 fontSize: 12,
@@ -1478,7 +1565,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         return (
             <View flex={1} style={{marginVertical: 20, justifyContent: 'flex-end'}}>
                 <View flexDirection="row" style={{...styles.comment_box, borderColor: colors.gray[5]}}>
-                    <TextInput flex={1} style={{fontSize: 16}}
+                    <TextInput flex={1} style={{fontSize: 16, color: colors.mainColor}}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="보관함에 댓글을 남겨보세요!"
@@ -1636,7 +1723,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                                 onShare();
                                             }
                                             if(i === 3) {
-                                                refRBSheet.current.close();
                                                 setDeleteMenu(true);
                                             }
                                         }} activeOpacity={0.8}>
@@ -1652,6 +1738,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                             }
                                             if(i === 1) {
                                                 setReportMenu(true);
+                                                
                                             }
                                         }} activeOpacity={0.8}>
                                             <View key={i} style={{marginLeft: 20, marginVertical: 11.5}}>
@@ -1661,8 +1748,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     ))
                                     }
                                     <DeleteModal refRBSheet={refRBSheet}/>
-                                    <ReportModal refRBSheet={refRBSheet}/>
-                                    <ReportConfirmModal refRBSheet={refRBSheet}/>
+                                    <ReportModal type={'collection'} refRBSheet={refRBSheet}/>
+                                    <ReportConfirmModal type={'collection'} refRBSheet={refRBSheet}/>
                                 </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
@@ -1872,7 +1959,6 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 50,
-
     },
     comment_box: {
         borderBottomWidth: 1,
@@ -1880,32 +1966,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 5
     },
-
-    //drag and sort style
-    container: {
-        flex: 1,
-        backgroundColor: '#f0f0f0',
-    },
-    item: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    item_children: {
-        backgroundColor: '#ffffff',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 4,
-    },
-    item_icon: {
-        marginLeft: 15,
-        resizeMode: 'contain',
-    },
-    item_text: {
-        marginRight: 55,
-        color: 'black'
-    },
-
     //modal example
     centeredView: {
         flex: 1,

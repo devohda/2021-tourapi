@@ -94,20 +94,6 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <ScreenContainerView flex={1}>
-                {/*<View style={{height: 50, marginTop: 20, justifyContent: 'flex-end'}}>*/}
-                {/*    <TouchableOpacity onPress={async () => {*/}
-                {/*        // await SecureStore.setItemAsync('isSignedIn', 'true');*/}
-                {/*        setIsSignedIn(true);*/}
-                {/*    }} activeOpacity={0.8}>*/}
-                {/*        <AppText style={{*/}
-                {/*            color: colors.mainColor,*/}
-                {/*            fontSize: 16,*/}
-                {/*            fontWeight: '400',*/}
-                {/*            alignSelf: 'flex-end',*/}
-                {/*            display: 'none'*/}
-                {/*        }}>둘러보기</AppText>*/}
-                {/*    </TouchableOpacity>*/}
-                {/*</View>*/}
                 <View flex={2} style={{alignItems: 'center', justifyContent: 'flex-end'}}>
                     <MainBoxIcon/>
                     <View style={{marginTop: 35.08, alignItems: 'center'}}>
