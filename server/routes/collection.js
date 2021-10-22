@@ -277,7 +277,8 @@ router.get('/:collectionId/places', verifyToken, async (req, res, next) => {
 // 보관함 댓글 리스트 조회
 router.get('/:collectionId/comments', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;
-    const result = await collectionService.readCollectionCommentList(collectionId);
+    const {user} = res.locals;
+    const result = await collectionService.readCollectionCommentList(user.user_pk, collectionId);
 
     if (result) {
         return res.status(200).json({
@@ -428,6 +429,25 @@ router.put('/:collectionId/place/:mapPk/comment', verifyToken, async (req, res, 
     }
 })
 
+// 보관함 댓글 수정
+router.put('/:collectionId/comments/:commentId', verifyToken, async (req, res, next) => {
+    const {commentId} = req.params;
+    const {comment} = req.body;
+    const result = await collectionService.updateCollectionComment(commentId, comment);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+})
+
 // DELETE
 // 보관함 대체 공간 1개 삭제
 router.delete('/:collectionId/place/:mapPk/replacement/:placeId', verifyToken, async (req, res, next) => {
@@ -505,6 +525,24 @@ router.delete('/:collectionId/place/:mapPk', verifyToken, async (req, res, next)
         });
     }
 })
+
+// 보관함 댓글 삭제
+router.delete('/:collectionId/comments/:commentId', verifyToken, async (req, res, next) => {
+    const {commentId} = req.params;
+    const result = await collectionService.deleteCollectionComment(commentId);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
 
 // 보관함 삭제
 router.delete('/:collectionId', verifyToken, async (req, res, next) => {
