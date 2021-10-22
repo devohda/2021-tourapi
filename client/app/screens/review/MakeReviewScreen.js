@@ -418,7 +418,6 @@ const MakeReviewScreen = ({route, navigation}) => {
             newArr.push(result.uri);
             setImage(newArr);
         }
-        ImagePicker.requestMediaLibraryPermissionsAsync()
     };
 
     const SelectReviewImage = () => {
