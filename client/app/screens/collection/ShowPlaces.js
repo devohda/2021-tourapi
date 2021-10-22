@@ -7,13 +7,13 @@ import {
     Alert,
     StyleSheet
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { Icon } from 'react-native-elements';
+import {useTheme} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
 import {Modal, Card} from '@ui-kitten/components';
 
 import AppText from '../../components/AppText';
 import TipsList from './TipsList';
-import { useToken } from '../../contexts/TokenContextProvider';
+import {useToken} from '../../contexts/TokenContextProvider';
 
 import Jewel from '../../assets/images/jewel.svg';
 import SlideMenu from '../../assets/images/menu_for_edit.svg';
@@ -23,12 +23,31 @@ import AlternativeSpaceList from './AlternativeSpaceList';
 import {useAlertDuplicated} from '../../contexts/LoginContextProvider';
 
 const ShowPlaces = props => {
-    const { colors } = useTheme();
+    const {colors} = useTheme();
 
-    const { day, index, isEditPage, item, length, curLength, navigation, pk, originData, isDeleted, isDeletedOrigin, isLimited,
-        isReplacementDeleted, isDeletedReplacement, checkDeletedReplacement, setDeletedReplacementData,
-        postPlaceComment, putPlaceComment, deletePlaceComment,
-        postReplacement, getReplacement, replacementData
+    const {
+        day,
+        index,
+        isEditPage,
+        item,
+        length,
+        curLength,
+        navigation,
+        pk,
+        originData,
+        isDeleted,
+        isDeletedOrigin,
+        isLimited,
+        isReplacementDeleted,
+        isDeletedReplacement,
+        checkDeletedReplacement,
+        setDeletedReplacementData,
+        postPlaceComment,
+        putPlaceComment,
+        deletePlaceComment,
+        postReplacement,
+        getReplacement,
+        replacementData
     } = props;
     const isFree = (typeof day === 'undefined');
     const [token, setToken] = useToken();
@@ -37,19 +56,19 @@ const ShowPlaces = props => {
     const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
 
     const checkType = (type) => {
-        if(type === 12) {
+        if (type === 12) {
             return '관광지';
-        } else if(type === 14) {
+        } else if (type === 14) {
             return '문화시설';
-        } else if(type === 15) {
+        } else if (type === 15) {
             return '축제/공연/행사';
-        } else if(type === 28) {
+        } else if (type === 28) {
             return '레포츠';
-        } else if(type === 32) {
+        } else if (type === 32) {
             return '숙박';
-        } else if(type === 38) {
+        } else if (type === 38) {
             return '쇼핑';
-        } else if(type === 39) {
+        } else if (type === 39) {
             return '음식';
         } else {
             return '기타';
@@ -57,16 +76,16 @@ const ShowPlaces = props => {
     };
 
     const checkDay = (day) => {
-        if(day === -1) return 0;
+        if (day === -1) return 0;
         else return day;
     };
 
     const checkIndex = () => {
         var prevCount = 0;
-        for(var i=0;i<index;i++) {
-            if(originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) prevCount += 1;
+        for (var i = 0; i < index; i++) {
+            if (originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) prevCount += 1;
         }
-        return (index+1) - prevCount;
+        return (index + 1) - prevCount;
     };
 
     const getInitialPlaceData = () => {
@@ -179,9 +198,7 @@ const ShowPlaces = props => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
@@ -204,29 +221,28 @@ const ShowPlaces = props => {
     };
     const checkCurrentDay = () => {
         var length = 0;
-        for(var i=0;i<originData.length;i++) {
-            if(day === 0) {
-                if(originData[i].cpm_plan_day === day || originData[i].cpm_plan_day === -1) length += 1;
-            }
-            else {
-                if(originData[i].cpm_plan_day === day) length += 1;
+        for (var i = 0; i < originData.length; i++) {
+            if (day === 0) {
+                if (originData[i].cpm_plan_day === day || originData[i].cpm_plan_day === -1) length += 1;
+            } else {
+                if (originData[i].cpm_plan_day === day) length += 1;
             }
         }
         return length;
     };
-    
+
     const checkCurrentIndex = (idx) => {
         var length = 0;
-        for(var i=0;i<idx;i++) {
+        for (var i = 0; i < idx; i++) {
             //위에 day제거, 시간대 제거
-            if(originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) length += 1;
+            if (originData[i].cpm_plan_day !== day || originData[i].place_pk === -1 || originData[i].place_pk === -2) length += 1;
         }
         return idx - length;
     };
 
     const checkLimit = () => {
-        if(!isEditPage && !isLimited && checkCurrentDay() > 5) {
-            if(checkCurrentIndex(index) <= 4) return false;
+        if (!isEditPage && !isLimited && checkCurrentDay() > 5) {
+            if (checkCurrentIndex(index) <= 4) return false;
             else return true;
         } else return false;
     };
@@ -241,16 +257,50 @@ const ShowPlaces = props => {
                 style={{backgroundColor: colors.backgroundColor, borderRadius: 10, marginTop: 10, width: '95%'}}
                 onBackdropPress={() => setDeleteVisible(false)}>
                 <Card disabled={true}
-                    style={{borderRadius: 10, backgroundColor: colors.backgroundColor, borderColor: colors.backgroundColor, justifyContent: 'center', alignItems: 'center'}}
+                      style={{
+                          borderRadius: 10,
+                          backgroundColor: colors.backgroundColor,
+                          borderColor: colors.backgroundColor,
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                      }}
                 >
                     <View style={{marginTop: 35}}>
-                        <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>공간을 삭제할까요?</AppText>
+                        <AppText style={{
+                            color: colors.mainColor,
+                            fontSize: 14,
+                            lineHeight: 22.4,
+                            fontWeight: '700',
+                            textAlign: 'center'
+                        }}>공간을 삭제할까요?</AppText>
                     </View>
                     <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 49}}>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
-                            <TouchableOpacity onPress={() => {setDeleteVisible(false);}} activeOpacity={0.8}>
-                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.defaultColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                                    <AppText style={{padding: 4, color: colors.mainColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>취소하기</AppText>
+                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: 20
+                        }}>
+                            <TouchableOpacity onPress={() => {
+                                setDeleteVisible(false);
+                            }} activeOpacity={0.8}>
+                                <View style={{
+                                    width: 138,
+                                    height: 43,
+                                    borderRadius: 10,
+                                    backgroundColor: colors.defaultColor,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    marginHorizontal: 9.5, ...styles.shadowOption
+                                }}>
+                                    <AppText style={{
+                                        padding: 4,
+                                        color: colors.mainColor,
+                                        fontSize: 14,
+                                        textAlign: 'center',
+                                        lineHeight: 22.4,
+                                        fontWeight: '500'
+                                    }}>취소하기</AppText>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
@@ -259,8 +309,23 @@ const ShowPlaces = props => {
                                 isDeleted(newArr);
                                 setDeleteVisible(false);
                             }} activeOpacity={0.8}>
-                                <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                                    <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                                <View style={{
+                                    width: 138,
+                                    height: 43,
+                                    borderRadius: 10,
+                                    backgroundColor: colors.red[3],
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    marginHorizontal: 9.5, ...styles.shadowOption
+                                }}>
+                                    <AppText style={{
+                                        padding: 4,
+                                        color: colors.defaultColor,
+                                        fontSize: 14,
+                                        textAlign: 'center',
+                                        lineHeight: 22.4,
+                                        fontWeight: '500'
+                                    }}>삭제하기</AppText>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -269,14 +334,20 @@ const ShowPlaces = props => {
             </Modal>
         );
     };
-    
+
     return (
         <View style={checkLimit() && {display: 'none'}}>
-            { item.place_pk > 0 && checkDay(item.cpm_plan_day) === day?
-                <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
+            {item.place_pk > 0 && checkDay(item.cpm_plan_day) === day ?
+                <TouchableHighlight underlayColor={colors.backgroundColor}
+                                    style={{backgroundColor: colors.backgroundColor}}>
                     <View flex={1} style={isDeletedOrigin[index] && {display: 'none'}}>
-                        <View style={{flexDirection: 'row', marginVertical: 6, justifyContent: 'center', alignItems: 'center'}}>
-                            <TouchableOpacity onPress={()=>{
+                        <View style={{
+                            flexDirection: 'row',
+                            marginVertical: 6,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <TouchableOpacity onPress={() => {
                                 setDeleteVisible(true);
                             }} style={!isEditPage && {display: 'none'}} activeOpacity={0.8}>
                                 <View style={{flexDirection: 'row', width: !isEditPage ? '100%' : '90%'}}>
@@ -285,11 +356,28 @@ const ShowPlaces = props => {
                                     </View>
                                 </View>
                             </TouchableOpacity>
-                            <DeleteModal />
-                            <View style={[{justifyContent: 'center', alignItems: 'center', marginRight: 12}, isEditPage && {display: 'none'}]}>
-                                <View style={{borderRadius: 50, width: 24, height: 24, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center'}}>
-                                    <AppText style={{color: colors.defaultColor, fontSize: 12, lineHeight: 19.2, fontWeight: '500', textAlign: 'center'}}>
-                                        {checkIndex()}    
+                            <DeleteModal/>
+                            <View style={[{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginRight: 12
+                            }, isEditPage && {display: 'none'}]}>
+                                <View style={{
+                                    borderRadius: 50,
+                                    width: 24,
+                                    height: 24,
+                                    backgroundColor: colors.mainColor,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}>
+                                    <AppText style={{
+                                        color: colors.defaultColor,
+                                        fontSize: 12,
+                                        lineHeight: 19.2,
+                                        fontWeight: '500',
+                                        textAlign: 'center'
+                                    }}>
+                                        {checkIndex()}
                                     </AppText>
                                 </View>
                             </View>
@@ -300,20 +388,51 @@ const ShowPlaces = props => {
                                 };
                                 props.navigation.navigate('Place', {data: data});
                             }} disabled={isEditPage && true} activeOpacity={0.8}>
-                                <View style={{flexDirection: 'row', width: isEditPage ? '98%' : '88%', marginLeft: isEditPage ? 8 : 0, paddingLeft: 6, paddingRight: 5, marginRight: 4,}}>
-                                    <View style={{flexDirection: 'row', alignItems: 'center', width: !isEditPage ? '90%' : '82.7%'}}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    width: isEditPage ? '98%' : '88%',
+                                    marginLeft: isEditPage ? 8 : 0,
+                                    paddingLeft: 6,
+                                    paddingRight: 5,
+                                    marginRight: 4,
+                                }}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        width: !isEditPage ? '90%' : '82.7%'
+                                    }}>
                                         {
                                             item.place_img ?
                                                 <Image source={{uri: item.place_img}}
-                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
-                                                    item.place_thumbnail ?
+                                                       style={{
+                                                           borderRadius: 10,
+                                                           width: 72,
+                                                           height: 72,
+                                                           marginTop: 2,
+                                                       }}/> :
+                                                item.place_thumbnail ?
                                                     <Image source={{uri: item.place_thumbnail}}
-                                                    style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
-                                                        item.review_img ?
+                                                           style={{
+                                                               borderRadius: 10,
+                                                               width: 72,
+                                                               height: 72,
+                                                               marginTop: 2,
+                                                           }}/> :
+                                                    item.review_img ?
                                                         <Image source={{uri: item.review_img}}
-                                                        style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                               style={{
+                                                                   borderRadius: 10,
+                                                                   width: 72,
+                                                                   height: 72,
+                                                                   marginTop: 2,
+                                                               }}/> :
                                                         <Image source={require('../../assets/images/here_default.png')}
-                                                            style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> 
+                                                               style={{
+                                                                   borderRadius: 10,
+                                                                   width: 72,
+                                                                   height: 72,
+                                                                   marginTop: 2
+                                                               }}/>
                                         }
                                         <View style={{
                                             justifyContent: 'space-between',
@@ -329,7 +448,8 @@ const ShowPlaces = props => {
                                                         fontSize: 10,
                                                         fontWeight: 'bold'
                                                     }}>{checkType(item.place_type)}</AppText>
-                                                    <View style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
+                                                    <View
+                                                        style={[{flexDirection: 'row'}, parseInt(item.review_score) == -1 && {display: 'none'}]}>
                                                         <AppText style={{
                                                             marginHorizontal: 4, color: colors.gray[7],
                                                             textAlign: 'center',
@@ -337,12 +457,12 @@ const ShowPlaces = props => {
                                                             fontWeight: 'bold',
                                                         }}>|</AppText>
                                                         <Image source={require('../../assets/images/review_star.png')}
-                                                            style={{
-                                                                width: 10,
-                                                                height: 10,
-                                                                alignSelf: 'center',
-                                                                marginTop: '1%',
-                                                            }}></Image>
+                                                               style={{
+                                                                   width: 10,
+                                                                   height: 10,
+                                                                   alignSelf: 'center',
+                                                                   marginTop: '1%',
+                                                               }}></Image>
                                                         <AppText style={{
                                                             color: colors.gray[3],
                                                             textAlign: 'center',
@@ -361,7 +481,10 @@ const ShowPlaces = props => {
                                                     }}>{item.place_name}</AppText>
                                                 </View>
                                                 <AppText
-                                                    style={{fontSize: 12, color: colors.gray[4]}}>{item.place_addr}</AppText>
+                                                    style={{
+                                                        fontSize: 12,
+                                                        color: colors.gray[4]
+                                                    }}>{item.place_addr}</AppText>
                                             </View>
                                         </View>
                                     </View>
@@ -378,7 +501,7 @@ const ShowPlaces = props => {
                                             }
                                         }} activeOpacity={0.8}>
                                             <Jewel width={26} height={21}
-                                                style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
+                                                   style={{color: isLiked ? colors.red[3] : colors.red_gray[5]}}/>
                                         </TouchableOpacity> :
                                         <TouchableOpacity activeOpacity={0.8}>
                                             <SlideMenu width={21} height={21} style={{marginLeft: 2}}/>
@@ -386,18 +509,30 @@ const ShowPlaces = props => {
                                 }
                             </View>
                         </View>
-                        {!isEditPage && <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage} private={props.private} navigation={navigation} pk={pk}
-                            isReplacementDeleted={isReplacementDeleted} isDeletedReplacement={isDeletedReplacement} checkDeletedReplacement={checkDeletedReplacement}
-                            postReplacement={postReplacement} getReplacement={getReplacement} getInitialPlaceData={getInitialPlaceData} 
-                            replacementData={replacementData}
+                        {!isEditPage &&
+                        <AlternativeSpaceList data={item} idx={index} day={day} key={index} isEditPage={isEditPage}
+                                              private={props.private} navigation={navigation} pk={pk}
+                                              isReplacementDeleted={isReplacementDeleted}
+                                              isDeletedReplacement={isDeletedReplacement}
+                                              checkDeletedReplacement={checkDeletedReplacement}
+                                              postReplacement={postReplacement} getReplacement={getReplacement}
+                                              getInitialPlaceData={getInitialPlaceData}
+                                              replacementData={replacementData}
                         />}
-                        {!isEditPage && <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private} isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment} putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
+                        {!isEditPage &&
+                        <TipsList comment={item.comment} data={item} idx={index} day={day} private={props.private}
+                                  isEditPage={isEditPage} isFree={isFree} postPlaceComment={postPlaceComment}
+                                  putPlaceComment={putPlaceComment} deletePlaceComment={deletePlaceComment}/>}
                     </View>
                 </TouchableHighlight> :
                 item.cpm_plan_day === day && curLength > 0 &&
-                <TouchableHighlight underlayColor={colors.backgroundColor} style={{backgroundColor: colors.backgroundColor}}>
-                    <View flex={1} style={[{flexDirection: 'row', justifyContent: 'space-between'}, isDeletedOrigin[index] && {display: 'none'}]}>
-                        <DeleteModal />
+                <TouchableHighlight underlayColor={colors.backgroundColor}
+                                    style={{backgroundColor: colors.backgroundColor}}>
+                    <View flex={1} style={[{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between'
+                    }, isDeletedOrigin[index] && {display: 'none'}]}>
+                        <DeleteModal/>
                         <View style={{
                             height: 30,
                             paddingVertical: 6,
@@ -417,7 +552,8 @@ const ShowPlaces = props => {
                                 justifyContent: 'center'
                             }}></View>
                             <View style={{marginHorizontal: '2%'}}>
-                                <AppText style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>
+                                <AppText
+                                    style={{color: colors.gray[4], fontSize: 12, lineHeight: 19.2, fontWeight: '400'}}>
                                     {item.place_pk === -1 ? '12PM' : '18PM'}
                                 </AppText>
                             </View>

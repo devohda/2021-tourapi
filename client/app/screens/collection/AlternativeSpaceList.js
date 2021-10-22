@@ -3,10 +3,7 @@ import { View, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-nati
 import { useTheme } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 import AppText from '../../components/AppText';
-import {Modal, Card} from '@ui-kitten/components';
-import ScreenDivideLine from '../../components/ScreenDivideLine';
 import BackIcon from '../../assets/images/back-icon.svg';
-import AlternativeSpaceScreen from './AlternativeSpaceScreen';
 
 const AlternativeSpaceList = props => {
     const { data, idx, day, isEditPage, navigation, pk,

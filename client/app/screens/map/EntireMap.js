@@ -52,7 +52,7 @@ const EntireMap = ({route, navigation}) => {
     
             newRegion.latitude = Number(parseFloat(placeData[0].place_latitude).toFixed(10));
             newRegion.longitude = Number(parseFloat(placeData[0].place_longitude).toFixed(10));
-    
+
             setRegion(newRegion);
         }
     }, []);
@@ -66,9 +66,7 @@ const EntireMap = ({route, navigation}) => {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 },
-            }).then((res) => {
-                res.json();
-            })
+            }).then((res) => res.json())
                 .then(async (response) => {
                     if (response.code === 405 && !alertDuplicated) {
                         setAlertDuplicated(true);
