@@ -1,6 +1,7 @@
 import React from "react";
 import {createStackNavigator} from '@react-navigation/stack';
 
+import ShowRulesTab from '../screens/auth/signUpEmail/ShowRulesTab';
 import GetEmailTab from "../screens/auth/signUpEmail/GetEmailTab";
 import GetPasswordTab from "../screens/auth/signUpEmail/GetPasswordTab";
 import GetNicknameTab from "../screens/auth/signUpEmail/GetNicknameTab";
@@ -18,6 +19,7 @@ const SignUpEmailNavigator = ({navigation: authNavigation}) => {
                 animationEnabled: false,
                 cardStyle: { backgroundColor: colors.backgroundColor }
             }}>
+            <Stack.Screen name="showRulesTab" component={ShowRulesTab}/>
             <Stack.Screen name="emailTab" component={GetEmailTab}/>
             <Stack.Screen name="passwordTab" component={GetPasswordTab}/>
             <Stack.Screen name="nicknameTab" component={GetNicknameTab}/>

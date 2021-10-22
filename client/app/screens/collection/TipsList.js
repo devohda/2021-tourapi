@@ -258,7 +258,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '88%'
+        width: '88%',
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+        borderRadius: 20
     },
     freeContainer: {
         height: 30,
@@ -271,7 +278,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '88%'
+        width: '88%',
+        shadowOffset: {
+            width: 6,
+            height: 6
+        },
+        shadowOpacity: 0.25,
+        shadowColor: 'rgba(203, 180, 180, 0.3)',
+        borderRadius: 20
     },
     shadowOption: {
         shadowOffset: {

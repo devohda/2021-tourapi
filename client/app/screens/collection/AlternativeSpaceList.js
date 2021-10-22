@@ -106,7 +106,6 @@ const styles = StyleSheet.create({
     spaceContainer: {
         height: 30,
         paddingVertical: 6,
-        marginBottom: 6,
         marginRight: 10,
         marginTop: 4,
         justifyContent: 'space-between',
