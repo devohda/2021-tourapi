@@ -526,6 +526,24 @@ router.delete('/:collectionId/place/:mapPk', verifyToken, async (req, res, next)
     }
 })
 
+// 보관함 댓글 삭제
+router.delete('/:collectionId/comments/:commentId', verifyToken, async (req, res, next) => {
+    const {commentId} = req.params;
+    const result = await collectionService.deleteCollectionComment(commentId);
+
+    if (result) {
+        return res.status(200).json({
+            code: 200,
+            status: 'OK'
+        });
+    } else {
+        return res.status(500).json({
+            code: 500,
+            status: 'SERVER ERROR'
+        });
+    }
+});
+
 // 보관함 삭제
 router.delete('/:collectionId', verifyToken, async (req, res, next) => {
     const {collectionId} = req.params;

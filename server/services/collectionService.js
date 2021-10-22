@@ -583,3 +583,11 @@ exports.deleteCollectionPlaceComment = async (cpm_map_pk) => {
     const result = await db.query(query);
     return result;
 }
+
+// 보관함에 댓글 삭제
+exports.deleteCollectionComment = async (cc_pk) => {
+    const query = `DELETE FROM collection_comments
+                   WHERE cc_pk = ${cc_pk}`;
+    const result = await db.query(query);
+    return result;
+};
