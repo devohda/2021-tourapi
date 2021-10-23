@@ -1634,12 +1634,16 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const ShowMarkers = props => {
         const { data, idx } = props;
+        let lat = 37.56633546113615;
+        let lng = 126.9779482762618;
+        if(data.place_latitude) lat =  Number(parseFloat(data.place_latitude).toFixed(10));
+        if(data.place_longitude) lng = Number(parseFloat(data.place_longitude).toFixed(10));
 
         return (
             <Marker coordinate={{
-                latitude: Number(parseFloat(data.place_latitude).toFixed(10)),
-                longitude: Number(parseFloat(data.place_longitude).toFixed(10))
-            }} style={{width: 100, height: 100}}>
+                latitude: lat,
+                longitude: lng,
+            }} style={[{width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}, (!data.place_latitude || !data.place_longitude) && {display: 'none'}]}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <CustomMarker />
                     <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
@@ -1864,7 +1868,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     {
                             Platform.OS == 'ios' ?
                             <View flex={1}>
-                                <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
+                                <MapView style={{width: Dimensions.get('window').width, height: 175, flex: 1, alignItems: 'center'}}
                                     region={region}
                                     moveOnMarkerPress
                                     tracksViewChanges={false}
@@ -1882,7 +1886,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                 }
                             </View> :
                             <View flex={1}>
-                                <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
+                                <MapView style={{width: Dimensions.get('window').width, height: 175, flex: 1, alignItems: 'center'}}
                                     region={region}
                                     moveOnMarkerPress
                                     tracksViewChanges={false}

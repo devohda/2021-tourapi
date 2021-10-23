@@ -38,20 +38,6 @@ const EntireMap = ({route, navigation}) => {
     const [currentData, setCurrentData] = useState({});
     const [token, setToken] = useToken();
 
-    useEffect(() => {
-        for(var i=0;i<placeData.length;i++) {
-            if(placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) {
-                const newRegion = { ...region };
-    
-                newRegion.latitude = Number(parseFloat(placeData[0].place_latitude).toFixed(10));
-                newRegion.longitude = Number(parseFloat(placeData[0].place_longitude).toFixed(10));
-    
-                setRegion(newRegion);
-                break;
-            }
-        }
-    }, []);
-
     const countPlaceView = (place_pk) => {
         try {
             fetch(`http://34.64.185.40/view/place/${place_pk}`, {
@@ -89,20 +75,18 @@ const EntireMap = ({route, navigation}) => {
             m => m.place_latitude == coordinate.latitude && m.place_longitude == coordinate.longitude
         );
 
-        if(currentInfo.place_pk !== -1 && currentInfo.place_pk !== -2) {
-            const newRegion = { ...region };
-    
-            newRegion.latitude = coordinate.latitude;
-            newRegion.longitude = coordinate.longitude;
-            newRegion.latitudeDelta = 0.015;
-            newRegion.longitudeDelta = 0.015;
-    
-            setRegion(newRegion);
-    
-            setCurrentData(currentInfo);
-            setCurReviewScore(parseFloat(currentData.review_score).toFixed(2));
-            setVisible(!visible);
-        }
+        const newRegion = { ...region };
+
+        newRegion.latitude = coordinate.latitude;
+        newRegion.longitude = coordinate.longitude;
+        newRegion.latitudeDelta = 0.015;
+        newRegion.longitudeDelta = 0.015;
+
+        setRegion(newRegion);
+
+        setCurrentData(currentInfo);
+        setCurReviewScore(parseFloat(currentData.review_score).toFixed(2));
+        setVisible(true);
     };
 
     const checkType = (type) => {
@@ -125,16 +109,26 @@ const EntireMap = ({route, navigation}) => {
         }
     };
 
-    const checkIndex = (cur) => {
+    const checkIndex = (pk) => {
         var cnt = 0;
-        for(var i=0;i<cur;i++) {
-            if(placeData[i].place_pk === -1 || placeData[i].place_pk === -2) {
-                cnt += 1;
+        for (var i = 0; i < placeData.length; i++) {
+            if(placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) cnt += 1;
+            if(placeData[i].place_pk === pk) break;
+        }
+        return cnt;
+    };
+
+    const checkStyle = (lat, lng) => {
+        if(lat === null && lng === null) {
+            return {
+                display: 'none'
+            }
+        } else {
+            return {
+                width: 100, height: 100
             }
         }
-
-        return cur - cnt + 1;
-    }
+    };
 
     const ShowMarkers = props => {
         const {data, idx} = props;
@@ -147,8 +141,8 @@ const EntireMap = ({route, navigation}) => {
             <Marker coordinate={{
                 latitude: lat,
                 longitude: lng,
-            }} style={[{width: 100, height: 100}, (!data.place_latitude || !data.place_longitude) && {display: 'none'}]}>
-                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            }} style={checkStyle(data.place_latitude, data.place_longitude)}>
+                <View style={[{justifyContent: 'center', alignItems: 'center'}, (!data.place_latitude || !data.place_longitude) && {display: 'none'}]}>
                     <CustomMarker/>
                     <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
                         <AppText style={{
@@ -156,7 +150,7 @@ const EntireMap = ({route, navigation}) => {
                             fontWeight: '500',
                             lineHeight: 19.2,
                             color: colors.mainColor
-                        }}>{checkIndex(idx)}</AppText>
+                        }}>{data.cpm_plan_day === -1 ? 1 : data.cpm_plan_day + 1}</AppText>
                     </View>
                     <View style={{
                         justifyContent: 'center',
@@ -310,22 +304,42 @@ const EntireMap = ({route, navigation}) => {
     return (
         <ScreenContainer backgroundColor={colors.backgroundColor}>
             <NavigationTop navigation={navigation} title={title}/>
-            <MapView style={{
-                width: Dimensions.get('window').width,
-                height: Platform.OS === 'android' ? Dimensions.get('window').height - 89 : Dimensions.get('window').height - 104
-            }}
-                     region={region}
-                     moveOnMarkerPress
-                     tracksViewChanges={false}
-                     provider={PROVIDER_GOOGLE}
-                     onMarkerPress={onMarkerPress}
-            >
-                { placeData.length > 0 &&
-                    placeData.map((data, idx) => (
-                        <ShowMarkers data={data} idx={idx} key={idx}/>
-                    ))
-                }
-            </MapView>
+            {
+                Platform.OS == 'ios' ?
+                <MapView style={{
+                    width: Dimensions.get('window').width,
+                    height: Platform.OS === 'android' ? Dimensions.get('window').height - 89 : Dimensions.get('window').height - 104
+                }}
+                    region={region}
+                    moveOnMarkerPress
+                    tracksViewChanges={false}
+                    onMarkerPress={onMarkerPress}
+                    onPress={()=>setVisible(false)}
+                >
+                    { placeData.length > 0 &&
+                        placeData.map((data, idx) => (
+                            <ShowMarkers data={data} idx={idx} key={idx}/>
+                        ))
+                    }
+                </MapView> :
+                <MapView style={{
+                    width: Dimensions.get('window').width,
+                    height: Platform.OS === 'android' ? Dimensions.get('window').height - 89 : Dimensions.get('window').height - 104
+                }}
+                    region={region}
+                    moveOnMarkerPress
+                    tracksViewChanges={false}
+                    onMarkerPress={onMarkerPress}
+                    provider={PROVIDER_GOOGLE}
+                >
+                    { placeData.length > 0 &&
+                        placeData.map((data, idx) => (
+                            <ShowMarkers data={data} idx={idx} key={idx}/>
+                        ))
+                    }
+                </MapView>
+            }
+
             {visible &&
             <ShowInfos/>
             }

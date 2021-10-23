@@ -1449,7 +1449,7 @@ console.log(response)
             <Marker coordinate={{
                 latitude: Number(parseFloat(data.place_latitude).toFixed(10)),
                 longitude: Number(parseFloat(data.place_longitude).toFixed(10))
-            }} style={{width: 100, height: 100}}>
+            }} style={{width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <CustomMarker />
                     <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
@@ -1670,7 +1670,7 @@ console.log(response)
                     {
                             Platform.OS == 'ios' ?
                             <View flex={1}>
-                                <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
+                                <MapView style={{width: Dimensions.get('window').width, height: 175, flex: 1, alignItems: 'center'}}
                                     region={region}
                                     moveOnMarkerPress
                                     tracksViewChanges={false}
@@ -1688,7 +1688,7 @@ console.log(response)
                                 }
                             </View> :
                             <View flex={1}>
-                                <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
+                                <MapView style={{width: Dimensions.get('window').width, height: 175, flex: 1, alignItems: 'center'}}
                                     region={region}
                                     moveOnMarkerPress
                                     tracksViewChanges={false}
