@@ -2,7 +2,7 @@
   "expo": {
     "name": "Here",
     "slug": "Here",
-    "version": "0.10.0",
+    "version": "0.11.0",
     "scheme": "here",
     "orientation": "portrait",
     "icon": "./app/assets/images/appicon.png",
@@ -29,7 +29,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.ohda.Here",
-      "buildNumber": "0.10.2",
+      "buildNumber": "0.11.0",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
         "NSPhotoLibraryUsageDescription": "보관함 썸네일 또는 리뷰에 참고될 사진을 등록하기 위해 사용자의 전체 사진 보관함 또는 사용자가 선택한 사진에만 접근하도록 허용합니다.\n사진은 편집이 가능하며 사진에 대한 접근에는 위치 및 심도 정보 같은 관련 메타 데이터가 포함됩니다."
@@ -42,7 +42,7 @@
         "backgroundColor": "#FFF8F8"
       },
       "package": "com.ohda.Here",
-      "versionCode": 10,
+      "versionCode": 11,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBfbTmomxwAPk8E9vUUep3qG703s11DYdI"
