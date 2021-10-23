@@ -13,7 +13,8 @@ import {
     Modal as RNModal,
     Alert,
     KeyboardAvoidingView,
-    Share
+    Share,
+    Platform
 } from 'react-native';
 import {useTheme, useIsFocused} from '@react-navigation/native';
 import { CheckBox, Icon } from 'react-native-elements';
@@ -1860,24 +1861,46 @@ const PlanCollectionScreen = ({route, navigation}) => {
                 </ScreenContainerView>
 
                 <View style={{marginTop: 20}} flex={1}>
-                    <View flex={1}>
-                        <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
-                            region={region}
-                            moveOnMarkerPress
-                            tracksViewChanges={false}
-                            onMarkerPress={onMarkerPress}
-                        >
-                            { placeData.length > 0 &&
-                            placeData.map((data, idx) => (
-                                <ShowMarkers data={data} idx={idx} key={idx}/>
-                            ))
-                            }
-                        </MapView>
-                        {
-                            placeData.length > 0 &&
-                            <EntireButton />
-                        }
-                    </View>
+                    {
+                            Platform.OS == 'ios' ?
+                            <View flex={1}>
+                                <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
+                                    region={region}
+                                    moveOnMarkerPress
+                                    tracksViewChanges={false}
+                                    onMarkerPress={onMarkerPress}
+                                >
+                                    { placeData.length > 0 &&
+                                    placeData.map((data, idx) => (
+                                        <ShowMarkers data={data} idx={idx} key={idx}/>
+                                    ))
+                                    }
+                                </MapView>
+                                {
+                                    placeData.length > 0 &&
+                                    <EntireButton />
+                                }
+                            </View> :
+                            <View flex={1}>
+                                <MapView style={{width: Dimensions.get('window').width, height: 150, flex: 1, alignItems: 'center'}}
+                                    region={region}
+                                    moveOnMarkerPress
+                                    tracksViewChanges={false}
+                                    onMarkerPress={onMarkerPress}
+                                    provider={PROVIDER_GOOGLE}
+                                >
+                                    { placeData.length > 0 &&
+                                    placeData.map((data, idx) => (
+                                        <ShowMarkers data={data} idx={idx} key={idx}/>
+                                    ))
+                                    }
+                                </MapView>
+                                {
+                                    placeData.length > 0 &&
+                                    <EntireButton />
+                                }
+                        </View>
+                    }
                 </View>
 
                 <ScreenContainerView flex={1}>

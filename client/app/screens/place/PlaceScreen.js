@@ -1117,23 +1117,44 @@ const PlaceScreen = ({route, navigation}) => {
                     }
                 </ScreenContainerView>
                 <View style={{marginVertical: 24}}>
-                    <View flex={1}>
-                        <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
-                                 region={region}
-                                 moveOnMarkerPress
-                                 tracksViewChanges={false}
-                                 onMarkerPress={onMarkerPress}
-                        >
-                            <Marker coordinate={{
-                                latitude: placeLat,
-                                longitude: placeLng
-                            }}>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <CustomPlaceMarker/>
-                                </View>
-                            </Marker>
-                        </MapView>
-                    </View>
+                    {
+                            Platform.OS == 'ios' ?
+                            <View flex={1}>
+                                <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
+                                        region={region}
+                                        moveOnMarkerPress
+                                        tracksViewChanges={false}
+                                        onMarkerPress={onMarkerPress}
+                                >
+                                    <Marker coordinate={{
+                                        latitude: placeLat,
+                                        longitude: placeLng
+                                    }}>
+                                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                            <CustomPlaceMarker/>
+                                        </View>
+                                    </Marker>
+                                </MapView>
+                            </View> :
+                            <View flex={1}>
+                                <MapView style={{width: Dimensions.get('window').width, height: 200, flex: 1}}
+                                        region={region}
+                                        moveOnMarkerPress
+                                        tracksViewChanges={false}
+                                        onMarkerPress={onMarkerPress}
+                                        provider={PROVIDER_GOOGLE}
+                                >
+                                    <Marker coordinate={{
+                                        latitude: placeLat,
+                                        longitude: placeLng
+                                    }}>
+                                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                            <CustomPlaceMarker/>
+                                        </View>
+                                    </Marker>
+                                </MapView>
+                        </View>
+                    }
                 </View>
                 <View>
                     <View style={{alignItems: 'center'}}>
