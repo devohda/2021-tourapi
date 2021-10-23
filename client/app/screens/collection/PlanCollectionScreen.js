@@ -1632,6 +1632,18 @@ const PlanCollectionScreen = ({route, navigation}) => {
         );
     };
 
+    const checkStyle = (lat, lng) => {
+        if(lat === null && lng === null) {
+            return {
+                display: 'none'
+            }
+        } else {
+            return {
+                width: 100, height: 100
+            }
+        }
+    };
+
     const ShowMarkers = props => {
         const { data, idx } = props;
         let lat = 37.56633546113615;
@@ -1643,8 +1655,8 @@ const PlanCollectionScreen = ({route, navigation}) => {
             <Marker coordinate={{
                 latitude: lat,
                 longitude: lng,
-            }} style={[{width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}, (!data.place_latitude || !data.place_longitude) && {display: 'none'}]}>
-                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            }} style={checkStyle(data.place_latitude, data.place_longitude)}>
+                <View style={[{justifyContent: 'center', alignItems: 'center'}, (!data.place_latitude || !data.place_longitude) && {display: 'none'}]}>
                     <CustomMarker />
                     <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
                         <AppText style={{fontSize: 12, fontWeight: '500', lineHeight: 19.2, color: colors.mainColor}}>{data.cpm_plan_day === -1 ? 1 : data.cpm_plan_day + 1}</AppText>
