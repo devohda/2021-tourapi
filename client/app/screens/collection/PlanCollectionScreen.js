@@ -1867,15 +1867,14 @@ const PlanCollectionScreen = ({route, navigation}) => {
                             tracksViewChanges={false}
                             onMarkerPress={onMarkerPress}
                         >
-                            { placeLength > 0 &&
+                            { placeData.length > 0 &&
                             placeData.map((data, idx) => (
-                                data.place_pk !== -1 && data.place_pk !== -2 &&
                                 <ShowMarkers data={data} idx={idx} key={idx}/>
                             ))
                             }
                         </MapView>
                         {
-                            placeLength > 0 &&
+                            placeData.length > 0 &&
                             <EntireButton />
                         }
                     </View>
