@@ -12,28 +12,21 @@ import {
     FlatList,
     Platform
 } from 'react-native';
-import {useTheme, useIsFocused} from '@react-navigation/native';
-import {Icon, Rating} from 'react-native-elements';
-import MapView, {Marker, UrlTile, PROVIDER_GOOGLE} from 'react-native-maps';
-import * as Location from 'expo-location';
-import Constants from 'expo-constants';
+import {useTheme} from '@react-navigation/native';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 
 import CustomMarker from '../../assets/images/map/map-marker.svg';
-import CustomMyMarker from '../../assets/images/map/map-mylocation-marker.svg';
-import Jewel from '../../assets/images/jewel.svg';
 
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContainerView from '../../components/ScreenContainerView';
 import NavigationTop from '../../components/NavigationTop';
 import AppText from '../../components/AppText';
 
-import {myLocation} from '../../contexts/LocationContextProvider';
 import {useToken} from '../../contexts/TokenContextProvider';
 
 const EntireMap = ({route, navigation}) => {
     const {colors} = useTheme();
     const {title, placeData, type, pk} = route.params;
-    const [myLocations, setMyLocations] = myLocation();
     const [region, setRegion] = useState({
         latitude: 37.56633546113615,
         longitude: 126.9779482762618,
@@ -43,17 +36,19 @@ const EntireMap = ({route, navigation}) => {
     const [visible, setVisible] = useState(false);
     const [curReviewScore, setCurReviewScore] = useState(0);
     const [currentData, setCurrentData] = useState({});
-    const [errorMsg, setErrorMsg] = useState(null);
     const [token, setToken] = useToken();
 
     useEffect(() => {
-        if(placeData.length) {
-            const newRegion = { ...region };
+        for(var i=0;i<placeData.length;i++) {
+            if(placeData[i].place_pk !== -1 && placeData[i].place_pk !== -2) {
+                const newRegion = { ...region };
     
-            newRegion.latitude = Number(parseFloat(placeData[0].place_latitude).toFixed(10));
-            newRegion.longitude = Number(parseFloat(placeData[0].place_longitude).toFixed(10));
-
-            setRegion(newRegion);
+                newRegion.latitude = Number(parseFloat(placeData[0].place_latitude).toFixed(10));
+                newRegion.longitude = Number(parseFloat(placeData[0].place_longitude).toFixed(10));
+    
+                setRegion(newRegion);
+                break;
+            }
         }
     }, []);
 
@@ -90,22 +85,24 @@ const EntireMap = ({route, navigation}) => {
 
     const onMarkerPress = (event) => {
         const { id, coordinate } = event.nativeEvent;
-        const newRegion = { ...region };
-    
-        newRegion.latitude = coordinate.latitude;
-        newRegion.longitude = coordinate.longitude;
-        newRegion.latitudeDelta = 0.015;
-        newRegion.longitudeDelta = 0.015;
-
-        setRegion(newRegion);
-
         const currentInfo = placeData.find(
             m => m.place_latitude == coordinate.latitude && m.place_longitude == coordinate.longitude
         );
 
-        setCurrentData(currentInfo);
-        setCurReviewScore(parseFloat(currentData.review_score).toFixed(2));
-        setVisible(!visible);
+        if(currentInfo.place_pk !== -1 && currentInfo.place_pk !== -2) {
+            const newRegion = { ...region };
+    
+            newRegion.latitude = coordinate.latitude;
+            newRegion.longitude = coordinate.longitude;
+            newRegion.latitudeDelta = 0.015;
+            newRegion.longitudeDelta = 0.015;
+    
+            setRegion(newRegion);
+    
+            setCurrentData(currentInfo);
+            setCurReviewScore(parseFloat(currentData.review_score).toFixed(2));
+            setVisible(!visible);
+        }
     };
 
     const checkType = (type) => {
@@ -128,21 +125,25 @@ const EntireMap = ({route, navigation}) => {
         }
     };
 
+    const checkIndex = (cur) => {
+        var cnt = 0;
+        for(var i=0;i<cur;i++) {
+            if(placeData[i].place_pk === -1 || placeData[i].place_pk === -2) {
+                cnt += 1;
+            }
+        }
+
+        return cur - cnt + 1;
+    }
+
     const ShowMarkers = props => {
         const {data, idx} = props;
-        let lat = 37.56633546113615;
-        let lng = 126.9779482762618;
-
-        if(data.place_latitude && data.place_longitude) {
-            lat = Number(parseFloat(data.place_latitude).toFixed(10));
-            lng = Number(parseFloat(data.place_longitude).toFixed(10));
-        }
 
         return (
             <Marker coordinate={{
-                latitude: lat,
-                longitude: lng,
-            }} style={[{width: 100, height: 100}, (data.place_pk === -1 || data.place_pk === -2) && {display: 'none'}]}>
+                latitude: Number(parseFloat(data.place_latitude).toFixed(10)),
+                longitude: Number(parseFloat(data.place_longitude).toFixed(10)),
+            }} style={{width: 100, height: 100}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <CustomMarker/>
                     <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
@@ -151,7 +152,7 @@ const EntireMap = ({route, navigation}) => {
                             fontWeight: '500',
                             lineHeight: 19.2,
                             color: colors.mainColor
-                        }}>{data.cpm_plan_day === -1 ? 1 : data.cpm_plan_day + 1}</AppText>
+                        }}>{checkIndex(idx)}</AppText>
                     </View>
                     <View style={{
                         justifyContent: 'center',
@@ -159,7 +160,7 @@ const EntireMap = ({route, navigation}) => {
                         backgroundColor: colors.mainColor,
                         borderRadius: 30,
                         height: 22,
-                        widht: '100%',
+                        width: '100%',
                         marginTop: 4
                     }}>
                         <View style={{
@@ -179,15 +180,6 @@ const EntireMap = ({route, navigation}) => {
             </Marker>
         );
     };
-
-    const checkIndex = (pk) => {
-        var cnt = 0;
-        for (var i = 0; i < placeData.length; i++) {
-            cnt += 1;
-            if (placeData[i].place_pk === pk) break;
-        }
-        return cnt;
-    }
 
     const ShowInfos = () => {
         return (
@@ -237,7 +229,7 @@ const EntireMap = ({route, navigation}) => {
                                     {
                                         currentData.place_img ?
                                             <Image source={{uri: currentData.place_img}}
-                                                   style={{borderRadius: 10, width: 72, height: 72, marginTop: 2,}}/> :
+                                                   style={{borderRadius: 10, width: 72, height: 72, marginTop: 2}}/> :
                                             currentData.review_img ?
                                                 <Image source={{uri: currentData.review_img}}
                                                        style={{
@@ -324,7 +316,7 @@ const EntireMap = ({route, navigation}) => {
                      provider={PROVIDER_GOOGLE}
                      onMarkerPress={onMarkerPress}
             >
-                {
+                { placeData.length > 0 &&
                     placeData.map((data, idx) => (
                         ((type === 1 && data.place_pk !== -1 && data.place_pk !== -2) || type === 0) &&
                         <ShowMarkers data={data} idx={idx} key={idx}/>
