@@ -315,6 +315,8 @@ const PlaceScreen = ({route, navigation}) => {
                     setPlaceLng(parseFloat(response.data.placeData.place_longitude).toFixed(10));
 
                     const newRegion = {...region};
+
+                    console.log(response.data.placeData.place_latitude)
                     newRegion.latitude = Number(parseFloat(response.data.placeData.place_latitude).toFixed(10));
                     newRegion.longitude = Number(parseFloat(response.data.placeData.place_longitude).toFixed(10));
 
@@ -727,8 +729,8 @@ const PlaceScreen = ({route, navigation}) => {
     const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
     const [region, setRegion] = useState({
-        latitude: placeLat,
-        longitude: placeLng,
+        latitude: 37.56633546113615,
+        longitude: 126.9779482762618,
         latitudeDelta: 0.0015,
         longitudeDelta: 0.0015,
     });
@@ -1127,9 +1129,9 @@ const PlaceScreen = ({route, navigation}) => {
                                         onMarkerPress={onMarkerPress}
                                 >
                                     <Marker coordinate={{
-                                        latitude: placeLat,
-                                        longitude: placeLng
-                                    }}>
+                                        latitude: Number(placeLat),
+                                        longitude: Number(placeLng)
+                                    }} style={{width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}}>
                                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                             <CustomPlaceMarker/>
                                         </View>
@@ -1145,15 +1147,15 @@ const PlaceScreen = ({route, navigation}) => {
                                         provider={PROVIDER_GOOGLE}
                                 >
                                     <Marker coordinate={{
-                                        latitude: placeLat,
-                                        longitude: placeLng
-                                    }}>
+                                        latitude: Number(placeLat),
+                                        longitude: Number(placeLng)
+                                    }} style={{width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}}>
                                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
                                             <CustomPlaceMarker/>
                                         </View>
                                     </Marker>
                                 </MapView>
-                        </View>
+                            </View>
                     }
                 </View>
                 <View>
