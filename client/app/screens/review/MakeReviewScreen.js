@@ -230,7 +230,7 @@ const MakeReviewScreen = ({route, navigation}) => {
                         return;
                     }
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
-                        {text: 'OK', onPress: () => navigation.goBack()}
+                        {text: 'OK', onPress: () => navigation.pop(1)}
                     ]);
                 })
                 .catch((err) => {

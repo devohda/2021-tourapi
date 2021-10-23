@@ -149,7 +149,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
                     Alert.alert('', '프로필이 수정되었습니다.', [
                         {
                             text: 'OK', onPress: () => {
-                                navigation.goBack();
+                                navigation.pop(1);
                             }
                         }]);
                 })
@@ -389,7 +389,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
             }}>
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
-                        navigation.goBack();
+                        navigation.pop(1);
                     }} activeOpacity={0.8}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>

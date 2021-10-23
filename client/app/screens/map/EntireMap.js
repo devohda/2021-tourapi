@@ -28,10 +28,10 @@ const EntireMap = ({route, navigation}) => {
     const {colors} = useTheme();
     const {title, placeData, type, pk} = route.params;
     const [region, setRegion] = useState({
-        latitude: 37.56633546113615,
-        longitude: 126.9779482762618,
-        latitudeDelta: 2,
-        longitudeDelta: 2,
+        latitude: 35.86933546113615,
+        longitude: 127.5779482762618,
+        latitudeDelta: 3.5,
+        longitudeDelta: 3.5,
     });
     const [visible, setVisible] = useState(false);
     const [curReviewScore, setCurReviewScore] = useState(0);

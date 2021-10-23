@@ -591,7 +591,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                     Alert.alert('', '삭제되었습니다.', [
                         {text : 'OK', onPress: () => {
                             if(data.now) navigation.pop(2);
-                            else navigation.goBack();
+                            else navigation.pop(1);
                             refRBSheet.current.close();
                         }}]);
                 })
@@ -1679,7 +1679,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         }
                         else {
                             if(isEditPage) setIsEditPage(false);
-                            else navigation.goBack();
+                            else navigation.pop(1);
                         }}} activeOpacity={0.8}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>

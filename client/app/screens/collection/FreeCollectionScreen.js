@@ -550,9 +550,10 @@ console.log(response)
                     Alert.alert('', '삭제되었습니다.', [
                         {text : 'OK', onPress: () => {
                             if(data.now) navigation.pop(2);
-                            else navigation.goBack();
+                            else navigation.pop(1);
                             setDeleteMenu(!deleteMenu);
                             refRBSheet.current.close();
+                            setDeleteMenu(!deleteMenu);
                         }}]);
                 })
                 .catch((err) => {
@@ -1178,7 +1179,6 @@ console.log(response)
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.red[3]}}
                             onPress={() => {
-                                setDeleteMenu(!deleteMenu);
                                 deleteCollection(props.refRBSheet);
                             }}
                         >
@@ -1485,7 +1485,7 @@ console.log(response)
                         }
                         else {
                             if(isEditPage) setIsEditPage(false);
-                            else navigation.goBack();
+                            else navigation.pop(1);
                         }}} activeOpacity={0.8}>
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>
