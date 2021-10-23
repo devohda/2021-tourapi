@@ -272,7 +272,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                         return;
                     }
 
-                    navigation.goBack();
+                    navigation.pop(1);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -566,9 +566,8 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
                 <View style={{position: 'absolute', left: 0}}>
                     <TouchableOpacity onPress={() => {
                         if (isEditSpace) setIsEditSpace(false);
-                        else navigation.goBack();
-                    }}
-                                      activeOpacity={0.8}
+                        else navigation.pop(1)
+                    }} activeOpacity={0.8}
                     >
                         <BackIcon style={{color: colors.mainColor}}/>
                     </TouchableOpacity>

@@ -38,7 +38,7 @@ const ShowRulesTab = ({navigation}) => {
             </ScrollView>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10}}>
                 <TouchableOpacity onPress={() => {
-                    navigation.goBack();
+                    navigation.pop(1);
                 }} activeOpacity={0.8}>
                     <View>
                     <AppText style={{

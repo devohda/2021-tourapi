@@ -731,8 +731,8 @@ const PlaceScreen = ({route, navigation}) => {
     const [region, setRegion] = useState({
         latitude: 37.56633546113615,
         longitude: 126.9779482762618,
-        latitudeDelta: 0.0015,
-        longitudeDelta: 0.0015,
+        latitudeDelta: 0.003,
+        longitudeDelta: 0.003,
     });
 
     const onMarkerPress = (event) => {

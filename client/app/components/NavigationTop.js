@@ -18,7 +18,7 @@ const NavigationTop = props => {
             justifyContent: 'center'
         }, Platform.OS === 'android' ? {marginTop: 20} : {marginTop: 10}]}>
             <View style={{position: 'absolute', left: 0}}>
-                <TouchableOpacity onPress={() => props.navigation.goBack()} activeOpacity={0.8}>
+                <TouchableOpacity onPress={() => props.navigation.pop(1)} activeOpacity={0.8}>
                     <BackIcon width={24} height={24} style={{color: colors.mainColor}}/>
                 </TouchableOpacity>
             </View>
