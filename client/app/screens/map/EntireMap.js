@@ -138,12 +138,16 @@ const EntireMap = ({route, navigation}) => {
 
     const ShowMarkers = props => {
         const {data, idx} = props;
+        let lat = 37.56633546113615;
+        let lng = 126.9779482762618;
+        if(data.place_latitude) lat =  Number(parseFloat(data.place_latitude).toFixed(10));
+        if(data.place_longitude) lng = Number(parseFloat(data.place_longitude).toFixed(10));
 
         return (
             <Marker coordinate={{
-                latitude: Number(parseFloat(data.place_latitude).toFixed(10)),
-                longitude: Number(parseFloat(data.place_longitude).toFixed(10)),
-            }} style={{width: 100, height: 100}}>
+                latitude: lat,
+                longitude: lng,
+            }} style={[{width: 100, height: 100}, (!data.place_latitude || !data.place_longitude) && {display: 'none'}]}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <CustomMarker/>
                     <View style={{position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 2}}>
@@ -318,7 +322,6 @@ const EntireMap = ({route, navigation}) => {
             >
                 { placeData.length > 0 &&
                     placeData.map((data, idx) => (
-                        ((type === 1 && data.place_pk !== -1 && data.place_pk !== -2) || type === 0) &&
                         <ShowMarkers data={data} idx={idx} key={idx}/>
                     ))
                 }
