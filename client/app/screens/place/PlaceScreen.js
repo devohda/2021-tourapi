@@ -1169,7 +1169,8 @@ const PlaceScreen = ({route, navigation}) => {
                                     lineHeight: 32
                                 }}>한줄 TIP</AppText>
                             </View>
-                            <AppText style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다</AppText>
+                            <AppText style={{color: colors.gray[3], fontSize: 12}}>한줄팁은 보관함에 공유된 소중한 리뷰입니다.</AppText>
+                            <AppText style={{color: colors.gray[3], fontSize: 12}}>직접 만든 일정/자유 보관함에 저장한 공간에 대한 한줄팁을 추가하면{'\n'}해당 공간의 페이지에 게시됩니다.</AppText>
                         </View>
                         <View style={{width: '90%', marginBottom: 29}}>
                             <View style={{marginBottom: 6}}><AppText style={{
