@@ -60,10 +60,6 @@ const SystemSettingScreen = ({navigation}) => {
         }
     };
 
-    const toggleSwitch = () => {
-        setIsEnabled(previousState => !previousState);
-    };
-
     const systemMenu = [
         {
             index: 1,

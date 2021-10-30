@@ -29,7 +29,7 @@ const MakeReviewScreen = ({route, navigation}) => {
     const {colors} = useTheme();
     const [token, setToken] = useToken();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const {placeName, place_pk} = route.params;
+    const {placeName, place_pk, getInitialData} = route.params;
     const [isOpened, setIsOpened] = useState(false);
     const [reviews, setReviews] = useState([
         '많이 아쉬워요', '아쉬워요', '괜찮아요', '마음에 들어요!', '다시 방문하고 싶어요!'
@@ -230,7 +230,10 @@ const MakeReviewScreen = ({route, navigation}) => {
                         return;
                     }
                     Alert.alert('', '리뷰 등록이 완료되었습니다.', [
-                        {text: 'OK', onPress: () => navigation.pop(1)}
+                        {text: 'OK', onPress: () => {
+                            getInitialData();
+                            navigation.pop(1);
+                        }}
                     ]);
                 })
                 .catch((err) => {

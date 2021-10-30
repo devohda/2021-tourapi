@@ -58,7 +58,6 @@ const CollectionTab = ({navigation}) => {
     useEffect(() => {
         getCollectionsFromUsers('RESENT');
         setShowMenu(false);
-        setCurrentMenu('최근 추가순');
     },[isFocused]);
 
     const {colors} = useTheme();
