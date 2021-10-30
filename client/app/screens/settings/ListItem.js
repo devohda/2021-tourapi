@@ -1,7 +1,7 @@
 import React, {memo, useState, useEffect} from 'react';
 import {View, Image, Switch, StyleSheet, Pressable, Modal, FlatList, TextInput, Dimensions, Platform} from 'react-native';
 import Constants from 'expo-constants';
-import {useIsFocused, useTheme} from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import { CheckBox, Icon } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
@@ -27,13 +27,12 @@ const ListItem = props => {
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [location, setLocation] = myLocation();
     const [errorMsg, setErrorMsg] = useState(null);
-    const isFocused = useIsFocused();
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
         if(location !== null) setIsEnabled(true);
         getUserData();
-    }, [isFocused]);
+    }, []);
 
     const getUserData = () => {
         try {

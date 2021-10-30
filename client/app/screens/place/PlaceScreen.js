@@ -12,7 +12,7 @@ import {
     FlatList
 } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {useTheme, useIsFocused} from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
 import {Icon, Rating} from 'react-native-elements';
 import MapView, {Marker, UrlTile, PROVIDER_GOOGLE} from 'react-native-maps';
 import * as SecureStore from 'expo-secure-store';
@@ -274,7 +274,6 @@ const PlaceScreen = ({route, navigation}) => {
     const [token, setToken] = useToken();
     const [placeScore, setPlaceScore] = useState(0);
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
-    const isFocused = useIsFocused();
     const [height, setHeight] = useState(180 + 90 * collectionList.length);
 
     const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
@@ -380,17 +379,7 @@ const PlaceScreen = ({route, navigation}) => {
         getCollectionList();
         getCommentList();
         getPopularPlaceData();
-        () => {
-            setPlaceData({});
-            setReviewData({});
-            setCollectionList([]);
-            setFacilityData([]);
-            setMorningCongestion(0);
-            setAfternoonCongestion(0);
-            setEveningCongestion(0);
-            setNightCongestion(0);
-        };
-    }, [isFocused]);
+    }, []);
 
 
     const getCollectionList = () => {
@@ -1068,7 +1057,8 @@ const PlaceScreen = ({route, navigation}) => {
                         }}
                                           onPress={() => navigation.navigate('MakeReview', {
                                               placeName: placeData.place_name,
-                                              place_pk: placeData.place_pk
+                                              place_pk: placeData.place_pk,
+                                              getInitialData: getInitialData,
                                           })}
                                           disabled={!reviewAccess ? false : true}
                                           activeOpacity={0.8}
@@ -1109,11 +1099,13 @@ const PlaceScreen = ({route, navigation}) => {
                         <View style={{marginVertical: 8}}>
                             <AppText style={{color: colors.mainColor, fontSize: 14, fontWeight: '700'}}>주변시설</AppText>
                             <View style={{flexDirection: 'row', marginTop: 6}}>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 {
                                     facilityData.map((item, idx) => (
                                         <ShowFacilities item={item} key={idx + '0000'}/>
                                     ))
                                 }
+                                </ScrollView>
                             </View>
                         </View>
                     }
