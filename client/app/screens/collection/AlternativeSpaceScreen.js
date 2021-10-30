@@ -9,7 +9,7 @@ import {
     FlatList,
     Alert
 } from 'react-native';
-import {useTheme, useIsFocused} from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {useSharedValue} from 'react-native-reanimated';
@@ -39,7 +39,6 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const [replacementData, setReplacementData] = useState([]);
     const [isDeletedReplacement, setIsDeletedReplacement] = useState([]);
     const [isEditSpace, setIsEditSpace] = useState(false);
-    const isFocused = useIsFocused();
     const [token, setToken] = useToken();
     const refRBSheet = useRef();
     const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
@@ -77,7 +76,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         () => {
             setPlaceData({});
         };
-    }, [isFocused]);
+    }, []);
 
     const getInitialData = () => {
         try {

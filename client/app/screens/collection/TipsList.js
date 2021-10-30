@@ -89,10 +89,10 @@ const TipsList = props => {
                     <AppText style={{color: colors.mainColor, fontSize: 14, lineHeight: 22.4, fontWeight: '700', textAlign: 'center'}}>한줄팁</AppText>
                 </View>
                 <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 5}}>
-                    <View style={{width: '95%', justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={[{width: '95%', justifyContent: 'center', alignItems: 'center'}, !props.private && {display: 'none'}]}>
                         <AppText style={{color: colors.gray[3], fontSize: 12, fontWeight: '500', lineHeight: 19.2, textAlign: 'center'}}>{data.place_name}을 위한 팁을 공유해주세요!</AppText>
                     </View>
-                    <View style={{marginTop: 14}}>
+                    <View style={[{marginTop: 14}, !props.private && {marginBottom: 14}]}>
                         <TextInput defaultValue={comment} onChangeText={(text)=>{
                                 setChanged(text);
                             }}
@@ -110,9 +110,18 @@ const TipsList = props => {
                             multiline
                             placeholderTextColor={colors.gray[5]}
                             textAlignVertical={'top'}
+                            editable={!props.private ? false : true}
                             ></TextInput>
                     </View>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 20}}>
+                    <View style={[{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 20}, !props.private && {display: 'none'}]}>
+                        <TouchableOpacity onPress={() => {
+                            setEditVisible(false);
+                            setDeleteVisible(true);
+                            }} activeOpacity={0.8}>
+                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
+                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
+                            </View>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
                             if(changed !== comment && changed !== '') {
                                 putPlaceComment(data.cpm_map_pk, changed);
@@ -121,14 +130,6 @@ const TipsList = props => {
                         }} activeOpacity={0.8}>
                             <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.mainColor, justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
                                 <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>수정하기</AppText>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => {
-                            setEditVisible(false);
-                            setDeleteVisible(true);
-                            }} activeOpacity={0.8}>
-                            <View style={{width: 138, height: 43, borderRadius: 10, backgroundColor: colors.red[3], justifyContent: 'center', alignItems: 'center', marginHorizontal: 9.5, ...styles.shadowOption}}>
-                                <AppText style={{padding: 4, color: colors.defaultColor, fontSize: 14, textAlign: 'center', lineHeight: 22.4, fontWeight: '500'}}>삭제하기</AppText>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -202,7 +203,7 @@ const TipsList = props => {
                 checkNone() && {display: 'none'}, isFree && !isEditPage && {width: '100%'}]}>
                 <TouchableOpacity onPress={() => {
                     if(comment) {
-                        if(props.private) setEditVisible(true);
+                        setEditVisible(true);
                     }
                     else {
                         if(props.private) setAddVisible(true);

@@ -7,7 +7,7 @@ import {
     ScrollView,
     ImageBackground, Platform, Alert,
 } from 'react-native';
-import {useTheme, useIsFocused} from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 
 import AppText from '../components/AppText';
@@ -30,7 +30,6 @@ export default function MainPageScreen({navigation}) {
     const [thumbnail, setThumbnail] = useState([]);
     const [token, setToken] = useToken();
     const [days, setDays] = useState('DAY');
-    const isFocused = useIsFocused();
     const [isSignedIn, setIsSignedIn] = useIsSignedIn();
     const [alertDuplicated, setAlertDuplicated] = useAlertDuplicated(false);
     const [defaultThumbnailList, setDefaultThumbnailList] = useState([
@@ -70,13 +69,8 @@ export default function MainPageScreen({navigation}) {
         getPopularCollectionData('DAY');
         getPopularPlaceData();
         getRecommendRegionData();
-        getPopularUserData();
-        () => {
-            setPopularCollection([]);
-            setPopularPlace([]);
-            setPopularUser([]);
-        };
-    }, [isFocused]);
+        getPopularUserData();        
+    }, []);
 
     const getPopularCollectionData = (day) => {
         try {
@@ -397,15 +391,15 @@ export default function MainPageScreen({navigation}) {
                             }
                         </View>
                     </View>
-                    <View flex={1} style={{marginLeft: 10, marginTop: 8}}>
+                    <View flex={1} style={{marginHorizontal: 10, marginTop: 8}}>
                         <AppText style={{
                             fontSize: 14,
                             fontWeight: '400',
                             color: colors.mainColor
                         }}>{item.collection_name}</AppText>
                         <View flexDirection="row"
-                              style={{marginTop: '24%', bottom: 10, justifyContent: 'space-between'}}>
-                            <View style={{flexDirection: 'row'}}>
+                              style={{position: 'absolute', bottom: 10}}>
+                            <View style={{flexDirection: 'row', width: '85%'}}>
                                 <AppText style={{
                                     fontSize: 10,
                                     color: colors.gray[4]

@@ -16,7 +16,7 @@ import {
     Share,
     Platform
 } from 'react-native';
-import {useTheme, useIsFocused} from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
 import { CheckBox, Icon } from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
@@ -59,7 +59,6 @@ const FreeCollectionScreen = ({route, navigation}) => {
     
     const [keywords, setKeywords] = useState([]);
     
-    const isFocused = useIsFocused();
     const [isLimited, setIsLimited] = useState(false);
 
     const [token, setToken] = useToken();
@@ -143,7 +142,7 @@ const FreeCollectionScreen = ({route, navigation}) => {
         getInitialPlaceData();
         getCollectionCommentsData();
         getUserData();
-    }, [isFocused]);
+    }, []);
 
     const getInitialCollectionData = () => {
         try {
@@ -1103,50 +1102,18 @@ console.log(response)
                                     },
                                     shadowOpacity: 0.25}}
                                 onPress={() => {
-                                    if(type === 'collection') {
-                                        props.refRBSheet.current.close();
-                                        reportCollection();
-                                    }
-                                    else reportComment(props.pk);
-                                    setReportMenu(!reportMenu);
+                                    Alert.alert('', '신고되었습니다.', [
+                                        {text : 'OK', onPress: () => {
+                                            setReportMenu(false);
+                                            if(type === 'collection') {
+                                                reportCollection();
+                                                props.refRBSheet.current.close();
+                                            }
+                                            else reportComment(props.pk);
+                                        }}]);
                                 }}
                             >
                                 <AppText style={styles.textStyle}>신고하기</AppText>
-                            </Pressable>
-                        </View>
-                    </View>
-                </View>
-            </RNModal>
-    )};
-
-    const ReportConfirmModal = props => {
-        const { type } = props;
-
-        return (
-            <RNModal
-                transparent={true}
-                visible={reportConfirmMenu}
-                onRequestClose={() => {
-                    setReportConfirmMenu(!reportConfirmMenu);
-                    if(type === 'collection') props.refRBSheet.current.close();
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고되었습니다.</AppText>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Pressable
-                                style={{...styles.button, backgroundColor: colors.mainColor}}
-                                onPress={() => {
-                                    setReportConfirmMenu(!reportConfirmMenu);
-                                    if(type === 'collection') {
-                                        props.refRBSheet.current.close();
-                                        reportCollection();
-                                    }
-                                    else reportComment(props.pk);
-                                }}
-                            >
-                                <AppText style={styles.textStyle}>확인</AppText>
                             </Pressable>
                         </View>
                     </View>
@@ -1341,10 +1308,9 @@ console.log(response)
                                     <AppText style={{color: colors.gray[4], fontSize: 12}}>{moment(data.cc_create_time).format('YY.MM.DD')}</AppText>
                                 </View>                      
                                 <TouchableOpacity onPress={()=>setReportMenu(true)} activeOpacity={0.8} style={data.is_creator && {display: 'none'}}>
-                                    <Icon type="ionicon" name={"alert-circle"} color={colors.red[3]} size={16}></Icon>
+                                    <Icon type="ionicon" name={"alert-circle"} color={colors.red[3]} size={20}></Icon>
                                 </TouchableOpacity>
                                 <ReportModal type={'comment'} pk={data.cc_pk} />
-                                <ReportConfirmModal type={'comment'} />
                             </View>
                             <View style={{flex: 1, width: '100%'}}><AppText style={{
                                 fontSize: 12,
@@ -1528,7 +1494,7 @@ console.log(response)
                                             }
                                             if(i === 1) {
                                                 refRBSheet.current.close();
-                                                navigation.navigate('MakePlanCollection', {data: collectionData, update: true, placeLength: placeLength});
+                                                navigation.navigate('MakeFreeCollection', {data: collectionData, update: true, placeLength: placeLength});
                                             }
                                             if(i === 2) {
                                                 onShare();
@@ -1560,7 +1526,6 @@ console.log(response)
                                     }
                                     <DeleteModal refRBSheet={refRBSheet}/>
                                     <ReportModal type={'collection'} refRBSheet={refRBSheet}/>
-                                    <ReportConfirmModal type={'collection'} refRBSheet={refRBSheet}/>
                                 </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
@@ -1624,11 +1589,11 @@ console.log(response)
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}>
-                        <View style={{justifyContent: 'center', alignItems: 'flex-start'}}>
+                        <View style={{justifyContent: 'center', alignItems: 'flex-start', width: '95%'}}>
                             <AppText style={{
                                 fontSize: 22,
                                 fontWeight: '700',
-                                color: colors.mainColor
+                                color: colors.mainColor,
                             }}>{collectionData.collection_name}</AppText>
                             <AppText style={{
                                 fontSize: 12,

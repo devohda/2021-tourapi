@@ -16,7 +16,7 @@ import {
     Share,
     Platform
 } from 'react-native';
-import {useTheme, useIsFocused} from '@react-navigation/native';
+import {useTheme} from '@react-navigation/native';
 import { CheckBox, Icon } from 'react-native-elements';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
@@ -62,7 +62,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const [planDays, setPlanDays] = useState([]);
     const [keywords, setKeywords] = useState([]);
 
-    const isFocused = useIsFocused();
     const [isLimited, setIsLimited] = useState(false);
 
     const [token, setToken] = useToken();
@@ -146,7 +145,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         getInitialPlaceData();
         getCollectionCommentsData();
         getUserData();
-    }, [isFocused]);
+    }, []);
 
     const getInitialCollectionData = () => {
         try {
@@ -1273,50 +1272,18 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     },
                                     shadowOpacity: 0.25}}
                                 onPress={() => {
-                                    if(type === 'collection') {
-                                        props.refRBSheet.current.close();
-                                        reportCollection();
-                                    }
-                                    else reportComment(props.pk);
-                                    setReportMenu(!reportMenu);
+                                    Alert.alert('', '신고되었습니다.', [
+                                        {text : 'OK', onPress: () => {
+                                            setReportMenu(false);
+                                            if(type === 'collection') {
+                                                reportCollection();
+                                                props.refRBSheet.current.close();
+                                            }
+                                            else reportComment(props.pk);
+                                        }}]);
                                 }}
                             >
                                 <AppText style={styles.textStyle}>신고하기</AppText>
-                            </Pressable>
-                        </View>
-                    </View>
-                </View>
-            </RNModal>
-    )};
-
-    const ReportConfirmModal = props => {
-        const { type } = props;
-
-        return (
-            <RNModal
-                transparent={true}
-                visible={reportConfirmMenu}
-                onRequestClose={() => {
-                    setReportConfirmMenu(!reportConfirmMenu);
-                    if(type === 'collection') props.refRBSheet.current.close();
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={{...styles.modalView, backgroundColor: colors.backgroundColor}}>
-                        <AppText style={{...styles.modalText, color: colors.blue[1]}}>신고되었습니다.</AppText>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Pressable
-                                style={{...styles.button, backgroundColor: colors.mainColor}}
-                                onPress={() => {
-                                    setReportConfirmMenu(!reportConfirmMenu);
-                                    if(type === 'collection') {
-                                        props.refRBSheet.current.close();
-                                        reportCollection();
-                                    }
-                                    else reportComment(props.pk);
-                                }}
-                            >
-                                <AppText style={styles.textStyle}>확인</AppText>
                             </Pressable>
                         </View>
                     </View>
@@ -1534,7 +1501,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     <Icon type="ionicon" name={"alert-circle"} color={colors.red[3]} size={16}></Icon>
                                 </TouchableOpacity>
                                 <ReportModal type={'comment'} pk={data.cc_pk} />
-                                <ReportConfirmModal type={'comment'} />
                             </View>
                             <View style={{flex: 1, width: '100%'}}><AppText style={{
                                 fontSize: 12,
@@ -1766,7 +1732,6 @@ const PlanCollectionScreen = ({route, navigation}) => {
                                     }
                                     <DeleteModal refRBSheet={refRBSheet}/>
                                     <ReportModal type={'collection'} refRBSheet={refRBSheet}/>
-                                    <ReportConfirmModal type={'collection'} refRBSheet={refRBSheet}/>
                                 </RBSheet>
                             </View> :
                             <View style={{position: 'absolute', right: 0}}>
@@ -1831,7 +1796,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}>
-                        <View style={{justifyContent: 'center', alignItems: 'flex-start'}}>
+                        <View style={{justifyContent: 'center', alignItems: 'flex-start', width: '95%'}}>
                             <AppText style={{color: colors.blue[1], fontSize: 16, lineHeight: 25.6, fontWeight: '500'}}>
                                 {setDate()}
                             </AppText>
