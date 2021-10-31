@@ -40,7 +40,10 @@ const PlaceTab = ({navigation}) => {
     const [currentRendering, setCurrentRendering] = useState(0);
 
     useEffect(() => {
+        getLikedPlace('RESENT');
+        getLikedCollection('RESENT');
         setShowMenu(false);
+        setCurrentMenu('최근 추가순');
     }, [isFocused]);
 
     const getLikedPlace = (NOW) => {
