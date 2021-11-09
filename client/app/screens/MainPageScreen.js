@@ -74,7 +74,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularCollectionData = (day) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MAIN&sort=LIKE&term=${day}`, {
+            fetch(`http://34.64.71.103/collection/list?type=MAIN&sort=LIKE&term=${day}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -106,7 +106,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularPlaceData = () => {
         try {
-            fetch('http://34.64.185.40/place/list?type=MAIN&sort=LIKE', {
+            fetch('http://34.64.71.103/place/list?type=MAIN&sort=LIKE', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -153,7 +153,7 @@ export default function MainPageScreen({navigation}) {
 
     const getPopularUserData = () => {
         try {
-            fetch('http://34.64.185.40/user/list?type=MAIN&sort=LIKE', {
+            fetch('http://34.64.71.103/user/list?type=MAIN&sort=LIKE', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -186,7 +186,7 @@ export default function MainPageScreen({navigation}) {
 
     const getRecommendRegionData = () => {
         try {
-            fetch('http://34.64.185.40/visitant/place', {
+            fetch('http://34.64.71.103/visitant/place', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -218,7 +218,7 @@ export default function MainPageScreen({navigation}) {
 
     const countCollectionView = (collection_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+            fetch(`http://34.64.71.103/view/collection/${collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -250,7 +250,7 @@ export default function MainPageScreen({navigation}) {
     const LikePlace = (pk) => {
         //공간 좋아요
         try {
-            fetch(`http://34.64.185.40/like/place/${pk}`, {
+            fetch(`http://34.64.71.103/like/place/${pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -284,7 +284,7 @@ export default function MainPageScreen({navigation}) {
     const DeleteLikedPlace = (pk) => {
         //공간 좋아요 삭제
         try {
-            fetch(`http://34.64.185.40/like/place/${pk}`, {
+            fetch(`http://34.64.71.103/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -508,7 +508,7 @@ export default function MainPageScreen({navigation}) {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

@@ -52,7 +52,7 @@ const ShowDirectories = ({refRBSheet, colors, collectionList, placeData, height,
         if (collectionList[index].collection_type) day = 0;
 
         try {
-            fetch(`http://34.64.185.40/collection/${collectionId}/place`, {
+            fetch(`http://34.64.71.103/collection/${collectionId}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -280,7 +280,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://34.64.185.40/place/${data.place_pk}`, {
+            fetch(`http://34.64.71.103/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -343,7 +343,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getPopularPlaceData = () => {
         try {
-            fetch('http://34.64.185.40/place/list?type=MAIN&sort=POPULAR', {
+            fetch('http://34.64.71.103/place/list?type=MAIN&sort=POPULAR', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -384,7 +384,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCollectionList = () => {
         try {
-            fetch('http://34.64.185.40/collection/list?type=MY', {
+            fetch('http://34.64.71.103/collection/list?type=MY', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -419,7 +419,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const getCommentList = () => {
         try {
-            fetch(`http://34.64.185.40/place/${data.place_pk}/comments`, {
+            fetch(`http://34.64.71.103/place/${data.place_pk}/comments`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -471,7 +471,7 @@ const PlaceScreen = ({route, navigation}) => {
             const LikePlace = (pk) => {
                 //공간 좋아요
                 try {
-                    fetch(`http://34.64.185.40/like/place/${pk}`, {
+                    fetch(`http://34.64.71.103/like/place/${pk}`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -506,7 +506,7 @@ const PlaceScreen = ({route, navigation}) => {
             const DeleteLikedPlace = (pk) => {
                 //공간 좋아요 삭제
                 try {
-                    fetch(`http://34.64.185.40/like/place/${pk}`, {
+                    fetch(`http://34.64.71.103/like/place/${pk}`, {
                         method: 'DELETE',
                         headers: {
                             'Accept': 'application/json',
@@ -735,7 +735,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -768,7 +768,7 @@ const PlaceScreen = ({route, navigation}) => {
 
     const countCollectionView = (collection_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+            fetch(`http://34.64.71.103/view/collection/${collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

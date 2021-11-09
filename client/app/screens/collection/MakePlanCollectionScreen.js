@@ -153,7 +153,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
     const getKeywords = useCallback(() => {
         try {
 
-            fetch('http://34.64.185.40/keyword/list', {
+            fetch('http://34.64.71.103/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -221,7 +221,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
         form.append('collectionData', JSON.stringify(forPostData));
 
         try {
-            fetch('http://34.64.185.40/collection/plan', {
+            fetch('http://34.64.71.103/collection/plan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -314,7 +314,7 @@ const MakePlanCollectionScreen = ({route, navigation}) => {
         form.append('collectionData', JSON.stringify(forPostData));
 
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/info`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/info`, {
                 method: 'PUT',
                 headers: {
                     'x-access-token': token

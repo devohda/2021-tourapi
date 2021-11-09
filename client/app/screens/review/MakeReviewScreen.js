@@ -71,7 +71,7 @@ const MakeReviewScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.64.185.40/user', {
+            fetch('http://34.64.71.103/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -104,7 +104,7 @@ const MakeReviewScreen = ({route, navigation}) => {
 
     const getFacilityData = () => {
         try {
-            fetch('http://34.64.185.40/facility/list', {
+            fetch('http://34.64.71.103/facility/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -207,7 +207,7 @@ const MakeReviewScreen = ({route, navigation}) => {
         form.append('reviewData', JSON.stringify(DATA));
 
         try {
-            fetch(`http://34.64.185.40/place/${place_pk}/review`, {
+            fetch(`http://34.64.71.103/place/${place_pk}/review`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',

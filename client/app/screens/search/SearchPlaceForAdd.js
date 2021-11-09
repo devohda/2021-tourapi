@@ -27,7 +27,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
         var prevLength = isPress.filter(element => (element === true)).length;
 
         try {
-            fetch(`http://34.64.185.40/collection/${pk}/place`, {
+            fetch(`http://34.64.71.103/collection/${pk}/place`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -66,7 +66,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
     const postReplacement = (placePk, prev) => {
         //대체공간 추가
         try {
-            fetch(`http://34.64.185.40/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
+            fetch(`http://34.64.71.103/collection/${pk}/place/${placeData.cpm_map_pk}/replacement`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -102,7 +102,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -137,7 +137,7 @@ const SearchPlaceForAdd = (props, {route, navigation}) => {
 
     const getResults = () => {
         try {
-            fetch(`http://34.64.185.40/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
+            fetch(`http://34.64.71.103/place/list?keyword=${decodeURIComponent(searchKeyword)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

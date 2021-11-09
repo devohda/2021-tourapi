@@ -27,7 +27,7 @@ const FindPasswordTab = ({route, navigation}) => {
 
     const findEmail = async (email) => {
         try {
-            const result = await fetch('http://34.64.185.40/auth/sameEmail', {
+            const result = await fetch('http://34.64.71.103/auth/sameEmail', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -54,7 +54,7 @@ const FindPasswordTab = ({route, navigation}) => {
             Alert.alert('', '정확한 전화번호를 입력해주세요.');
         } else {
             try {
-                fetch('http://34.64.185.40/auth/authPhone', {
+                fetch('http://34.64.71.103/auth/authPhone', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -82,7 +82,7 @@ const FindPasswordTab = ({route, navigation}) => {
     const getInfo = async () => {
         const phoneNum = '+82'+phoneNumber.slice(1);
         try {
-            fetch('http://34.64.185.40/auth/authPhoneCode', {
+            fetch('http://34.64.71.103/auth/authPhoneCode', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

@@ -40,7 +40,7 @@ const EntireMap = ({route, navigation}) => {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

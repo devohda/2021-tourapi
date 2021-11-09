@@ -26,7 +26,7 @@ const InputBox = styled(TextInput)`
 
 const signUp = async (user_email, user_password, user_nickname) => {
     try {
-        let url = 'http://34.64.185.40/auth/account';
+        let url = 'http://34.64.71.103/auth/account';
         let options = {
             method: 'POST',
             mode: 'cors',
@@ -66,7 +66,7 @@ const GetNicknameTab = ({route, navigation}) => {
 
     const findSameNickname = async (nickname) => {
         try {
-            const result = await fetch('http://34.64.185.40/auth/sameNickname', {
+            const result = await fetch('http://34.64.71.103/auth/sameNickname', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

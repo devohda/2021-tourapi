@@ -43,7 +43,7 @@ const SearchCollection = (props, {navigation}) => {
 
     const getResults = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?keyword=${decodeURIComponent(searchKeyword)}&sort=${NOW}`, {
+            fetch(`http://34.64.71.103/collection/list?keyword=${decodeURIComponent(searchKeyword)}&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -77,7 +77,7 @@ const SearchCollection = (props, {navigation}) => {
 
     const countCollectionView = (collection_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+            fetch(`http://34.64.71.103/view/collection/${collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

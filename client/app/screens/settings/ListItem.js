@@ -36,7 +36,7 @@ const ListItem = props => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.64.185.40/user', {
+            fetch('http://34.64.71.103/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -339,7 +339,7 @@ const ListItem = props => {
                             <Pressable
                                 style={{...styles.button, backgroundColor: colors.mainColor}}
                                 onPress={() => {
-                                    fetch('http://34.64.185.40/auth/logout', {
+                                    fetch('http://34.64.71.103/auth/logout', {
                                         method: 'DELETE',
                                         headers: {
                                             'Accept': 'application/json',
@@ -425,7 +425,7 @@ const ListItem = props => {
                         <Pressable
                             style={{...styles.button, backgroundColor: colors.mainColor}}
                             onPress={() => {
-                                fetch('http://34.64.185.40/auth/account', {
+                                fetch('http://34.64.71.103/auth/account', {
                                         method: 'DELETE',
                                         headers: {
                                             'Accept': 'application/json',

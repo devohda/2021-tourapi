@@ -66,7 +66,7 @@ const CollectionTab = ({navigation}) => {
     // 보관함 데이터 가져오는 함수
     const getCollectionsFromUsers = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/collection/list?type=MY&sort=${NOW}`, {
+            fetch(`http://34.64.71.103/collection/list?type=MY&sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

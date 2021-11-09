@@ -29,7 +29,7 @@ const SystemSettingScreen = ({navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.64.185.40/user', {
+            fetch('http://34.64.71.103/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

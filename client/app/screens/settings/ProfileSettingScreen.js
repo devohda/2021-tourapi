@@ -37,7 +37,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
     const getKeywords = useCallback(() => {
         try {
-            fetch('http://34.64.185.40/keyword/list', {
+            fetch('http://34.64.71.103/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -59,7 +59,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.64.185.40/user', {
+            fetch('http://34.64.71.103/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -126,7 +126,7 @@ const ProfileSettingScreen = ({route, navigation}) => {
 
         form.append('userData', JSON.stringify(forPostData));
         try {
-            fetch('http://34.64.185.40/user/info', {
+            fetch('http://34.64.71.103/user/info', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'multipart/form-data',

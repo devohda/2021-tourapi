@@ -124,7 +124,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         form.append('collectionData', JSON.stringify(forPostData));
 
         try {
-            fetch('http://34.64.185.40/collection/free', {
+            fetch('http://34.64.71.103/collection/free', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -209,7 +209,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
         form.append('collectionData', JSON.stringify(forPostData));
 
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/info`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/info`, {
                 method: 'PUT',
                 headers: {
                     'x-access-token': token
@@ -282,7 +282,7 @@ const MakeFreeCollectionScreen = ({route, navigation}) => {
 
     const getKeywords = useCallback(() => {
         try {
-            fetch('http://34.64.185.40/keyword/list', {
+            fetch('http://34.64.71.103/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

@@ -48,7 +48,7 @@ const PlaceTab = ({navigation}) => {
 
     const getLikedPlace = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/like/placeList?sort=${NOW}`, {
+            fetch(`http://34.64.71.103/like/placeList?sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -96,7 +96,7 @@ const PlaceTab = ({navigation}) => {
 
     const getLikedCollection = (NOW) => {
         try {
-            fetch(`http://34.64.185.40/like/collectionList?sort=${NOW}`, {
+            fetch(`http://34.64.71.103/like/collectionList?sort=${NOW}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -129,7 +129,7 @@ const PlaceTab = ({navigation}) => {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -160,7 +160,7 @@ const PlaceTab = ({navigation}) => {
 
     const countCollectionView = (collection_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+            fetch(`http://34.64.71.103/view/collection/${collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -192,7 +192,7 @@ const PlaceTab = ({navigation}) => {
     const DeleteLikedPlace = (pk) => {
         //공간 좋아요 삭제
         try {
-            fetch(`http://34.64.185.40/like/place/${pk}`, {
+            fetch(`http://34.64.71.103/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -225,7 +225,7 @@ const PlaceTab = ({navigation}) => {
 
     const DeleteLikedCollection = (pk) => {
         try {
-            fetch(`http://34.64.185.40/like/collection/${pk}`, {
+            fetch(`http://34.64.71.103/like/collection/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

@@ -109,7 +109,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getUserData = () => {
         try {
-            fetch('http://34.64.185.40/user', {
+            fetch('http://34.64.71.103/user', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -149,7 +149,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialCollectionData = () => {
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -201,7 +201,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const getInitialPlaceData = () => {
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/places`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -296,7 +296,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
         DATA.deletePlaceList = deletedData;
         if(isEmpty !== placeData.length || deletedData.length !== 0) {
             try {
-                fetch(`http://34.64.185.40/collection/${data.collection_pk}/places`, {
+                fetch(`http://34.64.71.103/collection/${data.collection_pk}/places`, {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
@@ -343,7 +343,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const getCollectionCommentsData = () => {
         //보관함 댓글 가져오기
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/comments`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -377,7 +377,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const postCollectionCommentsData = (comment) => {
         //보관함 댓글 등록
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/comments`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -414,7 +414,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const putCollectionCommentsData = (ccPk, comment) => {
         //보관함 댓글 수정
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments/${ccPk}`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/comments/${ccPk}`, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -451,7 +451,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const deleteCollectionCommentsData = (ccPk) => {
         //보관함 댓글 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}/comments/${ccPk}`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}/comments/${ccPk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -485,7 +485,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const reportComment = (ccpk) => {
         //보관함 댓글 신고
         try {
-            fetch(`http://34.64.185.40/report/comment/${ccpk}`, {
+            fetch(`http://34.64.71.103/report/comment/${ccpk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -517,7 +517,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const reportCollection = () => {
         //보관함 신고
         try {
-            fetch(`http://34.64.185.40/report/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.71.103/report/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -567,7 +567,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
 
     const deleteCollection = (refRBSheet) => {
         try {
-            fetch(`http://34.64.185.40/collection/${data.collection_pk}`, {
+            fetch(`http://34.64.71.103/collection/${data.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -606,7 +606,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const LikeCollection = () => {
         //보관함 좋아요
         try {
-            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.71.103/like/collection/${collectionData.collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -640,7 +640,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const DeleteLikedCollection = () => {
         //보관함 좋아요 삭제
         try {
-            fetch(`http://34.64.185.40/like/collection/${collectionData.collection_pk}`, {
+            fetch(`http://34.64.71.103/like/collection/${collectionData.collection_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -674,7 +674,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const postPlaceComment = (mapPk, addedComment) => {
         //한줄평 등록
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
+            fetch(`http://34.64.71.103/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -711,7 +711,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const putPlaceComment = (mapPk, editedComment) => {
         //한줄평 수정
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
+            fetch(`http://34.64.71.103/collection/${collectionData.collection_pk}/place/${mapPk}/comment`, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -748,7 +748,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const deletePlaceComment = (cpmMapPk, deletedComment) => {
         //한줄평 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
+            fetch(`http://34.64.71.103/collection/${collectionData.collection_pk}/place/${cpmMapPk}/comment`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -785,7 +785,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const getReplacement = (cpmMapPk) => {
         //대체공간 불러오기
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
+            fetch(`http://34.64.71.103/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacements`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -827,7 +827,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const postReplacement = (mapPk, placePk, prev) => {
         //대체공간 추가
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
+            fetch(`http://34.64.71.103/collection/${collectionData.collection_pk}/place/${mapPk}/replacement`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -874,7 +874,7 @@ const PlanCollectionScreen = ({route, navigation}) => {
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
+            fetch(`http://34.64.71.103/collection/${collectionData.collection_pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

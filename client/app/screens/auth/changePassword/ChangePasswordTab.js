@@ -38,7 +38,7 @@ const ChangePasswordTab = ({route, authNavigation}) => {
     
     const changePw = async (e, pw) => {
         try {
-            let url = 'http://34.64.185.40/auth/password';
+            let url = 'http://34.64.71.103/auth/password';
             let options = {
                 method: 'PUT',
                 mode: 'cors',

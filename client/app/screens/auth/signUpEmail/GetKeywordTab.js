@@ -19,7 +19,7 @@ const Form = styled(View)`
 const signUp = async (form) => {
     try {
 
-        let url = 'http://34.64.185.40/auth/account';
+        let url = 'http://34.64.71.103/auth/account';
         let options = {
             method: 'POST',
             mode: 'cors',
@@ -59,7 +59,7 @@ const GetKeywordTab = ({route, authNavigation}) => {
 
     const getKeywords = useCallback(() => {
         try {
-            fetch('http://34.64.185.40/keyword/list', {
+            fetch('http://34.64.71.103/keyword/list', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

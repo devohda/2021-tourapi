@@ -35,7 +35,7 @@ const GetEmailTab = ({navigation}) => {
 
     const findSameEmail = async (email) => {
         try {
-            const result = await fetch('http://34.64.185.40/auth/sameEmail', {
+            const result = await fetch('http://34.64.71.103/auth/sameEmail', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

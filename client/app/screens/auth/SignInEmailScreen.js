@@ -47,7 +47,7 @@ const SignInEmailScreen = ({appNavigation, navigation}) => {
 
     const signIn = async () => {
         try {
-            fetch('http://34.64.185.40/auth/loginJWT', {
+            fetch('http://34.64.71.103/auth/loginJWT', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

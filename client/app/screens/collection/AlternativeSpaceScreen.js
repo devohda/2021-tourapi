@@ -80,7 +80,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
     const getInitialData = () => {
         try {
-            fetch(`http://34.64.185.40/place/${data.place_pk}`, {
+            fetch(`http://34.64.71.103/place/${data.place_pk}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -120,7 +120,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const getInitialReplacementData = () => {
         //대체공간 불러오기 (실시간용)
         try {
-            fetch(`http://34.64.185.40/collection/${pk}/place/${data.cpm_map_pk}/replacements`, {
+            fetch(`http://34.64.71.103/collection/${pk}/place/${data.cpm_map_pk}/replacements`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -184,7 +184,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
         DATA.replacementPlaceList = putData;
         if (isEmpty !== placeData.length) {
             try {
-                fetch(`http://34.64.185.40/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
+                fetch(`http://34.64.71.103/collection/${data.collection_pk}/place/${data.cpm_map_pk}/replacement`, {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
@@ -219,7 +219,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const deleteReplacement = (cpmMapPk, place_pk) => {
         //대체공간 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
+            fetch(`http://34.64.71.103/collection/${pk}/place/${cpmMapPk}/replacement/${place_pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -251,7 +251,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const deleteAllReplacement = (cpmMapPk) => {
         //대체공간 자체를 삭제
         try {
-            fetch(`http://34.64.185.40/collection/${pk}/place/${cpmMapPk}/replacements`, {
+            fetch(`http://34.64.71.103/collection/${pk}/place/${cpmMapPk}/replacements`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -285,7 +285,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const LikePlace = (pk) => {
         //공간 좋아요
         try {
-            fetch(`http://34.64.185.40/like/place/${pk}`, {
+            fetch(`http://34.64.71.103/like/place/${pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -319,7 +319,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
     const DeleteLikedPlace = (pk) => {
         //공간 좋아요 삭제
         try {
-            fetch(`http://34.64.185.40/like/place/${pk}`, {
+            fetch(`http://34.64.71.103/like/place/${pk}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -523,7 +523,7 @@ const AlternativeSpaceScreen = ({route, navigation}) => {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

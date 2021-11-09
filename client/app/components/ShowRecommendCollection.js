@@ -29,7 +29,7 @@ const ShowRecommendCollection = props => {
 
     const getPopularCollectionData = () => {
         try {
-            fetch('http://34.64.185.40/collection/list?type=MAIN&sort=POPULAR', {
+            fetch('http://34.64.71.103/collection/list?type=MAIN&sort=POPULAR', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -61,7 +61,7 @@ const ShowRecommendCollection = props => {
 
     const countCollectionView = (collection_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/collection/${collection_pk}`, {
+            fetch(`http://34.64.71.103/view/collection/${collection_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

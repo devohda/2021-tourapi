@@ -48,7 +48,7 @@ const SignUpSocialScreen = ({appNavigation, navigation}) => {
 
     const loginApple = async (user, email, nickname, token) => {
         try {
-            let url = 'http://34.64.185.40/auth/loginApple';
+            let url = 'http://34.64.71.103/auth/loginApple';
             let options = {
                 method: 'POST',
                 mode: 'cors',

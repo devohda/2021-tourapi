@@ -38,7 +38,7 @@ const ShowRecommendPlace = props => {
 
     const getPopularPlaceData = () => {
         try {
-            fetch('http://34.64.185.40/place/list?type=MAIN&sort=POPULAR', {
+            fetch('http://34.64.71.103/place/list?type=MAIN&sort=POPULAR', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -86,7 +86,7 @@ const ShowRecommendPlace = props => {
 
     const countPlaceView = (place_pk) => {
         try {
-            fetch(`http://34.64.185.40/view/place/${place_pk}`, {
+            fetch(`http://34.64.71.103/view/place/${place_pk}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
